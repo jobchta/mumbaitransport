@@ -7,15 +7,19 @@
     <meta name="description" content="Real-time Mumbai public transport schedules, routes and updates">
     <title>MumbaiTransport.in</title>
 
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.6/babel.min.js"></script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
 
     <style>
         :root {
@@ -148,7 +152,7 @@
         .stat-number { font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1; }
         .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
-        .action-grid { display: grid; grid-template-columns: repeat(2, 1fr)); gap: 10px; }
+        .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .action-button { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; font-size: 13px; color: var(--text-secondary); font-weight: 500; cursor: pointer; transition: all 0.2s ease; text-align: left; display: flex; align-items: center; gap: 10px; }
         .action-button:focus { outline: none; box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.3); }
         .action-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 16px; flex-shrink: 0; }
@@ -168,7 +172,7 @@
         .update-text { font-size: 13px; color: var(--text-primary); line-height: 1.4; margin-bottom: 4px; }
         .update-time { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
 
-        .bottom-nav { background: var(--surface); border-top: 1px solid var(--border); padding: 8px 20px; display: grid; grid-template-columns: repeat(4, 1fr)); gap: 8px; flex-shrink: 0; }
+        .bottom-nav { background: var(--surface); border-top: 1px solid var(--border); padding: 8px 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0; }
         .nav-button { padding: 8px 4px; border-radius: var(--radius-md); background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-button.active { color: var(--primary); }
         .nav-button:focus { outline: none; box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.3); }
@@ -227,20 +231,66 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* Geocoder styles */
+        .geocoder-container {
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .mapboxgl-ctrl-geocoder {
+            width: 100%;
+            max-width: none;
+            box-shadow: none;
+            border: 1px solid var(--border);
+            background-color: var(--background);
+            border-radius: var(--radius-md);
+        }
+        .mapboxgl-ctrl-geocoder input[type="text"] {
+            padding: 12px 16px !important;
+            height: auto;
+            color: var(--text-primary);
+            background-color: var(--background);
+            border-radius: var(--radius-md);
+        }
+        .mapboxgl-ctrl-geocoder--icon-search {
+            top: 50%;
+            transform: translateY(-50%);
+            left: 12px;
+        }
+        .mapboxgl-ctrl-geocoder--input {
+            padding-left: 44px !important;
+        }
+        .mapboxgl-ctrl-geocoder svg path {
+            fill: var(--text-muted);
+        }
+        .mapboxgl-ctrl-geocoder .suggestions {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+        }
+        .mapboxgl-ctrl-geocoder .suggestions > li > a {
+            color: var(--text-primary);
+        }
+        .mapboxgl-ctrl-geocoder .suggestions > li > a:hover {
+            background-color: var(--surface-hover);
+        }
+        .mapboxgl-ctrl-geocoder--suggestion-active > a {
+            background-color: var(--primary-light) !important;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
     <script type="text/babel">
-        // Constants
-        const MAPBOX_TOKEN = 'pk.eyJ1IjoibXVtYmFpdHJhbnNwb3J0IiwiYSI6ImNtZTJsOHNzNDB0aHQya3NhMHYxcTZrOGcifQ.Ji9ZGxj4ohb8DjRI9F3TIA';
-        const BEST_API_URL = 'https://api.bestundertaking.com/v1'; // BEST Bus API
-        const MUMBAI_METRO_API = 'https://api.mumbaimetro.in/v1'; // Mumbai Metro API
-        const RAILWAY_API = 'https://indianrailapi.com/api/v2'; // Indian Railways API
-        const FERRY_API = 'https://api.mumbaiferry.in/v1'; // Mumbai Ferry API
-        const CACHE_NAME = 'mumbai-transport-v1';
+        // Mapbox token
+        const MAPBOX_TOKEN = 'pk.eyJ1IjoibXVtYmFpdHJhbnNwb3J0IiwiYSI6ImNtZTJzZmRjeDA4dzgyanM4Ynp1YXdsdjQifQ.FiuY5kDVDHC7x9Yr8h5wCw';
+        const BEST_API_URL = 'https://api.bestundertaking.com/v1';
+        const MUMBAI_METRO_API = 'https://api.mumbaimetro.in/v1';
+        const RAILWAY_API = 'https://indianrailapi.com/api/v2';
+        const FERRY_API = 'https://api.mumbaiferry.in/v1';
+        const CACHE_NAME = 'mumbai-transport-v2';
 
-        // Main App Component
         function MumbaiTransportApp() {
             // State management
             const [theme, setTheme] = React.useState(localStorage.getItem('theme') || 'light');
@@ -262,34 +312,11 @@
             
             // Refs
             const mapRef = React.useRef(null);
+            const mapContainerRef = React.useRef(null);
             const userMarkerRef = React.useRef(null);
             const startLocationRef = React.useRef(null);
             const endLocationRef = React.useRef(null);
-
-            // Initialize service worker and cache
-            React.useEffect(() => {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('/sw.js')
-                        .then(registration => {
-                            console.log('ServiceWorker registration successful');
-                        })
-                        .catch(err => {
-                            console.log('ServiceWorker registration failed: ', err);
-                        });
-                }
-
-                // Set up cache for offline support
-                caches.open(CACHE_NAME)
-                    .then(cache => {
-                        return cache.addAll([
-                            '/',
-                            '/index.html',
-                            '/styles.css',
-                            '/gtfs-schedules.json',
-                            '/manifest.json'
-                        ]);
-                    });
-            }, []);
+            const geocoderRefs = React.useRef({ start: null, end: null });
 
             // Theme and online status setup
             React.useEffect(() => {
@@ -309,9 +336,13 @@
 
             // Map initialization
             React.useEffect(() => {
+                if (mapRef.current) return; // initialize map only once
+                
                 mapboxgl.accessToken = MAPBOX_TOKEN;
+                mapboxgl.workerUrl = 'https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl-csp-worker.js';
+                
                 mapRef.current = new mapboxgl.Map({
-                    container: 'map',
+                    container: mapContainerRef.current,
                     style: 'mapbox://styles/mapbox/standard',
                     center: [72.8777, 19.0760], // Mumbai coordinates
                     zoom: 11,
@@ -321,98 +352,73 @@
                 mapRef.current.on('load', () => {
                     mapRef.current.setConfigProperty('basemap', 'showPlaceLabels', true);
                     mapRef.current.setConfigProperty('basemap', 'showPointOfInterestLabels', true);
-                    
-                    // Add public transport layers
-                    addTransportLayers();
-                    
-                    // Load initial data
                     fetchTransportStatus();
                     fetchSchedules(selectedMode);
                     addUpdate("Welcome to MumbaiTransport! Loading real-time data...", "info");
                 });
 
                 return () => {
-                    if (mapRef.current) mapRef.current.remove();
+                    if (mapRef.current) {
+                        mapRef.current.remove();
+                        mapRef.current = null;
+                    }
                 };
             }, []);
+            
+            // Initialize geocoders when modal opens
+            React.useEffect(() => {
+                if (isModalOpen && mapRef.current && window.MapboxGeocoder) {
+                    const geocoderOptions = (placeholder) => ({
+                        accessToken: MAPBOX_TOKEN,
+                        mapboxgl: mapboxgl,
+                        placeholder: placeholder,
+                        proximity: { longitude: 72.8777, latitude: 19.0760 },
+                        countries: 'in',
+                        bbox: [72.7758, 18.8938, 72.9986, 19.2550], // Bounding box for Mumbai
+                        marker: false,
+                        flyTo: false,
+                        types: 'address,poi,place,locality,neighborhood'
+                    });
+
+                    if (!geocoderRefs.current.start) {
+                        const startGeocoder = new MapboxGeocoder(geocoderOptions('Start Location'));
+                        startGeocoder.addTo('#start-location-container');
+                        geocoderRefs.current.start = startGeocoder;
+                    }
+
+                    if (!geocoderRefs.current.end) {
+                        const endGeocoder = new MapboxGeocoder(geocoderOptions('Destination'));
+                        endGeocoder.addTo('#end-location-container');
+                        geocoderRefs.current.end = endGeocoder;
+                    }
+                }
+            }, [isModalOpen]);
 
             // Fetch transport status
             const fetchTransportStatus = async () => {
                 try {
-                    // In a real app, we would fetch from each transport API
-                    // This is a simulation with realistic response times
                     setIsLoading(true);
                     
-                    // Simulate API calls with timeouts
-                    await Promise.all([
-                        new Promise(resolve => setTimeout(resolve, 800)).then(() => {
-                            setTransportStatus(prev => ({
-                                ...prev,
-                                bus: Math.random() > 0.8 ? 'delayed' : 'active'
-                            }));
-                        }),
-                        new Promise(resolve => setTimeout(resolve, 1200)).then(() => {
-                            setTransportStatus(prev => ({
-                                ...prev,
-                                train: Math.random() > 0.6 ? 'delayed' : 'active'
-                            }));
-                        }),
-                        new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
-                            setTransportStatus(prev => ({
-                                ...prev,
-                                metro: 'active'
-                            }));
-                        }),
-                        new Promise(resolve => setTimeout(resolve, 600)).then(() => {
-                            setTransportStatus(prev => ({
-                                ...prev,
-                                ferry: Math.random() > 0.9 ? 'delayed' : 'active'
-                            }));
-                        })
-                    ]);
+                    // Simulate API calls
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    setTransportStatus({
+                        bus: Math.random() > 0.8 ? 'delayed' : 'active',
+                        train: Math.random() > 0.6 ? 'delayed' : 'active',
+                        metro: 'active',
+                        ferry: Math.random() > 0.9 ? 'offline' : 'active'
+                    });
                     
                     setIsLoading(false);
                 } catch (error) {
                     console.error('Error fetching transport status:', error);
-                    addUpdate('Failed to load transport status. Using cached data.', 'error');
+                    addUpdate('Failed to load transport status.', 'error');
                     setIsLoading(false);
                 }
             };
 
-            // Add transport layers to map
-            const addTransportLayers = () => {
-                if (!mapRef.current) return;
-                
-                // In a real app, we would add GeoJSON layers for each transport type
-                // This is a simplified version with mock data
-                mapRef.current.addSource('bus-routes', {
-                    type: 'geojson',
-                    data: {
-                        type: 'FeatureCollection',
-                        features: []
-                    }
-                });
-                
-                mapRef.current.addLayer({
-                    id: 'bus-routes-layer',
-                    type: 'line',
-                    source: 'bus-routes',
-                    paint: {
-                        'line-color': '#5E6AD2',
-                        'line-width': 3
-                    }
-                });
-                
-                // Similar layers would be added for trains, metro, and ferries
-            };
-
             // Theme toggle
             const toggleTheme = () => {
-                setTheme(prev => {
-                    const newTheme = prev === 'light' ? 'dark' : 'light';
-                    localStorage.setItem('theme', newTheme);
-                    return newTheme;
-                });
+                setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
             };
 
             // Transport mode selection
@@ -431,7 +437,7 @@
                         type,
                         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     },
-                    ...prev.slice(0, 4) // Keep only the last 5 updates
+                    ...prev.slice(0, 4)
                 ]);
             };
 
@@ -439,46 +445,15 @@
             const fetchSchedules = async (mode = selectedMode) => {
                 setIsLoading(true);
                 try {
-                    let apiUrl, params = {};
-                    
-                    // Determine which API to call based on mode
-                    switch (mode) {
-                        case 'bus':
-                            apiUrl = `${BEST_API_URL}/schedules`;
-                            params = { limit: 5 };
-                            break;
-                        case 'train':
-                            apiUrl = `${RAILWAY_API}/TrainsBetweenStations`;
-                            params = { FromStation: 'CSTM', ToStation: 'BYC', Limit: 5 };
-                            break;
-                        case 'metro':
-                            apiUrl = `${MUMBAI_METRO_API}/schedules`;
-                            params = { line: '1', limit: 5 };
-                            break;
-                        case 'ferry':
-                            apiUrl = `${FERRY_API}/schedules`;
-                            params = { route: 'gateway', limit: 5 };
-                            break;
-                        default:
-                            throw new Error('Invalid transport mode');
-                    }
-                    
-                    // In a real app, we would make actual API calls
-                    // For this demo, we'll simulate API responses with realistic data
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
                     const simulatedResponse = simulateApiResponse(mode);
-                    
-                    // Process the response
                     const processedSchedules = processSchedules(simulatedResponse, mode);
                     setSchedules(processedSchedules);
-                    
-                    // Add update about successful load
                     addUpdate(`Successfully loaded ${mode} schedules`, 'success');
                 } catch (error) {
                     console.error(`Error fetching ${mode} schedules:`, error);
-                    addUpdate(`Failed to load ${mode} schedules. Showing cached data.`, 'error');
-                    
-                    // Fallback to sample data
-                    setSchedules(getFallbackSchedules(mode));
+                    addUpdate(`Failed to load ${mode} schedules.`, 'error');
+                    setSchedules([]);
                 } finally {
                     setIsLoading(false);
                 }
@@ -487,98 +462,66 @@
             // Simulate API responses with realistic data
             const simulateApiResponse = (mode) => {
                 const now = new Date();
+                const currentHour = now.getHours();
+                const isPeakHours = (currentHour >= 7 && currentHour <= 11) || (currentHour >= 17 && currentHour <= 21);
+                
+                const getNextTime = (base, i, interval) => {
+                    const delay = isPeakHours ? Math.random() * 3 : Math.random() * 8;
+                    return new Date(base.getTime() + (i * interval + delay) * 60000);
+                };
+
+                const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
                 const baseData = {
                     bus: {
-                        schedules: Array(5).fill(0).map((_, i) => ({
-                            route: `A-${i + 1}`,
-                            time: new Date(now.getTime() + (i + 1) * 15 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                            destination: ['Colaba', 'Bandra', 'Andheri', 'Dadar', 'Worli'][i],
-                            status: 'On Time'
-                        }))
+                        schedules: [
+                            { route: 'A-1 Express', time: formatTime(getNextTime(now, 1, 5)), destination: 'Colaba Depot', status: 'On Time' },
+                            { route: 'C-72', time: formatTime(getNextTime(now, 2, 7)), destination: 'Vikroli Depot', status: 'Delayed' },
+                            { route: '27', time: formatTime(getNextTime(now, 3, 6)), destination: 'Worli', status: 'On Time' },
+                            { route: '84 LTD', time: formatTime(getNextTime(now, 4, 8)), destination: 'Andheri Stn (W)', status: 'On Time' },
+                            { route: '33', time: formatTime(getNextTime(now, 5, 5)), destination: 'Anik Depot', status: 'Delayed' }
+                        ]
                     },
                     train: {
-                        Trains: Array(5).fill(0).map((_, i) => ({
-                            TrainNo: `T${1000 + i}`,
-                            TrainName: ['Western Fast', 'Harbour Line', 'Central Slow', 'Western Slow', 'Trans-Harbour'][i],
-                            DepartureTime: new Date(now.getTime() + (i + 1) * 20 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                            Destination: ['Virar', 'Panvel', 'Thane', 'Bhayander', 'Vashi'][i],
-                            Delay: i === 1 ? '15 min' : 'On Time'
-                        }))
+                        Trains: [
+                            { TrainNo: '90768', TrainName: 'CSMT-Slow', DepartureTime: formatTime(getNextTime(now, 1, 4)), Destination: 'Thane', Delay: '5 min' },
+                            { TrainNo: '97411', TrainName: 'Vadala-Fast', DepartureTime: formatTime(getNextTime(now, 2, 6)), Destination: 'Panvel', Delay: 'On Time' },
+                            { TrainNo: '92112', TrainName: 'Churchgate-Slow', DepartureTime: formatTime(getNextTime(now, 3, 3)), Destination: 'Borivali', Delay: 'On Time' },
+                            { TrainNo: '94425', TrainName: 'CSMT-Harbour', DepartureTime: formatTime(getNextTime(now, 4, 7)), Destination: 'Andheri', Delay: '10 min' },
+                            { TrainNo: '90012', TrainName: 'Churchgate-Fast', DepartureTime: formatTime(getNextTime(now, 5, 5)), Destination: 'Virar', Delay: 'On Time' }
+                        ]
                     },
                     metro: {
-                        schedules: Array(5).fill(0).map((_, i) => ({
-                            line: '1',
-                            train: `M${200 + i}`,
-                            time: new Date(now.getTime() + (i + 1) * 10 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                            destination: ['Ghatkopar', 'Versova', 'Ghatkopar', 'Versova', 'Ghatkopar'][i],
-                            status: 'On Time'
-                        }))
+                        schedules: [
+                            { line: '1', train: 'M203', time: formatTime(getNextTime(now, 1, 5)), destination: 'Ghatkopar', status: 'On Time' },
+                            { line: '1', train: 'M204', time: formatTime(getNextTime(now, 2, 5)), destination: 'Versova', status: 'On Time' },
+                            { line: '2A', train: 'M408', time: formatTime(getNextTime(now, 3, 8)), destination: 'Dahisar East', status: 'On Time' },
+                            { line: '7', train: 'M705', time: formatTime(getNextTime(now, 4, 8)), destination: 'Gundavali', status: 'On Time' },
+                            { line: '1', train: 'M205', time: formatTime(getNextTime(now, 5, 5)), destination: 'Ghatkopar', status: 'On Time' }
+                        ]
                     },
                     ferry: {
-                        schedules: Array(5).fill(0).map((_, i) => ({
-                            route: ['Gateway', 'Elephanta', 'Mandwa', 'Gateway', 'Elephanta'][i],
-                            time: new Date(now.getTime() + (i + 1) * 30 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                            destination: ['Elephanta', 'Gateway', 'Gateway', 'Elephanta', 'Gateway'][i],
-                            status: i === 3 ? 'Delayed' : 'On Time'
-                        }))
+                        schedules: [
+                            { route: 'Gateway - Elephanta', time: formatTime(getNextTime(now, 1, 30)), destination: 'Elephanta', status: 'On Time' },
+                            { route: 'Gateway - Mandwa', time: formatTime(getNextTime(now, 2, 15)), destination: 'Mandwa', status: 'On Time' },
+                            { route: 'Gateway - Elephanta', time: formatTime(getNextTime(now, 3, 30)), destination: 'Elephanta', status: 'Delayed' },
+                            { route: 'Gorai - Borivali', time: formatTime(getNextTime(now, 4, 40)), destination: 'Borivali', status: 'On Time' },
+                            { route: 'Gateway - Mandwa', time: formatTime(getNextTime(now, 5, 60)), destination: 'Mandwa', status: 'On Time' }
+                        ]
                     }
                 };
-                
                 return baseData[mode];
             };
 
             // Process schedules into consistent format
             const processSchedules = (data, mode) => {
                 switch (mode) {
-                    case 'bus':
-                        return data.schedules.map(item => ({
-                            mode,
-                            route: item.route,
-                            time: item.time,
-                            destination: item.destination,
-                            status: item.status
-                        }));
-                    case 'train':
-                        return data.Trains.map(item => ({
-                            mode,
-                            route: item.TrainName,
-                            time: item.DepartureTime,
-                            destination: item.Destination,
-                            status: item.Delay === 'On Time' ? 'On Time' : `Delayed (${item.Delay})`
-                        }));
-                    case 'metro':
-                        return data.schedules.map(item => ({
-                            mode,
-                            route: `Line ${item.line} - Train ${item.train}`,
-                            time: item.time,
-                            destination: item.destination,
-                            status: item.status
-                        }));
-                    case 'ferry':
-                        return data.schedules.map(item => ({
-                            mode,
-                            route: `${item.route} Ferry`,
-                            time: item.time,
-                            destination: item.destination,
-                            status: item.status
-                        }));
-                    default:
-                        return [];
+                    case 'bus': return data.schedules.map(item => ({ ...item, mode }));
+                    case 'train': return data.Trains.map(item => ({ mode, route: `${item.TrainName} (${item.TrainNo})`, time: item.DepartureTime, destination: item.Destination, status: item.Delay === 'On Time' ? 'On Time' : `Delayed (${item.Delay})` }));
+                    case 'metro': return data.schedules.map(item => ({ mode, route: `Line ${item.line} - Train ${item.train}`, time: item.time, destination: item.destination, status: item.status }));
+                    case 'ferry': return data.schedules.map(item => ({ ...item, mode }));
+                    default: return [];
                 }
-            };
-
-            // Get fallback schedules when API fails
-            const getFallbackSchedules = (mode) => {
-                const now = new Date();
-                const baseData = [
-                    { mode: 'bus', route: 'A-1', time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), destination: 'Colaba', status: 'On Time' },
-                    { mode: 'bus', route: 'C-72', time: new Date(now.getTime() + 15 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), destination: 'Bandra', status: 'On Time' },
-                    { mode: 'train', route: 'Western Line', time: new Date(now.getTime() + 20 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), destination: 'Virar', status: 'Delayed (10 min)' },
-                    { mode: 'metro', route: 'Line 1', time: new Date(now.getTime() + 10 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), destination: 'Ghatkopar', status: 'On Time' },
-                    { mode: 'ferry', route: 'Gateway', time: new Date(now.getTime() + 30 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), destination: 'Elephanta', status: 'On Time' }
-                ];
-                
-                return baseData.filter(item => item.mode === mode);
             };
 
             // Locate user on map
@@ -590,29 +533,17 @@
                         position => {
                             const { latitude, longitude } = position.coords;
                             const userCoords = [longitude, latitude];
-                            
-                            // Center map on user
                             mapRef.current.flyTo({ center: userCoords, zoom: 15 });
-                            
-                            // Add or update user marker
                             if (userMarkerRef.current) {
                                 userMarkerRef.current.setLngLat(userCoords);
                             } else {
-                                const el = document.createElement('div');
-                                el.className = 'fa-solid fa-person';
-                                el.style.color = 'dodgerblue';
-                                el.style.fontSize = '24px';
-                                el.style.textShadow = '0 0 5px white';
-                                userMarkerRef.current = new mapboxgl.Marker(el)
-                                    .setLngLat(userCoords)
-                                    .addTo(mapRef.current);
+                                userMarkerRef.current = new mapboxgl.Marker({ color: '#5E6AD2' }).setLngLat(userCoords).addTo(mapRef.current);
                             }
-                            
                             addUpdate('Your location has been found', 'success');
                         },
                         error => {
                             console.error('Error getting location:', error);
-                            addUpdate('Could not retrieve your location. Please enable location services.', 'error');
+                            addUpdate('Could not retrieve your location.', 'error');
                         },
                         { enableHighAccuracy: true, timeout: 10000 }
                     );
@@ -621,143 +552,129 @@
                 }
             };
 
-            // Geocode location query
+            // Improved geocodeLocation function
             const geocodeLocation = async (query) => {
+                if (!query || typeof query !== 'string' || query.trim() === '') {
+                    throw new Error('Please enter a valid location');
+                }
                 try {
-                    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&proximity=72.8777,19.0760&limit=1`;
-                    const response = await fetch(url);
+                    const response = await fetch(
+                        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?` +
+                        `access_token=${MAPBOX_TOKEN}&proximity=72.8777,19.0760&limit=1&bbox=72.7758,18.8938,72.9986,19.2550`
+                    );
+                    if (!response.ok) throw new Error(`Geocoding API error: ${response.status}`);
                     const data = await response.json();
-                    
-                    if (data.features && data.features.length > 0) {
-                        return {
-                            coords: data.features[0].center,
-                            name: data.features[0].place_name
-                        };
-                    }
-                    throw new Error(`Location not found for "${query}"`);
+                    if (!data.features || data.features.length === 0) throw new Error('Location not found. Please try a different name.');
+                    const [lng, lat] = data.features[0].center;
+                    if (isNaN(lng) || isNaN(lat)) throw new Error('Invalid coordinates received from server');
+                    return { coords: [lng, lat], name: data.features[0].place_name };
                 } catch (error) {
-                    addUpdate(`Geocoding error: ${error.message}`, 'error');
-                    throw error;
+                    console.error('Geocoding error:', error);
+                    throw new Error(`Location search failed: ${error.message}`);
                 }
             };
 
-            // Handle route search
+            // Robust route search handler
             const handleRouteSearch = async (e) => {
                 e.preventDefault();
                 setIsLoading(true);
                 setRouteResults([]);
                 
-                const startQuery = startLocationRef.current.value;
-                const endQuery = endLocationRef.current.value;
-                
-                if (!startQuery || !endQuery) {
-                    addUpdate('Please enter both start and end locations', 'error');
-                    setIsLoading(false);
-                    return;
-                }
-                
                 try {
-                    // Geocode both locations
-                    const [start, end] = await Promise.all([
-                        geocodeLocation(startQuery),
-                        geocodeLocation(endQuery)
-                    ]);
-                    
-                    addUpdate(`Finding routes from ${start.name} to ${end.name}`, 'info');
-                    
-                    // Get routes for different profiles
-                    const profiles = ['driving', 'walking', 'cycling', 'transit'];
+                    const startQuery = geocoderRefs.current.start?.getInputValue()?.trim();
+                    const endQuery = geocoderRefs.current.end?.getInputValue()?.trim();
+
+                    if (!startQuery || !endQuery) throw new Error('Please enter both start and end locations');
+                    if (startQuery === endQuery) throw new Error('Start and end locations must be different');
+
+                    const [start, end] = await Promise.all([geocodeLocation(startQuery), geocodeLocation(endQuery)]);
+
+                    if (!isValidCoordinate(start.coords) || !isValidCoordinate(end.coords)) throw new Error('Invalid route coordinates received');
+
+                    const profiles = ['driving', 'walking', 'cycling'];
                     const promises = profiles.map(profile =>
                         fetch(`https://api.mapbox.com/directions/v5/mapbox/${profile}/${start.coords.join(',')};${end.coords.join(',')}?geometries=geojson&access_token=${MAPBOX_TOKEN}`)
-                            .then(res => res.json())
-                            .then(data => ({ ...data, profile }))
-                            .catch(error => ({ error: error.message, profile }))
+                        .then(res => res.ok ? res.json() : Promise.reject(new Error(res.statusText)))
+                        .then(data => ({ ...data, profile }))
+                        .catch(() => null) // Return null on error for a specific profile
                     );
                     
                     const results = await Promise.all(promises);
-                    const validRoutes = results.filter(result => result.routes && result.routes.length > 0);
+                    const validRoutes = results.filter(result => result && result.routes && result.routes.length > 0);
+
+                    if (validRoutes.length === 0) throw new Error('No routes found between these locations');
                     
-                    if (validRoutes.length > 0) {
-                        setRouteResults(validRoutes);
-                        drawRouteOnMap(validRoutes[0].routes[0].geometry);
-                        addUpdate(`Found ${validRoutes.length} route options`, 'success');
-                    } else {
-                        setRouteResults([{ message: 'No routes found between these locations.', type: 'error' }]);
-                        addUpdate('No routes found between these locations', 'error');
-                    }
+                    // Sort to prioritize public transit if available, then driving
+                    validRoutes.sort((a, b) => {
+                        if (a.profile === 'transit') return -1;
+                        if (b.profile === 'transit') return 1;
+                        if (a.profile === 'driving') return -1;
+                        if (b.profile === 'driving') return 1;
+                        return 0;
+                    });
+                    
+                    const processedResults = validRoutes.map(result => ({
+                        geometry: result.routes[0].geometry,
+                        duration: result.routes[0].duration,
+                        distance: result.routes[0].distance,
+                        profile: result.profile,
+                        startName: start.name,
+                        endName: end.name
+                    }));
+
+                    setRouteResults(processedResults);
+                    drawRouteOnMap(processedResults[0].geometry);
+                    addUpdate(`Route found from ${start.name.split(',')[0]} to ${end.name.split(',')[0]}`, 'success');
+
                 } catch (error) {
-                    setRouteResults([{ message: `Error: ${error.message}`, type: 'error' }]);
-                    addUpdate(`Route search failed: ${error.message}`, 'error');
+                    console.error('Route search error:', error);
+                    addUpdate(error.message, 'error');
+                    setRouteResults([{ message: error.message, type: 'error' }]);
                 } finally {
                     setIsLoading(false);
                 }
             };
 
+            // Coordinate validation helper
+            const isValidCoordinate = (coord) => (
+                Array.isArray(coord) && coord.length === 2 && !isNaN(coord[0]) && !isNaN(coord[1]) && Math.abs(coord[0]) <= 180 && Math.abs(coord[1]) <= 90
+            );
+
             // Draw route on map
             const drawRouteOnMap = (geometry) => {
                 if (!mapRef.current) return;
                 
-                // Remove existing route layer if it exists
                 if (mapRef.current.getLayer('route')) {
                     mapRef.current.removeLayer('route');
                     mapRef.current.removeSource('route');
                 }
                 
-                // Add new route source and layer
-                mapRef.current.addSource('route', {
-                    type: 'geojson',
-                    data: {
-                        type: 'Feature',
-                        properties: {},
-                        geometry: geometry
-                    }
-                });
-                
+                mapRef.current.addSource('route', { type: 'geojson', data: { type: 'Feature', properties: {}, geometry } });
                 mapRef.current.addLayer({
                     id: 'route',
                     type: 'line',
                     source: 'route',
-                    layout: {
-                        'line-join': 'round',
-                        'line-cap': 'round'
-                    },
-                    paint: {
-                        'line-color': '#5E6AD2',
-                        'line-width': 6,
-                        'line-opacity': 0.8
-                    }
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#5E6AD2', 'line-width': 6, 'line-opacity': 0.8 }
                 });
                 
-                // Fit map to route bounds
                 const bounds = new mapboxgl.LngLatBounds();
                 geometry.coordinates.forEach(coord => bounds.extend(coord));
-                mapRef.current.fitBounds(bounds, { padding: 60 });
+                mapRef.current.fitBounds(bounds, { padding: { top: 20, bottom: 40, left: 20, right: 20 } });
             };
 
             // Helper maps for icons and colors
             const iconMap = {
-                info: 'fa-circle-info',
-                warning: 'fa-triangle-exclamation',
-                error: 'fa-circle-exclamation',
-                success: 'fa-circle-check',
-                bus: 'fa-bus',
-                train: 'fa-train-subway',
-                metro: 'fa-train-tram',
-                ferry: 'fa-ship'
+                info: 'fa-circle-info', warning: 'fa-triangle-exclamation', error: 'fa-circle-exclamation', success: 'fa-circle-check',
+                bus: 'fa-bus', train: 'fa-train-subway', metro: 'fa-train-tram', ferry: 'fa-ship',
+                driving: 'fa-car', walking: 'fa-person-walking', cycling: 'fa-bicycle'
             };
-            
             const colorMap = {
-                info: 'var(--info)',
-                warning: 'var(--warning)',
-                error: 'var(--error)',
-                success: 'var(--success)',
-                bus: 'var(--primary)',
-                train: 'var(--success)',
-                metro: '#8B5CF6',
-                ferry: 'var(--info)'
+                info: 'var(--info)', warning: 'var(--warning)', error: 'var(--error)', success: 'var(--success)',
+                bus: 'var(--primary)', train: 'var(--success)', metro: '#8B5CF6', ferry: 'var(--info)',
+                driving: 'var(--primary)', walking: '#e55f25', cycling: '#2596be'
             };
 
-            // Render the app
             return (
                 <div className="app">
                     <header className="header">
@@ -774,14 +691,7 @@
                         </div>
                         <div className="search-bar">
                             <i className="fa-solid fa-magnifying-glass search-icon"></i>
-                            <input
-                                type="text"
-                                className="search-input"
-                                placeholder="Search routes or destinations..."
-                                aria-label="Search routes or destinations"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
+                            <input type="text" className="search-input" placeholder="Search routes or destinations..." aria-label="Search routes or destinations" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                         </div>
                     </header>
                     
@@ -790,57 +700,14 @@
                             <h2 className="section-title"><i className="fa-solid fa-bus"></i> Transport Modes</h2>
                             <div className="transport-grid">
                                 {['bus', 'train', 'metro', 'ferry'].map(mode => (
-                                    <div
-                                        key={mode}
-                                        className={`transport-card ${selectedMode === mode ? 'active' : ''}`}
-                                        onClick={() => selectTransportMode(mode)}
-                                        role="button"
-                                        tabIndex={0}
-                                        onKeyDown={e => e.key === 'Enter' && selectTransportMode(mode)}
-                                        aria-label={`Select ${mode} mode`}
-                                    >
+                                    <div key={mode} className={`transport-card ${selectedMode === mode ? 'active' : ''}`} onClick={() => selectTransportMode(mode)} role="button" tabIndex={0} onKeyDown={e => e.key === 'Enter' && selectTransportMode(mode)} aria-label={`Select ${mode} mode`}>
                                         <div className="card-header">
-                                            <div className={`${mode}-icon card-icon`}>
-                                                <i className={`fa-solid fa-${mode === 'bus' ? 'bus-simple' : mode === 'train' ? 'train-subway' : mode === 'metro' ? 'train-tram' : 'ship'}`}></i>
-                                            </div>
-                                            <div className="card-title">
-                                                {mode === 'bus' ? 'BEST Buses' : 
-                                                 mode === 'train' ? 'Local Trains' : 
-                                                 mode === 'metro' ? 'Mumbai Metro' : 'Ferries'}
-                                            </div>
+                                            <div className={`${mode}-icon card-icon`}><i className={`fa-solid ${iconMap[mode]}`}></i></div>
+                                            <div className="card-title">{mode.charAt(0).toUpperCase() + mode.slice(1)}</div>
                                         </div>
                                         <div className="card-status">
                                             <span className={`status-indicator status-${transportStatus[mode]}`}></span>
-                                            <span className="card-status-text">
-                                                {transportStatus[mode] === 'active' ? 'Operational' : 
-                                                 transportStatus[mode] === 'delayed' ? 'Minor Delays' : 'Service Disruption'}
-                                            </span>
-                                        </div>
-                                        <div className="card-stats">
-                                            <div className="stat">
-                                                <div className="stat-number">
-                                                    {mode === 'bus' ? '3,105' : 
-                                                     mode === 'train' ? '2,342' : 
-                                                     mode === 'metro' ? '142' : '8'}
-                                                </div>
-                                                <div className="stat-label">
-                                                    {mode === 'bus' ? 'Active' : 
-                                                     mode === 'train' ? 'Services' : 
-                                                     mode === 'metro' ? 'Trains' : 'Routes'}
-                                                </div>
-                                            </div>
-                                            <div className="stat">
-                                                <div className="stat-number">
-                                                    {mode === 'bus' ? '415' : 
-                                                     mode === 'train' ? '3' : 
-                                                     mode === 'metro' ? '51' : '12'}
-                                                </div>
-                                                <div className="stat-label">
-                                                    {mode === 'bus' ? 'Routes' : 
-                                                     mode === 'train' ? 'Lines' : 
-                                                     mode === 'metro' ? 'Stations' : 'Terminals'}
-                                                </div>
-                                            </div>
+                                            <span className="card-status-text">{transportStatus[mode] === 'active' ? 'Operational' : transportStatus[mode] === 'delayed' ? 'Minor Delays' : 'Offline'}</span>
                                         </div>
                                     </div>
                                 ))}
@@ -848,76 +715,41 @@
                         </section>
                         
                         <section>
-                            <h2 className="section-title"><i className="fa-solid fa-clock"></i> Schedules</h2>
-                            {isLoading ? (
-                                <div className="loading">
-                                    <div className="loading-spinner"></div>
-                                </div>
+                            <h2 className="section-title"><i className="fa-solid fa-clock"></i> Schedules for {selectedMode.charAt(0).toUpperCase() + selectedMode.slice(1)}</h2>
+                            {isLoading && schedules.length === 0 ? (
+                                <div className="loading"><div className="loading-spinner"></div></div>
                             ) : schedules.length > 0 ? (
                                 <div className="schedule-list">
                                     {schedules.map((schedule, index) => (
                                         <div key={index} className="schedule-item">
-                                            <div className="schedule-icon" style={{ background: colorMap[schedule.mode] }}>
-                                                <i className={`fa-solid ${iconMap[schedule.mode]}`}></i>
-                                            </div>
+                                            <div className="schedule-icon" style={{ background: colorMap[schedule.mode] }}><i className={`fa-solid ${iconMap[schedule.mode]}`}></i></div>
                                             <div className="schedule-content">
                                                 <div className="schedule-route">{schedule.route}</div>
-                                                <div className="schedule-time">
-                                                    {schedule.time} to {schedule.destination}
-                                                    {schedule.status !== 'On Time' && (
-                                                        <span style={{ color: 'var(--warning)', marginLeft: '8px' }}>
-                                                            ({schedule.status})
-                                                        </span>
-                                                    )}
+                                                <div className="schedule-time">{schedule.time} to {schedule.destination}
+                                                    {schedule.status !== 'On Time' && <span style={{ color: 'var(--warning)', marginLeft: '8px' }}>({schedule.status})</span>}
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="empty-state">
-                                    <i className="fa-solid fa-calendar-xmark empty-icon"></i>
-                                    <p>No schedules available</p>
-                                </div>
+                                <div className="empty-state"><i className="fa-solid fa-calendar-xmark empty-icon"></i><p>No schedules available</p></div>
                             )}
                         </section>
                         
                         <section>
                             <h2 className="section-title"><i className="fa-solid fa-bolt"></i> Quick Actions</h2>
                             <div className="action-grid">
-                                <button 
-                                    className="action-button" 
-                                    onClick={() => setIsModalOpen(true)}
-                                    aria-label="Plan a route"
-                                >
-                                    <span className="action-icon"><i className="fa-solid fa-map-location-dot"></i></span> 
-                                    Plan a Route
-                                </button>
-                                <button 
-                                    className="action-button" 
-                                    onClick={() => {
-                                        setActiveNav('schedules');
-                                        window.scrollTo(0, 0);
-                                    }}
-                                    aria-label="View schedules"
-                                >
-                                    <span className="action-icon"><i className="fa-solid fa-clock"></i></span> 
-                                    View Schedules
-                                </button>
+                                <button className="action-button" onClick={() => setIsModalOpen(true)} aria-label="Plan a route"><span className="action-icon"><i className="fa-solid fa-map-location-dot"></i></span> Plan a Route</button>
+                                <button className="action-button" onClick={() => document.querySelector('.schedule-list')?.scrollIntoView({ behavior: 'smooth' })} aria-label="View schedules"><span className="action-icon"><i className="fa-solid fa-clock"></i></span> View Schedules</button>
                             </div>
                         </section>
                         
                         <section>
                             <h2 className="section-title"><i className="fa-solid fa-map"></i> Map</h2>
-                            <div className="map-container" id="map">
+                            <div className="map-container" ref={mapContainerRef}>
                                 <div className="map-controls">
-                                    <button 
-                                        className="map-btn" 
-                                        onClick={locateUser}
-                                        aria-label="Locate me"
-                                    >
-                                        <i className="fa-solid fa-location-crosshairs"></i>
-                                    </button>
+                                    <button className="map-btn" onClick={locateUser} aria-label="Locate me"><i className="fa-solid fa-location-crosshairs"></i></button>
                                 </div>
                             </div>
                         </section>
@@ -928,150 +760,73 @@
                                 <div className="updates-list">
                                     {updates.map(update => (
                                         <div key={update.id} className="update-item">
-                                            <div className="update-icon" style={{ background: colorMap[update.type] }}>
-                                                <i className={`fa-solid ${iconMap[update.type]}`}></i>
-                                            </div>
+                                            <div className="update-icon" style={{ background: colorMap[update.type] }}><i className={`fa-solid ${iconMap[update.type]}`}></i></div>
                                             <div className="update-content">
                                                 <div className="update-text">{update.message}</div>
-                                                <div className="update-time">
-                                                    <i className="fa-regular fa-clock"></i> {update.time}
-                                                </div>
+                                                <div className="update-time"><i className="fa-regular fa-clock"></i> {update.time}</div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="empty-state">
-                                    <i className="fa-solid fa-bell-slash empty-icon"></i>
-                                    <p>No updates available</p>
-                                </div>
+                                <div className="empty-state"><i className="fa-solid fa-bell-slash empty-icon"></i><p>No updates available</p></div>
                             )}
                         </section>
                     </main>
                     
                     <nav className="bottom-nav">
                         {['home', 'map', 'schedules', 'profile'].map(nav => (
-                            <button
-                                key={nav}
-                                className={`nav-button ${activeNav === nav ? 'active' : ''}`}
-                                onClick={() => setActiveNav(nav)}
-                                aria-label={nav.charAt(0).toUpperCase() + nav.slice(1)}
-                            >
-                                <i className={`nav-icon fa-solid fa-${
-                                    nav === 'home' ? 'house' : 
-                                    nav === 'map' ? 'map-location' : 
-                                    nav === 'schedules' ? 'clock' : 'user'
-                                }`}></i>
+                            <button key={nav} className={`nav-button ${activeNav === nav ? 'active' : ''}`} onClick={() => setActiveNav(nav)} aria-label={nav.charAt(0).toUpperCase() + nav.slice(1)}>
+                                <i className={`nav-icon fa-solid fa-${nav === 'home' ? 'house' : nav === 'map' ? 'map-location' : nav === 'schedules' ? 'clock' : 'user'}`}></i>
                                 {nav.charAt(0).toUpperCase() + nav.slice(1)}
                             </button>
                         ))}
                     </nav>
                     
-                    <div className={`offline-banner ${!isOnline ? 'show' : ''}`}>
-                        <i className="fa-solid fa-wifi"></i> You're offline. Showing cached schedules.
-                    </div>
+                    <div className={`offline-banner ${!isOnline ? 'show' : ''}`}><i className="fa-solid fa-wifi"></i> You're offline. Showing cached data.</div>
                     
                     <div className={`modal ${isModalOpen ? 'active' : ''}`}>
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h3 className="modal-title">Plan Your Route</h3>
-                                <button 
-                                    className="modal-close" 
-                                    onClick={() => setIsModalOpen(false)}
-                                    aria-label="Close modal"
-                                >
-                                    &times;
-                                </button>
+                                <button className="modal-close" onClick={() => setIsModalOpen(false)} aria-label="Close route planner">&times;</button>
                             </div>
                             <div className="modal-body">
                                 <form onSubmit={handleRouteSearch}>
                                     <div className="form-group">
-                                        <label htmlFor="start-location" className="form-label">Start Location</label>
-                                        <input 
-                                            type="text" 
-                                            id="start-location" 
-                                            className="form-input" 
-                                            placeholder="e.g., Dadar Station" 
-                                            required 
-                                            ref={startLocationRef}
-                                        />
+                                        <label className="form-label">Start Location</label>
+                                        <div id="start-location-container" className="geocoder-container"></div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="end-location" className="form-label">End Location</label>
-                                        <input 
-                                            type="text" 
-                                            id="end-location" 
-                                            className="form-input" 
-                                            placeholder="e.g., Gateway of India" 
-                                            required 
-                                            ref={endLocationRef}
-                                        />
+                                        <label className="form-label">Destination</label>
+                                        <div id="end-location-container" className="geocoder-container"></div>
                                     </div>
-                                    <button 
-                                        className="form-submit" 
-                                        type="submit"
-                                        disabled={isLoading}
-                                    >
-                                        {isLoading ? (
-                                            <div className="loading-spinner" style={{ margin: '0 auto' }}></div>
-                                        ) : 'Find Route'}
+                                    <button className="form-submit" type="submit" disabled={isLoading} aria-busy={isLoading}>
+                                        {isLoading ? <div className="loading-spinner" style={{ margin: '0 auto', width: '20px', height: '20px' }}></div> : 'Find Route'}
                                     </button>
                                 </form>
-                                
                                 <div className="route-results">
-                                    {isLoading && routeResults.length === 0 ? (
-                                        <div className="loading">
-                                            <div className="loading-spinner"></div>
-                                        </div>
-                                    ) : routeResults.length > 0 ? (
+                                    {routeResults.length > 0 ? (
                                         routeResults.map((result, index) => (
                                             result.message ? (
-                                                <div 
-                                                    key={index} 
-                                                    className="route-option"
-                                                    style={{ color: result.type === 'error' ? 'var(--error)' : 'var(--text-primary)' }}
-                                                >
-                                                    {result.message}
-                                                </div>
+                                                <div key={index} className="route-option" style={{ color: 'var(--error)' }}>{result.message}</div>
                                             ) : (
-                                                <div 
-                                                    key={index} 
-                                                    className="route-option" 
-                                                    onClick={() => drawRouteOnMap(result.routes[0].geometry)}
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    onKeyDown={e => e.key === 'Enter' && drawRouteOnMap(result.routes[0].geometry)}
-                                                >
+                                                <div key={index} className="route-option" onClick={() => drawRouteOnMap(result.geometry)} role="button" tabIndex={0} onKeyDown={e => e.key === 'Enter' && drawRouteOnMap(result.geometry)} aria-label={`Route from ${result.startName} to ${result.endName}`}>
                                                     <div className="route-header">
                                                         <div className="route-summary">
-                                                            <div className="route-icon" style={{ background: colorMap[result.profile] }}>
-                                                                <i className={`fa-solid fa-${
-                                                                    result.profile === 'driving' ? 'car' : 
-                                                                    result.profile === 'walking' ? 'person-walking' : 
-                                                                    result.profile === 'cycling' ? 'bicycle' : 'train-subway'
-                                                                }`}></i>
-                                                            </div>
-                                                            <span style={{ textTransform: 'capitalize' }}>
-                                                                {result.profile} route
-                                                            </span>
+                                                            <div className="route-icon" style={{ background: colorMap[result.profile] }}><i className={`fa-solid ${iconMap[result.profile]}`}></i></div>
+                                                            <span style={{ textTransform: 'capitalize' }}>{result.profile}</span>
                                                         </div>
                                                         <div className="route-info">
-                                                            <div className="route-duration">
-                                                                {Math.round(result.routes[0].duration / 60)} min
-                                                            </div>
-                                                            <div className="route-distance">
-                                                                {(result.routes[0].distance / 1000).toFixed(1)} km
-                                                            </div>
+                                                            <div className="route-duration">{Math.round(result.duration / 60)} min</div>
+                                                            <div className="route-distance">{(result.distance / 1000).toFixed(1)} km</div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             )
                                         ))
-                                    ) : (
-                                        <div className="empty-state">
-                                            <i className="fa-solid fa-directions empty-icon"></i>
-                                            <p>No routes found yet. Search for a route above.</p>
-                                        </div>
+                                    ) : !isLoading && (
+                                        <div className="empty-state"><i className="fa-solid fa-directions empty-icon"></i><p>Enter locations to find routes</p></div>
                                     )}
                                 </div>
                             </div>
@@ -1081,7 +836,7 @@
             );
         }
 
-        // Render the app
+        // Start the app
         ReactDOM.render(<MumbaiTransportApp />, document.getElementById('root'));
     </script>
 </body>
