@@ -1,27 +1,22 @@
- <!DOCTYPE html>
+
+Enhanced Mumbai Transport App with Real APIs
+Here's the complete implementation with real API integrations for Mumbai transport services, Mapbox mapping, real-time tracking, and routing functionality:
+
+html
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#5E6AD2">
     <meta name="description" content="Real-time Mumbai public transport tracking">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/png" href="/icon-192.png">
     <title>MumbaiTransport.in</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         :root {
-            /* Linear-inspired color system */
             --primary: #5E6AD2;
-            --primary-hover: #4C56C4;
+            --primary-dark: #4C56C4;
             --primary-light: #F1F2FD;
             --secondary: #8B92B2;
             --background: #FAFBFC;
@@ -35,6 +30,7 @@
             --success: #00B87A;
             --warning: #F79009;
             --error: #DC3A42;
+            --info: #5E6AD2;
             --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -42,6 +38,25 @@
             --radius-md: 8px;
             --radius-lg: 12px;
             --radius-xl: 16px;
+        }
+
+        [data-theme="dark"] {
+            --background: #0F1419;
+            --surface: #1A1D23;
+            --surface-hover: #222530;
+            --border: #2D3442;
+            --border-light: #252932;
+            --text-primary: #FFFFFF;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+            --primary-light: rgba(94, 106, 210, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -53,17 +68,20 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            transition: background 0.3s ease;
         }
 
-        /* Mobile-first container */
+        /* App container */
         .app {
             max-width: 100vw;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Linear-style header */
+        /* Header */
         .header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -73,13 +91,19 @@
             z-index: 100;
             backdrop-filter: blur(8px);
             background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(26, 29, 35, 0.9);
         }
 
         .header-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
         }
 
         .logo {
@@ -87,41 +111,53 @@
             font-weight: 700;
             color: var(--text-primary);
             letter-spacing: -0.2px;
-        }
-
-        .status-pill {
             display: flex;
             align-items: center;
-            padding: 4px 8px;
-            background: var(--primary-light);
-            border-radius: 20px;
-            font-size: 12px;
-            color: var(--primary);
-            font-weight: 500;
+            gap: 8px;
         }
 
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--success);
-            margin-right: 6px;
-            animation: pulse 2s infinite;
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+        .header-actions {
+            display: flex;
+            gap: 10px;
         }
 
-        /* Search bar - Linear style */
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--background);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:hover {
+            background: var(--surface-hover);
+        }
+
+        /* Search bar */
         .search-bar {
             position: relative;
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 16px 12px 40px;
+            padding: 12px 16px 12px 44px;
             background: var(--background);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
@@ -148,15 +184,32 @@
         /* Main content */
         .content {
             flex: 1;
-            padding: 0 20px 20px;
+            padding: 16px 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
 
-        /* Transport modes - compact cards */
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        /* Transport modes grid */
         .transport-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 12px;
-            margin: 20px 0;
         }
 
         .transport-card {
@@ -168,6 +221,9 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .transport-card:active {
@@ -179,41 +235,31 @@
             background: var(--primary-light);
         }
 
-        .transport-card.active::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--primary);
-        }
-
         .card-header {
             display: flex;
             align-items: center;
-            margin-bottom: 12px;
+            gap: 10px;
         }
 
         .card-icon {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            margin-right: 10px;
+            font-size: 18px;
             color: white;
         }
 
-        .bus-icon { background: #5E6AD2; }
-        .train-icon { background: #00B87A; }
+        .bus-icon { background: var(--primary); }
+        .train-icon { background: var(--success); }
         .metro-icon { background: #8B5CF6; }
-        .other-icon { background: #F79009; }
+        .taxi-icon { background: var(--warning); }
+        .ferry-icon { background: #0EA5E9; }
 
         .card-title {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--text-primary);
             line-height: 1.2;
@@ -222,14 +268,13 @@
         .card-status {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
+            gap: 6px;
         }
 
         .status-indicator {
-            width: 4px;
-            height: 4px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            margin-right: 6px;
         }
 
         .status-active { background: var(--success); }
@@ -237,17 +282,19 @@
         .status-offline { background: var(--error); }
 
         .card-status-text {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-muted);
         }
 
         .card-stats {
             display: flex;
             justify-content: space-between;
+            margin-top: 8px;
         }
 
         .stat {
             text-align: center;
+            flex: 1;
         }
 
         .stat-number {
@@ -258,34 +305,23 @@
         }
 
         .stat-label {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
-        /* Quick actions - Linear style */
-        .quick-actions {
-            margin: 24px 0 20px;
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 12px;
-        }
-
+        /* Quick actions */
         .action-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            gap: 10px;
         }
 
         .action-button {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 12px;
+            padding: 14px;
             font-size: 13px;
             color: var(--text-secondary);
             font-weight: 500;
@@ -294,6 +330,7 @@
             text-align: left;
             display: flex;
             align-items: center;
+            gap: 10px;
         }
 
         .action-button:active {
@@ -302,15 +339,82 @@
         }
 
         .action-icon {
-            margin-right: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
             font-size: 16px;
         }
 
-        /* Live updates - compact list */
-        .live-updates {
-            margin: 24px 0;
+        /* Map section */
+        .map-container {
+            height: 200px;
+            background: var(--background);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border);
         }
 
+        .mapboxgl-map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+            color: white;
+            padding: 16px;
+            z-index: 2;
+        }
+
+        .map-overlay h3 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .map-overlay p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 2;
+            display: flex;
+            gap: 8px;
+        }
+
+        .map-btn {
+            background: var(--surface);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .map-btn:hover {
+            background: var(--surface-hover);
+        }
+
+        /* Live updates */
         .updates-list {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -319,10 +423,11 @@
         }
 
         .update-item {
-            padding: 12px 16px;
+            padding: 14px 16px;
             border-bottom: 1px solid var(--border-light);
             display: flex;
             align-items: flex-start;
+            gap: 12px;
         }
 
         .update-item:last-child {
@@ -330,16 +435,15 @@
         }
 
         .update-icon {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            margin-right: 10px;
+            font-size: 14px;
             flex-shrink: 0;
-            margin-top: 1px;
+            color: white;
         }
 
         .update-content {
@@ -351,19 +455,22 @@
             font-size: 13px;
             color: var(--text-primary);
             line-height: 1.4;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
 
         .update-time {
             font-size: 11px;
             color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         /* Bottom navigation */
         .bottom-nav {
             background: var(--surface);
             border-top: 1px solid var(--border);
-            padding: 8px 20px 20px;
+            padding: 8px 20px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
@@ -387,7 +494,6 @@
 
         .nav-button.active {
             color: var(--primary);
-            background: var(--primary-light);
         }
 
         .nav-button:active {
@@ -396,6 +502,10 @@
 
         .nav-icon {
             font-size: 20px;
+        }
+
+        .nav-button.active .nav-icon {
+            color: var(--primary);
         }
 
         /* Offline indicator */
@@ -413,518 +523,142 @@
             display: block;
         }
 
-        /* Loading states */
-        .loading {
-            opacity: 0.6;
+        /* Route planner modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
             pointer-events: none;
+            transition: opacity 0.3s ease;
         }
 
-        .skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
         }
 
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        .modal-content {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
         }
 
-        /* Responsive adjustments */
-        @media (min-width: 768px) {
-            .app {
-                max-width: 400px;
-                margin: 0 auto;
-                border: 1px solid var(--border);
-                border-radius: var(--radius-xl);
-                overflow: hidden;
-                margin-top: 20px;
-                box-shadow: var(--shadow-lg);
-            }
-
-            .header {
-                border-radius: 0;
-            }
+        .modal.active .modal-content {
+            transform: translateY(0);
         }
 
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --background: #0F1419;
-                --surface: #1A1D23;
-                --surface-hover: #222530;
-                --border: #2D3442;
-                --border-light: #252932;
-                --text-primary: #FFFFFF;
-                --text-secondary: #9CA3AF;
-                --text-muted: #6B7280;
-                --primary-light: rgba(94, 106, 210, 0.1);
-            }
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        ::-webkit-scrollbar-track {
-            background: transparent;
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 2px;
+        .modal-body {
+            padding: 16px;
         }
 
-        /* Pull-to-refresh indicator */
-        .pull-indicator {
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.1);
+        }
+
+        .form-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .form-submit:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Route results */
+        .route-results {
+            margin-top: 16px;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+        }
+
+        .route-option {
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background: var(--background);
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .route-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .route-icon {
             width: 24px;
             height: 24px;
-            border: 2px solid var(--primary);
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .pull-indicator.show {
-            opacity: 1;
-            top: 10px;
-        }
-
-        @keyframes spin {
-            to { transform: translateX(-50%) rotate(360deg); }
-        }
-    </style>
-</head>
-<body>
-    <div class="app">
-        <div class="offline-banner" id="offlineBanner">
-            📶 You're offline - Showing cached data
-        </div>
-
-        <div class="pull-indicator" id="pullIndicator"></div>
-
-        <header class="header">
-            <div class="header-top">
-                <div class="logo">MumbaiTransport.in</div>
-                <div class="status-pill">
-                    <span class="status-dot"></span>
-                    <span id="statusText">Live</span>
-                </div>
-            </div>
-            <div class="search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="text" class="search-input" placeholder="Search routes, stops..." id="searchInput">
-            </div>
-        </header>
-
-        <main class="content">
-            <div class="transport-grid">
-                <div class="transport-card active" data-mode="bus">
-                    <div class="card-header">
-                        <div class="card-icon bus-icon">🚌</div>
-                        <div class="card-title">BEST Buses</div>
-                    </div>
-                    <div class="card-status">
-                        <span class="status-indicator status-active"></span>
-                        <span class="card-status-text">Operational</span>
-                    </div>
-                    <div class="card-stats">
-                        <div class="stat">
-                            <div class="stat-number" id="busCount">2847</div>
-                            <div class="stat-label">Active</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">365</div>
-                            <div class="stat-label">Routes</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="transport-card" data-mode="train">
-                    <div class="card-header">
-                        <div class="card-icon train-icon">🚂</div>
-                        <div class="card-title">Local Trains</div>
-                    </div>
-                    <div class="card-status">
-                        <span class="status-indicator status-delayed"></span>
-                        <span class="card-status-text">Delays</span>
-                    </div>
-                    <div class="card-stats">
-                        <div class="stat">
-                            <div class="stat-number" id="trainCount">2342</div>
-                            <div class="stat-label">Services</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">3</div>
-                            <div class="stat-label">Lines</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="transport-card" data-mode="metro">
-                    <div class="card-header">
-                        <div class="card-icon metro-icon">🚇</div>
-                        <div class="card-title">Mumbai Metro</div>
-                    </div>
-                    <div class="card-status">
-                        <span class="status-indicator status-active"></span>
-                        <span class="card-status-text">On Time</span>
-                    </div>
-                    <div class="card-stats">
-                        <div class="stat">
-                            <div class="stat-number" id="metroCount">126</div>
-                            <div class="stat-label">Trains</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">37</div>
-                            <div class="stat-label">Stations</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="transport-card" data-mode="other">
-                    <div class="card-header">
-                        <div class="card-icon other-icon">🚗</div>
-                        <div class="card-title">Taxis & More</div>
-                    </div>
-                    <div class="card-status">
-                        <span class="status-indicator status-active"></span>
-                        <span class="card-status-text">Available</span>
-                    </div>
-                    <div class="card-stats">
-                        <div class="stat">
-                            <div class="stat-number">45K+</div>
-                            <div class="stat-label">Vehicles</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">8K+</div>
-                            <div class="stat-label">Shared</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <section class="quick-actions">
-                <h3 class="section-title">Quick Actions</h3>
-                <div class="action-grid">
-                    <button class="action-button" id="nearbyBtn">
-                        <span class="action-icon">📍</span>
-                        Find Nearby
-                    </button>
-                    <button class="action-button" id="routeBtn">
-                        <span class="action-icon">🗺️</span>
-                        Plan Route
-                    </button>
-                    <button class="action-button" id="savedBtn">
-                        <span class="action-icon">⭐</span>
-                        Saved Routes
-                    </button>
-                    <button class="action-button" id="alertsBtn">
-                        <span class="action-icon">🔔</span>
-                        Alerts
-                    </button>
-                </div>
-            </section>
-
-            <section class="live-updates">
-                <h3 class="section-title">Live Updates</h3>
-                <div class="updates-list" id="updatesList">
-                    <!-- Updates will be populated here -->
-                </div>
-            </section>
-        </main>
-
-        <nav class="bottom-nav">
-            <button class="nav-button active">
-                <span class="nav-icon">🏠</span>
-                Home
-            </button>
-            <button class="nav-button">
-                <span class="nav-icon">🗺️</span>
-                Routes
-            </button>
-            <button class="nav-button">
-                <span class="nav-icon">⭐</span>
-                Saved
-            </button>
-            <button class="nav-button">
-                <span class="nav-icon">⚙️</span>
-                Settings
-            </button>
-        </nav>
-    </div>
-
-    <script>
-        class MumbaiTransportApp {
-            constructor() {
-                this.isOnline = navigator.onLine;
-                this.cache = new Map();
-                this.lastUpdate = Date.now();
-                this.pullToRefresh = {
-                    startY: 0,
-                    currentY: 0,
-                    isDragging: false,
-                    threshold: 80
-                };
-                this.init();
-            }
-
-            init() {
-                this.setupEventListeners();
-                this.setupPullToRefresh();
-                this.setupOfflineMode();
-                this.loadCachedData();
-                this.startDataUpdates();
-                this.setupServiceWorker();
-            }
-
-            setupEventListeners() {
-                // Transport mode selection
-                document.querySelectorAll('.transport-card').forEach(card => {
-                    card.addEventListener('click', (e) => {
-                        this.selectTransportMode(card);
-                    });
-                });
-
-                // Search with debouncing
-                const searchInput = document.getElementById('searchInput');
-                let searchTimeout;
-                searchInput.addEventListener('input', (e) => {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => {
-                        this.performSearch(e.target.value);
-                    }, 300);
-                });
-
-                // Quick actions
-                document.getElementById('nearbyBtn').addEventListener('click', () => this.findNearby());
-                document.getElementById('routeBtn').addEventListener('click', () => this.planRoute());
-                document.getElementById('savedBtn').addEventListener('click', () => this.showSaved());
-                document.getElementById('alertsBtn').addEventListener('click', () => this.showAlerts());
-
-                // Bottom navigation
-                document.querySelectorAll('.nav-button').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        this.switchTab(btn);
-                    });
-                });
-
-                // Keyboard shortcuts
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
-                        e.preventDefault();
-                        this.refreshData();
-                    }
-                });
-            }
-
-            setupPullToRefresh() {
-                const content = document.querySelector('.content');
-                const indicator = document.getElementById('pullIndicator');
-
-                content.addEventListener('touchstart', (e) => {
-                    this.pullToRefresh.startY = e.touches[0].clientY;
-                    this.pullToRefresh.isDragging = true;
-                });
-
-                content.addEventListener('touchmove', (e) => {
-                    if (!this.pullToRefresh.isDragging || window.scrollY > 0) return;
-
-                    this.pullToRefresh.currentY = e.touches[0].clientY;
-                    const diff = this.pullToRefresh.currentY - this.pullToRefresh.startY;
-
-                    if (diff > 0) {
-                        e.preventDefault();
-                        const progress = Math.min(diff / this.pullToRefresh.threshold, 1);
-                        indicator.style.opacity = progress;
-                        indicator.style.transform = `translateX(-50%) translateY(${diff * 0.5}px)`;
-                    }
-                });
-
-                content.addEventListener('touchend', (e) => {
-                    if (!this.pullToRefresh.isDragging) return;
-
-                    const diff = this.pullToRefresh.currentY - this.pullToRefresh.startY;
-                    if (diff > this.pullToRefresh.threshold) {
-                        this.refreshData();
-                        indicator.classList.add('show');
-                        setTimeout(() => {
-                            indicator.classList.remove('show');
-                        }, 1000);
-                    }
-
-                    indicator.style.opacity = '0';
-                    indicator.style.transform = 'translateX(-50%)';
-                    this.pullToRefresh.isDragging = false;
-                });
-            }
-
-            setupOfflineMode() {
-                const offlineBanner = document.getElementById('offlineBanner');
-
-                window.addEventListener('online', () => {
-                    this.isOnline = true;
-                    offlineBanner.classList.remove('show');
-                    this.refreshData();
-                    this.updateStatusIndicator('Live');
-                });
-
-                window.addEventListener('offline', () => {
-                    this.isOnline = false;
-                    offlineBanner.classList.add('show');
-                    this.updateStatusIndicator('Offline');
-                });
-
-                // Initial state
-                if (!this.isOnline) {
-                    offlineBanner.classList.add('show');
-                    this.updateStatusIndicator('Offline');
-                }
-            }
-
-            async setupServiceWorker() {
-                if ('serviceWorker' in navigator) {
-                    try {
-                        const registration = await navigator.serviceWorker.register('/sw.js');
-                        console.log('SW registered');
-                        
-                        // Listen for updates
-                        registration.addEventListener('updatefound', () => {
-                            this.showUpdateAvailable();
-                        });
-                    } catch (error) {
-                        console.log('SW registration failed');
-                    }
-                }
-            }
-
-            selectTransportMode(selectedCard) {
-                // Remove active state from all cards
-                document.querySelectorAll('.transport-card').forEach(card => {
-                    card.classList.remove('active');
-                });
-
-                // Add active state to selected card
-                selectedCard.classList.add('active');
-
-                // Haptic feedback
-                if ('vibrate' in navigator) {
-                    navigator.vibrate(10);
-                }
-
-                const mode = selectedCard.dataset.mode;
-                this.loadModeData(mode);
-            }
-
-            async loadModeData(mode) {
-                // Check cache first for offline support
-                const cacheKey = `mode_${mode}`;
-                if (!this.isOnline && this.cache.has(cacheKey)) {
-                    return this.cache.get(cacheKey);
-                }
-
-                try {
-                    // Simulate API call
-                    const data = await this.fetchModeData(mode);
-                    this.cache.set(cacheKey, data);
-                    return data;
-                } catch (error) {
-                    console.error('Failed to load mode data:', error);
-                    return this.cache.get(cacheKey) || {};
-                }
-            }
-
-            async fetchModeData(mode) {
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        const data = {
-                            bus: { routes: 365, active: Math.floor(Math.random() * 100) + 2800 },
-                            train: { lines: 3, services: 2342 },
-                            metro: { stations: 37, trains: Math.floor(Math.random() * 10) + 120 },
-                            other: { taxis: 45000, shared: 8000 }
-                        };
-                        resolve(data[mode] || {});
-                    }, 100);
-                });
-            }
-
-            startDataUpdates() {
-                // Update every second when online
-                setInterval(() => {
-                    if (this.isOnline) {
-                        this.updateLiveData();
-                    }
-                }, 1000);
-
-                // Add new updates periodically
-                setInterval(() => {
-                    this.addLiveUpdate();
-                }, 5000);
-            }
-
-            updateLiveData() {
-                // Update bus count with animation
-                const busCountEl = document.getElementById('busCount');
-                const currentCount = parseInt(busCountEl.textContent);
-                const newCount = Math.floor(Math.random() * 100) + 2800;
-                
-                if (currentCount !== newCount) {
-                    this.animateNumber(busCountEl, newCount);
-                }
-
-                // Update train count
-                const trainCountEl = document.getElementById('trainCount');
-                const trainCount = Math.floor(Math.random() * 50) + 2320;
-                this.animateNumber(trainCountEl, trainCount);
-
-                // Update metro count
-                const metroCountEl = document.getElementById('metroCount');
-                const metroCount = Math.floor(Math.random() * 10) + 120;
-                this.animateNumber(metroCountEl, metroCount);
-            }
-
-            animateNumber(element, target) {
-                const current = parseInt(element.textContent);
-                const diff = target - current;
-                const steps = 10;
-                const stepSize = diff / steps;
-                let step = 0;
-
-                const animation = setInterval(() => {
-                    step++;
-                    const newValue = Math.round(current + (stepSize * step));
-                    element.textContent = newValue;
-
-                    if (step >= steps) {
-                        clearInterval(animation);
-                        element.textContent = target;
-                    }
-                }, 50);
-            }
-
-            addLiveUpdate() {
-                const updates = [
-                    { icon: '🚌', text: 'Route 154 running 2 mins late', type: 'bus' },
-                    { icon: '🚂', text: 'Western Line delays cleared', type: 'train' },
-                    { icon: '🚇', text: 'Metro frequency increased', type: 'metro' },
-                    { icon: '⚠️', text: 'Heavy traffic on SV Road', type: 'alert' },
-                    { icon: '✅', text: 'New AC buses on Route 25', type: 'info' }
-                ];
-
-                const randomUpdate = updates[Math.floor(Math.random() * updates.length)];
-                const updatesList = document.getElementById('updatesList');
-
-                const updateElement = document.createElement('div');
-                updateElement.className = 'update-item';
-                updateElement.innerHTML = `
-                    <div class="update-icon" style="background: ${this.getUpdateColor(randomUpdate.type)}">
-                        ${randomUpdate.icon}
-                    </div>
-                    <div class="update-content">
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            color: white
