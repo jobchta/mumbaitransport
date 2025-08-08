@@ -6,11 +6,20 @@
     <meta name="theme-color" content="#5E6AD2">
     <meta name="description" content="Real-time Mumbai public transport tracking">
     <title>MumbaiTransport.in</title>
+
+    <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    
+    <!-- Link to your CSS file -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Link to your PWA Manifest file -->
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <div class="app">
+        <!-- Header Section -->
         <header class="header">
             <div class="header-top">
                 <div class="logo">
@@ -29,7 +38,9 @@
             </div>
         </header>
 
+        <!-- Main Scrollable Content -->
         <main class="content">
+            <!-- Transport Modes Section -->
             <section>
                 <h2 class="section-title"><i class="fa-solid fa-bus"></i> Transport Modes</h2>
                 <div class="transport-grid">
@@ -80,6 +91,7 @@
                 </div>
             </section>
 
+            <!-- Quick Actions Section -->
             <section>
                  <h2 class="section-title"><i class="fa-solid fa-bolt"></i> Quick Actions</h2>
                  <div class="action-grid">
@@ -92,6 +104,7 @@
                  </div>
             </section>
             
+            <!-- Map View Section -->
             <section>
                 <h2 class="section-title"><i class="fa-solid fa-map"></i> Live Map</h2>
                 <div class="map-container" id="map">
@@ -103,14 +116,17 @@
                 </div>
             </section>
 
+            <!-- Live Updates Section -->
             <section>
                 <h2 class="section-title"><i class="fa-solid fa-satellite-dish"></i> Live Updates</h2>
                 <div class="updates-list" id="updates-list">
-                    </div>
+                    <!-- JS will populate this -->
+                </div>
             </section>
 
         </main>
 
+        <!-- Bottom Navigation -->
         <nav class="bottom-nav">
             <button class="nav-button active" aria-label="Home"><i class="nav-icon fa-solid fa-house"></i> Home</button>
             <button class="nav-button" aria-label="Map"><i class="nav-icon fa-solid fa-map-location"></i> Map</button>
@@ -118,10 +134,12 @@
             <button class="nav-button" aria-label="Profile"><i class="nav-icon fa-solid fa-user"></i> Profile</button>
         </nav>
         
+        <!-- Offline Banner -->
         <div class="offline-banner" id="offline-banner">
             <i class="fa-solid fa-wifi"></i> You're offline. Showing cached data.
         </div>
 
+        <!-- Route Planner Modal -->
         <div class="modal" id="route-planner-modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -141,11 +159,15 @@
                         <button type="submit" class="form-submit">Find Route</button>
                     </form>
                     <div class="route-results" id="route-results">
-                        </div>
+                        <!-- JS will populate this -->
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Link to External JavaScript files -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
