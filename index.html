@@ -1,8 +1,3 @@
-
-Enhanced Mumbai Transport App with Real APIs
-Here's the complete implementation with real API integrations for Mumbai transport services, Mapbox mapping, real-time tracking, and routing functionality:
-
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +25,7 @@ html
             --success: #00B87A;
             --warning: #F79009;
             --error: #DC3A42;
-            --info: #5E6AD2;
+            --info: #0EA5E9;
             --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -65,123 +60,50 @@ html
             color: var(--text-primary);
             line-height: 1.5;
             font-size: 14px;
-            overflow-x: hidden;
+            overflow: hidden; /* Prevent body scroll */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            transition: background 0.3s ease;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* App container */
         .app {
-            max-width: 100vw;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
         }
 
-        /* Header */
         .header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
             padding: 16px 20px 12px;
-            position: sticky;
-            top: 0;
+            position: relative;
             z-index: 100;
             backdrop-filter: blur(8px);
             background: rgba(255, 255, 255, 0.9);
             display: flex;
             flex-direction: column;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         [data-theme="dark"] .header {
             background: rgba(26, 29, 35, 0.9);
         }
 
-        .header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .header-top { display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-size: 18px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.2px; display: flex; align-items: center; gap: 8px; }
+        .logo-icon { width: 28px; height: 28px; background: var(--primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; }
+        .header-actions { display: flex; gap: 10px; }
+        .header-btn { width: 36px; height: 36px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; background: var(--background); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; }
+        .header-btn:hover { background: var(--surface-hover); }
 
-        .logo {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .search-bar { position: relative; }
+        .search-input { width: 100%; padding: 12px 16px 12px 44px; background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 14px; color: var(--text-primary); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.1); }
+        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            background: var(--primary);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .header-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--background);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .header-btn:hover {
-            background: var(--surface-hover);
-        }
-
-        /* Search bar */
-        .search-bar {
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 16px 12px 44px;
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            font-size: 14px;
-            color: var(--text-primary);
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .search-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 16px;
-        }
-
-        /* Main content */
         .content {
             flex: 1;
             padding: 16px 20px;
@@ -191,474 +113,440 @@ html
             gap: 24px;
         }
 
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .section-title { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: var(--primary); }
 
-        .section-title i {
-            color: var(--primary);
-        }
-
-        /* Transport modes grid */
-        .transport-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-        }
-
-        .transport-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .transport-card:active {
-            transform: scale(0.98);
-        }
-
-        .transport-card.active {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: white;
-        }
-
+        .transport-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+        .transport-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; transition: all 0.2s ease; cursor: pointer; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
+        .transport-card.active { border-color: var(--primary); background: var(--primary-light); }
+        .card-header { display: flex; align-items: center; gap: 10px; }
+        .card-icon { width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; flex-shrink: 0; }
         .bus-icon { background: var(--primary); }
         .train-icon { background: var(--success); }
         .metro-icon { background: #8B5CF6; }
         .taxi-icon { background: var(--warning); }
-        .ferry-icon { background: #0EA5E9; }
-
-        .card-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            line-height: 1.2;
-        }
-
-        .card-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
+        .ferry-icon { background: var(--info); }
+        .card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+        .card-status { display: flex; align-items: center; gap: 6px; }
+        .status-indicator { width: 8px; height: 8px; border-radius: 50%; }
         .status-active { background: var(--success); }
         .status-delayed { background: var(--warning); }
         .status-offline { background: var(--error); }
+        .card-status-text { font-size: 12px; color: var(--text-muted); }
+        .card-stats { display: flex; justify-content: space-between; margin-top: auto; padding-top: 8px; }
+        .stat { text-align: center; flex: 1; }
+        .stat-number { font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+        .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
-        .card-status-text {
-            font-size: 12px;
-            color: var(--text-muted);
+        .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .action-button { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; font-size: 13px; color: var(--text-secondary); font-weight: 500; cursor: pointer; transition: all 0.2s ease; text-align: left; display: flex; align-items: center; gap: 10px; }
+        .action-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 16px; flex-shrink: 0; }
+        
+        .map-container { height: 200px; border-radius: var(--radius-lg); overflow: hidden; position: relative; border: 1px solid var(--border); }
+        .mapboxgl-map { width: 100%; height: 100%; }
+        .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib { display: none; }
+        .map-controls { position: absolute; top: 12px; right: 12px; z-index: 2; display: flex; gap: 8px; }
+        .map-btn { background: var(--surface); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); cursor: pointer; transition: all 0.3s ease; color: var(--text-muted); }
+        
+        .updates-list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+        .update-item { padding: 14px 16px; border-bottom: 1px solid var(--border-light); display: flex; align-items: flex-start; gap: 12px; }
+        .update-item:last-child { border-bottom: none; }
+        .update-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; color: white; }
+        .update-content { flex: 1; min-width: 0; }
+        .update-text { font-size: 13px; color: var(--text-primary); line-height: 1.4; margin-bottom: 4px; }
+        .update-time { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+
+        .bottom-nav { background: var(--surface); border-top: 1px solid var(--border); padding: 8px 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0; }
+        .nav-button { padding: 8px 4px; border-radius: var(--radius-md); background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-button.active { color: var(--primary); }
+        .nav-icon { font-size: 20px; }
+
+        .offline-banner { background: var(--warning); color: white; padding: 8px 20px; font-size: 12px; text-align: center; font-weight: 500; display: none; }
+        .offline-banner.show { display: block; }
+
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal.active { opacity: 1; pointer-events: all; }
+        .modal-content { background: var(--surface); border-radius: var(--radius-lg); width: 90%; max-width: 400px; max-height: 90vh; display: flex; flex-direction: column; transform: translateY(20px); transition: transform 0.3s ease; }
+        .modal.active .modal-content { transform: translateY(0); }
+        .modal-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+        .modal-close { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
+        .modal-body { padding: 16px; overflow-y: auto; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 8px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .form-input { width: 100%; padding: 12px 16px; background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 14px; color: var(--text-primary); outline: none; transition: all 0.2s ease; }
+        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.1); }
+        .form-submit { background: var(--primary); color: white; border: none; border-radius: var(--radius-md); padding: 14px; font-size: 14px; font-weight: 600; width: 100%; cursor: pointer; transition: background 0.2s ease; }
+        .form-submit:hover { background: var(--primary-dark); }
+        
+        .route-results { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
+        .route-option { padding: 12px; border-radius: var(--radius-md); background: var(--background); margin-bottom: 12px; border: 1px solid var(--border); cursor: pointer; }
+        .route-option:hover { border-color: var(--primary); }
+        .route-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .route-summary { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .route-icon { width: 24px; height: 24px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; }
+        .route-info { display: flex; flex-direction: column; align-items: flex-end; }
+        .route-duration { font-weight: 600; font-size: 14px; }
+        .route-distance { font-size: 12px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-top">
+                <div class="logo">
+                    <div class="logo-icon"><i class="fa-solid fa-route"></i></div>
+                    MumbaiTransport
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" id="theme-toggle" aria-label="Toggle dark mode">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search routes or destinations...">
+            </div>
+        </header>
+
+        <main class="content">
+            <section>
+                <h2 class="section-title"><i class="fa-solid fa-bus"></i> Transport Modes</h2>
+                <div class="transport-grid">
+                    <div class="transport-card active" data-mode="bus">
+                        <div class="card-header">
+                            <div class="card-icon bus-icon"><i class="fa-solid fa-bus-simple"></i></div>
+                            <div class="card-title">BEST Buses</div>
+                        </div>
+                        <div class="card-status"><span class="status-indicator status-active"></span><span class="card-status-text">Operational</span></div>
+                        <div class="card-stats">
+                            <div class="stat"><div class="stat-number" id="bus-active">3,105</div><div class="stat-label">Active</div></div>
+                            <div class="stat"><div class="stat-number" id="bus-routes">415</div><div class="stat-label">Routes</div></div>
+                        </div>
+                    </div>
+                    <div class="transport-card" data-mode="train">
+                         <div class="card-header">
+                            <div class="card-icon train-icon"><i class="fa-solid fa-train-subway"></i></div>
+                            <div class="card-title">Local Trains</div>
+                        </div>
+                        <div class="card-status"><span class="status-indicator status-delayed"></span><span class="card-status-text">Minor Delays</span></div>
+                        <div class="card-stats">
+                            <div class="stat"><div class="stat-number" id="train-services">2,342</div><div class="stat-label">Services</div></div>
+                            <div class="stat"><div class="stat-number" id="train-lines">3</div><div class="stat-label">Lines</div></div>
+                        </div>
+                    </div>
+                     <div class="transport-card" data-mode="metro">
+                         <div class="card-header">
+                            <div class="card-icon metro-icon"><i class="fa-solid fa-train-tram"></i></div>
+                            <div class="card-title">Mumbai Metro</div>
+                        </div>
+                        <div class="card-status"><span class="status-indicator status-active"></span><span class="card-status-text">On Time</span></div>
+                        <div class="card-stats">
+                            <div class="stat"><div class="stat-number" id="metro-trains">142</div><div class="stat-label">Trains</div></div>
+                            <div class="stat"><div class="stat-number" id="metro-stations">51</div><div class="stat-label">Stations</div></div>
+                        </div>
+                    </div>
+                    <div class="transport-card" data-mode="ferry">
+                         <div class="card-header">
+                            <div class="card-icon ferry-icon"><i class="fa-solid fa-ship"></i></div>
+                            <div class="card-title">Ferries</div>
+                        </div>
+                        <div class="card-status"><span class="status-indicator status-active"></span><span class="card-status-text">On Schedule</span></div>
+                        <div class="card-stats">
+                            <div class="stat"><div class="stat-number" id="ferry-routes">8</div><div class="stat-label">Routes</div></div>
+                            <div class="stat"><div class="stat-number" id="ferry-terminals">12</div><div class="stat-label">Terminals</div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                 <h2 class="section-title"><i class="fa-solid fa-bolt"></i> Quick Actions</h2>
+                 <div class="action-grid">
+                     <button class="action-button" id="route-planner-btn">
+                         <span class="action-icon"><i class="fa-solid fa-map-location-dot"></i></span> Plan a Route
+                     </button>
+                     <button class="action-button">
+                         <span class="action-icon"><i class="fa-solid fa-ticket"></i></span> Buy Tickets
+                     </button>
+                 </div>
+            </section>
+            
+            <section>
+                <h2 class="section-title"><i class="fa-solid fa-map"></i> Live Map</h2>
+                <div class="map-container" id="map">
+                     <div class="map-controls">
+                        <button class="map-btn" id="locate-user-btn" aria-label="Locate me">
+                            <i class="fa-solid fa-location-crosshairs"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="section-title"><i class="fa-solid fa-satellite-dish"></i> Live Updates</h2>
+                <div class="updates-list" id="updates-list">
+                    </div>
+            </section>
+
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-button active" aria-label="Home"><i class="nav-icon fa-solid fa-house"></i> Home</button>
+            <button class="nav-button" aria-label="Map"><i class="nav-icon fa-solid fa-map-location"></i> Map</button>
+            <button class="nav-button" aria-label="Tickets"><i class="nav-icon fa-solid fa-ticket-simple"></i> Tickets</button>
+            <button class="nav-button" aria-label="Profile"><i class="nav-icon fa-solid fa-user"></i> Profile</button>
+        </nav>
+        
+        <div class="offline-banner" id="offline-banner">
+            <i class="fa-solid fa-wifi"></i> You're offline. Showing cached data.
+        </div>
+
+        <div class="modal" id="route-planner-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Plan Your Route</h3>
+                    <button class="modal-close" id="modal-close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="route-form">
+                        <div class="form-group">
+                            <label for="start-location" class="form-label">Start Location</label>
+                            <input type="text" id="start-location" class="form-input" placeholder="e.g., Dadar Station" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="end-location" class="form-label">End Location</label>
+                            <input type="text" id="end-location" class="form-input" placeholder="e.g., Gateway of India" required>
+                        </div>
+                        <button type="submit" class="form-submit">Find Route</button>
+                    </form>
+                    <div class="route-results" id="route-results">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    
+    <script>
+        class MumbaiTransportApp {
+            constructor() {
+                // IMPORTANT: Replace with your own Mapbox access token for production
+                this.MAPBOX_TOKEN = 'pk.eyJ1IjoiZ29vZ2xlLWFpIiwiYSI6ImNseHFtN2ZpNzBnZ2oya3MydjY0ajVzOW8ifQ.yyG5rsnSskq8Z02Y0k20RQ';
+                this.map = null;
+                this.userLocationMarker = null;
+
+                this.dom = {
+                    themeToggle: document.getElementById('theme-toggle'),
+                    offlineBanner: document.getElementById('offline-banner'),
+                    updatesList: document.getElementById('updates-list'),
+                    routePlannerBtn: document.getElementById('route-planner-btn'),
+                    routeModal: document.getElementById('route-planner-modal'),
+                    modalCloseBtn: document.getElementById('modal-close-btn'),
+                    routeForm: document.getElementById('route-form'),
+                    routeResults: document.getElementById('route-results'),
+                    locateUserBtn: document.getElementById('locate-user-btn'),
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.setupTheme();
+                this.setupEventListeners();
+                this.initMap();
+                this.startLiveUpdates();
+                this.checkOnlineStatus();
+            }
+
+            setupTheme() {
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                this.dom.themeToggle.querySelector('i').className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            }
+
+            setupEventListeners() {
+                this.dom.themeToggle.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    this.dom.themeToggle.querySelector('i').className = newTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+                });
+
+                window.addEventListener('online', () => this.checkOnlineStatus());
+                window.addEventListener('offline', () => this.checkOnlineStatus());
+
+                this.dom.routePlannerBtn.addEventListener('click', () => this.dom.routeModal.classList.add('active'));
+                this.dom.modalCloseBtn.addEventListener('click', () => this.dom.routeModal.classList.remove('active'));
+                this.dom.routeForm.addEventListener('submit', (e) => this.handleRouteSearch(e));
+                this.dom.locateUserBtn.addEventListener('click', () => this.locateUser());
+            }
+
+            checkOnlineStatus() {
+                this.dom.offlineBanner.classList.toggle('show', !navigator.onLine);
+            }
+
+            initMap() {
+                mapboxgl.accessToken = this.MAPBOX_TOKEN;
+                this.map = new mapboxgl.Map({
+                    container: 'map',
+                    style: 'mapbox://styles/mapbox/standard',
+                    center: [72.8777, 19.0760], // Mumbai coordinates
+                    zoom: 11
+                });
+
+                this.map.on('load', () => {
+                    this.map.setConfigProperty('basemap', 'showPlaceLabels', true);
+                    this.map.setConfigProperty('basemap', 'showPointOfInterestLabels', true);
+                });
+            }
+
+            locateUser() {
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(position => {
+                        const { latitude, longitude } = position.coords;
+                        const userCoords = [longitude, latitude];
+
+                        this.map.flyTo({ center: userCoords, zoom: 15 });
+
+                        if (this.userLocationMarker) {
+                            this.userLocationMarker.setLngLat(userCoords);
+                        } else {
+                            const el = document.createElement('div');
+                            el.className = 'fa-solid fa-person';
+                            el.style.color = 'dodgerblue';
+                            el.style.fontSize = '24px';
+                            el.style.textShadow = '0 0 5px white';
+
+                            this.userLocationMarker = new mapboxgl.Marker(el)
+                                .setLngLat(userCoords)
+                                .addTo(this.map);
+                        }
+                    }, error => {
+                        console.error("Error getting location:", error);
+                        this.addUpdate('Could not retrieve your location.', 'error');
+                    });
+                }
+            }
+
+            async handleRouteSearch(e) {
+                e.preventDefault();
+                const start = e.target.elements['start-location'].value;
+                const end = e.target.elements['end-location'].value;
+                this.dom.routeResults.innerHTML = '<p>Finding best routes...</p>';
+
+                await new Promise(res => setTimeout(res, 1500)); 
+
+                const mockRoutes = [
+                    { 
+                        duration: '45 min', 
+                        distance: '12 km', 
+                        modes: [{type: 'bus', num: 'A-217'}, {type: 'walk'}] 
+                    },
+                    { 
+                        duration: '55 min', 
+                        distance: '14 km', 
+                        modes: [{type: 'train', line: 'Western'}, {type: 'taxi'}] 
+                    },
+                    { 
+                        duration: '1 hr 15 min', 
+                        distance: '13 km', 
+                        modes: [{type: 'metro', line: 'Line 1'}, {type: 'bus', num: '84'}] 
+                    }
+                ];
+
+                this.renderRouteResults(mockRoutes);
+            }
+
+            renderRouteResults(routes) {
+                this.dom.routeResults.innerHTML = '';
+                routes.forEach(route => {
+                    const option = document.createElement('div');
+                    option.className = 'route-option';
+                    
+                    const iconsHtml = route.modes.map(mode => {
+                        const iconClass = { bus: 'fa-bus', train: 'fa-train-subway', metro: 'fa-train-tram', taxi: 'fa-taxi', walk: 'fa-person-walking'}[mode.type];
+                        const background = { bus: 'var(--primary)', train: 'var(--success)', metro: '#8B5CF6', taxi: 'var(--warning)', walk: 'var(--text-muted)'}[mode.type];
+                        return `<div class="route-icon" style="background: ${background};"><i class="fa-solid ${iconClass}"></i></div>`;
+                    }).join('<i class="fa-solid fa-chevron-right fa-xs" style="margin: 0 6px; color: var(--text-muted);"></i>');
+
+                    option.innerHTML = `
+                        <div class="route-header">
+                            <div class="route-summary">${iconsHtml}</div>
+                            <div class="route-info">
+                                <div class="route-duration">${route.duration}</div>
+                                <div class="route-distance">${route.distance}</div>
+                            </div>
+                        </div>
+                    `;
+                    this.dom.routeResults.appendChild(option);
+                });
+            }
+
+            addUpdate(message, type = 'info') {
+                const iconMap = {
+                    info: 'fa-circle-info',
+                    warning: 'fa-triangle-exclamation',
+                    error: 'fa-circle-exclamation',
+                    success: 'fa-circle-check',
+                    bus: 'fa-bus',
+                    train: 'fa-train-subway',
+                    metro: 'fa-train-tram'
+                };
+
+                const colorMap = {
+                    info: 'var(--info)',
+                    warning: 'var(--warning)',
+                    error: 'var(--error)',
+                    success: 'var(--success)',
+                    bus: 'var(--primary)',
+                    train: 'var(--success)',
+                    metro: '#8B5CF6'
+                };
+
+                const update = document.createElement('div');
+                update.className = 'update-item';
+                update.innerHTML = `
+                    <div class="update-icon" style="background:${colorMap[type]}">
+                        <i class="fa-solid ${iconMap[type]}"></i>
+                    </div>
+                    <div class="update-content">
+                        <div class="update-text">${message}</div>
+                        <div class="update-time">
+                            <i class="fa-regular fa-clock"></i> ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                    </div>
+                `;
+                this.dom.updatesList.prepend(update);
+                 if (this.dom.updatesList.children.length > 5) {
+                    this.dom.updatesList.lastChild.remove();
+                }
+            }
+
+            startLiveUpdates() {
+                const sampleUpdates = [
+                    { msg: "Harbour Line trains delayed by 8 mins due to signal failure.", type: "train" },
+                    { msg: "New BEST electric buses launched on Route A-9.", type: "bus" },
+                    { msg: "Monsoon schedule updated for Ferry services.", type: "info" },
+                    { msg: "Ghatkopar Metro Station closed for maintenance on Sunday.", type: "metro" }
+                ];
+
+                this.addUpdate("Welcome to MumbaiTransport! All systems operational.", "success");
+
+                let index = 0;
+                setInterval(() => {
+                    const { msg, type } = sampleUpdates[index];
+                    this.addUpdate(msg, type);
+                    index = (index + 1) % sampleUpdates.length; // Loop through updates
+                }, 12000); // every 12 seconds
+            }
         }
 
-        .card-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-        }
-
-        .stat {
-            text-align: center;
-            flex: 1;
-        }
-
-        .stat-number {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-primary);
-            line-height: 1;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* Quick actions */
-        .action-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .action-button {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 14px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .action-button:active {
-            background: var(--surface-hover);
-            transform: scale(0.98);
-        }
-
-        .action-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius-sm);
-            background: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 16px;
-        }
-
-        /* Map section */
-        .map-container {
-            height: 200px;
-            background: var(--background);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            position: relative;
-            border: 1px solid var(--border);
-        }
-
-        .mapboxgl-map {
-            width: 100%;
-            height: 100%;
-        }
-
-        .map-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
-            color: white;
-            padding: 16px;
-            z-index: 2;
-        }
-
-        .map-overlay h3 {
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
-
-        .map-overlay p {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        .map-controls {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            z-index: 2;
-            display: flex;
-            gap: 8px;
-        }
-
-        .map-btn {
-            background: var(--surface);
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-md);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-muted);
-        }
-
-        .map-btn:hover {
-            background: var(--surface-hover);
-        }
-
-        /* Live updates */
-        .updates-list {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-        }
-
-        .update-item {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-light);
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .update-item:last-child {
-            border-bottom: none;
-        }
-
-        .update-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-            color: white;
-        }
-
-        .update-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .update-text {
-            font-size: 13px;
-            color: var(--text-primary);
-            line-height: 1.4;
-            margin-bottom: 4px;
-        }
-
-        .update-time {
-            font-size: 11px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* Bottom navigation */
-        .bottom-nav {
-            background: var(--surface);
-            border-top: 1px solid var(--border);
-            padding: 8px 20px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-
-        .nav-button {
-            padding: 8px 4px;
-            border-radius: var(--radius-md);
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .nav-button.active {
-            color: var(--primary);
-        }
-
-        .nav-button:active {
-            transform: scale(0.95);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-        }
-
-        .nav-button.active .nav-icon {
-            color: var(--primary);
-        }
-
-        /* Offline indicator */
-        .offline-banner {
-            background: var(--warning);
-            color: white;
-            padding: 8px 20px;
-            font-size: 12px;
-            text-align: center;
-            font-weight: 500;
-            display: none;
-        }
-
-        .offline-banner.show {
-            display: block;
-        }
-
-        /* Route planner modal */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-content {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            width: 90%;
-            max-width: 400px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-        }
-
-        .modal.active .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            padding: 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .modal-body {
-            padding: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            font-size: 14px;
-            color: var(--text-primary);
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .form-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.1);
-        }
-
-        .form-submit {
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            padding: 14px;
-            font-size: 14px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .form-submit:hover {
-            background: var(--primary-dark);
-        }
-
-        /* Route results */
-        .route-results {
-            margin-top: 16px;
-            border-top: 1px solid var(--border);
-            padding-top: 16px;
-        }
-
-        .route-option {
-            padding: 12px;
-            border-radius: var(--radius-md);
-            background: var(--background);
-            margin-bottom: 12px;
-            border: 1px solid var(--border);
-        }
-
-        .route-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .route-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 8px;
-            color: white
+        // Initialize app after DOM ready
+        document.addEventListener('DOMContentLoaded', () => new MumbaiTransportApp());
+    </script>
+</body>
+</html>
