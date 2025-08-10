@@ -319,9 +319,38 @@
         <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
         <input type="text" class="search-input" id="searchInput" placeholder="Search routes or destinations..." aria-label="Search routes or destinations" autocomplete="off" />
       </div>
+      <div style="display:flex; gap:8px; margin-top:4px;">
+        <span class="chip" id="share-btn" role="button" tabindex="0"><i class="fa-solid fa-share-from-square"></i> Share</span>
+        <span class="chip info" id="home-refresh" role="button" tabindex="0"><i class="fa-solid fa-arrows-rotate"></i> Refresh</span>
+      </div>
     </header>
 
     <main class="content" id="main">
+      <section aria-labelledby="home-panel-heading" id="home-panel">
+        <h2 class="section-title" id="home-panel-heading"><i class="fa-solid fa-star"></i> Your Home</h2>
+        <div class="updates-list" style="margin-bottom: 12px;">
+          <div class="update-item">
+            <div class="update-icon" style="background: var(--primary);"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="update-content" style="width:100%">
+              <div class="update-text" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>Recent Searches</span><button id="clear-recent" class="chip" type="button">Clear</button>
+              </div>
+              <div id="recentList" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="updates-list">
+          <div class="update-item">
+            <div class="update-icon" style="background: var(--success);"><i class="fa-solid fa-bookmark"></i></div>
+            <div class="update-content" style="width:100%">
+              <div class="update-text" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>Saved Trips</span><button id="clear-trips" class="chip" type="button">Clear</button>
+              </div>
+              <div id="tripsList" style="margin-top:8px; display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
       <section aria-labelledby="modes-heading">
         <h2 class="section-title" id="modes-heading"><i class="fa-solid fa-bus"></i> Transport Modes <span class="live-indicator">LIVE</span></h2>
         <div class="transport-grid" role="tablist" aria-label="Transport modes">
@@ -658,6 +687,8 @@
 
         setupEventListeners() {
           document.getElementById('theme-toggle').addEventListener('click', () => this.toggleTheme());
+          document.getElementById('share-btn').addEventListener('click', () => this.shareCurrentView());
+          document.getElementById('home-refresh').addEventListener('click', () => this.renderHomePanel());
 
           // Transport cards open detail sheet
           document.querySelectorAll('.transport-card').forEach(card => {
@@ -718,6 +749,9 @@
           // URL params for embed mode
           this.handleURLParams();
 
+          // Initial render for home panel
+          this.renderHomePanel();
+
           // FAB
           const fab = document.getElementById('fab');
           const fabMain = document.getElementById('fab-main');
@@ -725,6 +759,108 @@
           document.getElementById('fab-fare').addEventListener('click', () => this.openFareEstimator());
           document.getElementById('fab-tickets').addEventListener('click', () => this.openTicketsSheet());
           document.getElementById('fab-nearby').addEventListener('click', () => this.openNearbySheet());
+        }
+
+        shareCurrentView() {
+          const url = location.href;
+          if (navigator.share) {
+            navigator.share({ title: 'Mumbai Transport Hub', url }).catch(()=>{});
+          } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(() => this.showNotification('🔗 Link copied'));
+          } else {
+            this.showNotification('🔗 ' + url);
+          }
+        }
+
+        renderHomePanel() {
+          const recentWrap = document.getElementById('recentList');
+          const tripsWrap = document.getElementById('tripsList');
+          if (!recentWrap || !tripsWrap) return;
+
+          // Recent searches as chips
+          recentWrap.innerHTML = '';
+          if (this.appData.recentSearches.length === 0) {
+            recentWrap.innerHTML = '<span class="chip">No recent searches</span>';
+          } else {
+            this.appData.recentSearches.forEach(q => {
+              const chip = document.createElement('button');
+              chip.className = 'chip';
+              chip.type = 'button';
+              chip.textContent = q;
+              chip.addEventListener('click', () => {
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                  searchInput.value = q;
+                  this.performSearch(q);
+                  this.scrollToSection('departures-heading');
+                }
+              });
+              recentWrap.appendChild(chip);
+            });
+          }
+
+          // Saved trips list with focus chips
+          tripsWrap.innerHTML = '';
+          if (this.appData.savedTrips.length === 0) {
+            tripsWrap.innerHTML = '<div class="frequency-item"><div><strong>No saved trips</strong><br><span style="color:var(--text-secondary);font-size:13px">Save routes from search</span></div></div>';
+          } else {
+            this.appData.savedTrips.forEach(t => {
+              // Lookup from schedules to get name/endpoints
+              const all = window.MUMBAI_SCHEDULES?.routes || [];
+              const match = all.find(r => r.mode === t.transport && (r.routeId === t.id || r.id === t.id));
+              const title = match ? match.name : `${t.transport.toUpperCase()} • ${t.id}`;
+              const sub = match ? `${match.from} → ${match.to}` : 'Saved route';
+              const row = document.createElement('div');
+              row.className = 'frequency-item';
+              row.innerHTML = `
+                <div>
+                  <strong>${title}</strong><br>
+                  <span style="color:var(--text-secondary);font-size:13px">${sub}</span>
+                </div>
+                <div>
+                  <button class="chip info" data-focus="${t.transport}:${t.id}"><i class="fa-solid fa-location-crosshairs"></i> Focus</button>
+                </div>
+              `;
+              tripsWrap.appendChild(row);
+            });
+            tripsWrap.querySelectorAll('[data-focus]').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const [transport, id] = btn.getAttribute('data-focus').split(':');
+                this.focusRoute({ transport, id });
+              });
+            });
+          }
+
+          // Clear handlers
+          const clearRecent = document.getElementById('clear-recent');
+          const clearTrips = document.getElementById('clear-trips');
+          clearRecent?.addEventListener('click', () => {
+            this.appData.recentSearches = [];
+            localStorage.setItem('mth.recentSearches', '[]');
+            this.renderHomePanel();
+          });
+          clearTrips?.addEventListener('click', () => {
+            this.appData.savedTrips = [];
+            localStorage.setItem('mth.savedTrips', '[]');
+            this.renderHomePanel();
+          });
+        }
+
+        focusRoute({ transport, id }) {
+          // Find route and zoom map to corridor endpoints
+          const all = window.MUMBAI_SCHEDULES?.routes || [];
+          const match = all.find(r => r.mode === transport && (r.routeId === id || r.id === id));
+          if (!match || !this.map) {
+            this.showNotification('⚠️ Route details not available');
+            return;
+          }
+          const from = match.fromStop, to = match.toStop;
+          if (from && to) {
+            const bounds = L.latLngBounds([ [from.lat, from.lng], [to.lat, to.lng] ]);
+            this.map.fitBounds(bounds.pad(0.2));
+            this.scrollToSection('live-heading');
+            this.showNotification(`🎯 Focused ${match.name}`);
+          }
         }
 
         setupSheetControls() {
