@@ -1422,6 +1422,72 @@
           document.getElementById('sheet').setAttribute('aria-hidden', 'false');
         }
 
+        // Predefined stop lists for detailed route info (concise, ordered)
+        getRouteStops() {
+          return {
+            M1: ['Versova','D.N. Nagar','Azad Nagar','Andheri','Western Express Highway','Chakala (J.B.Nagar)','Marol Naka','Airport Road','Saki Naka','Asalpha','Jagruti Nagar','Ghatkopar'],
+            M2A: ['Dahisar East','Ovaripada','Rashtriya Udyan','Devipada','Magathane','Poisar','Akurli','Kurla (W.E.)','Valnai–Meeth Chowky','Lower Malad','Bangur Nagar','Goregaon West','Lower Oshiwara','Lower DN Nagar','DN Nagar'],
+            M7: ['Dahisar East','Ovaripada','Rashtriya Udyan','Magathane','Poisar','Akurli','Aarey','Mogra','Jogeshwari East','Shankarwadi','Andheri East'],
+            M3: ['Aarey JVLR','SEEPZ','MIDC','Marol Naka','CSIA T2','Santacruz Electronics Export Processing Zone','BKC','Acharya Atre Chowk'],
+            WR_FAST: ['Borivali','Andheri','Bandra','Dadar','Mumbai Central','Churchgate'],
+            WR_SLOW: ['Virar','Nalasopara','Vasai Road','Bhayandar','Borivali','Andheri','Bandra','Dadar','Mumbai Central','Churchgate'],
+            CR_FAST: ['Kalyan','Thane','Ghatkopar','Dadar','Byculla','CSMT'],
+            HR: ['Panvel','Kharghar','Vashi','Mankhurd','Wadala Road','Sandhurst Road','CSMT']
+          };
+        }
+
+        openRouteDetails(routeId, reverse=false) {
+          const routes = (window.MUMBAI_SCHEDULES?.routes)||[];
+          const route = routes.find(r => r.routeId === routeId);
+          const stopsMap = this.getRouteStops();
+          let stops = stopsMap[routeId] || (route ? [route.from, route.to] : []);
+          if (reverse) stops = [...stops].reverse();
+          const direction = reverse && route ? `${route.to} → ${route.from}` : (route ? `${route.from} → ${route.to}` : '');
+
+          const listHtml = stops.map((s, i) => `
+            <div class="frequency-item">
+              <div><strong>${i+1}. ${s}</strong></div>
+              <div class="chip">${i===0?'Start':(i===stops.length-1?'End':'Stop')}</div>
+            </div>
+          `).join('');
+
+          const nextHtml = route ? (()=>{
+            try {
+              const n = (window.nextDepartures ? window.nextDepartures(route, 3) : []) || [];
+              if (!n.length) return '';
+              return `<div style="margin-top:8px">${n.map(d=>`<span class=\"chip\">${d.etaMin} min</span>`).join(' ')}</div>`;
+            } catch(_) { return ''; }
+          })() : '';
+
+          const content = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div>
+                <h3 style="margin:0;">${route ? route.name : routeId}</h3>
+                <div style="font-size:12px;color:var(--text-secondary);">Direction: <strong id="routeDirText">${direction}</strong></div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="chip info" id="toggleDir"><i class="fa-solid fa-right-left"></i> Reverse</button>
+                <button class="chip" id="focusRoute"><i class="fa-solid fa-location-crosshairs"></i> Focus</button>
+              </div>
+            </div>
+            ${nextHtml}
+            <div style="margin-top:10px;">${listHtml}</div>
+          `;
+          this.openSheet('Route Details', content);
+          this.bindRouteDetailEvents({ routeId, reverse });
+        }
+
+        bindRouteDetailEvents(state) {
+          const toggle = document.getElementById('toggleDir');
+          const focus = document.getElementById('focusRoute');
+          toggle?.addEventListener('click', () => this.openRouteDetails(state.routeId, !state.reverse));
+          focus?.addEventListener('click', () => {
+            const all = window.MUMBAI_SCHEDULES?.routes || [];
+            const match = all.find(r => r.routeId === state.routeId);
+            if (match) this.focusRoute({ transport: match.mode, id: match.routeId });
+          });
+        }
+
         closeSheet() {
           document.getElementById('sheetBackdrop').classList.remove('show');
           document.getElementById('sheet').classList.remove('show');
@@ -1437,11 +1503,17 @@
           if (routes.length > 0) {
             content += '<div class="frequency-list">';
             routes.forEach(route => {
+              const routeId = route.routeId || route.id;
               content += `
                 <div class="frequency-item">
                   <div>
                     <strong>${route.name}</strong><br>
                     <span style="color: var(--text-secondary); font-size: 13px;">${route.from} → ${route.to}</span>
+                    <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+                      <button class="chip" data-route="${routeId}"><i class="fa-solid fa-train"></i> Direction A</button>
+                      <button class="chip" data-route-rev="${routeId}"><i class="fa-solid fa-train"></i> Direction B</button>
+                      <button class="chip info" data-focus="${route.mode}:${routeId}"><i class="fa-solid fa-location-crosshairs"></i> Focus</button>
+                    </div>
                   </div>
                   <div style="text-align: right; font-size: 12px; color: var(--text-muted);">
                     ${route.frequencies?.[0]?.headway || 'N/A'} min intervals
@@ -1455,6 +1527,14 @@
           }
           
           this.openSheet(`${transport.toUpperCase()} Information`, content);
+          // Bind route detail chips
+          const body = document.getElementById('sheetBody');
+          body.querySelectorAll('[data-route]')?.forEach(b => b.addEventListener('click', ()=> this.openRouteDetails(b.getAttribute('data-route'), false)));
+          body.querySelectorAll('[data-route-rev]')?.forEach(b => b.addEventListener('click', ()=> this.openRouteDetails(b.getAttribute('data-route-rev'), true)));
+          body.querySelectorAll('[data-focus]')?.forEach(b => b.addEventListener('click', ()=> {
+            const [transport, id] = b.getAttribute('data-focus').split(':');
+            this.focusRoute({ transport, id });
+          }));
         }
 
         openTicketsSheet() {
