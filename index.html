@@ -1653,10 +1653,9 @@
         // Auto Fare Estimator (Mumbai, Aug 2025)
         openFareEstimator() {
           const now = new Date();
-          const night = now.getHours() >= 23 || now.getHours() < 5; // typical night window
-          const base = night ? 33 : 30; // base fare
-          const perKm = night ? 23 : 21; // per-km fare
-          const perMin = 2; // nominal time component for traffic waiting
+          const night = now.getHours() < 5; // 00:00–05:00 night charge window
+          const base = 26; // Minimum fare (covers first 1 km)
+          const perKm = 17.14; // Each km after first, rounded to nearest rupee on total
 
           const content = `
             <div class="tabs" role="tablist" aria-label="Fare">
@@ -1664,26 +1663,24 @@
               <div class="tab" data-tab="taxi" role="tab" aria-selected="false">Taxi</div>
             </div>
             <div id="fare-content" style="margin-top:12px">
-              ${this.renderFareTab('auto', { base, perKm, perMin, night })}
+              ${this.renderFareTab('auto', { base, perKm, night })}
             </div>
           `;
           this.openSheet('Fare Estimator', content);
-          this.bindFareTabs({ base, perKm, perMin, night });
+          this.bindFareTabs({ base, perKm, night });
+          this.setupFareCalc('auto', { base, perKm, night });
         }
 
         renderFareTab(tab, cfg) {
           const inputs = `
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;">
+            <div style="display:grid;grid-template-columns:1fr;gap:10px;margin:10px 0;">
               <div>
                 <label style="font-size:12px;color:var(--text-secondary)">Distance (km)</label>
                 <input id="fare-km" type="number" min="0" step="0.1" value="5" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-primary)" />
-              </div>
-              <div>
-                <label style="font-size:12px;color:var(--text-secondary)">Time (min)</label>
-                <input id="fare-min" type="number" min="0" step="1" value="20" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-primary)" />
+                <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">Minimum fare ₹${Math.round(cfg.base)} covers first 1 km. Subsequent per km ₹${cfg.perKm}.</div>
               </div>
             </div>
-            <div class="chip ${cfg.night ? 'warn' : 'success'}">${cfg.night ? 'Night charges active' : 'Day rates'}</div>
+            <div class="chip ${cfg.night ? 'warn' : 'success'}">${cfg.night ? 'Night +25% (00:00–05:00)' : 'Day rates'}</div>
           `;
 
           if (tab === 'taxi') {
@@ -1692,16 +1689,6 @@
               ${inputs}
               <div id="fare-output" style="margin-top:12px"></div>
               <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">Estimates as of Aug 2025. Actual fares may vary by RTO updates, traffic, and operator.</div>
-              <script data-cfasync="false">(function(){
-                const calc = () => {
-                  const km = parseFloat(document.getElementById('fare-km').value||'0');
-                  const mins = parseFloat(document.getElementById('fare-min').value||'0');
-                  const fare = Math.max(${tCfg.base}, ${tCfg.base} + km*${tCfg.perKm} + mins*${tCfg.perMin});
-                  document.getElementById('fare-output').innerHTML = `<div class=\"frequency-item\"><div><strong>Estimated Taxi Fare</strong><br><span style=\"color:var(--text-secondary);font-size:13px\">${'${km.toFixed(1)}'} km • ${'${mins}'} min</span></div><div class=\"chip\">₹ ${'${Math.round(fare)}'}</div></div>`;
-                };
-                ['fare-km','fare-min'].forEach(id=>document.getElementById(id).addEventListener('input', calc));
-                calc();
-              })()</script>
             `;
           }
 
@@ -1709,16 +1696,6 @@
             ${inputs}
             <div id="fare-output" style="margin-top:12px"></div>
             <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">Estimates as of Aug 2025. Actual fares may vary by RTO updates, traffic, and operator.</div>
-            <script data-cfasync="false">(function(){
-              const calc = () => {
-                const km = parseFloat(document.getElementById('fare-km').value||'0');
-                const mins = parseFloat(document.getElementById('fare-min').value||'0');
-                const fare = Math.max(${cfg.base}, ${cfg.base} + km*${cfg.perKm} + mins*${cfg.perMin});
-                document.getElementById('fare-output').innerHTML = `<div class=\"frequency-item\"><div><strong>Estimated Auto Fare</strong><br><span style=\"color:var(--text-secondary);font-size:13px\">${'${km.toFixed(1)}'} km • ${'${mins}'} min</span></div><div class=\"chip\">₹ ${'${Math.round(fare)}'}</div></div>`;
-              };
-              ['fare-km','fare-min'].forEach(id=>document.getElementById(id).addEventListener('input', calc));
-              calc();
-            })()</script>
           `;
         }
 
@@ -1729,8 +1706,37 @@
               container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
               tab.classList.add('active');
               container.querySelector('#fare-content').innerHTML = this.renderFareTab(tab.dataset.tab, cfg);
+              if (tab.dataset.tab === 'taxi') {
+                const tCfg = { base: cfg.night ? 40 : 35, perKm: cfg.night ? 28 : 26, perMin: 3, night: cfg.night };
+                this.setupFareCalc('taxi', tCfg);
+              } else {
+                this.setupFareCalc('auto', cfg);
+              }
             });
           });
+        }
+
+        setupFareCalc(mode, cfg) {
+          const kmInput = document.getElementById('fare-km');
+          const out = document.getElementById('fare-output');
+          if (!kmInput || !out) return;
+          const calc = () => {
+            const km = Math.max(0, parseFloat(kmInput.value || '0'));
+            let fare;
+            if (mode === 'auto') {
+              const extraKm = Math.max(0, km - 1);
+              const dayFare = cfg.base + extraKm * cfg.perKm;
+              fare = cfg.night ? Math.round(dayFare * 1.25) : Math.round(dayFare);
+              out.innerHTML = `<div class="frequency-item"><div><strong>Estimated Auto Fare</strong><br><span style="color:var(--text-secondary);font-size:13px">${km.toFixed(1)} km</span></div><div class="chip">₹ ${fare}</div></div>`;
+            } else {
+              // Simple taxi estimate: base + perKm*km
+              const dayFare = cfg.base + km * cfg.perKm; // ignoring perMin in simple UI
+              fare = Math.round(dayFare);
+              out.innerHTML = `<div class="frequency-item"><div><strong>Estimated Taxi Fare</strong><br><span style="color:var(--text-secondary);font-size:13px">${km.toFixed(1)} km</span></div><div class="chip">₹ ${fare}</div></div>`;
+            }
+          };
+          kmInput.addEventListener('input', calc);
+          calc();
         }
       }
 
