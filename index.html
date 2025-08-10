@@ -185,6 +185,16 @@
       z-index: 1000; box-shadow: var(--shadow-lg); max-width: 300px;
     }
 
+    /* Bottom sheet for details */
+    .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1200; display: none; }
+    .sheet { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: 16px 16px 0 0; box-shadow: var(--shadow-lg); transform: translateY(100%); transition: transform 0.25s ease; z-index: 1201; max-height: 70vh; display: flex; flex-direction: column; }
+    .sheet.open { transform: translateY(0); }
+    .sheet-backdrop.show { display: block; }
+    .sheet-header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); }
+    .sheet-title { font-size: 14px; font-weight: 700; }
+    .sheet-close { border: 1px solid var(--border); background: var(--background); color: var(--text-secondary); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+    .sheet-body { padding: 12px 16px; overflow-y: auto; }
+
     .stat-number.updating { animation: numberUpdate 0.5s ease; }
     @keyframes numberUpdate { 0%{transform:scale(1)} 50%{transform:scale(1.1); color:var(--primary)} 100%{transform:scale(1)} }
 
@@ -250,8 +260,8 @@
             </div>
             <div class="card-stats" aria-hidden="true">
               <div class="stat">
-                <span class="stat-number" id="bus-count">1,247</span>
-                <span class="stat-label">Active</span>
+                <span class="stat-number" id="bus-count">2,800</span>
+                <span class="stat-label">Fleet</span>
               </div>
               <div class="stat">
                 <span class="stat-number" id="bus-ontime">92%</span>
@@ -271,7 +281,7 @@
             </div>
             <div class="card-stats" aria-hidden="true">
               <div class="stat">
-                <span class="stat-number" id="train-count">2,847</span>
+                <span class="stat-number" id="train-count">2,342</span>
                 <span class="stat-label">Services</span>
               </div>
               <div class="stat">
@@ -390,6 +400,30 @@
         <div class="updates-list" id="updatesList" role="feed" aria-live="polite"></div>
       </section>
 
+      <section aria-labelledby="facts-heading">
+        <h2 class="section-title" id="facts-heading"><i class="fa-solid fa-chart-line"></i> Mumbai Transport Facts</h2>
+        <div class="updates-list">
+          <div class="update-item">
+            <div class="update-icon" style="background: var(--success);">
+              <i class="fa-solid fa-bus"></i>
+            </div>
+            <div class="update-content">
+              <div class="update-text"><strong>BEST</strong> operates ~2,800 buses across Mumbai.</div>
+              <div class="update-time">Daily operations</div>
+            </div>
+          </div>
+          <div class="update-item">
+            <div class="update-icon" style="background: var(--info);">
+              <i class="fa-solid fa-train"></i>
+            </div>
+            <div class="update-content">
+              <div class="update-text"><strong>Mumbai Suburban Railway</strong> runs 2,342 services daily and carries 7.5M+ commuters on Western, Central and Harbour lines.</div>
+              <div class="update-time">Indicative daily averages</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section aria-labelledby="metro-info-heading">
         <h2 class="section-title" id="metro-info-heading"><i class="fa-solid fa-circle-info"></i> Mumbai Metro Network Status</h2>
         <div class="updates-list">
@@ -433,6 +467,16 @@
         Account
       </button>
     </nav>
+  </div>
+
+  <!-- Bottom sheet for details -->
+  <div class="sheet-backdrop" id="sheetBackdrop"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+    <div class="sheet-header">
+      <div class="sheet-title" id="sheetTitle">Details</div>
+      <button class="sheet-close" id="sheetClose" type="button">Close</button>
+    </div>
+    <div class="sheet-body" id="sheetBody"></div>
   </div>
 
   <noscript>
@@ -976,7 +1020,7 @@
       }
 
       let transportHub;
-      document.addEventListener('DOMContentLoaded', () => {
+      function boot() {
         transportHub = new MumbaiTransportHub();
 
         // Initial service update
@@ -997,7 +1041,10 @@
         }, 30000);
 
         window.MumbaiTransport = transportHub;
-      });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else { boot(); }
     })();
   </script>
   <script>
@@ -1162,6 +1209,9 @@
       ]
     };
 
+    // Expose schedules for UI details
+    window.MUMBAI_SCHEDULES = SCHEDULES;
+
     const colors = { bus:'#5E6AD2', train:'#00B87A', metro:'#8B5CF6', ferry:'#0EA5E9', monorail:'#10B981' };
     const icons  = { bus:'fa-bus', train:'fa-train-subway', metro:'fa-train-tram', ferry:'fa-ship', monorail:'fa-train' };
     const toMinutes = (hhmm) => { const [h,m] = hhmm.split(':').map(Number); return h*60 + m; };
@@ -1219,12 +1269,12 @@
         const lng = route.fromStop.lng + (route.toStop.lng - route.fromStop.lng) * progress;
         if (hub.map && !hub.mapFallbackMode && window.L) {
           const id = `${route.routeId}_${nowMin - offset}`;
-          let marker = hub.appData.leafletMarkers?.get ? hub.appData.leafletMarkers.get(id) : null;
+          let marker = (hub.appData && hub.appData.leafletMarkers && hub.appData.leafletMarkers.get) ? hub.appData.leafletMarkers.get(id) : null;
           if (!marker) {
             marker = L.circleMarker([lat, lng], { radius:5, color:'#fff', weight:1.5, fillColor:colors[mode], fillOpacity:1 })
                       .bindTooltip(`${route.name}`, { direction:'top', offset:[0,-4] })
                       .addTo(hub.map);
-            hub.appData.leafletMarkers?.set && hub.appData.leafletMarkers.set(id, marker);
+            if (hub.appData && hub.appData.leafletMarkers && hub.appData.leafletMarkers.set) hub.appData.leafletMarkers.set(id, marker);
           } else {
             marker.setLatLng([lat, lng]);
           }
@@ -1246,6 +1296,16 @@
         const routes = (SCHEDULES.routes||[]).filter(r => r.mode === mode).slice(0, 6);
         if (!routes.length) return this.updateSchedulesSimulated();
         scheduleList.innerHTML = '';
+        // Add a header row with a details button
+        const header = document.createElement('div');
+        header.className = 'update-item';
+        header.innerHTML = `
+          <div class="update-icon" style="background:${colors[mode]};"><i class="fa-solid ${icons[mode]}"></i></div>
+          <div class="update-content">
+            <div class="update-text"><strong>${mode.toUpperCase()}</strong> next departures</div>
+            <div class="update-time">Tap a route for details</div>
+          </div>`;
+        scheduleList.appendChild(header);
         routes.forEach(route => {
           const n = nextDepartures(route, 1)[0];
           const total = n ? n.etaMin : '—';
@@ -1258,6 +1318,7 @@
               <div class="schedule-route">${route.name} • ${route.from} → ${route.to}</div>
               <div class="schedule-time">Next: ${total} min${delayText}</div>
             </div>`;
+          item.addEventListener('click', () => openDetailsSheet({ type: 'route', mode, route }));
           scheduleList.appendChild(item);
         });
       };
@@ -1267,7 +1328,7 @@
         const routes = (SCHEDULES.routes||[]).filter(r => r.mode === mode).slice(0, 6);
         if (!routes.length) return this.updateVehiclePositionsSimulated();
         if (!this.map || this.mapFallbackMode || !window.L) clearFallbackMarkers();
-        if (this.appData?.leafletMarkers && this.appData.leafletMarkers.size > 240 && this.map) {
+        if (this.appData && this.appData.leafletMarkers && this.appData.leafletMarkers.size > 240 && this.map) {
           this.appData.leafletMarkers.forEach((m, id) => { m.remove(); this.appData.leafletMarkers.delete(id); });
         }
         routes.forEach(route => placeMarkersForRoute(this, route, mode));
@@ -1288,6 +1349,74 @@
       const iv = setInterval(() => { if (tryInit()) clearInterval(iv); }, 300);
       setTimeout(() => clearInterval(iv), 12000);
     }
+
+    // Bottom sheet helpers
+    function openDetailsSheet(payload) {
+      const sheet = document.getElementById('sheet');
+      const sheetBody = document.getElementById('sheetBody');
+      const sheetTitle = document.getElementById('sheetTitle');
+      const backdrop = document.getElementById('sheetBackdrop');
+      if (!sheet || !sheetBody || !sheetTitle || !backdrop) return;
+
+      if (payload && payload.type === 'route') {
+        const r = payload.route;
+        sheetTitle.textContent = `${r.name}`;
+        const wins = (r.frequencies||[]).map(f => `<li>${f.days}: ${f.start}–${f.end} • every ${f.headway} min • runtime ${f.runtime} min</li>`).join('');
+        sheetBody.innerHTML = `
+          <div style="margin-bottom:8px; color: var(--text-secondary);">${r.from} → ${r.to}</div>
+          <ul style="margin-left:16px;">${wins || '<li>No data</li>'}</ul>
+        `;
+      } else if (payload && payload.type === 'actions') {
+        sheetTitle.textContent = payload.title || 'Actions';
+        sheetBody.innerHTML = payload.html || '';
+      }
+
+      sheet.setAttribute('aria-hidden', 'false');
+      sheet.classList.add('open');
+      backdrop.classList.add('show');
+      backdrop.onclick = closeDetailsSheet;
+      const closeBtn = document.getElementById('sheetClose');
+      if (closeBtn) closeBtn.onclick = closeDetailsSheet;
+    }
+    function closeDetailsSheet() {
+      const sheet = document.getElementById('sheet');
+      const backdrop = document.getElementById('sheetBackdrop');
+      if (!sheet || !backdrop) return;
+      sheet.classList.remove('open');
+      backdrop.classList.remove('show');
+      sheet.setAttribute('aria-hidden', 'true');
+    }
+
+    // Hook up action buttons and nav for better UX
+    document.addEventListener('DOMContentLoaded', () => {
+      const actions = [
+        { id: 'buy-ticket', title: 'Buy Ticket', html: '<p>Use the official operator apps or kiosks. This demo shows static schedules only.</p>' },
+        { id: 'plan-journey', title: 'Plan Journey', html: '<p>Pick a mode, then compare next departures. Detailed journey planning can be integrated later.</p>' },
+        { id: 'nearby-stations', title: 'Nearby Stations', html: '<p>Enable location in a future update to show stations within 1–3 km. For now, use mode schedules above.</p>' },
+        { id: 'recharge-card', title: 'Recharge Card', html: '<p>Use your wallet or the official portals to recharge. This demo does not process payments.</p>' }
+      ];
+      actions.forEach(a => {
+        const el = document.getElementById(a.id);
+        if (el) el.addEventListener('click', () => openDetailsSheet({ type: 'actions', title: a.title, html: a.html }));
+      });
+
+      document.querySelectorAll('.nav-button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const nav = btn.getAttribute('data-nav');
+          if (nav === 'home') window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (nav === 'map') {
+            const el = document.getElementById('live-heading');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          if (nav === 'tickets') {
+            openDetailsSheet({ type:'actions', title:'Tickets', html:'<p>Tickets can be purchased via operator apps or counters. This demo shows schedules only.</p>' });
+          }
+          if (nav === 'account') {
+            openDetailsSheet({ type:'actions', title:'Account', html:'<p>Sign-in and profile features are not part of this static demo.</p>' });
+          }
+        });
+      });
+    });
   })();
   </script>
 </body>
