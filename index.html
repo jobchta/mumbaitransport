@@ -525,7 +525,7 @@
   <!-- Leaflet JS with fallback CDN -->
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="(function(){var s=document.createElement('script');s.defer=true;s.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';document.head.appendChild(s);})()"></script>
 
-  <script>
+  <script data-cfasync="false">
     // Mumbai Transport Hub - robust single-file app
     (function() {
       const STORAGE_KEYS = {
@@ -1092,10 +1092,16 @@
         }
 
         registerServiceWorker() {
+          // Disable SW under proxied /portal path to avoid caching/interaction issues
+          try {
+            const path = (location && location.pathname) || '';
+            if (path.startsWith('/portal')) return; // skip under Cloudflare proxy
+          } catch (_) {}
           if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => {
-              console.warn('SW registration failed (ok if no sw.js yet):', err);
-            });
+            // Only register if sw.js exists
+            fetch('sw.js', { method: 'HEAD' })
+              .then(r => { if (r.ok) return navigator.serviceWorker.register('sw.js'); })
+              .catch(() => {});
           }
         }
 
@@ -1376,7 +1382,7 @@
       });
     })();
   </script>
-  <script>
+  <script data-cfasync="false">
   /* Static live overlay (Aug 2025) — single-file, no external JSON. */
   (function(){
     const SCHEDULES = {
