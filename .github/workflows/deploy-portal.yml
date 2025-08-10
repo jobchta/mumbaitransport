@@ -1,0 +1,30 @@
+name: Deploy portal to GoDaddy (FTP)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, feat/static-live-aug-2025 ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via FTP to GoDaddy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          local-dir: .
+          server-dir: /public_html/portal/
+          exclude: |
+            **/.git*/**
+            .github/**
+            **/*.md
+            **/*.MD
+
+
