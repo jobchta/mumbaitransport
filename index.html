@@ -552,6 +552,10 @@
         <i class="nav-icon fa-solid fa-ticket"></i>
         Tickets
       </button>
+      <button class="nav-button" data-nav="journey" type="button">
+        <i class="nav-icon fa-solid fa-route"></i>
+        Journey
+      </button>
       <button class="nav-button" data-nav="account" type="button">
         <i class="nav-icon fa-solid fa-user"></i>
         Account
@@ -682,6 +686,7 @@
               const nav = navBtn.dataset.nav;
               try {
                 if (nav === 'tickets') this.openTicketsSheet();
+                else if (nav === 'journey') this.openJourneySheet();
                 else if (nav === 'account') this.openAccountSheet();
                 else if (nav === 'map') this.scrollToSection('live-heading');
                 else this.scrollToSection('home-panel-heading');
