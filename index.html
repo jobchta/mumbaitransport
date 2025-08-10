@@ -1463,6 +1463,7 @@
               <div class="tab active" data-tab="metro" role="tab" aria-selected="true">Metro</div>
               <div class="tab" data-tab="train" role="tab" aria-selected="false">Train</div>
               <div class="tab" data-tab="bus" role="tab" aria-selected="false">Bus</div>
+              <div class="tab" data-tab="upi" role="tab" aria-selected="false">UPI</div>
             </div>
             <div id="tickets-content" style="margin-top:12px">
               ${this.renderTicketsTab('metro')}
@@ -1476,20 +1477,46 @@
         renderTicketsTab(tab) {
           if (tab === 'metro') {
             return `
-              <div class="frequency-item"><div><strong>Line 1 (Blue)</strong><br><span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span></div><div class="chip info"><i class="fa-brands fa-whatsapp"></i> 9670008889</div></div>
+              <div class="frequency-item">
+                <div>
+                  <strong>Line 1 (Blue)</strong><br>
+                  <span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span>
+                </div>
+                <a href="https://wa.me/919670008889?text=hi" target="_blank" class="chip info">
+                  <i class="fa-brands fa-whatsapp"></i> Book Now
+                </a>
+              </div>
               <ol>
-                <li>Send 'hi' to <strong>9670008889</strong></li>
+                <li>Click "Book Now" or send 'hi' to <strong>9670008889</strong></li>
                 <li>Select source & destination</li>
                 <li>Pay online or share OTP for paper ticket</li>
                 <li>Receive WhatsApp QR to travel</li>
               </ol>
-              <div class="frequency-item"><div><strong>Lines 2A & 7</strong><br><span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span></div><div class="chip info"><i class="fa-brands fa-whatsapp"></i> 86526 35500</div></div>
+              
+              <div class="frequency-item">
+                <div>
+                  <strong>Lines 2A & 7 (Yellow)</strong><br>
+                  <span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span>
+                </div>
+                <a href="https://wa.me/918652635500?text=Hi" target="_blank" class="chip info">
+                  <i class="fa-brands fa-whatsapp"></i> Book Now
+                </a>
+              </div>
               <ul>
-                <li>Send 'Hi' to <strong>86526 35500</strong></li>
+                <li>Click "Book Now" or send 'Hi' to <strong>86526 35500</strong></li>
                 <li>Pay via card/UPI</li>
                 <li>Valid same business day; non-refundable</li>
               </ul>
-              <div class="frequency-item"><div><strong>Line 3 (Aqua)</strong><br><span style="color:var(--text-secondary);font-size:13px">Official MMRCL Portal</span></div><div class="chip">Portal</div></div>
+              
+              <div class="frequency-item">
+                <div>
+                  <strong>Line 3 (Aqua)</strong><br>
+                  <span style="color:var(--text-secondary);font-size:13px">Official MMRCL Portal</span>
+                </div>
+                <a href="https://mmrcl.com/en/map" target="_blank" class="chip">
+                  <i class="fa-solid fa-external-link-alt"></i> Portal
+                </a>
+              </div>
               <p>Book tickets via the official MMRCL portal for Aqua Line services.</p>
             `;
           }
@@ -1497,6 +1524,40 @@
             return `
               <div class="frequency-item"><div><strong>UTS on Mobile</strong><br><span style="color:var(--text-secondary);font-size:13px">Unreserved tickets & passes</span></div><div class="chip success"><i class="fa-solid fa-mobile-screen"></i> Recommended</div></div>
               <p>Use UTS app or station counters for suburban tickets and passes.</p>
+            `;
+          }
+          if (tab === 'upi') {
+            return `
+              <div class="frequency-item">
+                <div>
+                  <strong>Metro UPI QR Tickets</strong><br>
+                  <span style="color:var(--text-secondary);font-size:13px">Mobile-as-ticket at AFC gates</span>
+                </div>
+                <div class="chip success">Valid 2 hours</div>
+              </div>
+              <p>Use your preferred UPI app to buy QR tickets and tap at the gates.</p>
+              
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+                <a href="paytm://metro" target="_self" class="chip info" style="text-decoration:none;">
+                  <i class="fa-solid fa-mobile-screen"></i> PayTM App
+                </a>
+                <a href="phonepe://travel" target="_self" class="chip info" style="text-decoration:none;">
+                  <i class="fa-solid fa-qrcode"></i> PhonePe App
+                </a>
+              </div>
+              
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                <a href="https://paytm.com/metro" target="_blank" rel="noopener noreferrer" class="chip" style="text-decoration:none;">
+                  <i class="fa-solid fa-external-link-alt"></i> PayTM Web
+                </a>
+                <a href="https://www.phonepe.com/travel-and-transit/" target="_blank" rel="noopener noreferrer" class="chip" style="text-decoration:none;">
+                  <i class="fa-solid fa-external-link-alt"></i> PhonePe Web
+                </a>
+              </div>
+              
+              <p style="margin-top:12px; font-size:12px; color:var(--text-muted);">
+                <i class="fa-solid fa-info-circle"></i> Journey must start within 2 hours of issue. Keep QR brightness high for scanning.
+              </p>
             `;
           }
           return `
