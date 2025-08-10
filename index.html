@@ -192,7 +192,7 @@
     .nav-icon { font-size: 20px; }
 
     /* Mini bottom map */
-    .mini-map { position: fixed; left: 12px; right: 12px; bottom: 140px; height: 84px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); z-index: 1100; display: none; }
+    .mini-map { position: fixed; left: 12px; right: 12px; bottom: 140px; height: 84px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); z-index: 1100; display: none; pointer-events: none; }
     .mini-map.show { display: block; }
     #miniMap { height: 100%; width: 100%; filter: saturate(1.1) contrast(1.03); }
     .mini-map-overlay { position: absolute; right: 8px; top: 8px; z-index: 2; }
@@ -637,6 +637,7 @@
         safeInit() {
           try {
             this.setupEventListeners();
+            this.bindGlobalDelegates();
             this.initMap();
             this.createInitialVehicles();
             this.restoreSelectedTransportUI();
@@ -649,6 +650,58 @@
             console.error('Initialization error:', e);
             this.showNotification('⚠️ Initialization failed. Some features may be limited.');
           }
+        }
+
+        bindGlobalDelegates() {
+          // Robust event delegation so buttons always work even if DOM changes
+          document.addEventListener('click', (ev) => {
+            const el = ev.target;
+            if (!el) return;
+            const q = (sel) => el.closest && el.closest(sel);
+
+            // Transport cards
+            const card = q('.transport-card');
+            if (card && card.dataset && card.dataset.transport) {
+              const t = card.dataset.transport;
+              try { this.selectTransport(t); this.openDetailsSheet(t); } catch(_) {}
+              return;
+            }
+
+            // Quick actions
+            if (q('#buy-ticket')) { try { this.openTicketsSheet(); } catch(_) {} return; }
+            if (q('#plan-journey')) { try { this.openJourneySheet(); } catch(_) {} return; }
+            if (q('#nearby-stations')) { try { this.openNearbySheet(); } catch(_) {} return; }
+            if (q('#recharge-card')) { try { this.openRechargeSheet(); } catch(_) {} return; }
+            if (q('#fare-estimator')) { try { this.openFareEstimator(); } catch(_) {} return; }
+
+            // Bottom nav
+            const navBtn = q('.nav-button');
+            if (navBtn && navBtn.dataset && navBtn.dataset.nav) {
+              document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+              navBtn.classList.add('active');
+              const nav = navBtn.dataset.nav;
+              try {
+                if (nav === 'tickets') this.openTicketsSheet();
+                else if (nav === 'account') this.openAccountSheet();
+                else if (nav === 'map') this.scrollToSection('live-heading');
+                else this.scrollToSection('home-panel-heading');
+              } catch(_) {}
+              return;
+            }
+
+            // FAB
+            if (q('#fab-main')) {
+              const fab = document.getElementById('fab');
+              if (fab) fab.classList.toggle('show');
+              return;
+            }
+            if (q('#fab-fare')) { try { this.openFareEstimator(); } catch(_) {} return; }
+            if (q('#fab-tickets')) { try { this.openTicketsSheet(); } catch(_) {} return; }
+            if (q('#fab-nearby')) { try { this.openNearbySheet(); } catch(_) {} return; }
+
+            // Sheet close
+            if (q('#sheetClose') || q('#sheetBackdrop')) { try { this.closeSheet(); } catch(_) {} return; }
+          }, { capture: true });
         }
 
         initializeRoutes() {
@@ -686,9 +739,9 @@
         }
 
         setupEventListeners() {
-          document.getElementById('theme-toggle').addEventListener('click', () => this.toggleTheme());
-          document.getElementById('share-btn').addEventListener('click', () => this.shareCurrentView());
-          document.getElementById('home-refresh').addEventListener('click', () => this.renderHomePanel());
+          document.getElementById('theme-toggle')?.addEventListener('click', () => this.toggleTheme());
+          document.getElementById('share-btn')?.addEventListener('click', () => this.shareCurrentView());
+          document.getElementById('home-refresh')?.addEventListener('click', () => this.renderHomePanel());
 
           // Transport cards open detail sheet
           document.querySelectorAll('.transport-card').forEach(card => {
@@ -707,11 +760,11 @@
           });
 
           // Action buttons open relevant sheets
-          document.getElementById('buy-ticket').addEventListener('click', () => this.openTicketsSheet());
-          document.getElementById('plan-journey').addEventListener('click', () => this.openJourneySheet());
-          document.getElementById('nearby-stations').addEventListener('click', () => this.openNearbySheet());
-          document.getElementById('recharge-card').addEventListener('click', () => this.openRechargeSheet());
-          document.getElementById('fare-estimator').addEventListener('click', () => this.openFareEstimator());
+          document.getElementById('buy-ticket')?.addEventListener('click', () => this.openTicketsSheet());
+          document.getElementById('plan-journey')?.addEventListener('click', () => this.openJourneySheet());
+          document.getElementById('nearby-stations')?.addEventListener('click', () => this.openNearbySheet());
+          document.getElementById('recharge-card')?.addEventListener('click', () => this.openRechargeSheet());
+          document.getElementById('fare-estimator')?.addEventListener('click', () => this.openFareEstimator());
 
           // Navigation buttons
           document.querySelectorAll('.nav-button').forEach(btn => {
@@ -727,14 +780,14 @@
           });
 
           // Time selector
-          document.getElementById('useNow').addEventListener('click', () => {
+          document.getElementById('useNow')?.addEventListener('click', () => {
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
             document.getElementById('refTime').value = timeStr;
             this.updateSchedules();
           });
 
-          document.getElementById('refTime').addEventListener('change', () => this.updateSchedules());
+          document.getElementById('refTime')?.addEventListener('change', () => this.updateSchedules());
 
           // Sheet controls
           this.setupSheetControls();
@@ -2057,7 +2110,7 @@
       const iv = setInterval(() => { if (tryInit()) clearInterval(iv); }, 300);
       setTimeout(() => clearInterval(iv), 12000);
     }
-  })();
+    })();
   </script>
 </body>
 </html>
