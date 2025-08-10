@@ -1437,16 +1437,23 @@
           const routes = window.MUMBAI_SCHEDULES?.routes?.filter(r => r.mode === transport) || [];
           const hash = `mode=${encodeURIComponent(transport)}`;
           history.replaceState(null, '', this.updateHashParam('sheet', hash));
-          let content = `<h3>${transport.toUpperCase()} Details</h3>`;
+          let content = `<h3>${transport.toUpperCase()} Routes & Schedules</h3>`;
           
           if (routes.length > 0) {
+            content += `<p>Found ${routes.length} active routes for ${transport}:</p>`;
             content += '<div class="frequency-list">';
             routes.forEach(route => {
+              const nextDeps = window.nextDepartures ? window.nextDepartures(route, 3) : [];
+              const nextTimings = nextDeps.length ? 
+                nextDeps.map(d => `${d.etaMin} min`).join(', ') : 
+                'Schedule loading...';
+              
               content += `
                 <div class="frequency-item">
                   <div>
                     <strong>${route.name}</strong><br>
-                    <span style="color: var(--text-secondary); font-size: 13px;">${route.from} → ${route.to}</span>
+                    <span style="color: var(--text-secondary); font-size: 13px;">${route.from} → ${route.to}</span><br>
+                    <span style="color: var(--text-muted); font-size: 11px;">Next: ${nextTimings}</span>
                   </div>
                   <div style="text-align: right; font-size: 12px; color: var(--text-muted);">
                     ${route.frequencies?.[0]?.headway || 'N/A'} min intervals
@@ -1456,7 +1463,7 @@
             });
             content += '</div>';
           } else {
-            content += '<p>No detailed schedule information available for this transport mode.</p>';
+            content += '<p>Loading route information...</p>';
           }
           
           this.openSheet(`${transport.toUpperCase()} Information`, content);
@@ -1618,31 +1625,60 @@
         }
 
         openJourneySheet() {
+          const allRoutes = window.MUMBAI_SCHEDULES?.routes || [];
+          const metroRoutes = allRoutes.filter(r => r.mode === 'metro').length;
+          const trainRoutes = allRoutes.filter(r => r.mode === 'train').length;
+          const busRoutes = allRoutes.filter(r => r.mode === 'bus').length;
+          const ferryRoutes = allRoutes.filter(r => r.mode === 'ferry').length;
+          
           const content = `
             <h3>🗺️ Plan Your Journey</h3>
-            <p>Plan efficient routes across Mumbai's transport network:</p>
+            <p>Plan efficient routes across Mumbai's comprehensive transport network:</p>
             
-            <div class="frequency-item">
-              <div>
-                <strong>Multi-modal Planning</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">Combine Metro, Trains, Buses</span>
+            <div style="margin: 16px 0;">
+              <h4 style="margin: 0 0 8px 0; color: var(--primary);">Available Transport Modes</h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                <div class="frequency-item" style="margin: 0;">
+                  <div><strong>🚇 Metro</strong><br><span style="color: var(--text-secondary); font-size: 12px;">${metroRoutes} active lines</span></div>
+                  <div class="chip info">East-West</div>
+                </div>
+                <div class="frequency-item" style="margin: 0;">
+                  <div><strong>🚊 Trains</strong><br><span style="color: var(--text-secondary); font-size: 12px;">${trainRoutes} major routes</span></div>
+                  <div class="chip success">North-South</div>
+                </div>
+                <div class="frequency-item" style="margin: 0;">
+                  <div><strong>🚌 Buses</strong><br><span style="color: var(--text-secondary); font-size: 12px;">${busRoutes} BEST routes</span></div>
+                  <div class="chip">Citywide</div>
+                </div>
+                <div class="frequency-item" style="margin: 0;">
+                  <div><strong>⛴️ Ferry</strong><br><span style="color: var(--text-secondary); font-size: 12px;">${ferryRoutes} routes</span></div>
+                  <div class="chip warn">Coastal</div>
+                </div>
               </div>
             </div>
             
-            <p><strong>Tips for efficient travel:</strong></p>
-            <ul>
-              <li>Use Metro for East-West connectivity</li>
-              <li>Local trains for North-South routes</li>
-              <li>BEST buses for local area coverage</li>
-              <li>Check peak hour timings (7-10 AM, 6-9 PM)</li>
+            <h4 style="margin: 16px 0 8px 0; color: var(--primary);">Smart Travel Tips</h4>
+            <ul style="margin: 0 0 16px 0; padding-left: 18px;">
+              <li>Metro: Best for Versova-Ghatkopar (Line 1) and Dahisar-DN Nagar (Line 2A/7)</li>
+              <li>Local Trains: Fastest for long-distance North-South travel</li>
+              <li>BEST Buses: Last-mile connectivity and cross-city routes</li>
+              <li>Ferry: Scenic route to Elephanta and coastal destinations</li>
+              <li>Peak hours: 7-10 AM & 6-9 PM (expect delays)</li>
             </ul>
             
-            <p><strong>Integration points:</strong></p>
-            <ul>
-              <li>Andheri: Metro Line 1 ↔ Western/Metro Line 7</li>
-              <li>Ghatkopar: Metro Line 1 ↔ Central Line</li>
-              <li>Churchgate/CST: Major train terminuses</li>
+            <h4 style="margin: 16px 0 8px 0; color: var(--primary);">Major Interchange Hubs</h4>
+            <ul style="margin: 0; padding-left: 18px;">
+              <li><strong>Andheri:</strong> Metro Line 1 ↔ Western Railway ↔ Metro Line 7</li>
+              <li><strong>Ghatkopar:</strong> Metro Line 1 ↔ Central Railway</li>
+              <li><strong>Churchgate/CST:</strong> Major train terminuses + bus connectivity</li>
+              <li><strong>Bandra:</strong> Western Railway ↔ Multiple bus routes</li>
             </ul>
+            
+            <div style="margin-top: 16px; padding: 12px; background: var(--primary-light); border-radius: 8px;">
+              <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">
+                💡 <strong>Pro Tip:</strong> Use the transport mode cards above to view detailed schedules and live timings for specific routes.
+              </p>
+            </div>
           `;
           this.openSheet('Plan Journey', content);
           history.replaceState(null, '', this.updateHashParam('sheet', 'journey'));
@@ -2085,6 +2121,9 @@
       ]
     };
 
+    // Expose schedules globally for the main class to use
+    window.MUMBAI_SCHEDULES = SCHEDULES;
+
     const colors = { bus:'#5E6AD2', train:'#00B87A', metro:'#8B5CF6', ferry:'#0EA5E9', monorail:'#10B981' };
     const icons  = { bus:'fa-bus', train:'fa-train-subway', metro:'fa-train-tram', ferry:'fa-ship', monorail:'fa-train' };
     const toMinutes = (hhmm) => { const [h,m] = hhmm.split(':').map(Number); return h*60 + m; };
@@ -2093,6 +2132,7 @@
     const peak      = (h) => (h>=7 && h<=10) || (h>=18 && h<=21);
     const jitter    = (now=new Date()) => peak(now.getHours()) ? (Math.random()<0.5?0:1) : 0;
 
+    // Define and expose helper functions globally
     function nextDepartures(routeDef, count=6, now=new Date()) {
       const nowMin = sinceMid(now);
       const wins = (routeDef.frequencies||[]).filter(f => f.days==='daily' || f.days===dayType(now));
@@ -2108,6 +2148,9 @@
       }
       return out.slice(0, count).map(d => ({ etaMin: Math.max(0, d.departMin - sinceMid(now)) + jitter(now), runtime: d.runtime }));
     }
+
+    // Expose the function globally
+    window.nextDepartures = nextDepartures;
 
     function clearFallbackMarkers() {
       const mapContent = document.getElementById('mapContent');
