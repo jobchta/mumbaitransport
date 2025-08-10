@@ -128,11 +128,9 @@
 
     /* Real map container */
     .map-container { border-radius: var(--radius-lg); overflow: hidden; position: relative; border: 1px solid var(--border); background: var(--surface); }
-    #leafletMap { height: 68vh; width: 100%; }
+    #leafletMap { height: 260px; width: 100%; }
     /* Fallback decorative map */
     .map-fallback { height: 200px; position: relative; background: linear-gradient(135deg, #e8f4f8 0%, #f5f9fc 100%); }
-    .map-tools { position: absolute; top: 10px; left: 10px; z-index: 10; display: flex; gap: 8px; align-items: center; }
-    .map-btn { padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.9); border: 1px solid var(--border); font-size: 12px; cursor: pointer; }
     .map-bg { position: absolute; inset: 0; background-image:
       radial-gradient(circle at 20% 30%, rgba(94, 106, 210, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 70%, rgba(0, 184, 122, 0.1) 0%, transparent 50%); }
@@ -466,13 +464,6 @@
       <section aria-labelledby="live-heading">
         <h2 class="section-title" id="live-heading"><i class="fa-solid fa-map-location-dot"></i> Live Vehicle Tracking <span class="live-indicator">LIVE</span></h2>
         <div class="map-container">
-          <div class="map-tools">
-            <button class="map-btn" id="locateMe" type="button"><i class="fa-solid fa-location-crosshairs"></i> Locate me</button>
-            <button class="map-btn" id="resetView" type="button"><i class="fa-solid fa-rotate-left"></i> Reset</button>
-            <label class="chip" style="background:rgba(255,255,255,0.9)">
-              <input type="checkbox" id="toggleLiveBus" style="margin-right:6px"> Live Buses
-            </label>
-          </div>
           <div id="leafletMap" role="img" aria-label="Live map of Mumbai vehicles"></div>
           <div class="map-fallback" id="mapFallback" hidden>
             <div class="map-bg"></div>
@@ -514,18 +505,6 @@
           <button class="action-button" id="fare-estimator" type="button">
             <span class="action-icon"><i class="fa-solid fa-indian-rupee-sign"></i></span>
             Fare Estimator (Auto)
-          </button>
-          <button class="action-button" id="upi-tickets" type="button">
-            <span class="action-icon"><i class="fa-solid fa-qrcode"></i></span>
-            Metro UPI QR Tickets
-          </button>
-          <button class="action-button" id="train-timetables" type="button">
-            <span class="action-icon"><i class="fa-solid fa-train-subway"></i></span>
-            Train Timetables
-          </button>
-          <button class="action-button" id="bus-routes" type="button">
-            <span class="action-icon"><i class="fa-solid fa-bus"></i></span>
-            Bus Routes (BEST)
           </button>
         </div>
       </section>
@@ -694,9 +673,6 @@
             if (q('#nearby-stations')) { try { this.openNearbySheet(); } catch(_) {} return; }
             if (q('#recharge-card')) { try { this.openRechargeSheet(); } catch(_) {} return; }
             if (q('#fare-estimator')) { try { this.openFareEstimator(); } catch(_) {} return; }
-          if (q('#upi-tickets')) { try { this.openUPIMetroSheet(); } catch(_) {} return; }
-          if (q('#train-timetables')) { try { this.openTrainTimetableSheet(); } catch(_) {} return; }
-          if (q('#bus-routes')) { try { this.openBESTSheet(); } catch(_) {} return; }
 
             // Bottom nav
             const navBtn = q('.nav-button');
@@ -1446,72 +1422,6 @@
           document.getElementById('sheet').setAttribute('aria-hidden', 'false');
         }
 
-        // Predefined stop lists for detailed route info (concise, ordered)
-        getRouteStops() {
-          return {
-            M1: ['Versova','D.N. Nagar','Azad Nagar','Andheri','Western Express Highway','Chakala (J.B.Nagar)','Marol Naka','Airport Road','Saki Naka','Asalpha','Jagruti Nagar','Ghatkopar'],
-            M2A: ['Dahisar East','Ovaripada','Rashtriya Udyan','Devipada','Magathane','Poisar','Akurli','Kurla (W.E.)','Valnai–Meeth Chowky','Lower Malad','Bangur Nagar','Goregaon West','Lower Oshiwara','Lower DN Nagar','DN Nagar'],
-            M7: ['Dahisar East','Ovaripada','Rashtriya Udyan','Magathane','Poisar','Akurli','Aarey','Mogra','Jogeshwari East','Shankarwadi','Andheri East'],
-            M3: ['Aarey JVLR','SEEPZ','MIDC','Marol Naka','CSIA T2','Santacruz Electronics Export Processing Zone','BKC','Acharya Atre Chowk'],
-            WR_FAST: ['Borivali','Andheri','Bandra','Dadar','Mumbai Central','Churchgate'],
-            WR_SLOW: ['Virar','Nalasopara','Vasai Road','Bhayandar','Borivali','Andheri','Bandra','Dadar','Mumbai Central','Churchgate'],
-            CR_FAST: ['Kalyan','Thane','Ghatkopar','Dadar','Byculla','CSMT'],
-            HR: ['Panvel','Kharghar','Vashi','Mankhurd','Wadala Road','Sandhurst Road','CSMT']
-          };
-        }
-
-        openRouteDetails(routeId, reverse=false) {
-          const routes = (window.MUMBAI_SCHEDULES?.routes)||[];
-          const route = routes.find(r => r.routeId === routeId);
-          const stopsMap = this.getRouteStops();
-          let stops = stopsMap[routeId] || (route ? [route.from, route.to] : []);
-          if (reverse) stops = [...stops].reverse();
-          const direction = reverse && route ? `${route.to} → ${route.from}` : (route ? `${route.from} → ${route.to}` : '');
-
-          const listHtml = stops.map((s, i) => `
-            <div class="frequency-item">
-              <div><strong>${i+1}. ${s}</strong></div>
-              <div class="chip">${i===0?'Start':(i===stops.length-1?'End':'Stop')}</div>
-            </div>
-          `).join('');
-
-          const nextHtml = route ? (()=>{
-            try {
-              const n = (window.nextDepartures ? window.nextDepartures(route, 3) : []) || [];
-              if (!n.length) return '';
-              return `<div style="margin-top:8px">${n.map(d=>`<span class=\"chip\">${d.etaMin} min</span>`).join(' ')}</div>`;
-            } catch(_) { return ''; }
-          })() : '';
-
-          const content = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <div>
-                <h3 style="margin:0;">${route ? route.name : routeId}</h3>
-                <div style="font-size:12px;color:var(--text-secondary);">Direction: <strong id="routeDirText">${direction}</strong></div>
-              </div>
-              <div style="display:flex; gap:8px;">
-                <button class="chip info" id="toggleDir"><i class="fa-solid fa-right-left"></i> Reverse</button>
-                <button class="chip" id="focusRoute"><i class="fa-solid fa-location-crosshairs"></i> Focus</button>
-              </div>
-            </div>
-            ${nextHtml}
-            <div style="margin-top:10px;">${listHtml}</div>
-          `;
-          this.openSheet('Route Details', content);
-          this.bindRouteDetailEvents({ routeId, reverse });
-        }
-
-        bindRouteDetailEvents(state) {
-          const toggle = document.getElementById('toggleDir');
-          const focus = document.getElementById('focusRoute');
-          toggle?.addEventListener('click', () => this.openRouteDetails(state.routeId, !state.reverse));
-          focus?.addEventListener('click', () => {
-            const all = window.MUMBAI_SCHEDULES?.routes || [];
-            const match = all.find(r => r.routeId === state.routeId);
-            if (match) this.focusRoute({ transport: match.mode, id: match.routeId });
-          });
-        }
-
         closeSheet() {
           document.getElementById('sheetBackdrop').classList.remove('show');
           document.getElementById('sheet').classList.remove('show');
@@ -1527,17 +1437,11 @@
           if (routes.length > 0) {
             content += '<div class="frequency-list">';
             routes.forEach(route => {
-              const routeId = route.routeId || route.id;
               content += `
                 <div class="frequency-item">
                   <div>
                     <strong>${route.name}</strong><br>
                     <span style="color: var(--text-secondary); font-size: 13px;">${route.from} → ${route.to}</span>
-                    <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
-                      <button class="chip" data-route="${routeId}"><i class="fa-solid fa-train"></i> Direction A</button>
-                      <button class="chip" data-route-rev="${routeId}"><i class="fa-solid fa-train"></i> Direction B</button>
-                      <button class="chip info" data-focus="${route.mode}:${routeId}"><i class="fa-solid fa-location-crosshairs"></i> Focus</button>
-                    </div>
                   </div>
                   <div style="text-align: right; font-size: 12px; color: var(--text-muted);">
                     ${route.frequencies?.[0]?.headway || 'N/A'} min intervals
@@ -1551,14 +1455,6 @@
           }
           
           this.openSheet(`${transport.toUpperCase()} Information`, content);
-          // Bind route detail chips
-          const body = document.getElementById('sheetBody');
-          body.querySelectorAll('[data-route]')?.forEach(b => b.addEventListener('click', ()=> this.openRouteDetails(b.getAttribute('data-route'), false)));
-          body.querySelectorAll('[data-route-rev]')?.forEach(b => b.addEventListener('click', ()=> this.openRouteDetails(b.getAttribute('data-route-rev'), true)));
-          body.querySelectorAll('[data-focus]')?.forEach(b => b.addEventListener('click', ()=> {
-            const [transport, id] = b.getAttribute('data-focus').split(':');
-            this.focusRoute({ transport, id });
-          }));
         }
 
         openTicketsSheet() {
@@ -1567,7 +1463,6 @@
               <div class="tab active" data-tab="metro" role="tab" aria-selected="true">Metro</div>
               <div class="tab" data-tab="train" role="tab" aria-selected="false">Train</div>
               <div class="tab" data-tab="bus" role="tab" aria-selected="false">Bus</div>
-              <div class="tab" data-tab="upi" role="tab" aria-selected="false">UPI</div>
             </div>
             <div id="tickets-content" style="margin-top:12px">
               ${this.renderTicketsTab('metro')}
@@ -1581,77 +1476,27 @@
         renderTicketsTab(tab) {
           if (tab === 'metro') {
             return `
-              <div class="frequency-item">
-                <div>
-                  <strong>Line 1 (Blue)</strong><br>
-                  <span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span>
-                </div>
-                <a class="chip info" href="https://wa.me/919670008889?text=hi" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Open</a>
-              </div>
+              <div class="frequency-item"><div><strong>Line 1 (Blue)</strong><br><span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span></div><div class="chip info"><i class="fa-brands fa-whatsapp"></i> 9670008889</div></div>
               <ol>
                 <li>Send 'hi' to <strong>9670008889</strong></li>
                 <li>Select source & destination</li>
                 <li>Pay online or share OTP for paper ticket</li>
                 <li>Receive WhatsApp QR to travel</li>
               </ol>
-              <p style="margin-top:6px"><a class="chip" href="https://mmrcl.com/en/map" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map"></i> Network Map</a></p>
-
-              <div class="frequency-item">
-                <div>
-                  <strong>Lines 2A & 7</strong><br>
-                  <span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span>
-                </div>
-                <a class="chip info" href="https://wa.me/918652635500?text=Hi" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Open</a>
-              </div>
+              <div class="frequency-item"><div><strong>Lines 2A & 7</strong><br><span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span></div><div class="chip info"><i class="fa-brands fa-whatsapp"></i> 86526 35500</div></div>
               <ul>
                 <li>Send 'Hi' to <strong>86526 35500</strong></li>
                 <li>Pay via card/UPI</li>
                 <li>Valid same business day; non-refundable</li>
               </ul>
-
-              <div class="frequency-item">
-                <div>
-                  <strong>Line 3 (Aqua)</strong><br>
-                  <span style="color:var(--text-secondary);font-size:13px">Official MMRCL Portal</span>
-                </div>
-                <span class="chip" id="open-aqua-embed" role="button" tabindex="0">Open</span>
-              </div>
-              <div id="aqua-embed" style="display:none; margin-top:10px; height:360px; border:1px solid var(--border); border-radius:12px; overflow:hidden;">
-                <div style="height:100%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #00a3e0, #0078d4); color:white; text-align:center; padding:20px;">
-                  <div>
-                    <h3 style="margin:0 0 10px 0; font-size:18px;">🚇 Mumbai Metro Aqua Line 3</h3>
-                    <p style="margin:0 0 15px 0; opacity:0.9;">Interactive route map and station information</p>
-                    <a href="https://mmrcl.com/en/map" target="_blank" style="background:rgba(255,255,255,0.2); color:white; padding:8px 16px; border-radius:6px; text-decoration:none; display:inline-block;">
-                      <i class="fa-solid fa-external-link-alt"></i> Open Official Map
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <script data-cfasync="false">(function(){
-                const btn = document.getElementById('open-aqua-embed');
-                const pane = document.getElementById('aqua-embed');
-                if (btn && pane) btn.addEventListener('click', () => { pane.style.display = pane.style.display==='none'?'block':'none'; });
-              })()</script>
-              <p style="margin-top:6px">Book tickets via the official MMRCL portal for Aqua Line services.</p>
+              <div class="frequency-item"><div><strong>Line 3 (Aqua)</strong><br><span style="color:var(--text-secondary);font-size:13px">Official MMRCL Portal</span></div><div class="chip">Portal</div></div>
+              <p>Book tickets via the official MMRCL portal for Aqua Line services.</p>
             `;
           }
           if (tab === 'train') {
             return `
               <div class="frequency-item"><div><strong>UTS on Mobile</strong><br><span style="color:var(--text-secondary);font-size:13px">Unreserved tickets & passes</span></div><div class="chip success"><i class="fa-solid fa-mobile-screen"></i> Recommended</div></div>
               <p>Use UTS app or station counters for suburban tickets and passes.</p>
-            `;
-          }
-          if (tab === 'upi') {
-            return `
-              <div class="frequency-item"><div><strong>Metro UPI QR Tickets</strong><br><span style="color:var(--text-secondary);font-size:13px">Mobile-as-ticket at AFC gates</span></div><div class="chip success">Valid 2 hours</div></div>
-              <p>Use your preferred app to buy QR tickets and tap at the gates.</p>
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-                <a class="chip info" href="paytm://metro" target="_self"><i class="fa-brands fa-cc-amazon-pay"></i> Open PayTM</a>
-                <a class="chip info" href="phonepe://travel" target="_self"><i class="fa-solid fa-qrcode"></i> Open PhonePe</a>
-                <a class="chip" href="https://paytm.com/metro" target="_blank" rel="noopener noreferrer">PayTM (web)</a>
-                <a class="chip" href="https://www.phonepe.com/travel-and-transit/" target="_blank" rel="noopener noreferrer">PhonePe (web)</a>
-              </div>
-              <p style="margin-top:8px; font-size:12px; color:var(--text-muted)">Journey must start within 2 hours of issue. Keep QR brightness high.</p>
             `;
           }
           return `
@@ -1697,7 +1542,6 @@
               <li>Ghatkopar: Metro Line 1 ↔ Central Line</li>
               <li>Churchgate/CST: Major train terminuses</li>
             </ul>
-            <div class="chip info" style="margin-top:10px;">Live-like timetables integrated for Western/Central/Harbour and key BEST routes.</div>
           `;
           this.openSheet('Plan Journey', content);
           history.replaceState(null, '', this.updateHashParam('sheet', 'journey'));
@@ -2258,6 +2102,7 @@
 
       hub.updateSchedules();
       hub.updateVehiclePositions();
+      hub.showNotification && hub.showNotification('✅ Static schedules (Aug 2025) live view enabled');
       return true;
     }
 
@@ -2266,11 +2111,6 @@
       setTimeout(() => clearInterval(iv), 12000);
     }
     })();
-
-    // Initialize the application
-    window.addEventListener('load', () => {
-      window.MumbaiTransport = new MumbaiTransportHub();
-    });
   </script>
 </body>
 </html>
