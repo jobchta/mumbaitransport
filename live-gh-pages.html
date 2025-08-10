@@ -128,11 +128,9 @@
 
     /* Real map container */
     .map-container { border-radius: var(--radius-lg); overflow: hidden; position: relative; border: 1px solid var(--border); background: var(--surface); }
-    #leafletMap { height: 68vh; width: 100%; }
+    #leafletMap { height: 260px; width: 100%; }
     /* Fallback decorative map */
     .map-fallback { height: 200px; position: relative; background: linear-gradient(135deg, #e8f4f8 0%, #f5f9fc 100%); }
-    .map-tools { position: absolute; top: 10px; left: 10px; z-index: 10; display: flex; gap: 8px; align-items: center; }
-    .map-btn { padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.9); border: 1px solid var(--border); font-size: 12px; cursor: pointer; }
     .map-bg { position: absolute; inset: 0; background-image:
       radial-gradient(circle at 20% 30%, rgba(94, 106, 210, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 70%, rgba(0, 184, 122, 0.1) 0%, transparent 50%); }
@@ -170,35 +168,12 @@
     .schedule-time { font-size: 12px; color: var(--text-muted); }
     .schedule-delay { font-size: 11px; color: var(--warning); font-weight: 600; }
 
-    /* Chips, Tabs, FAB */
-    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 999px; font-size: 11px; background: var(--primary-light); color: var(--text-secondary); border: 1px solid var(--border); }
-    .chip.success { background: rgba(0,184,122,0.12); color: #0E9F6E; border-color: rgba(0,184,122,0.3); }
-    .chip.warn { background: rgba(247,144,9,0.12); color: #B4690E; border-color: rgba(247,144,9,0.3); }
-    .chip.info { background: rgba(14,165,233,0.12); color: #0E7490; border-color: rgba(14,165,233,0.3); }
-
-    .tabs { display: flex; gap: 8px; background: var(--background); border: 1px solid var(--border); padding: 6px; border-radius: var(--radius-lg); }
-    .tab { flex: 1; text-align: center; padding: 8px 10px; border-radius: var(--radius-md); font-size: 13px; cursor: pointer; color: var(--text-secondary); border: 1px solid transparent; }
-    .tab.active { background: var(--surface); color: var(--text-primary); border-color: var(--border); box-shadow: var(--shadow-sm); }
-
-    .fab { position: fixed; right: 18px; bottom: 86px; z-index: 1200; }
-    .fab-main { width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg); border: none; cursor: pointer; }
-    .fab-menu { position: absolute; bottom: 66px; right: 0; display: none; flex-direction: column; gap: 10px; }
-    .fab.show .fab-menu { display: flex; }
-    .fab-item { display: flex; align-items: center; gap: 8px; background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); padding: 8px 10px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; }
-
     .bottom-nav { background: var(--surface); border-top: 1px solid var(--border); padding: 8px 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0; }
     .nav-button { padding: 8px 4px; border-radius: var(--radius-md); background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .nav-button.active { color: var(--primary); background: var(--primary-light); }
     .nav-button:hover { background: var(--surface-hover); }
     .nav-button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
     .nav-icon { font-size: 20px; }
-
-    /* Mini bottom map */
-    .mini-map { position: fixed; left: 12px; right: 12px; bottom: 140px; height: 84px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); z-index: 1100; display: none; pointer-events: none; }
-    .mini-map.show { display: block; }
-    #miniMap { height: 100%; width: 100%; filter: saturate(1.1) contrast(1.03); }
-    .mini-map-overlay { position: absolute; right: 8px; top: 8px; z-index: 2; }
-    .mini-map-overlay .chip { background: rgba(0,0,0,0.55); color: #fff; border-color: rgba(255,255,255,0.2); }
 
     .live-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; color: var(--error); background: rgba(220, 58, 66, 0.1); padding: 2px 6px; border-radius: 10px; margin-left: 8px; }
     .live-indicator::before { content: ""; display: block; width: 6px; height: 6px; background: var(--error); border-radius: 50%; animation: pulse 1.5s infinite; }
@@ -231,69 +206,6 @@
     @media (max-width: 380px) {
       .action-grid, .transport-grid { grid-template-columns: 1fr; }
     }
-
-    /* Bottom Sheet Modal */
-    .sheet-backdrop {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5);
-      z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
-    }
-    .sheet-backdrop.show { opacity: 1; visibility: visible; }
-
-    .sheet {
-      position: fixed; bottom: 0; left: 0; right: 0; max-height: 80vh; background: var(--surface);
-      border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-lg);
-      transform: translateY(100%); transition: transform 0.3s ease; z-index: 1001;
-      display: flex; flex-direction: column; overflow: hidden;
-    }
-    .sheet.show { transform: translateY(0); }
-
-    .sheet-header {
-      padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex;
-      align-items: center; justify-content: space-between; flex-shrink: 0; position: relative;
-    }
-    .sheet-handle {
-      position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-      width: 32px; height: 4px; background: var(--border); border-radius: 2px;
-    }
-    .sheet-title { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-top: 8px; }
-    .sheet-close {
-      width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--background);
-      border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;
-      display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
-    }
-    .sheet-close:hover { background: var(--surface-hover); }
-
-    .sheet-body {
-      padding: 20px; overflow-y: auto; flex: 1; color: var(--text-primary); line-height: 1.6;
-    }
-    .sheet-body h3 { margin: 0 0 12px 0; color: var(--text-primary); }
-    .sheet-body p { margin: 0 0 16px 0; }
-    .sheet-body .frequency-item {
-      background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-md);
-      padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
-    }
-    .sheet-body .frequency-item strong { color: var(--primary); }
-
-    /* Time Selector */
-    .schedule-controls {
-      display: flex; gap: 8px; align-items: center; margin: 0 0 16px 0; padding: 12px;
-      background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-md);
-    }
-    .schedule-controls label { font-size: 12px; color: var(--text-secondary); }
-    .schedule-controls input[type="time"] {
-      padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-      background: var(--surface); color: var(--text-primary); font-size: 14px;
-    }
-    .schedule-controls button {
-      padding: 6px 12px; border: 1px solid var(--border); background: var(--surface);
-      color: var(--text-secondary); border-radius: var(--radius-sm); cursor: pointer;
-      font-size: 12px; transition: all 0.2s ease;
-    }
-    .schedule-controls button:hover { background: var(--surface-hover); }
-
-    /* Embed mode - hide bottom nav */
-    body.embedded .bottom-nav { display: none; }
-    body.embedded .content { padding-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -321,38 +233,9 @@
         <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
         <input type="text" class="search-input" id="searchInput" placeholder="Search routes or destinations..." aria-label="Search routes or destinations" autocomplete="off" />
       </div>
-      <div style="display:flex; gap:8px; margin-top:4px;">
-        <span class="chip" id="share-btn" role="button" tabindex="0"><i class="fa-solid fa-share-from-square"></i> Share</span>
-        <span class="chip info" id="home-refresh" role="button" tabindex="0"><i class="fa-solid fa-arrows-rotate"></i> Refresh</span>
-      </div>
     </header>
 
     <main class="content" id="main">
-      <section aria-labelledby="home-panel-heading" id="home-panel">
-        <h2 class="section-title" id="home-panel-heading"><i class="fa-solid fa-star"></i> Your Home</h2>
-        <div class="updates-list" style="margin-bottom: 12px;">
-          <div class="update-item">
-            <div class="update-icon" style="background: var(--primary);"><i class="fa-solid fa-magnifying-glass"></i></div>
-            <div class="update-content" style="width:100%">
-              <div class="update-text" style="display:flex; justify-content:space-between; align-items:center;">
-                <span>Recent Searches</span><button id="clear-recent" class="chip" type="button">Clear</button>
-              </div>
-              <div id="recentList" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;"></div>
-            </div>
-          </div>
-        </div>
-        <div class="updates-list">
-          <div class="update-item">
-            <div class="update-icon" style="background: var(--success);"><i class="fa-solid fa-bookmark"></i></div>
-            <div class="update-content" style="width:100%">
-              <div class="update-text" style="display:flex; justify-content:space-between; align-items:center;">
-                <span>Saved Trips</span><button id="clear-trips" class="chip" type="button">Clear</button>
-              </div>
-              <div id="tripsList" style="margin-top:8px; display:flex; flex-direction:column; gap:8px;"></div>
-            </div>
-          </div>
-        </div>
-      </section>
       <section aria-labelledby="modes-heading">
         <h2 class="section-title" id="modes-heading"><i class="fa-solid fa-bus"></i> Transport Modes <span class="live-indicator">LIVE</span></h2>
         <div class="transport-grid" role="tablist" aria-label="Transport modes">
@@ -466,13 +349,6 @@
       <section aria-labelledby="live-heading">
         <h2 class="section-title" id="live-heading"><i class="fa-solid fa-map-location-dot"></i> Live Vehicle Tracking <span class="live-indicator">LIVE</span></h2>
         <div class="map-container">
-          <div class="map-tools">
-            <button class="map-btn" id="locateMe" type="button"><i class="fa-solid fa-location-crosshairs"></i> Locate me</button>
-            <button class="map-btn" id="resetView" type="button"><i class="fa-solid fa-rotate-left"></i> Reset</button>
-            <label class="chip" style="background:rgba(255,255,255,0.9)">
-              <input type="checkbox" id="toggleLiveBus" style="margin-right:6px"> Live Buses
-            </label>
-          </div>
           <div id="leafletMap" role="img" aria-label="Live map of Mumbai vehicles"></div>
           <div class="map-fallback" id="mapFallback" hidden>
             <div class="map-bg"></div>
@@ -484,11 +360,6 @@
 
       <section aria-labelledby="departures-heading">
         <h2 class="section-title" id="departures-heading"><i class="fa-solid fa-clock"></i> Next Departures</h2>
-        <div class="schedule-controls">
-          <label for="refTime">Check time:</label>
-          <input type="time" id="refTime" />
-          <button id="useNow" type="button">Now</button>
-        </div>
         <div class="schedule-list" id="scheduleList" role="list"></div>
       </section>
 
@@ -510,22 +381,6 @@
           <button class="action-button" id="recharge-card" type="button">
             <span class="action-icon"><i class="fa-solid fa-wallet"></i></span>
             Recharge Card
-          </button>
-          <button class="action-button" id="fare-estimator" type="button">
-            <span class="action-icon"><i class="fa-solid fa-indian-rupee-sign"></i></span>
-            Fare Estimator (Auto)
-          </button>
-          <button class="action-button" id="upi-tickets" type="button">
-            <span class="action-icon"><i class="fa-solid fa-qrcode"></i></span>
-            Metro UPI QR Tickets
-          </button>
-          <button class="action-button" id="train-timetables" type="button">
-            <span class="action-icon"><i class="fa-solid fa-train-subway"></i></span>
-            Train Timetables
-          </button>
-          <button class="action-button" id="bus-routes" type="button">
-            <span class="action-icon"><i class="fa-solid fa-bus"></i></span>
-            Bus Routes (BEST)
           </button>
         </div>
       </section>
@@ -580,45 +435,14 @@
     </nav>
   </div>
 
-  <!-- Floating Action Button (Quick Menu) -->
-  <div class="fab" id="fab">
-    <div class="fab-menu">
-      <div class="fab-item" id="fab-fare"><i class="fa-solid fa-indian-rupee-sign"></i> Fare Estimator</div>
-      <div class="fab-item" id="fab-tickets"><i class="fa-solid fa-ticket"></i> Tickets</div>
-      <div class="fab-item" id="fab-nearby"><i class="fa-solid fa-location-arrow"></i> Nearby</div>
-    </div>
-    <button class="fab-main" id="fab-main" aria-label="Open quick menu"><i class="fa-solid fa-plus"></i></button>
-  </div>
-
-  <!-- Mini bottom map -->
-  <div class="mini-map" id="miniMapWrap" aria-hidden="true">
-    <div class="mini-map-overlay"><span class="chip" id="miniMapStatus">Live</span></div>
-    <div id="miniMap"></div>
-  </div>
-
-  <!-- Bottom Sheet Modal -->
-  <div class="sheet-backdrop" id="sheetBackdrop"></div>
-  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
-    <div class="sheet-header">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title" id="sheetTitle">Details</div>
-      <button class="sheet-close" id="sheetClose" type="button" aria-label="Close">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-    <div class="sheet-body" id="sheetBody">
-      <p>Loading...</p>
-    </div>
-  </div>
-
   <noscript>
     <div class="notification" role="alert">This app needs JavaScript enabled.</div>
   </noscript>
 
-  <!-- Leaflet JS with fallback CDN -->
-  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="(function(){var s=document.createElement('script');s.defer=true;s.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';document.head.appendChild(s);})()"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 
-  <script data-cfasync="false">
+  <script>
     // Mumbai Transport Hub - robust single-file app
     (function() {
       const STORAGE_KEYS = {
@@ -641,9 +465,7 @@
             routes: this.initializeRoutes(),
             updates: [],
             searchTimer: null,
-            reduceMotion: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-            recentSearches: JSON.parse(localStorage.getItem('mth.recentSearches')||'[]').slice(0,8),
-            savedTrips: JSON.parse(localStorage.getItem('mth.savedTrips')||'[]').slice(0,8)
+            reduceMotion: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
           };
 
           this.map = null;
@@ -658,7 +480,6 @@
         safeInit() {
           try {
             this.setupEventListeners();
-            this.bindGlobalDelegates();
             this.initMap();
             this.createInitialVehicles();
             this.restoreSelectedTransportUI();
@@ -671,61 +492,6 @@
             console.error('Initialization error:', e);
             this.showNotification('⚠️ Initialization failed. Some features may be limited.');
           }
-        }
-
-        bindGlobalDelegates() {
-          // Robust event delegation so buttons always work even if DOM changes
-          document.addEventListener('click', (ev) => {
-            const el = ev.target;
-            if (!el) return;
-            const q = (sel) => el.closest && el.closest(sel);
-
-            // Transport cards
-            const card = q('.transport-card');
-            if (card && card.dataset && card.dataset.transport) {
-              const t = card.dataset.transport;
-              try { this.selectTransport(t); this.openDetailsSheet(t); } catch(_) {}
-              return;
-            }
-
-            // Quick actions
-            if (q('#buy-ticket')) { try { this.openTicketsSheet(); } catch(_) {} return; }
-            if (q('#plan-journey')) { try { this.openJourneySheet(); } catch(_) {} return; }
-            if (q('#nearby-stations')) { try { this.openNearbySheet(); } catch(_) {} return; }
-            if (q('#recharge-card')) { try { this.openRechargeSheet(); } catch(_) {} return; }
-            if (q('#fare-estimator')) { try { this.openFareEstimator(); } catch(_) {} return; }
-          if (q('#upi-tickets')) { try { this.openUPIMetroSheet(); } catch(_) {} return; }
-          if (q('#train-timetables')) { try { this.openTrainTimetableSheet(); } catch(_) {} return; }
-          if (q('#bus-routes')) { try { this.openBESTSheet(); } catch(_) {} return; }
-
-            // Bottom nav
-            const navBtn = q('.nav-button');
-            if (navBtn && navBtn.dataset && navBtn.dataset.nav) {
-              document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
-              navBtn.classList.add('active');
-              const nav = navBtn.dataset.nav;
-              try {
-                if (nav === 'tickets') this.openTicketsSheet();
-                else if (nav === 'account') this.openAccountSheet();
-                else if (nav === 'map') this.scrollToSection('live-heading');
-                else this.scrollToSection('home-panel-heading');
-              } catch(_) {}
-              return;
-            }
-
-            // FAB
-            if (q('#fab-main')) {
-              const fab = document.getElementById('fab');
-              if (fab) fab.classList.toggle('show');
-              return;
-            }
-            if (q('#fab-fare')) { try { this.openFareEstimator(); } catch(_) {} return; }
-            if (q('#fab-tickets')) { try { this.openTicketsSheet(); } catch(_) {} return; }
-            if (q('#fab-nearby')) { try { this.openNearbySheet(); } catch(_) {} return; }
-
-            // Sheet close
-            if (q('#sheetClose') || q('#sheetBackdrop')) { try { this.closeSheet(); } catch(_) {} return; }
-          }, { capture: true });
         }
 
         initializeRoutes() {
@@ -763,16 +529,12 @@
         }
 
         setupEventListeners() {
-          document.getElementById('theme-toggle')?.addEventListener('click', () => this.toggleTheme());
-          document.getElementById('share-btn')?.addEventListener('click', () => this.shareCurrentView());
-          document.getElementById('home-refresh')?.addEventListener('click', () => this.renderHomePanel());
+          document.getElementById('theme-toggle').addEventListener('click', () => this.toggleTheme());
 
-          // Transport cards open detail sheet
           document.querySelectorAll('.transport-card').forEach(card => {
             card.addEventListener('click', () => {
               const transport = card.dataset.transport;
               this.selectTransport(transport);
-              this.openDetailsSheet(transport);
             });
           });
 
@@ -783,38 +545,22 @@
             this.appData.searchTimer = setTimeout(() => this.performSearch(q), 220);
           });
 
-          // Action buttons open relevant sheets
-          document.getElementById('buy-ticket')?.addEventListener('click', () => this.openTicketsSheet());
-          document.getElementById('plan-journey')?.addEventListener('click', () => this.openJourneySheet());
-          document.getElementById('nearby-stations')?.addEventListener('click', () => this.openNearbySheet());
-          document.getElementById('recharge-card')?.addEventListener('click', () => this.openRechargeSheet());
-          document.getElementById('fare-estimator')?.addEventListener('click', () => this.openFareEstimator());
+          document.getElementById('buy-ticket').addEventListener('click', () =>
+            this.showNotification('🎫 Redirecting to ticket booking...'));
+          document.getElementById('plan-journey').addEventListener('click', () =>
+            this.showNotification('🗺️ Opening route planner...'));
+          document.getElementById('nearby-stations').addEventListener('click', () =>
+            this.findNearbyStations());
+          document.getElementById('recharge-card').addEventListener('click', () =>
+            this.showNotification('💳 Opening recharge portal...'));
 
-          // Navigation buttons
           document.querySelectorAll('.nav-button').forEach(btn => {
             btn.addEventListener('click', () => {
               document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
               btn.classList.add('active');
-              const nav = btn.dataset.nav;
-              if (nav === 'tickets') this.openTicketsSheet();
-              else if (nav === 'account') this.openAccountSheet();
-              else if (nav === 'map') this.scrollToSection('live-heading');
-              else this.scrollToSection('modes-heading');
+              this.showNotification(`📱 ${btn.textContent.trim()} section`);
             });
           });
-
-          // Time selector
-          document.getElementById('useNow')?.addEventListener('click', () => {
-            const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('refTime').value = timeStr;
-            this.updateSchedules();
-          });
-
-          document.getElementById('refTime')?.addEventListener('change', () => this.updateSchedules());
-
-          // Sheet controls
-          this.setupSheetControls();
 
           document.addEventListener('visibilitychange', () => {
             if (document.hidden) this.pauseUpdates();
@@ -822,166 +568,11 @@
           });
 
           window.addEventListener('beforeunload', () => this.cleanup());
-
-          // URL params for embed mode
-          this.handleURLParams();
-
-          // Initial render for home panel
-          this.renderHomePanel();
-
-          // FAB
-          const fab = document.getElementById('fab');
-          const fabMain = document.getElementById('fab-main');
-          fabMain.addEventListener('click', () => fab.classList.toggle('show'));
-          document.getElementById('fab-fare').addEventListener('click', () => this.openFareEstimator());
-          document.getElementById('fab-tickets').addEventListener('click', () => this.openTicketsSheet());
-          document.getElementById('fab-nearby').addEventListener('click', () => this.openNearbySheet());
-        }
-
-        shareCurrentView() {
-          const url = location.href;
-          if (navigator.share) {
-            navigator.share({ title: 'Mumbai Transport Hub', url }).catch(()=>{});
-          } else if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).then(() => this.showNotification('🔗 Link copied'));
-          } else {
-            this.showNotification('🔗 ' + url);
-          }
-        }
-
-        renderHomePanel() {
-          const recentWrap = document.getElementById('recentList');
-          const tripsWrap = document.getElementById('tripsList');
-          if (!recentWrap || !tripsWrap) return;
-
-          // Recent searches as chips
-          recentWrap.innerHTML = '';
-          if (this.appData.recentSearches.length === 0) {
-            recentWrap.innerHTML = '<span class="chip">No recent searches</span>';
-          } else {
-            this.appData.recentSearches.forEach(q => {
-              const chip = document.createElement('button');
-              chip.className = 'chip';
-              chip.type = 'button';
-              chip.textContent = q;
-              chip.addEventListener('click', () => {
-                const searchInput = document.getElementById('searchInput');
-                if (searchInput) {
-                  searchInput.value = q;
-                  this.performSearch(q);
-                  this.scrollToSection('departures-heading');
-                }
-              });
-              recentWrap.appendChild(chip);
-            });
-          }
-
-          // Saved trips list with focus chips
-          tripsWrap.innerHTML = '';
-          if (this.appData.savedTrips.length === 0) {
-            tripsWrap.innerHTML = '<div class="frequency-item"><div><strong>No saved trips</strong><br><span style="color:var(--text-secondary);font-size:13px">Save routes from search</span></div></div>';
-          } else {
-            this.appData.savedTrips.forEach(t => {
-              // Lookup from schedules to get name/endpoints
-              const all = window.MUMBAI_SCHEDULES?.routes || [];
-              const match = all.find(r => r.mode === t.transport && (r.routeId === t.id || r.id === t.id));
-              const title = match ? match.name : `${t.transport.toUpperCase()} • ${t.id}`;
-              const sub = match ? `${match.from} → ${match.to}` : 'Saved route';
-              const row = document.createElement('div');
-              row.className = 'frequency-item';
-              row.innerHTML = `
-                <div>
-                  <strong>${title}</strong><br>
-                  <span style="color:var(--text-secondary);font-size:13px">${sub}</span>
-                </div>
-                <div>
-                  <button class="chip info" data-focus="${t.transport}:${t.id}"><i class="fa-solid fa-location-crosshairs"></i> Focus</button>
-                </div>
-              `;
-              tripsWrap.appendChild(row);
-            });
-            tripsWrap.querySelectorAll('[data-focus]').forEach(btn => {
-              btn.addEventListener('click', () => {
-                const [transport, id] = btn.getAttribute('data-focus').split(':');
-                this.focusRoute({ transport, id });
-              });
-            });
-          }
-
-          // Clear handlers
-          const clearRecent = document.getElementById('clear-recent');
-          const clearTrips = document.getElementById('clear-trips');
-          clearRecent?.addEventListener('click', () => {
-            this.appData.recentSearches = [];
-            localStorage.setItem('mth.recentSearches', '[]');
-            this.renderHomePanel();
-          });
-          clearTrips?.addEventListener('click', () => {
-            this.appData.savedTrips = [];
-            localStorage.setItem('mth.savedTrips', '[]');
-            this.renderHomePanel();
-          });
-        }
-
-        focusRoute({ transport, id }) {
-          // Find route and zoom map to corridor endpoints
-          const all = window.MUMBAI_SCHEDULES?.routes || [];
-          const match = all.find(r => r.mode === transport && (r.routeId === id || r.id === id));
-          if (!match || !this.map) {
-            this.showNotification('⚠️ Route details not available');
-            return;
-          }
-          const from = match.fromStop, to = match.toStop;
-          if (from && to) {
-            const bounds = L.latLngBounds([ [from.lat, from.lng], [to.lat, to.lng] ]);
-            this.map.fitBounds(bounds.pad(0.2));
-            this.scrollToSection('live-heading');
-            this.showNotification(`🎯 Focused ${match.name}`);
-          }
-        }
-
-        setupSheetControls() {
-          const backdrop = document.getElementById('sheetBackdrop');
-          const closeBtn = document.getElementById('sheetClose');
-          
-          [backdrop, closeBtn].forEach(el => {
-            el?.addEventListener('click', () => this.closeSheet());
-          });
-
-          // Prevent sheet content clicks from closing
-          document.getElementById('sheet')?.addEventListener('click', (e) => e.stopPropagation());
-        }
-
-        handleURLParams() {
-          const params = new URLSearchParams(window.location.search);
-          if (params.get('embed') === '1') {
-            document.body.classList.add('embedded');
-          }
-          const mode = params.get('mode');
-          if (mode) this.selectTransport(mode);
-
-          // Deep-link sheet via hash
-          const sheet = this.readHashParam('sheet');
-          if (sheet === 'tickets') this.openTicketsSheet();
-          else if (sheet === 'journey') this.openJourneySheet();
-          else if (sheet === 'nearby') this.openNearbySheet();
-          else if (sheet === 'recharge') this.openRechargeSheet();
-          else if (sheet === 'account') this.openAccountSheet();
-          else if (sheet && sheet.startsWith('mode=')) {
-            const m = sheet.split('=')[1];
-            this.openDetailsSheet(m);
-          }
-        }
-
-        scrollToSection(headingId) {
-          document.getElementById(headingId)?.scrollIntoView({ behavior: 'smooth' });
         }
 
         initMap() {
           const fallback = document.getElementById('mapFallback');
           const leafletDiv = document.getElementById('leafletMap');
-          const miniWrap = document.getElementById('miniMapWrap');
-          const miniDiv = document.getElementById('miniMap');
           try {
             if (window.L && leafletDiv) {
               this.map = L.map('leafletMap', { zoomControl: false, attributionControl: false }).setView([19.076, 72.8777], 11);
@@ -990,13 +581,6 @@
               }).addTo(this.map);
               fallback.hidden = true;
               leafletDiv.hidden = false;
-
-              // Mini map
-              if (miniDiv) {
-                this.miniMap = L.map('miniMap', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false }).setView([19.076, 72.8777], 11);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(this.miniMap);
-                miniWrap.classList.add('show');
-              }
             } else {
               throw new Error('Leaflet not available yet');
             }
@@ -1067,18 +651,6 @@
               if (this.map && !this.mapFallbackMode) {
                 const marker = this.appData.leafletMarkers.get(v.id);
                 if (marker) marker.setLatLng([v.lat, v.lng]);
-                // Sync a subset to mini map for performance
-                if (this.miniMap && Math.random() < 0.15) {
-                  if (!this.miniMarkers) this.miniMarkers = new Map();
-                  let m = this.miniMarkers.get(v.id);
-                  if (!m) {
-                    m = L.circleMarker([v.lat, v.lng], { radius: 3, color: '#fff', weight: 1, fillColor: v.color, fillOpacity: 1 });
-                    m.addTo(this.miniMap);
-                    this.miniMarkers.set(v.id, m);
-                  } else {
-                    m.setLatLng([v.lat, v.lng]);
-                  }
-                }
               } else if (mapContent) {
                 // Render fallback markers in a simple grid (not geo-accurate)
                 const marker = document.createElement('div');
@@ -1296,38 +868,9 @@
                 <div class="schedule-route">${route.name} • ${route.from} → ${route.to}</div>
                 <div class="schedule-time">Next: ${totalTime} min${delayText} • ${route.transport.toUpperCase()}</div>
               </div>
-              <button class="chip" data-save="${route.transport}:${route.id}"><i class="fa-solid fa-bookmark"></i> Save</button>
             `;
             scheduleList.appendChild(item);
           });
-
-          // Save recent search
-          this.addRecentSearch(query);
-          // Bind save buttons
-          scheduleList.querySelectorAll('[data-save]').forEach(btn => {
-            btn.addEventListener('click', () => {
-              const [transport, id] = btn.getAttribute('data-save').split(':');
-              this.saveTrip({ transport, id });
-              this.showNotification('⭐ Saved to Trips');
-            });
-          });
-        }
-
-        addRecentSearch(q) {
-          const list = this.appData.recentSearches.filter(s => s !== q);
-          list.unshift(q);
-          this.appData.recentSearches = list.slice(0,8);
-          localStorage.setItem('mth.recentSearches', JSON.stringify(this.appData.recentSearches));
-        }
-
-        saveTrip(trip) {
-          const key = `${trip.transport}:${trip.id}`;
-          const exists = this.appData.savedTrips.find(t => `${t.transport}:${t.id}` === key);
-          if (!exists) {
-            this.appData.savedTrips.unshift(trip);
-            this.appData.savedTrips = this.appData.savedTrips.slice(0,8);
-            localStorage.setItem('mth.savedTrips', JSON.stringify(this.appData.savedTrips));
-          }
         }
 
         findNearbyStations() {
@@ -1421,532 +964,15 @@
         }
 
         registerServiceWorker() {
-          // Disable SW under proxied /portal path to avoid caching/interaction issues
-          try {
-            const path = (location && location.pathname) || '';
-            if (path.startsWith('/portal')) return; // skip under Cloudflare proxy
-          } catch (_) {}
           if ('serviceWorker' in navigator) {
-            // Only register if sw.js exists
-            fetch('sw.js', { method: 'HEAD' })
-              .then(r => { if (r.ok) return navigator.serviceWorker.register('sw.js'); })
-              .catch(() => {});
+            navigator.serviceWorker.register('sw.js').catch(err => {
+              console.warn('SW registration failed (ok if no sw.js yet):', err);
+            });
           }
         }
 
         randomInRange(min, max) { return Math.random() * (max - min) + min; }
         escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-        // Bottom Sheet Methods
-        openSheet(title, content) {
-          document.getElementById('sheetTitle').textContent = title;
-          document.getElementById('sheetBody').innerHTML = content;
-          document.getElementById('sheetBackdrop').classList.add('show');
-          document.getElementById('sheet').classList.add('show');
-          document.getElementById('sheet').setAttribute('aria-hidden', 'false');
-        }
-
-        // Predefined stop lists for detailed route info (concise, ordered)
-        getRouteStops() {
-          return {
-            M1: ['Versova','D.N. Nagar','Azad Nagar','Andheri','Western Express Highway','Chakala (J.B.Nagar)','Marol Naka','Airport Road','Saki Naka','Asalpha','Jagruti Nagar','Ghatkopar'],
-            M2A: ['Dahisar East','Ovaripada','Rashtriya Udyan','Devipada','Magathane','Poisar','Akurli','Kurla (W.E.)','Valnai–Meeth Chowky','Lower Malad','Bangur Nagar','Goregaon West','Lower Oshiwara','Lower DN Nagar','DN Nagar'],
-            M7: ['Dahisar East','Ovaripada','Rashtriya Udyan','Magathane','Poisar','Akurli','Aarey','Mogra','Jogeshwari East','Shankarwadi','Andheri East'],
-            M3: ['Aarey JVLR','SEEPZ','MIDC','Marol Naka','CSIA T2','Santacruz Electronics Export Processing Zone','BKC','Acharya Atre Chowk'],
-            WR_FAST: ['Borivali','Andheri','Bandra','Dadar','Mumbai Central','Churchgate'],
-            WR_SLOW: ['Virar','Nalasopara','Vasai Road','Bhayandar','Borivali','Andheri','Bandra','Dadar','Mumbai Central','Churchgate'],
-            CR_FAST: ['Kalyan','Thane','Ghatkopar','Dadar','Byculla','CSMT'],
-            HR: ['Panvel','Kharghar','Vashi','Mankhurd','Wadala Road','Sandhurst Road','CSMT']
-          };
-        }
-
-        openRouteDetails(routeId, reverse=false) {
-          const routes = (window.MUMBAI_SCHEDULES?.routes)||[];
-          const route = routes.find(r => r.routeId === routeId);
-          const stopsMap = this.getRouteStops();
-          let stops = stopsMap[routeId] || (route ? [route.from, route.to] : []);
-          if (reverse) stops = [...stops].reverse();
-          const direction = reverse && route ? `${route.to} → ${route.from}` : (route ? `${route.from} → ${route.to}` : '');
-
-          const listHtml = stops.map((s, i) => `
-            <div class="frequency-item">
-              <div><strong>${i+1}. ${s}</strong></div>
-              <div class="chip">${i===0?'Start':(i===stops.length-1?'End':'Stop')}</div>
-            </div>
-          `).join('');
-
-          const nextHtml = route ? (()=>{
-            try {
-              const n = (window.nextDepartures ? window.nextDepartures(route, 3) : []) || [];
-              if (!n.length) return '';
-              return `<div style="margin-top:8px">${n.map(d=>`<span class=\"chip\">${d.etaMin} min</span>`).join(' ')}</div>`;
-            } catch(_) { return ''; }
-          })() : '';
-
-          const content = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <div>
-                <h3 style="margin:0;">${route ? route.name : routeId}</h3>
-                <div style="font-size:12px;color:var(--text-secondary);">Direction: <strong id="routeDirText">${direction}</strong></div>
-              </div>
-              <div style="display:flex; gap:8px;">
-                <button class="chip info" id="toggleDir"><i class="fa-solid fa-right-left"></i> Reverse</button>
-                <button class="chip" id="focusRoute"><i class="fa-solid fa-location-crosshairs"></i> Focus</button>
-              </div>
-            </div>
-            ${nextHtml}
-            <div style="margin-top:10px;">${listHtml}</div>
-          `;
-          this.openSheet('Route Details', content);
-          this.bindRouteDetailEvents({ routeId, reverse });
-        }
-
-        bindRouteDetailEvents(state) {
-          const toggle = document.getElementById('toggleDir');
-          const focus = document.getElementById('focusRoute');
-          toggle?.addEventListener('click', () => this.openRouteDetails(state.routeId, !state.reverse));
-          focus?.addEventListener('click', () => {
-            const all = window.MUMBAI_SCHEDULES?.routes || [];
-            const match = all.find(r => r.routeId === state.routeId);
-            if (match) this.focusRoute({ transport: match.mode, id: match.routeId });
-          });
-        }
-
-        closeSheet() {
-          document.getElementById('sheetBackdrop').classList.remove('show');
-          document.getElementById('sheet').classList.remove('show');
-          document.getElementById('sheet').setAttribute('aria-hidden', 'true');
-        }
-
-        openDetailsSheet(transport) {
-          const routes = window.MUMBAI_SCHEDULES?.routes?.filter(r => r.mode === transport) || [];
-          const hash = `mode=${encodeURIComponent(transport)}`;
-          history.replaceState(null, '', this.updateHashParam('sheet', hash));
-          let content = `<h3>${transport.toUpperCase()} Details</h3>`;
-          
-          if (routes.length > 0) {
-            content += '<div class="frequency-list">';
-            routes.forEach(route => {
-              const routeId = route.routeId || route.id;
-              content += `
-                <div class="frequency-item">
-                  <div>
-                    <strong>${route.name}</strong><br>
-                    <span style="color: var(--text-secondary); font-size: 13px;">${route.from} → ${route.to}</span>
-                    <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
-                      <button class="chip" data-route="${routeId}"><i class="fa-solid fa-train"></i> Direction A</button>
-                      <button class="chip" data-route-rev="${routeId}"><i class="fa-solid fa-train"></i> Direction B</button>
-                      <button class="chip info" data-focus="${route.mode}:${routeId}"><i class="fa-solid fa-location-crosshairs"></i> Focus</button>
-                    </div>
-                  </div>
-                  <div style="text-align: right; font-size: 12px; color: var(--text-muted);">
-                    ${route.frequencies?.[0]?.headway || 'N/A'} min intervals
-                  </div>
-                </div>
-              `;
-            });
-            content += '</div>';
-          } else {
-            content += '<p>No detailed schedule information available for this transport mode.</p>';
-          }
-          
-          this.openSheet(`${transport.toUpperCase()} Information`, content);
-          // Bind route detail chips
-          const body = document.getElementById('sheetBody');
-          body.querySelectorAll('[data-route]')?.forEach(b => b.addEventListener('click', ()=> this.openRouteDetails(b.getAttribute('data-route'), false)));
-          body.querySelectorAll('[data-route-rev]')?.forEach(b => b.addEventListener('click', ()=> this.openRouteDetails(b.getAttribute('data-route-rev'), true)));
-          body.querySelectorAll('[data-focus]')?.forEach(b => b.addEventListener('click', ()=> {
-            const [transport, id] = b.getAttribute('data-focus').split(':');
-            this.focusRoute({ transport, id });
-          }));
-        }
-
-        openTicketsSheet() {
-          const content = `
-            <div class="tabs" role="tablist" aria-label="Ticketing">
-              <div class="tab active" data-tab="metro" role="tab" aria-selected="true">Metro</div>
-              <div class="tab" data-tab="train" role="tab" aria-selected="false">Train</div>
-              <div class="tab" data-tab="bus" role="tab" aria-selected="false">Bus</div>
-              <div class="tab" data-tab="upi" role="tab" aria-selected="false">UPI</div>
-            </div>
-            <div id="tickets-content" style="margin-top:12px">
-              ${this.renderTicketsTab('metro')}
-            </div>
-          `;
-          this.openSheet('Buy Tickets', content);
-          this.bindTicketsTabs();
-          history.replaceState(null, '', this.updateHashParam('sheet', 'tickets'));
-        }
-
-        renderTicketsTab(tab) {
-          if (tab === 'metro') {
-            return `
-              <div class="frequency-item">
-                <div>
-                  <strong>Line 1 (Blue)</strong><br>
-                  <span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span>
-                </div>
-                <a class="chip info" href="https://wa.me/919670008889?text=hi" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Open</a>
-              </div>
-              <ol>
-                <li>Send 'hi' to <strong>9670008889</strong></li>
-                <li>Select source & destination</li>
-                <li>Pay online or share OTP for paper ticket</li>
-                <li>Receive WhatsApp QR to travel</li>
-              </ol>
-              <p style="margin-top:6px"><a class="chip" href="https://mmrcl.com/en/map" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map"></i> Network Map</a></p>
-
-              <div class="frequency-item">
-                <div>
-                  <strong>Lines 2A & 7</strong><br>
-                  <span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span>
-                </div>
-                <a class="chip info" href="https://wa.me/918652635500?text=Hi" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Open</a>
-              </div>
-              <ul>
-                <li>Send 'Hi' to <strong>86526 35500</strong></li>
-                <li>Pay via card/UPI</li>
-                <li>Valid same business day; non-refundable</li>
-              </ul>
-
-              <div class="frequency-item">
-                <div>
-                  <strong>Line 3 (Aqua)</strong><br>
-                  <span style="color:var(--text-secondary);font-size:13px">Official MMRCL Portal</span>
-                </div>
-                <span class="chip" id="open-aqua-embed" role="button" tabindex="0">Open</span>
-              </div>
-              <div id="aqua-embed" style="display:none; margin-top:10px; height:360px; border:1px solid var(--border); border-radius:12px; overflow:hidden;">
-                <div style="height:100%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #00a3e0, #0078d4); color:white; text-align:center; padding:20px;">
-                  <div>
-                    <h3 style="margin:0 0 10px 0; font-size:18px;">🚇 Mumbai Metro Aqua Line 3</h3>
-                    <p style="margin:0 0 15px 0; opacity:0.9;">Interactive route map and station information</p>
-                    <a href="https://mmrcl.com/en/map" target="_blank" style="background:rgba(255,255,255,0.2); color:white; padding:8px 16px; border-radius:6px; text-decoration:none; display:inline-block;">
-                      <i class="fa-solid fa-external-link-alt"></i> Open Official Map
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <script data-cfasync="false">(function(){
-                const btn = document.getElementById('open-aqua-embed');
-                const pane = document.getElementById('aqua-embed');
-                if (btn && pane) btn.addEventListener('click', () => { pane.style.display = pane.style.display==='none'?'block':'none'; });
-              })()</script>
-              <p style="margin-top:6px">Book tickets via the official MMRCL portal for Aqua Line services.</p>
-            `;
-          }
-          if (tab === 'train') {
-            return `
-              <div class="frequency-item"><div><strong>UTS on Mobile</strong><br><span style="color:var(--text-secondary);font-size:13px">Unreserved tickets & passes</span></div><div class="chip success"><i class="fa-solid fa-mobile-screen"></i> Recommended</div></div>
-              <p>Use UTS app or station counters for suburban tickets and passes.</p>
-            `;
-          }
-          if (tab === 'upi') {
-            return `
-              <div class="frequency-item"><div><strong>Metro UPI QR Tickets</strong><br><span style="color:var(--text-secondary);font-size:13px">Mobile-as-ticket at AFC gates</span></div><div class="chip success">Valid 2 hours</div></div>
-              <p>Use your preferred app to buy QR tickets and tap at the gates.</p>
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-                <a class="chip info" href="paytm://metro" target="_self"><i class="fa-brands fa-cc-amazon-pay"></i> Open PayTM</a>
-                <a class="chip info" href="phonepe://travel" target="_self"><i class="fa-solid fa-qrcode"></i> Open PhonePe</a>
-                <a class="chip" href="https://paytm.com/metro" target="_blank" rel="noopener noreferrer">PayTM (web)</a>
-                <a class="chip" href="https://www.phonepe.com/travel-and-transit/" target="_blank" rel="noopener noreferrer">PhonePe (web)</a>
-              </div>
-              <p style="margin-top:8px; font-size:12px; color:var(--text-muted)">Journey must start within 2 hours of issue. Keep QR brightness high.</p>
-            `;
-          }
-          return `
-            <div class="frequency-item"><div><strong>BEST Bus</strong><br><span style="color:var(--text-secondary);font-size:13px">Mobile app / card / cash</span></div><div class="chip"><i class="fa-solid fa-bus"></i> Citywide</div></div>
-            <p>Pay via BEST app, prepaid cards, or cash at boarding.</p>
-          `;
-        }
-
-        bindTicketsTabs() {
-          const container = document.getElementById('sheetBody');
-          container.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-              container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-              tab.classList.add('active');
-              container.querySelector('#tickets-content').innerHTML = this.renderTicketsTab(tab.dataset.tab);
-            });
-          });
-        }
-
-        openJourneySheet() {
-          const content = `
-            <h3>🗺️ Plan Your Journey</h3>
-            <p>Plan efficient routes across Mumbai's transport network:</p>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>Multi-modal Planning</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">Combine Metro, Trains, Buses</span>
-              </div>
-            </div>
-            
-            <p><strong>Tips for efficient travel:</strong></p>
-            <ul>
-              <li>Use Metro for East-West connectivity</li>
-              <li>Local trains for North-South routes</li>
-              <li>BEST buses for local area coverage</li>
-              <li>Check peak hour timings (7-10 AM, 6-9 PM)</li>
-            </ul>
-            
-            <p><strong>Integration points:</strong></p>
-            <ul>
-              <li>Andheri: Metro Line 1 ↔ Western/Metro Line 7</li>
-              <li>Ghatkopar: Metro Line 1 ↔ Central Line</li>
-              <li>Churchgate/CST: Major train terminuses</li>
-            </ul>
-            <div class="chip info" style="margin-top:10px;">Live-like timetables integrated for Western/Central/Harbour and key BEST routes.</div>
-          `;
-          this.openSheet('Plan Journey', content);
-          history.replaceState(null, '', this.updateHashParam('sheet', 'journey'));
-        }
-
-        openNearbySheet() {
-          const content = `
-            <div class="tabs" role="tablist" aria-label="Nearby">
-              <div class="tab active" data-tab="stations" role="tab" aria-selected="true">Stations</div>
-              <div class="tab" data-tab="stops" role="tab" aria-selected="false">Bus Stops</div>
-              <div class="tab" data-tab="metros" role="tab" aria-selected="false">Metro</div>
-            </div>
-            <div id="nearby-content" style="margin-top:12px">
-              ${this.renderNearbyTab('stations')}
-            </div>
-          `;
-          this.openSheet('Nearby Stations', content);
-          this.bindNearbyTabs();
-          history.replaceState(null, '', this.updateHashParam('sheet', 'nearby'));
-        }
-
-        renderNearbyTab(tab) {
-          const list = (items) => items.map(i => `
-            <div class="frequency-item">
-              <div>
-                <strong>${i.title}</strong><br>
-                <span style="color:var(--text-secondary);font-size:13px;">${i.subtitle}</span>
-              </div>
-              <div class="chip ${i.badge?.type||''}">${i.badge?.text||''}</div>
-            </div>`).join('');
-          if (tab === 'stops') {
-            return list([
-              { title: 'Kala Ghoda', subtitle: '0.4 km • BEST stop', badge: { text: '5 routes', type: 'info' }},
-              { title: 'CST Bus Terminus', subtitle: '1.2 km • Hub', badge: { text: '12 routes', type: 'success' }},
-            ]);
-          }
-          if (tab === 'metros') {
-            return list([
-              { title: 'Ghatkopar Metro', subtitle: '2.1 km • Line 1', badge: { text: 'East-West', type: '' }},
-              { title: 'Andheri East Metro', subtitle: '5.8 km • Line 7', badge: { text: 'North-South', type: '' }},
-            ]);
-          }
-          return list([
-            { title: 'Churchgate Station', subtitle: '0.3 km • Western Line', badge: { text: '2 min walk', type: 'success' }},
-            { title: 'Marine Lines', subtitle: '0.8 km • Western Line', badge: { text: '8 min walk', type: 'success' }},
-            { title: 'Charni Road', subtitle: '1.2 km • Western Line', badge: { text: '12 min walk', type: 'warn' }},
-            { title: 'CSMT', subtitle: '1.5 km • Central/Harbour', badge: { text: '15 min walk', type: 'warn' }},
-          ]);
-        }
-
-        bindNearbyTabs() {
-          const container = document.getElementById('sheetBody');
-          container.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-              container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-              tab.classList.add('active');
-              container.querySelector('#nearby-content').innerHTML = this.renderNearbyTab(tab.dataset.tab);
-            });
-          });
-        }
-
-        openRechargeSheet() {
-          const content = `
-            <div class="tabs" role="tablist" aria-label="Recharge">
-              <div class="tab active" data-tab="metro" role="tab" aria-selected="true">Metro</div>
-              <div class="tab" data-tab="train" role="tab" aria-selected="false">Train</div>
-              <div class="tab" data-tab="bus" role="tab" aria-selected="false">Bus</div>
-            </div>
-            <div id="recharge-content" style="margin-top:12px">${this.renderRechargeTab('metro')}</div>
-          `;
-          this.openSheet('Recharge Cards', content);
-          this.bindRechargeTabs();
-          history.replaceState(null, '', this.updateHashParam('sheet', 'recharge'));
-        }
-
-        renderRechargeTab(tab) {
-          if (tab === 'train') {
-            return `
-              <div class="frequency-item"><div><strong>Season Pass</strong><br><span style="color:var(--text-secondary);font-size:13px;">Monthly/Quarterly</span></div><div class="chip success">UTS app</div></div>
-              <p>Recharge and manage passes via UTS app or counters.</p>
-            `;
-          }
-          if (tab === 'bus') {
-            return `
-              <div class="frequency-item"><div><strong>BEST Prepaid</strong><br><span style="color:var(--text-secondary);font-size:13px;">Citywide</span></div><div class="chip">Retail/Online</div></div>
-              <p>Recharge at depots, authorized centers, or through the BEST app.</p>
-            `;
-          }
-          return `
-            <div class="frequency-item"><div><strong>Metro Smart Cards</strong><br><span style="color:var(--text-secondary);font-size:13px;">Lines 1, 2A, 7</span></div><div class="chip info">App/Station</div></div>
-            <p>Recharge at stations, authorized retailers, or the Mumbai Metro app.</p>
-          `;
-        }
-
-        bindRechargeTabs() {
-          const container = document.getElementById('sheetBody');
-          container.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-              container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-              tab.classList.add('active');
-              container.querySelector('#recharge-content').innerHTML = this.renderRechargeTab(tab.dataset.tab);
-            });
-          });
-        }
-
-        openAccountSheet() {
-          const content = `
-            <h3>👤 Account & Settings</h3>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>Theme Settings</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">Light/Dark mode toggle</span>
-              </div>
-            </div>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>Notifications</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">Service alerts & updates</span>
-              </div>
-            </div>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>Saved Routes</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">Quick access to frequent routes</span>
-              </div>
-            </div>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>Language</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">English, हिंदी, मराठी</span>
-              </div>
-            </div>
-            
-            <p><strong>Data & Privacy:</strong></p>
-            <ul>
-              <li>Location data used only for nearby stations</li>
-              <li>No personal data stored on servers</li>
-              <li>All preferences saved locally</li>
-            </ul>
-          `;
-          this.openSheet('Account & Settings', content);
-          history.replaceState(null, '', this.updateHashParam('sheet', 'account'));
-        }
-
-        // Deep link helpers
-        updateHashParam(key, value) {
-          const url = new URL(location.href);
-          const hash = new URLSearchParams(url.hash.replace(/^#/, ''));
-          hash.set(key, value);
-          url.hash = hash.toString();
-          return url.toString();
-        }
-        readHashParam(key) {
-          const hash = new URLSearchParams((location.hash||'').replace(/^#/, ''));
-          return hash.get(key);
-        }
-
-        // Auto Fare Estimator (Mumbai, Aug 2025)
-        openFareEstimator() {
-          const now = new Date();
-          const night = now.getHours() < 5; // 00:00–05:00 night charge window
-          const base = 26; // Minimum fare (covers first 1 km)
-          const perKm = 17.14; // Each km after first, rounded to nearest rupee on total
-
-          const content = `
-            <div class="tabs" role="tablist" aria-label="Fare">
-              <div class="tab active" data-tab="auto" role="tab" aria-selected="true">Auto</div>
-              <div class="tab" data-tab="taxi" role="tab" aria-selected="false">Taxi</div>
-            </div>
-            <div id="fare-content" style="margin-top:12px">
-              ${this.renderFareTab('auto', { base, perKm, night })}
-            </div>
-          `;
-          this.openSheet('Fare Estimator', content);
-          this.bindFareTabs({ base, perKm, night });
-          this.setupFareCalc('auto', { base, perKm, night });
-        }
-
-        renderFareTab(tab, cfg) {
-          const inputs = `
-            <div style="display:grid;grid-template-columns:1fr;gap:10px;margin:10px 0;">
-              <div>
-                <label style="font-size:12px;color:var(--text-secondary)">Distance (km)</label>
-                <input id="fare-km" type="number" min="0" step="0.1" value="5" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-primary)" />
-                <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">Minimum fare ₹${Math.round(cfg.base)} covers first 1 km. Subsequent per km ₹${cfg.perKm}.</div>
-              </div>
-            </div>
-            <div class="chip ${cfg.night ? 'warn' : 'success'}">${cfg.night ? 'Night +25% (00:00–05:00)' : 'Day rates'}</div>
-          `;
-
-          if (tab === 'taxi') {
-            const tCfg = { base: cfg.night ? 40 : 35, perKm: cfg.night ? 28 : 26, perMin: 3, night: cfg.night };
-            return `
-              ${inputs}
-              <div id="fare-output" style="margin-top:12px"></div>
-              <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">Estimates as of Aug 2025. Actual fares may vary by RTO updates, traffic, and operator.</div>
-            `;
-          }
-
-          return `
-            ${inputs}
-            <div id="fare-output" style="margin-top:12px"></div>
-            <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">Estimates as of Aug 2025. Actual fares may vary by RTO updates, traffic, and operator.</div>
-          `;
-        }
-
-        bindFareTabs(cfg) {
-          const container = document.getElementById('sheetBody');
-          container.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-              container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-              tab.classList.add('active');
-              container.querySelector('#fare-content').innerHTML = this.renderFareTab(tab.dataset.tab, cfg);
-              if (tab.dataset.tab === 'taxi') {
-                const tCfg = { base: cfg.night ? 40 : 35, perKm: cfg.night ? 28 : 26, perMin: 3, night: cfg.night };
-                this.setupFareCalc('taxi', tCfg);
-              } else {
-                this.setupFareCalc('auto', cfg);
-              }
-            });
-          });
-        }
-
-        setupFareCalc(mode, cfg) {
-          const kmInput = document.getElementById('fare-km');
-          const out = document.getElementById('fare-output');
-          if (!kmInput || !out) return;
-          const calc = () => {
-            const km = Math.max(0, parseFloat(kmInput.value || '0'));
-            let fare;
-            if (mode === 'auto') {
-              const extraKm = Math.max(0, km - 1);
-              const dayFare = cfg.base + extraKm * cfg.perKm;
-              fare = cfg.night ? Math.round(dayFare * 1.25) : Math.round(dayFare);
-              out.innerHTML = `<div class="frequency-item"><div><strong>Estimated Auto Fare</strong><br><span style="color:var(--text-secondary);font-size:13px">${km.toFixed(1)} km</span></div><div class="chip">₹ ${fare}</div></div>`;
-            } else {
-              // Simple taxi estimate: base + perKm*km
-              const dayFare = cfg.base + km * cfg.perKm; // ignoring perMin in simple UI
-              fare = Math.round(dayFare);
-              out.innerHTML = `<div class="frequency-item"><div><strong>Estimated Taxi Fare</strong><br><span style="color:var(--text-secondary);font-size:13px">${km.toFixed(1)} km</span></div><div class="chip">₹ ${fare}</div></div>`;
-            }
-          };
-          kmInput.addEventListener('input', calc);
-          calc();
-        }
       }
 
       let transportHub;
@@ -1971,14 +997,10 @@
         }, 30000);
 
         window.MumbaiTransport = transportHub;
-        
-        // Expose functions globally for embedded use
-        window.openTicketsSheet = () => transportHub.openTicketsSheet();
-        window.openDetailsSheet = (transport) => transportHub.openDetailsSheet(transport);
       });
     })();
   </script>
-  <script data-cfasync="false">
+  <script>
   /* Static live overlay (Aug 2025) — single-file, no external JSON. */
   (function(){
     const SCHEDULES = {
@@ -2258,6 +1280,7 @@
 
       hub.updateSchedules();
       hub.updateVehiclePositions();
+      hub.showNotification && hub.showNotification('✅ Static schedules (Aug 2025) live view enabled');
       return true;
     }
 
@@ -2265,8 +1288,7 @@
       const iv = setInterval(() => { if (tryInit()) clearInterval(iv); }, 300);
       setTimeout(() => clearInterval(iv), 12000);
     }
-    })();
+  })();
   </script>
 </body>
 </html>
-
