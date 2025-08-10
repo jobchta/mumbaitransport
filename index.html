@@ -168,6 +168,22 @@
     .schedule-time { font-size: 12px; color: var(--text-muted); }
     .schedule-delay { font-size: 11px; color: var(--warning); font-weight: 600; }
 
+    /* Chips, Tabs, FAB */
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 999px; font-size: 11px; background: var(--primary-light); color: var(--text-secondary); border: 1px solid var(--border); }
+    .chip.success { background: rgba(0,184,122,0.12); color: #0E9F6E; border-color: rgba(0,184,122,0.3); }
+    .chip.warn { background: rgba(247,144,9,0.12); color: #B4690E; border-color: rgba(247,144,9,0.3); }
+    .chip.info { background: rgba(14,165,233,0.12); color: #0E7490; border-color: rgba(14,165,233,0.3); }
+
+    .tabs { display: flex; gap: 8px; background: var(--background); border: 1px solid var(--border); padding: 6px; border-radius: var(--radius-lg); }
+    .tab { flex: 1; text-align: center; padding: 8px 10px; border-radius: var(--radius-md); font-size: 13px; cursor: pointer; color: var(--text-secondary); border: 1px solid transparent; }
+    .tab.active { background: var(--surface); color: var(--text-primary); border-color: var(--border); box-shadow: var(--shadow-sm); }
+
+    .fab { position: fixed; right: 18px; bottom: 86px; z-index: 1200; }
+    .fab-main { width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg); border: none; cursor: pointer; }
+    .fab-menu { position: absolute; bottom: 66px; right: 0; display: none; flex-direction: column; gap: 10px; }
+    .fab.show .fab-menu { display: flex; }
+    .fab-item { display: flex; align-items: center; gap: 8px; background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); padding: 8px 10px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; }
+
     .bottom-nav { background: var(--surface); border-top: 1px solid var(--border); padding: 8px 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0; }
     .nav-button { padding: 8px 4px; border-radius: var(--radius-md); background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .nav-button.active { color: var(--primary); background: var(--primary-light); }
@@ -450,6 +466,10 @@
             <span class="action-icon"><i class="fa-solid fa-wallet"></i></span>
             Recharge Card
           </button>
+          <button class="action-button" id="fare-estimator" type="button">
+            <span class="action-icon"><i class="fa-solid fa-indian-rupee-sign"></i></span>
+            Fare Estimator (Auto)
+          </button>
         </div>
       </section>
 
@@ -501,6 +521,16 @@
         Account
       </button>
     </nav>
+  </div>
+
+  <!-- Floating Action Button (Quick Menu) -->
+  <div class="fab" id="fab">
+    <div class="fab-menu">
+      <div class="fab-item" id="fab-fare"><i class="fa-solid fa-indian-rupee-sign"></i> Fare Estimator</div>
+      <div class="fab-item" id="fab-tickets"><i class="fa-solid fa-ticket"></i> Tickets</div>
+      <div class="fab-item" id="fab-nearby"><i class="fa-solid fa-location-arrow"></i> Nearby</div>
+    </div>
+    <button class="fab-main" id="fab-main" aria-label="Open quick menu"><i class="fa-solid fa-plus"></i></button>
   </div>
 
   <!-- Bottom Sheet Modal -->
@@ -635,6 +665,7 @@
           document.getElementById('plan-journey').addEventListener('click', () => this.openJourneySheet());
           document.getElementById('nearby-stations').addEventListener('click', () => this.openNearbySheet());
           document.getElementById('recharge-card').addEventListener('click', () => this.openRechargeSheet());
+          document.getElementById('fare-estimator').addEventListener('click', () => this.openFareEstimator());
 
           // Navigation buttons
           document.querySelectorAll('.nav-button').forEach(btn => {
@@ -671,6 +702,14 @@
 
           // URL params for embed mode
           this.handleURLParams();
+
+          // FAB
+          const fab = document.getElementById('fab');
+          const fabMain = document.getElementById('fab-main');
+          fabMain.addEventListener('click', () => fab.classList.toggle('show'));
+          document.getElementById('fab-fare').addEventListener('click', () => this.openFareEstimator());
+          document.getElementById('fab-tickets').addEventListener('click', () => this.openTicketsSheet());
+          document.getElementById('fab-nearby').addEventListener('click', () => this.openNearbySheet());
         }
 
         setupSheetControls() {
@@ -1152,51 +1191,60 @@
 
         openTicketsSheet() {
           const content = `
-            <h3>🎫 Buy Tickets</h3>
-            
-            <h4>Metro Lines</h4>
-            <div class="frequency-item">
-              <div>
-                <strong>Line 1 (Blue) - Versova to Ghatkopar</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">WhatsApp Ticketing Available</span>
-              </div>
+            <div class="tabs" role="tablist" aria-label="Ticketing">
+              <div class="tab active" data-tab="metro" role="tab" aria-selected="true">Metro</div>
+              <div class="tab" data-tab="train" role="tab" aria-selected="false">Train</div>
+              <div class="tab" data-tab="bus" role="tab" aria-selected="false">Bus</div>
             </div>
-            <p><strong>How to book:</strong></p>
-            <ol>
-              <li>Send 'hi' to <strong>9670008889</strong></li>
-              <li>Click link to select source & destination</li>
-              <li>Pay online for e-ticket or share OTP for paper ticket</li>
-              <li>Receive WhatsApp QR code to travel</li>
-            </ol>
-
-            <div class="frequency-item">
-              <div>
-                <strong>Lines 2A & 7 (Yellow & Red)</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">WhatsApp Ticketing Available</span>
-              </div>
+            <div id="tickets-content" style="margin-top:12px">
+              ${this.renderTicketsTab('metro')}
             </div>
-            <p><strong>How to book:</strong></p>
-            <ol>
-              <li>Send 'Hi' to <strong>86526 35500</strong></li>
-              <li>Select route and make payment via Bank card/UPI</li>
-              <li>Valid for same business day only</li>
-              <li>Non-refundable once issued</li>
-            </ol>
-
-            <div class="frequency-item">
-              <div>
-                <strong>Line 3 (Aqua) - Partial Operations</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">Official MMRCL Portal</span>
-              </div>
-            </div>
-            <p>Book tickets through the official MMRCL portal for Aqua Line services.</p>
-
-            <h4>Other Transport</h4>
-            <p><strong>Local Trains:</strong> Book via UTS app or station counters</p>
-            <p><strong>BEST Buses:</strong> Pay via prepaid card, mobile app, or cash</p>
-            <p><strong>Ferry:</strong> Tickets available at boarding points</p>
           `;
           this.openSheet('Buy Tickets', content);
+          this.bindTicketsTabs();
+        }
+
+        renderTicketsTab(tab) {
+          if (tab === 'metro') {
+            return `
+              <div class="frequency-item"><div><strong>Line 1 (Blue)</strong><br><span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span></div><div class="chip info"><i class="fa-brands fa-whatsapp"></i> 9670008889</div></div>
+              <ol>
+                <li>Send 'hi' to <strong>9670008889</strong></li>
+                <li>Select source & destination</li>
+                <li>Pay online or share OTP for paper ticket</li>
+                <li>Receive WhatsApp QR to travel</li>
+              </ol>
+              <div class="frequency-item"><div><strong>Lines 2A & 7</strong><br><span style="color:var(--text-secondary);font-size:13px">WhatsApp Ticketing</span></div><div class="chip info"><i class="fa-brands fa-whatsapp"></i> 86526 35500</div></div>
+              <ul>
+                <li>Send 'Hi' to <strong>86526 35500</strong></li>
+                <li>Pay via card/UPI</li>
+                <li>Valid same business day; non-refundable</li>
+              </ul>
+              <div class="frequency-item"><div><strong>Line 3 (Aqua)</strong><br><span style="color:var(--text-secondary);font-size:13px">Official MMRCL Portal</span></div><div class="chip">Portal</div></div>
+              <p>Book tickets via the official MMRCL portal for Aqua Line services.</p>
+            `;
+          }
+          if (tab === 'train') {
+            return `
+              <div class="frequency-item"><div><strong>UTS on Mobile</strong><br><span style="color:var(--text-secondary);font-size:13px">Unreserved tickets & passes</span></div><div class="chip success"><i class="fa-solid fa-mobile-screen"></i> Recommended</div></div>
+              <p>Use UTS app or station counters for suburban tickets and passes.</p>
+            `;
+          }
+          return `
+            <div class="frequency-item"><div><strong>BEST Bus</strong><br><span style="color:var(--text-secondary);font-size:13px">Mobile app / card / cash</span></div><div class="chip"><i class="fa-solid fa-bus"></i> Citywide</div></div>
+            <p>Pay via BEST app, prepaid cards, or cash at boarding.</p>
+          `;
+        }
+
+        bindTicketsTabs() {
+          const container = document.getElementById('sheetBody');
+          container.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+              container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+              tab.classList.add('active');
+              container.querySelector('#tickets-content').innerHTML = this.renderTicketsTab(tab.dataset.tab);
+            });
+          });
         }
 
         openJourneySheet() {
@@ -1231,83 +1279,100 @@
 
         openNearbySheet() {
           const content = `
-            <h3>📍 Nearby Stations</h3>
-            <p>Stations within 3km radius:</p>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>Churchgate Station</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">0.3 km • Western Line</span>
-              </div>
-              <div style="color: var(--success); font-size: 12px;">2 min walk</div>
+            <div class="tabs" role="tablist" aria-label="Nearby">
+              <div class="tab active" data-tab="stations" role="tab" aria-selected="true">Stations</div>
+              <div class="tab" data-tab="stops" role="tab" aria-selected="false">Bus Stops</div>
+              <div class="tab" data-tab="metros" role="tab" aria-selected="false">Metro</div>
             </div>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>Marine Lines</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">0.8 km • Western Line</span>
-              </div>
-              <div style="color: var(--success); font-size: 12px;">8 min walk</div>
+            <div id="nearby-content" style="margin-top:12px">
+              ${this.renderNearbyTab('stations')}
             </div>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>Charni Road</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">1.2 km • Western Line</span>
-              </div>
-              <div style="color: var(--warning); font-size: 12px;">12 min walk</div>
-            </div>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>CST Terminus</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">1.5 km • Central/Harbour Lines</span>
-              </div>
-              <div style="color: var(--warning); font-size: 12px;">15 min walk</div>
-            </div>
-            
-            <p><em>Location access required for precise nearby stations.</em></p>
           `;
           this.openSheet('Nearby Stations', content);
+          this.bindNearbyTabs();
+        }
+
+        renderNearbyTab(tab) {
+          const list = (items) => items.map(i => `
+            <div class="frequency-item">
+              <div>
+                <strong>${i.title}</strong><br>
+                <span style="color:var(--text-secondary);font-size:13px;">${i.subtitle}</span>
+              </div>
+              <div class="chip ${i.badge?.type||''}">${i.badge?.text||''}</div>
+            </div>`).join('');
+          if (tab === 'stops') {
+            return list([
+              { title: 'Kala Ghoda', subtitle: '0.4 km • BEST stop', badge: { text: '5 routes', type: 'info' }},
+              { title: 'CST Bus Terminus', subtitle: '1.2 km • Hub', badge: { text: '12 routes', type: 'success' }},
+            ]);
+          }
+          if (tab === 'metros') {
+            return list([
+              { title: 'Ghatkopar Metro', subtitle: '2.1 km • Line 1', badge: { text: 'East-West', type: '' }},
+              { title: 'Andheri East Metro', subtitle: '5.8 km • Line 7', badge: { text: 'North-South', type: '' }},
+            ]);
+          }
+          return list([
+            { title: 'Churchgate Station', subtitle: '0.3 km • Western Line', badge: { text: '2 min walk', type: 'success' }},
+            { title: 'Marine Lines', subtitle: '0.8 km • Western Line', badge: { text: '8 min walk', type: 'success' }},
+            { title: 'Charni Road', subtitle: '1.2 km • Western Line', badge: { text: '12 min walk', type: 'warn' }},
+            { title: 'CSMT', subtitle: '1.5 km • Central/Harbour', badge: { text: '15 min walk', type: 'warn' }},
+          ]);
+        }
+
+        bindNearbyTabs() {
+          const container = document.getElementById('sheetBody');
+          container.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+              container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+              tab.classList.add('active');
+              container.querySelector('#nearby-content').innerHTML = this.renderNearbyTab(tab.dataset.tab);
+            });
+          });
         }
 
         openRechargeSheet() {
           const content = `
-            <h3>💳 Recharge Travel Cards</h3>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>Metro Cards</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">Line 1, 2A, 7 Smart Cards</span>
-              </div>
+            <div class="tabs" role="tablist" aria-label="Recharge">
+              <div class="tab active" data-tab="metro" role="tab" aria-selected="true">Metro</div>
+              <div class="tab" data-tab="train" role="tab" aria-selected="false">Train</div>
+              <div class="tab" data-tab="bus" role="tab" aria-selected="false">Bus</div>
             </div>
-            <p>Recharge at metro stations, authorized retailers, or mobile apps.</p>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>Local Train Season Pass</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">Monthly/Quarterly passes</span>
-              </div>
-            </div>
-            <p>Available at railway booking counters and UTS app.</p>
-            
-            <div class="frequency-item">
-              <div>
-                <strong>BEST Prepaid Cards</strong><br>
-                <span style="color: var(--text-secondary); font-size: 13px;">Bus travel cards</span>
-              </div>
-            </div>
-            <p>Recharge at BEST depots, authorized centers, or online.</p>
-            
-            <p><strong>Digital Options:</strong></p>
-            <ul>
-              <li>Mumbai Metro app</li>
-              <li>UTS app for trains</li>
-              <li>BEST mobile app</li>
-              <li>PayTM, GPay integration</li>
-            </ul>
+            <div id="recharge-content" style="margin-top:12px">${this.renderRechargeTab('metro')}</div>
           `;
           this.openSheet('Recharge Cards', content);
+          this.bindRechargeTabs();
+        }
+
+        renderRechargeTab(tab) {
+          if (tab === 'train') {
+            return `
+              <div class="frequency-item"><div><strong>Season Pass</strong><br><span style="color:var(--text-secondary);font-size:13px;">Monthly/Quarterly</span></div><div class="chip success">UTS app</div></div>
+              <p>Recharge and manage passes via UTS app or counters.</p>
+            `;
+          }
+          if (tab === 'bus') {
+            return `
+              <div class="frequency-item"><div><strong>BEST Prepaid</strong><br><span style="color:var(--text-secondary);font-size:13px;">Citywide</span></div><div class="chip">Retail/Online</div></div>
+              <p>Recharge at depots, authorized centers, or through the BEST app.</p>
+            `;
+          }
+          return `
+            <div class="frequency-item"><div><strong>Metro Smart Cards</strong><br><span style="color:var(--text-secondary);font-size:13px;">Lines 1, 2A, 7</span></div><div class="chip info">App/Station</div></div>
+            <p>Recharge at stations, authorized retailers, or the Mumbai Metro app.</p>
+          `;
+        }
+
+        bindRechargeTabs() {
+          const container = document.getElementById('sheetBody');
+          container.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+              container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+              tab.classList.add('active');
+              container.querySelector('#recharge-content').innerHTML = this.renderRechargeTab(tab.dataset.tab);
+            });
+          });
         }
 
         openAccountSheet() {
@@ -1350,6 +1415,89 @@
             </ul>
           `;
           this.openSheet('Account & Settings', content);
+        }
+
+        // Auto Fare Estimator (Mumbai, Aug 2025)
+        openFareEstimator() {
+          const now = new Date();
+          const night = now.getHours() >= 23 || now.getHours() < 5; // typical night window
+          const base = night ? 33 : 30; // base fare
+          const perKm = night ? 23 : 21; // per-km fare
+          const perMin = 2; // nominal time component for traffic waiting
+
+          const content = `
+            <div class="tabs" role="tablist" aria-label="Fare">
+              <div class="tab active" data-tab="auto" role="tab" aria-selected="true">Auto</div>
+              <div class="tab" data-tab="taxi" role="tab" aria-selected="false">Taxi</div>
+            </div>
+            <div id="fare-content" style="margin-top:12px">
+              ${this.renderFareTab('auto', { base, perKm, perMin, night })}
+            </div>
+          `;
+          this.openSheet('Fare Estimator', content);
+          this.bindFareTabs({ base, perKm, perMin, night });
+        }
+
+        renderFareTab(tab, cfg) {
+          const inputs = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;">
+              <div>
+                <label style="font-size:12px;color:var(--text-secondary)">Distance (km)</label>
+                <input id="fare-km" type="number" min="0" step="0.1" value="5" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-primary)" />
+              </div>
+              <div>
+                <label style="font-size:12px;color:var(--text-secondary)">Time (min)</label>
+                <input id="fare-min" type="number" min="0" step="1" value="20" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-primary)" />
+              </div>
+            </div>
+            <div class="chip ${cfg.night ? 'warn' : 'success'}">${cfg.night ? 'Night charges active' : 'Day rates'}</div>
+          `;
+
+          if (tab === 'taxi') {
+            const tCfg = { base: cfg.night ? 40 : 35, perKm: cfg.night ? 28 : 26, perMin: 3, night: cfg.night };
+            return `
+              ${inputs}
+              <div id="fare-output" style="margin-top:12px"></div>
+              <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">Estimates as of Aug 2025. Actual fares may vary by RTO updates, traffic, and operator.</div>
+              <script data-cfasync="false">(function(){
+                const calc = () => {
+                  const km = parseFloat(document.getElementById('fare-km').value||'0');
+                  const mins = parseFloat(document.getElementById('fare-min').value||'0');
+                  const fare = Math.max(${tCfg.base}, ${tCfg.base} + km*${tCfg.perKm} + mins*${tCfg.perMin});
+                  document.getElementById('fare-output').innerHTML = `<div class=\"frequency-item\"><div><strong>Estimated Taxi Fare</strong><br><span style=\"color:var(--text-secondary);font-size:13px\">${'${km.toFixed(1)}'} km • ${'${mins}'} min</span></div><div class=\"chip\">₹ ${'${Math.round(fare)}'}</div></div>`;
+                };
+                ['fare-km','fare-min'].forEach(id=>document.getElementById(id).addEventListener('input', calc));
+                calc();
+              })()</script>
+            `;
+          }
+
+          return `
+            ${inputs}
+            <div id="fare-output" style="margin-top:12px"></div>
+            <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">Estimates as of Aug 2025. Actual fares may vary by RTO updates, traffic, and operator.</div>
+            <script data-cfasync="false">(function(){
+              const calc = () => {
+                const km = parseFloat(document.getElementById('fare-km').value||'0');
+                const mins = parseFloat(document.getElementById('fare-min').value||'0');
+                const fare = Math.max(${cfg.base}, ${cfg.base} + km*${cfg.perKm} + mins*${cfg.perMin});
+                document.getElementById('fare-output').innerHTML = `<div class=\"frequency-item\"><div><strong>Estimated Auto Fare</strong><br><span style=\"color:var(--text-secondary);font-size:13px\">${'${km.toFixed(1)}'} km • ${'${mins}'} min</span></div><div class=\"chip\">₹ ${'${Math.round(fare)}'}</div></div>`;
+              };
+              ['fare-km','fare-min'].forEach(id=>document.getElementById(id).addEventListener('input', calc));
+              calc();
+            })()</script>
+          `;
+        }
+
+        bindFareTabs(cfg) {
+          const container = document.getElementById('sheetBody');
+          container.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+              container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+              tab.classList.add('active');
+              container.querySelector('#fare-content').innerHTML = this.renderFareTab(tab.dataset.tab, cfg);
+            });
+          });
         }
       }
 
