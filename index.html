@@ -600,6 +600,19 @@
 
   <!-- Leaflet JS with fallback CDN -->
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="(function(){var s=document.createElement('script');s.defer=true;s.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';document.head.appendChild(s);})()"></script>
+  
+  <!-- PhonePe SDK Integration -->
+  <script>
+    // PhonePe Payment Configuration
+    window.PhonePeConfig = {
+      merchantId: 'DEMO_MERCHANT', // Demo merchant ID
+      saltKey: 'DEMO_SALT_KEY',    // Demo salt key  
+      saltIndex: '1',              // Demo salt index
+      environment: 'UAT',          // UAT for testing, PRODUCTION for live
+      callbackUrl: window.location.origin + '/payment-callback',
+      redirectUrl: window.location.origin + '/payment-success'
+    };
+  </script>
 
   <script data-cfasync="false">
     // Mumbai Transport Hub - robust single-file app
@@ -1560,9 +1573,19 @@
                 </div>
                 <div class="chip success">Valid 2 hours</div>
               </div>
-              <p>Use your preferred UPI app to buy QR tickets and tap at the gates.</p>
+              <p>Buy tickets instantly with UPI and get digital QR tickets:</p>
               
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+              <div style="margin: 16px 0;">
+                <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--primary);">Quick Ticket Booking</h4>
+                <button id="quick-metro-ticket" class="btn btn-primary" style="width: 100%; margin-bottom: 8px; background: linear-gradient(135deg, #5F259F, #8E44AD); border: none;">
+                  <i class="fa-solid fa-ticket"></i> Buy Metro Ticket with PhonePe
+                </button>
+                <button id="view-my-tickets" class="btn btn-secondary" style="width: 100%;">
+                  <i class="fa-solid fa-list"></i> View My Tickets
+                </button>
+              </div>
+              
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;">
                 <a href="paytm://metro" target="_self" class="chip info" style="text-decoration:none;">
                   <i class="fa-solid fa-mobile-screen"></i> PayTM App
                 </a>
@@ -1620,8 +1643,127 @@
               container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
               tab.classList.add('active');
               container.querySelector('#tickets-content').innerHTML = this.renderTicketsTab(tab.dataset.tab);
+              
+              // Bind UPI tab specific functionality
+              if (tab.dataset.tab === 'upi') {
+                setTimeout(() => {
+                  const quickTicketBtn = document.getElementById('quick-metro-ticket');
+                  const viewTicketsBtn = document.getElementById('view-my-tickets');
+                  
+                  if (quickTicketBtn) {
+                    quickTicketBtn.addEventListener('click', () => this.showQuickTicketBooking());
+                  }
+                  
+                  if (viewTicketsBtn) {
+                    viewTicketsBtn.addEventListener('click', () => this.showUserTickets());
+                  }
+                }, 100);
+              }
             });
           });
+        }
+
+        showQuickTicketBooking() {
+          const content = `
+            <div style="padding: 20px;">
+              <h3 style="margin: 0 0 16px 0; text-align: center; color: var(--primary);">
+                <i class="fa-solid fa-ticket"></i> Quick Metro Ticket
+              </h3>
+              
+              <div style="background: var(--background); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">Route</label>
+                  <select id="ticket-route" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                    <option value="M1">Metro Line 1 (Blue) - Versova ↔ Ghatkopar</option>
+                    <option value="M2A">Metro Line 2A (Yellow) - Dahisar ↔ DN Nagar</option>
+                    <option value="M7">Metro Line 7 (Red) - Andheri E ↔ Dahisar E</option>
+                    <option value="M3">Metro Line 3 (Pink) - Colaba ↔ SEEPZ</option>
+                  </select>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">From</label>
+                    <input type="text" id="ticket-from" placeholder="Start station" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">To</label>
+                    <input type="text" id="ticket-to" placeholder="End station" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">Journey Date</label>
+                    <input type="date" id="ticket-date" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);" value="${new Date().toISOString().split('T')[0]}">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">Passengers</label>
+                    <select id="ticket-passengers" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                      <option value="1">1 Adult</option>
+                      <option value="2">2 Adults</option>
+                      <option value="3">3 Adults</option>
+                      <option value="4">4 Adults</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div style="background: var(--primary-light); border-radius: 8px; padding: 12px; text-align: center;">
+                  <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Estimated Fare</div>
+                  <div style="font-size: 24px; font-weight: 600; color: var(--primary);" id="estimated-fare">₹45</div>
+                  <div style="font-size: 10px; color: var(--text-muted);">Base fare + taxes</div>
+                </div>
+              </div>
+              
+              <button id="proceed-payment" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; background: linear-gradient(135deg, #5F259F, #8E44AD); border: none;">
+                <i class="fa-solid fa-credit-card"></i> Proceed to Pay with PhonePe
+              </button>
+              
+              <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin: 12px 0 0 0;">
+                <i class="fa-solid fa-shield-halved"></i> Secure payment • 2 hours validity • Digital QR ticket
+              </p>
+            </div>
+          `;
+          
+          this.openSheet('Book Metro Ticket', content);
+          
+          setTimeout(() => {
+            const proceedBtn = document.getElementById('proceed-payment');
+            const routeSelect = document.getElementById('ticket-route');
+            const passengersSelect = document.getElementById('ticket-passengers');
+            const fareDisplay = document.getElementById('estimated-fare');
+            
+            // Update fare when route or passengers change
+            const updateFare = () => {
+              const baseFare = 45; // Base metro fare
+              const passengers = parseInt(passengersSelect.value);
+              const totalFare = baseFare * passengers;
+              fareDisplay.textContent = `₹${totalFare}`;
+            };
+            
+            if (routeSelect) routeSelect.addEventListener('change', updateFare);
+            if (passengersSelect) passengersSelect.addEventListener('change', updateFare);
+            
+            if (proceedBtn) {
+              proceedBtn.addEventListener('click', () => {
+                const ticketData = {
+                  route: routeSelect.options[routeSelect.selectedIndex].text,
+                  from: document.getElementById('ticket-from').value || 'Selected Station',
+                  to: document.getElementById('ticket-to').value || 'Destination',
+                  date: document.getElementById('ticket-date').value,
+                  passengers: passengersSelect.value,
+                  amount: parseInt(fareDisplay.textContent.replace('₹', ''))
+                };
+                
+                if (!ticketData.from || !ticketData.to || ticketData.from === 'Selected Station') {
+                  this.showNotification('⚠️ Please enter valid stations');
+                  return;
+                }
+                
+                this.initPhonePePayment(ticketData);
+              });
+            }
+          }, 100);
         }
 
         openJourneySheet() {
@@ -1825,6 +1967,428 @@
           `;
           this.openSheet('Account & Settings', content);
           history.replaceState(null, '', this.updateHashParam('sheet', 'account'));
+        }
+
+        // PhonePe UPI Payment Integration
+        async initPhonePePayment(ticketData) {
+          const transactionId = 'TXN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+          
+          const paymentPayload = {
+            merchantId: window.PhonePeConfig.merchantId,
+            merchantTransactionId: transactionId,
+            merchantUserId: 'USER_' + Date.now(),
+            amount: ticketData.amount * 100, // Amount in paisa
+            redirectUrl: window.PhonePeConfig.redirectUrl,
+            redirectMode: 'REDIRECT',
+            callbackUrl: window.PhonePeConfig.callbackUrl,
+            mobileNumber: ticketData.mobile || '',
+            paymentInstrument: {
+              type: 'UPI_INTENT',
+              targetApp: 'com.phonepe.app'
+            }
+          };
+
+          // Store transaction details in localStorage for later reference
+          localStorage.setItem('pendingTransaction', JSON.stringify({
+            ...ticketData,
+            transactionId,
+            timestamp: Date.now()
+          }));
+
+          try {
+            // Simulate PhonePe payment flow (in real implementation, this would call PhonePe's API)
+            await this.showPhonePePaymentModal(paymentPayload, ticketData);
+          } catch (error) {
+            console.error('PhonePe payment error:', error);
+            this.showNotification('❌ Payment failed. Please try again.');
+          }
+        }
+
+        async showPhonePePaymentModal(payload, ticketData) {
+          const content = `
+            <div style="text-align: center; padding: 20px;">
+              <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #5F259F, #8E44AD); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-mobile-screen" style="font-size: 32px; color: white;"></i>
+              </div>
+              
+              <h3 style="margin: 0 0 10px 0; color: var(--primary);">PhonePe Payment</h3>
+              <p style="margin: 0 0 20px 0; color: var(--text-secondary);">Complete your payment securely</p>
+              
+              <div style="background: var(--background); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 16px 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="color: var(--text-secondary);">Route:</span>
+                  <strong>${ticketData.route}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="color: var(--text-secondary);">From:</span>
+                  <strong>${ticketData.from}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="color: var(--text-secondary);">To:</span>
+                  <strong>${ticketData.to}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="color: var(--text-secondary);">Journey Date:</span>
+                  <strong>${ticketData.date}</strong>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--border); margin: 12px 0;">
+                <div style="display: flex; justify-content: space-between; font-size: 18px;">
+                  <span style="color: var(--text-secondary);">Total Amount:</span>
+                  <strong style="color: var(--primary);">₹${ticketData.amount}</strong>
+                </div>
+              </div>
+              
+              <div style="margin: 20px 0;">
+                <button id="phonepe-pay-btn" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; background: linear-gradient(135deg, #5F259F, #8E44AD); border: none;">
+                  <i class="fa-solid fa-mobile-screen"></i> Pay with PhonePe
+                </button>
+              </div>
+              
+              <div style="margin: 16px 0;">
+                <button id="simulate-success-btn" class="btn btn-secondary" style="width: 100%; padding: 10px; font-size: 14px;">
+                  <i class="fa-solid fa-check"></i> Simulate Success (Demo)
+                </button>
+              </div>
+              
+              <p style="font-size: 12px; color: var(--text-muted); margin: 16px 0 0 0;">
+                <i class="fa-solid fa-shield-halved"></i> Secure payment powered by PhonePe
+              </p>
+            </div>
+          `;
+
+          this.openSheet('Complete Payment', content);
+
+          // Bind payment button events
+          setTimeout(() => {
+            const payBtn = document.getElementById('phonepe-pay-btn');
+            const simulateBtn = document.getElementById('simulate-success-btn');
+            
+            if (payBtn) {
+              payBtn.addEventListener('click', () => this.processPhonePePayment(payload, ticketData));
+            }
+            
+            if (simulateBtn) {
+              simulateBtn.addEventListener('click', () => this.simulatePaymentSuccess(ticketData));
+            }
+          }, 100);
+        }
+
+        async processPhonePePayment(payload, ticketData) {
+          // Show loading state
+          const payBtn = document.getElementById('phonepe-pay-btn');
+          if (payBtn) {
+            payBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+            payBtn.disabled = true;
+          }
+
+          try {
+            // In a real implementation, this would make an API call to your backend
+            // which would then communicate with PhonePe's API
+            
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Simulate opening PhonePe app or web interface
+            const phonepeUrl = `phonepe://pay?pa=mumbaitransport@paytm&pn=Mumbai+Transport&tn=Metro+Ticket+${payload.merchantTransactionId}&am=${ticketData.amount}&cu=INR&mode=02`;
+            
+            // Try to open PhonePe app, fallback to web
+            const opened = this.tryOpenApp(phonepeUrl);
+            
+            if (!opened) {
+              // Fallback to web interface simulation
+              await this.showPhonePeWebInterface(ticketData);
+            } else {
+              // Monitor for return from PhonePe app
+              this.monitorPaymentReturn(payload.merchantTransactionId, ticketData);
+            }
+            
+          } catch (error) {
+            console.error('Payment processing error:', error);
+            this.showNotification('❌ Payment processing failed. Please try again.');
+            
+            if (payBtn) {
+              payBtn.innerHTML = '<i class="fa-solid fa-mobile-screen"></i> Pay with PhonePe';
+              payBtn.disabled = false;
+            }
+          }
+        }
+
+        tryOpenApp(url) {
+          try {
+            // Create a hidden iframe to attempt app opening
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = url;
+            document.body.appendChild(iframe);
+            
+            // Remove iframe after attempting to open
+            setTimeout(() => {
+              document.body.removeChild(iframe);
+            }, 1000);
+            
+            return true;
+          } catch (error) {
+            console.log('App opening failed, falling back to web interface');
+            return false;
+          }
+        }
+
+        async showPhonePeWebInterface(ticketData) {
+          const content = `
+            <div style="text-align: center; padding: 20px;">
+              <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #5F259F, #8E44AD); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: pulse 2s infinite;">
+                <i class="fa-solid fa-qrcode" style="font-size: 32px; color: white;"></i>
+              </div>
+              
+              <h3 style="margin: 0 0 10px 0; color: var(--primary);">Scan QR Code</h3>
+              <p style="margin: 0 0 20px 0; color: var(--text-secondary);">Open PhonePe app and scan the QR code</p>
+              
+              <div style="background: white; border: 2px solid var(--border); border-radius: 12px; padding: 20px; margin: 20px 0; display: inline-block;">
+                <div style="width: 150px; height: 150px; background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" fill=\"%23000\"/><rect x=\"10\" y=\"10\" width=\"10\" height=\"10\" fill=\"%23fff\"/><rect x=\"30\" y=\"10\" width=\"10\" height=\"10\" fill=\"%23fff\"/><rect x=\"50\" y=\"10\" width=\"10\" height=\"10\" fill=\"%23fff\"/><rect x=\"70\" y=\"10\" width=\"10\" height=\"10\" fill=\"%23fff\"/></svg>') center/cover;"></div>
+              </div>
+              
+              <p style="font-size: 14px; color: var(--text-secondary); margin: 16px 0;">
+                Amount: <strong style="color: var(--primary);">₹${ticketData.amount}</strong>
+              </p>
+              
+              <div style="margin: 20px 0;">
+                <button id="payment-success-btn" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                  <i class="fa-solid fa-check"></i> Payment Completed
+                </button>
+              </div>
+              
+              <div style="margin: 16px 0;">
+                <button id="payment-cancel-btn" class="btn btn-secondary" style="width: 100%; padding: 10px;">
+                  <i class="fa-solid fa-times"></i> Cancel Payment
+                </button>
+              </div>
+            </div>
+          `;
+
+          this.openSheet('PhonePe Payment', content);
+
+          setTimeout(() => {
+            const successBtn = document.getElementById('payment-success-btn');
+            const cancelBtn = document.getElementById('payment-cancel-btn');
+            
+            if (successBtn) {
+              successBtn.addEventListener('click', () => this.simulatePaymentSuccess(ticketData));
+            }
+            
+            if (cancelBtn) {
+              cancelBtn.addEventListener('click', () => {
+                this.closeSheet();
+                this.showNotification('❌ Payment cancelled by user');
+              });
+            }
+          }, 100);
+        }
+
+        monitorPaymentReturn(transactionId, ticketData) {
+          // Simulate monitoring payment status
+          let checkCount = 0;
+          const maxChecks = 30; // 30 seconds timeout
+          
+          const checkInterval = setInterval(async () => {
+            checkCount++;
+            
+            // Simulate random success after some time (for demo)
+            if (checkCount > 5 && Math.random() > 0.3) {
+              clearInterval(checkInterval);
+              await this.simulatePaymentSuccess(ticketData);
+              return;
+            }
+            
+            if (checkCount >= maxChecks) {
+              clearInterval(checkInterval);
+              this.showNotification('⏱️ Payment timeout. Please check your PhonePe app or try again.');
+              this.closeSheet();
+            }
+          }, 1000);
+        }
+
+        async simulatePaymentSuccess(ticketData) {
+          // Generate ticket
+          const ticket = {
+            id: 'TKT_' + Date.now(),
+            ...ticketData,
+            status: 'CONFIRMED',
+            paymentMethod: 'PhonePe UPI',
+            transactionId: 'TXN_' + Date.now(),
+            qrCode: this.generateQRCode(),
+            validUntil: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours validity
+            issuedAt: new Date().toISOString()
+          };
+
+          // Save ticket
+          const savedTickets = JSON.parse(localStorage.getItem('userTickets') || '[]');
+          savedTickets.unshift(ticket);
+          localStorage.setItem('userTickets', JSON.stringify(savedTickets));
+
+          // Clear pending transaction
+          localStorage.removeItem('pendingTransaction');
+
+          // Show success
+          await this.showTicketSuccess(ticket);
+        }
+
+        generateQRCode() {
+          // Generate a simple QR-like code for demo
+          return 'QR_' + Math.random().toString(36).substr(2, 12).toUpperCase();
+        }
+
+        async showTicketSuccess(ticket) {
+          const content = `
+            <div style="text-align: center; padding: 20px;">
+              <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-check" style="font-size: 32px; color: white;"></i>
+              </div>
+              
+              <h3 style="margin: 0 0 10px 0; color: var(--success);">Payment Successful!</h3>
+              <p style="margin: 0 0 20px 0; color: var(--text-secondary);">Your ticket has been confirmed</p>
+              
+              <div style="background: var(--background); border: 2px solid var(--success); border-radius: 12px; padding: 16px; margin: 16px 0;">
+                <div style="border-bottom: 1px dashed var(--border); padding-bottom: 12px; margin-bottom: 12px;">
+                  <h4 style="margin: 0 0 8px 0; color: var(--primary);">Digital Ticket</h4>
+                  <div style="font-family: monospace; font-size: 12px; color: var(--text-muted);">ID: ${ticket.id}</div>
+                </div>
+                
+                <div style="text-align: left;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="color: var(--text-secondary);">Route:</span>
+                    <strong>${ticket.route}</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="color: var(--text-secondary);">From:</span>
+                    <strong>${ticket.from}</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="color: var(--text-secondary);">To:</span>
+                    <strong>${ticket.to}</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="color: var(--text-secondary);">Amount:</span>
+                    <strong>₹${ticket.amount}</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="color: var(--text-secondary);">Valid Until:</span>
+                    <strong>${new Date(ticket.validUntil).toLocaleTimeString()}</strong>
+                  </div>
+                </div>
+                
+                <div style="border-top: 1px dashed var(--border); padding-top: 12px; margin-top: 12px; text-align: center;">
+                  <div style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin: 8px 0;">
+                    <div style="font-family: monospace; font-size: 24px; letter-spacing: 3px; color: var(--primary);">${ticket.qrCode}</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Show this QR at gates</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="margin: 20px 0;">
+                <button id="download-ticket-btn" class="btn btn-primary" style="width: 100%; padding: 12px; margin-bottom: 8px;">
+                  <i class="fa-solid fa-download"></i> Save Ticket
+                </button>
+                <button id="view-tickets-btn" class="btn btn-secondary" style="width: 100%; padding: 10px;">
+                  <i class="fa-solid fa-ticket"></i> View All Tickets
+                </button>
+              </div>
+              
+              <p style="font-size: 12px; color: var(--text-muted);">
+                <i class="fa-solid fa-info-circle"></i> Valid for 2 hours from issue time
+              </p>
+            </div>
+          `;
+
+          this.openSheet('Ticket Confirmed', content);
+
+          setTimeout(() => {
+            const downloadBtn = document.getElementById('download-ticket-btn');
+            const viewBtn = document.getElementById('view-tickets-btn');
+            
+            if (downloadBtn) {
+              downloadBtn.addEventListener('click', () => {
+                this.downloadTicket(ticket);
+                this.showNotification('✅ Ticket saved to device');
+              });
+            }
+            
+            if (viewBtn) {
+              viewBtn.addEventListener('click', () => {
+                this.showUserTickets();
+              });
+            }
+          }, 100);
+
+          // Auto-close after 10 seconds
+          setTimeout(() => {
+            this.closeSheet();
+            this.showNotification('🎫 Ticket saved! Access via Tickets tab');
+          }, 10000);
+        }
+
+        downloadTicket(ticket) {
+          const ticketData = JSON.stringify(ticket, null, 2);
+          const blob = new Blob([ticketData], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `ticket_${ticket.id}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+
+        showUserTickets() {
+          const tickets = JSON.parse(localStorage.getItem('userTickets') || '[]');
+          
+          if (tickets.length === 0) {
+            const content = `
+              <h3>🎫 Your Tickets</h3>
+              <div style="text-align: center; padding: 40px 20px;">
+                <i class="fa-solid fa-ticket" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                <p style="color: var(--text-secondary);">No tickets found</p>
+                <button class="btn btn-primary" onclick="hub.openTicketsSheet()">Buy Tickets</button>
+              </div>
+            `;
+            this.openSheet('Your Tickets', content);
+            return;
+          }
+
+          const ticketsList = tickets.map(ticket => {
+            const isValid = new Date(ticket.validUntil) > new Date();
+            const statusColor = isValid ? 'var(--success)' : 'var(--text-muted)';
+            const statusIcon = isValid ? 'fa-check-circle' : 'fa-clock';
+            
+            return `
+              <div class="frequency-item" style="margin-bottom: 12px;">
+                <div>
+                  <strong>${ticket.route}</strong><br>
+                  <span style="color: var(--text-secondary); font-size: 13px;">${ticket.from} → ${ticket.to}</span><br>
+                  <span style="color: ${statusColor}; font-size: 11px;">
+                    <i class="fa-solid ${statusIcon}"></i> ${isValid ? 'Valid until ' + new Date(ticket.validUntil).toLocaleTimeString() : 'Expired'}
+                  </span>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 14px; color: var(--primary); font-weight: 600;">₹${ticket.amount}</div>
+                  <div style="font-size: 10px; color: var(--text-muted);">${ticket.id}</div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          const content = `
+            <h3>🎫 Your Tickets</h3>
+            <p>Manage your purchased tickets:</p>
+            ${ticketsList}
+            <div style="margin-top: 16px;">
+              <button class="btn btn-primary" style="width: 100%;" onclick="hub.openTicketsSheet()">
+                <i class="fa-solid fa-plus"></i> Buy More Tickets
+              </button>
+            </div>
+          `;
+          
+          this.openSheet('Your Tickets', content);
         }
 
         // Deep link helpers
