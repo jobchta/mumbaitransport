@@ -1527,8 +1527,21 @@
           }
           if (tab === 'train') {
             return `
-              <div class="frequency-item"><div><strong>UTS on Mobile</strong><br><span style="color:var(--text-secondary);font-size:13px">Unreserved tickets & passes</span></div><div class="chip success"><i class="fa-solid fa-mobile-screen"></i> Recommended</div></div>
-              <p>Use UTS app or station counters for suburban tickets and passes.</p>
+              <div class="frequency-item">
+                <div>
+                  <strong>UTS on Mobile</strong><br>
+                  <span style="color:var(--text-secondary);font-size:13px">Unreserved tickets & passes</span>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <a href="https://www.utsonmobile.indianrail.gov.in/login?4" target="_blank" class="chip success" style="text-decoration:none;">
+                    <i class="fa-solid fa-external-link-alt"></i> UTS Web
+                  </a>
+                  <div class="chip info">
+                    <i class="fa-solid fa-mobile-screen"></i> UTS App
+                  </div>
+                </div>
+              </div>
+              <p>Download UTS app from Play Store/App Store or use the web portal for suburban train tickets and passes.</p>
             `;
           }
           if (tab === 'upi') {
@@ -1566,8 +1579,30 @@
             `;
           }
           return `
-            <div class="frequency-item"><div><strong>BEST Bus</strong><br><span style="color:var(--text-secondary);font-size:13px">Mobile app / card / cash</span></div><div class="chip"><i class="fa-solid fa-bus"></i> Citywide</div></div>
+            <div class="frequency-item">
+              <div>
+                <strong>BEST Bus</strong><br>
+                <span style="color:var(--text-secondary);font-size:13px">Mobile app / card / cash</span>
+              </div>
+              <div class="chip"><i class="fa-solid fa-bus"></i> Citywide</div>
+            </div>
             <p>Pay via BEST app, prepaid cards, or cash at boarding.</p>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Chalo App</strong><br>
+                <span style="color:var(--text-secondary);font-size:13px">Live tracking & digital tickets</span>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <a href="https://chalo.com/" target="_blank" class="chip info" style="text-decoration:none;">
+                  <i class="fa-solid fa-external-link-alt"></i> Chalo Web
+                </a>
+                <div class="chip success">
+                  <i class="fa-solid fa-mobile-screen"></i> Chalo App
+                </div>
+              </div>
+            </div>
+            <p>India's #1 bus transport technology - track buses live, buy mobile tickets, and get digital bus passes. Available in 65+ cities including Mumbai.</p>
           `;
         }
 
