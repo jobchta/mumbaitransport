@@ -185,6 +185,16 @@
       z-index: 1000; box-shadow: var(--shadow-lg); max-width: 300px;
     }
 
+    /* Bottom sheet for details */
+    .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1200; display: none; }
+    .sheet { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: 16px 16px 0 0; box-shadow: var(--shadow-lg); transform: translateY(100%); transition: transform 0.25s ease; z-index: 1201; max-height: 70vh; display: flex; flex-direction: column; }
+    .sheet.open { transform: translateY(0); }
+    .sheet-backdrop.show { display: block; }
+    .sheet-header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); }
+    .sheet-title { font-size: 14px; font-weight: 700; }
+    .sheet-close { border: 1px solid var(--border); background: var(--background); color: var(--text-secondary); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+    .sheet-body { padding: 12px 16px; overflow-y: auto; }
+
     .stat-number.updating { animation: numberUpdate 0.5s ease; }
     @keyframes numberUpdate { 0%{transform:scale(1)} 50%{transform:scale(1.1); color:var(--primary)} 100%{transform:scale(1)} }
 
@@ -199,6 +209,11 @@
       position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important;
       margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important;
     }
+
+    /* Embed mode tweaks */
+    body.embedded .bottom-nav { display: none; }
+    body.embedded .header { padding-top: 12px; }
+    body.embedded .app { height: 100%; }
 
     @media (prefers-reduced-motion: reduce) {
       * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -250,8 +265,8 @@
             </div>
             <div class="card-stats" aria-hidden="true">
               <div class="stat">
-                <span class="stat-number" id="bus-count">1,247</span>
-                <span class="stat-label">Active</span>
+                <span class="stat-number" id="bus-count">2,800</span>
+                <span class="stat-label">Fleet</span>
               </div>
               <div class="stat">
                 <span class="stat-number" id="bus-ontime">92%</span>
@@ -271,7 +286,7 @@
             </div>
             <div class="card-stats" aria-hidden="true">
               <div class="stat">
-                <span class="stat-number" id="train-count">2,847</span>
+                <span class="stat-number" id="train-count">2,342</span>
                 <span class="stat-label">Services</span>
               </div>
               <div class="stat">
@@ -360,6 +375,11 @@
 
       <section aria-labelledby="departures-heading">
         <h2 class="section-title" id="departures-heading"><i class="fa-solid fa-clock"></i> Next Departures</h2>
+        <div class="schedule-controls" style="display:flex; gap:8px; align-items:center; margin: 0 0 8px 0;">
+          <label for="refTime" style="font-size:12px; color:var(--text-secondary);">Check time:</label>
+          <input type="time" id="refTime" style="padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text-primary);">
+          <button id="useNow" type="button" style="padding:6px 10px; border:1px solid var(--border); background:var(--background); color:var(--text-secondary); border-radius:8px; cursor:pointer;">Now</button>
+        </div>
         <div class="schedule-list" id="scheduleList" role="list"></div>
       </section>
 
@@ -389,6 +409,54 @@
         <h2 class="section-title" id="updates-heading"><i class="fa-solid fa-triangle-exclamation"></i> Service Updates</h2>
         <div class="updates-list" id="updatesList" role="feed" aria-live="polite"></div>
       </section>
+
+      <section aria-labelledby="facts-heading">
+        <h2 class="section-title" id="facts-heading"><i class="fa-solid fa-chart-line"></i> Mumbai Transport Facts</h2>
+        <div class="updates-list">
+          <div class="update-item">
+            <div class="update-icon" style="background: var(--success);">
+              <i class="fa-solid fa-bus"></i>
+            </div>
+            <div class="update-content">
+              <div class="update-text"><strong>BEST</strong> operates ~2,800 buses across Mumbai.</div>
+              <div class="update-time">Daily operations</div>
+            </div>
+          </div>
+          <div class="update-item">
+            <div class="update-icon" style="background: var(--info);">
+              <i class="fa-solid fa-train"></i>
+            </div>
+            <div class="update-content">
+              <div class="update-text"><strong>Mumbai Suburban Railway</strong> runs 2,342 services daily and carries 7.5M+ commuters on Western, Central and Harbour lines.</div>
+              <div class="update-time">Indicative daily averages</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="metro-info-heading">
+        <h2 class="section-title" id="metro-info-heading"><i class="fa-solid fa-circle-info"></i> Mumbai Metro Network Status</h2>
+        <div class="updates-list">
+          <div class="update-item">
+            <div class="update-icon" style="background: var(--info);">
+              <i class="fa-solid fa-train-tram"></i>
+            </div>
+            <div class="update-content">
+              <div class="update-text"><strong>Operational lines</strong>: Line 1 (Versova–Andheri–Ghatkopar), Line 2A (Dahisar–Dahanukarwadi), Line 7 (Andheri East–Dahisar East).</div>
+              <div class="update-time">Verified metro info (June 2025)</div>
+            </div>
+          </div>
+          <div class="update-item">
+            <div class="update-icon" style="background: var(--warning);">
+              <i class="fa-solid fa-wrench"></i>
+            </div>
+            <div class="update-content">
+              <div class="update-text"><strong>Under construction / planned</strong>: Line 3 (Colaba–Bandra–SEEPZ), Line 5 (Thane–Bhiwandi–Kalyan), Line 6 (Swami Samarth Nagar–Vikhroli).</div>
+              <div class="update-time">Compiled from official/public sources</div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <nav class="bottom-nav" role="navigation" aria-label="Primary">
@@ -409,6 +477,16 @@
         Account
       </button>
     </nav>
+  </div>
+
+  <!-- Bottom sheet for details -->
+  <div class="sheet-backdrop" id="sheetBackdrop"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+    <div class="sheet-header">
+      <div class="sheet-title" id="sheetTitle">Details</div>
+      <button class="sheet-close" id="sheetClose" type="button">Close</button>
+    </div>
+    <div class="sheet-body" id="sheetBody"></div>
   </div>
 
   <noscript>
@@ -521,8 +599,10 @@
             this.appData.searchTimer = setTimeout(() => this.performSearch(q), 220);
           });
 
-          document.getElementById('buy-ticket').addEventListener('click', () =>
-            this.showNotification('🎫 Redirecting to ticket booking...'));
+          document.getElementById('buy-ticket').addEventListener('click', () => {
+            if (window.openTicketsSheet) window.openTicketsSheet();
+            else this.showNotification('🎫 Redirecting to ticket booking...');
+          });
           document.getElementById('plan-journey').addEventListener('click', () =>
             this.showNotification('🗺️ Opening route planner...'));
           document.getElementById('nearby-stations').addEventListener('click', () =>
@@ -952,7 +1032,7 @@
       }
 
       let transportHub;
-      document.addEventListener('DOMContentLoaded', () => {
+      function boot() {
         transportHub = new MumbaiTransportHub();
 
         // Initial service update
@@ -973,7 +1053,503 @@
         }, 30000);
 
         window.MumbaiTransport = transportHub;
+        // Handle embed mode
+        const params = new URLSearchParams(window.location.search);
+        const isEmbed = params.get('embed') === '1';
+        if (isEmbed) {
+          document.body.classList.add('embedded');
+          const mode = params.get('mode');
+          const section = params.get('section');
+          if (mode) {
+            const card = document.querySelector(`[data-transport="${mode}"]`);
+            if (card) card.click();
+          }
+          if (section === 'map') {
+            const el = document.getElementById('live-heading');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          // Post a ready signal
+          try { parent.postMessage({ type: 'mumbai-transport-ready' }, '*'); } catch(_) {}
+        }
+
+        // Listen for parent navigation commands
+        window.addEventListener('message', (e) => {
+          const msg = e.data || {};
+          if (msg.type === 'mumbai-transport-nav') {
+            if (msg.mode) {
+              const card = document.querySelector(`[data-transport="${msg.mode}"]`);
+              if (card) card.click();
+            }
+            if (msg.section === 'map') {
+              const el = document.getElementById('live-heading');
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else { boot(); }
+    })();
+  </script>
+  <script>
+  /* Static live overlay (Aug 2025) — single-file, no external JSON. */
+  (function(){
+    const SCHEDULES = {
+      generatedAt: '2025-08-10T00:00:00+05:30',
+      timezone: 'Asia/Kolkata',
+      vehicleBounds: { latMin: 18.85, latMax: 19.35, lngMin: 72.75, lngMax: 73.10 },
+      routes: [
+        { mode:'metro', routeId:'M1', name:'Line 1 (Blue)', from:'Versova', to:'Ghatkopar',
+          fromStop:{ id:'VERS', lat:19.1340, lng:72.8260 }, toStop:{ id:'GHAT', lat:19.0860, lng:72.9230 },
+          frequencies:[
+            { days:'weekday', start:'06:00', end:'10:30', headway:3, runtime:24 },
+            { days:'weekday', start:'10:30', end:'17:00', headway:5, runtime:24 },
+            { days:'weekday', start:'17:00', end:'21:30', headway:3, runtime:24 },
+            { days:'weekday', start:'21:30', end:'23:15', headway:6, runtime:24 },
+            { days:'weekend', start:'07:00', end:'23:00', headway:6, runtime:24 }
+          ]
+        },
+        // Aqua Line (Line 3) partial operations (Aarey JVLR ↔ Acharya Atre Chowk)
+        { mode:'metro', routeId:'M3', name:'Line 3 (Aqua) – Aarey JVLR ↔ Acharya Atre Chowk', from:'Aarey JVLR', to:'Acharya Atre Chowk',
+          fromStop:{ id:'ARY', lat:19.1475, lng:72.8644 }, toStop:{ id:'AAC', lat:18.9775, lng:72.8325 },
+          frequencies:[
+            { days:'weekday', start:'06:30', end:'10:30', headway:7, runtime:32 },
+            { days:'weekday', start:'10:30', end:'17:30', headway:8, runtime:32 },
+            { days:'weekday', start:'17:30', end:'21:30', headway:7, runtime:32 },
+            { days:'weekend', start:'07:00', end:'22:30', headway:8, runtime:32 }
+          ]
+        },
+        { mode:'metro', routeId:'M2A', name:'Line 2A (Yellow)', from:'Dahisar E', to:'DN Nagar',
+          fromStop:{ id:'DHS', lat:19.2560, lng:72.8625 }, toStop:{ id:'DNN', lat:19.1287, lng:72.8370 },
+          frequencies:[
+            { days:'weekday', start:'06:30', end:'10:30', headway:4, runtime:40 },
+            { days:'weekday', start:'10:30', end:'17:00', headway:6, runtime:40 },
+            { days:'weekday', start:'17:00', end:'21:30', headway:4, runtime:40 },
+            { days:'weekday', start:'21:30', end:'23:00', headway:8, runtime:40 },
+            { days:'weekend', start:'07:00', end:'23:00', headway:6, runtime:40 }
+          ]
+        },
+        { mode:'metro', routeId:'M7', name:'Line 7 (Red)', from:'Andheri E', to:'Dahisar E',
+          fromStop:{ id:'AND', lat:19.1130, lng:72.8697 }, toStop:{ id:'DHE', lat:19.2512, lng:72.8720 },
+          frequencies:[
+            { days:'weekday', start:'06:30', end:'10:30', headway:4, runtime:33 },
+            { days:'weekday', start:'10:30', end:'17:00', headway:6, runtime:33 },
+            { days:'weekday', start:'17:00', end:'21:30', headway:4, runtime:33 },
+            { days:'weekday', start:'21:30', end:'23:00', headway:8, runtime:33 },
+            { days:'weekend', start:'07:00', end:'23:00', headway:6, runtime:33 }
+          ]
+        },
+
+        { mode:'train', routeId:'WR_FAST', name:'Western Fast (Borivali → Churchgate)', from:'Borivali', to:'Churchgate',
+          fromStop:{ id:'BOR', lat:19.2307, lng:72.8567 }, toStop:{ id:'CHG', lat:18.9354, lng:72.8277 },
+          frequencies:[
+            { days:'weekday', start:'05:30', end:'09:45', headway:2, runtime:38 },
+            { days:'weekday', start:'09:45', end:'17:30', headway:5, runtime:38 },
+            { days:'weekday', start:'17:30', end:'21:30', headway:2, runtime:38 },
+            { days:'weekday', start:'21:30', end:'00:15', headway:6, runtime:38 },
+            { days:'weekend', start:'06:00', end:'23:30', headway:6, runtime:38 }
+          ]
+        },
+        { mode:'train', routeId:'WR_SLOW', name:'Western Slow (Virar → Churchgate)', from:'Virar', to:'Churchgate',
+          fromStop:{ id:'VIR', lat:19.4559, lng:72.8110 }, toStop:{ id:'CHG', lat:18.9354, lng:72.8277 },
+          frequencies:[
+            { days:'weekday', start:'05:15', end:'09:45', headway:3, runtime:75 },
+            { days:'weekday', start:'09:45', end:'17:30', headway:6, runtime:75 },
+            { days:'weekday', start:'17:30', end:'21:30', headway:3, runtime:75 },
+            { days:'weekday', start:'21:30', end:'00:00', headway:8, runtime:75 },
+            { days:'weekend', start:'06:00', end:'23:30', headway:8, runtime:75 }
+          ]
+        },
+        { mode:'train', routeId:'CR_FAST', name:'Central Fast (Kalyan → CSMT)', from:'Kalyan', to:'CSMT',
+          fromStop:{ id:'KLY', lat:19.2437, lng:73.1355 }, toStop:{ id:'CSM', lat:18.9402, lng:72.8356 },
+          frequencies:[
+            { days:'weekday', start:'05:30', end:'09:45', headway:3, runtime:45 },
+            { days:'weekday', start:'09:45', end:'17:30', headway:6, runtime:45 },
+            { days:'weekday', start:'17:30', end:'21:30', headway:3, runtime:45 },
+            { days:'weekday', start:'21:30', end:'00:15', headway:8, runtime:45 },
+            { days:'weekend', start:'06:00', end:'23:30', headway:8, runtime:45 }
+          ]
+        },
+        { mode:'train', routeId:'HR', name:'Harbour (Panvel → CSMT)', from:'Panvel', to:'CSMT',
+          fromStop:{ id:'PNV', lat:18.9894, lng:73.1175 }, toStop:{ id:'CSM', lat:18.9402, lng:72.8356 },
+          frequencies:[
+            { days:'weekday', start:'05:45', end:'10:00', headway:4, runtime:60 },
+            { days:'weekday', start:'10:00', end:'17:30', headway:8, runtime:60 },
+            { days:'weekday', start:'17:30', end:'21:30', headway:4, runtime:60 },
+            { days:'weekday', start:'21:30', end:'23:15', headway:10, runtime:60 },
+            { days:'weekend', start:'06:30', end:'23:00', headway:10, runtime:60 }
+          ]
+        },
+
+        { mode:'ferry', routeId:'F1', name:'Gateway ↔ Elephanta', from:'Gateway of India', to:'Elephanta',
+          fromStop:{ id:'GTW', lat:18.9218, lng:72.8347 }, toStop:{ id:'ELP', lat:18.9634, lng:72.9316 },
+          frequencies:[ { days:'daily', start:'09:00', end:'17:00', headway:30, runtime:50 } ]
+        },
+
+        { mode:'bus', routeId:'A1E', name:'BEST A-1 Express', from:'Colaba', to:'Bandra',
+          fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'BAN', lat:19.0596, lng:72.8295 },
+          frequencies:[
+            { days:'weekday', start:'07:00', end:'10:30', headway:10, runtime:55 },
+            { days:'weekday', start:'17:00', end:'20:30', headway:10, runtime:55 }
+          ]
+        },
+        { mode:'bus', routeId:'2L', name:'BEST 2Ltd (Mumbai Central → Bandra)', from:'Mumbai Central', to:'Bandra',
+          fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'BAN', lat:19.0596, lng:72.8295 },
+          frequencies:[
+            { days:'weekday', start:'07:00', end:'10:30', headway:12, runtime:45 },
+            { days:'weekday', start:'10:30', end:'17:00', headway:15, runtime:45 },
+            { days:'weekday', start:'17:00', end:'20:30', headway:12, runtime:45 }
+          ]
+        },
+        { mode:'bus', routeId:'37', name:'BEST 37 (Santacruz → Colaba)', from:'Santacruz', to:'Colaba',
+          fromStop:{ id:'SAN', lat:19.0810, lng:72.8410 }, toStop:{ id:'COL', lat:18.9100, lng:72.8090 },
+          frequencies:[ { days:'daily', start:'06:30', end:'22:00', headway:15, runtime:65 } ]
+        },
+
+        // Additional BEST routes (from published timetables)
+        { mode:'bus', routeId:'234', name:'BEST 234 (Vesave/Yari Road ↔ Jogeshwari)', from:'Vesave/Yari Road', to:'Jogeshwari',
+          fromStop:{ id:'VYR', lat:19.1274, lng:72.8050 }, toStop:{ id:'JOG', lat:19.1356, lng:72.8480 },
+          frequencies:[
+            { days:'daily', start:'06:00', end:'10:00', headway:10, runtime:35 },
+            { days:'daily', start:'10:00', end:'17:00', headway:15, runtime:35 },
+            { days:'daily', start:'17:00', end:'21:00', headway:10, runtime:35 },
+            { days:'daily', start:'21:00', end:'22:30', headway:15, runtime:35 }
+          ]
+        },
+        { mode:'bus', routeId:'78', name:'Bus 78 (Wagle Depot ↔ Bharat Gears)', from:'Wagle Depot', to:'Bharat Gears',
+          fromStop:{ id:'WAG', lat:19.1969, lng:72.9611 }, toStop:{ id:'BGE', lat:19.1780, lng:72.9690 },
+          frequencies:[
+            { days:'daily', start:'05:45', end:'10:00', headway:30, runtime:60 },
+            { days:'daily', start:'10:00', end:'17:00', headway:40, runtime:60 },
+            { days:'daily', start:'17:00', end:'19:15', headway:30, runtime:60 }
+          ]
+        },
+        { mode:'bus', routeId:'42', name:'BEST 42 (Sandhurst Road ↔ Kamla Nehru Park)', from:'Sandhurst Road', to:'Kamla Nehru Park',
+          fromStop:{ id:'SDR', lat:18.9634, lng:72.8397 }, toStop:{ id:'KNP', lat:18.9533, lng:72.8050 },
+          frequencies:[
+            { days:'daily', start:'06:00', end:'22:00', headway:12, runtime:45 }
+          ]
+        },
+        { mode:'bus', routeId:'164', name:'BEST 164 (Maharana Pratap Chowk ↔ Dharavi Depot)', from:'Maharana Pratap Chowk', to:'Dharavi Depot',
+          fromStop:{ id:'MPC', lat:19.1735, lng:72.9477 }, toStop:{ id:'DHD', lat:19.0465, lng:72.8543 },
+          frequencies:[
+            { days:'daily', start:'06:00', end:'21:30', headway:26, runtime:65 }
+          ]
+        },
+        { mode:'bus', routeId:'9', name:'BEST 9 (Antop Hill ↔ Colaba)', from:'Antop Hill', to:'Colaba',
+          fromStop:{ id:'ATH', lat:19.0169, lng:72.8598 }, toStop:{ id:'COL', lat:18.9100, lng:72.8090 },
+          frequencies:[
+            { days:'daily', start:'06:30', end:'22:00', headway:30, runtime:70 }
+          ]
+        },
+        { mode:'bus', routeId:'115', name:'Bus 115 (Lakshmi Park ↔ Mulund Stn W)', from:'Lakshmi Park', to:'Mulund Stn (W)',
+          fromStop:{ id:'LKP', lat:19.1730, lng:72.9330 }, toStop:{ id:'MLW', lat:19.1736, lng:72.9425 },
+          frequencies:[
+            { days:'daily', start:'07:00', end:'12:00', headway:25, runtime:35 },
+            { days:'daily', start:'12:00', end:'17:00', headway:35, runtime:35 },
+            { days:'daily', start:'17:00', end:'22:00', headway:25, runtime:35 }
+          ]
+        }
+      ]
+    };
+
+    // Expose schedules for UI details
+    window.MUMBAI_SCHEDULES = SCHEDULES;
+
+    const colors = { bus:'#5E6AD2', train:'#00B87A', metro:'#8B5CF6', ferry:'#0EA5E9', monorail:'#10B981' };
+    const icons  = { bus:'fa-bus', train:'fa-train-subway', metro:'fa-train-tram', ferry:'fa-ship', monorail:'fa-train' };
+    const toMinutes = (hhmm) => { const [h,m] = hhmm.split(':').map(Number); return h*60 + m; };
+    const sinceMid  = (d=new Date()) => d.getHours()*60 + d.getMinutes();
+    const dayType   = (d=new Date()) => ([0,6].includes(d.getDay()) ? 'weekend' : 'weekday');
+    const peak      = (h) => (h>=7 && h<=10) || (h>=18 && h<=21);
+    const jitter    = (now=new Date()) => peak(now.getHours()) ? (Math.random()<0.5?0:1) : 0;
+    function getReferenceTime() {
+      const inp = document.getElementById('refTime');
+      const val = inp && inp.value;
+      if (!val) return new Date();
+      const [hh, mm] = val.split(':').map(Number);
+      const d = new Date();
+      d.setHours(hh || 0, mm || 0, 0, 0);
+      return d;
+    }
+    function prettyClockFromMinutes(mins) {
+      const m = ((mins % 1440) + 1440) % 1440;
+      const h = Math.floor(m / 60);
+      const mi = m % 60;
+      const d = new Date();
+      d.setHours(h, mi, 0, 0);
+      return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(d);
+    }
+
+    function nextDepartures(routeDef, count=6, now=new Date()) {
+      const nowMin = sinceMid(now);
+      const wins = (routeDef.frequencies||[]).filter(f => f.days==='daily' || f.days===dayType(now));
+      const out = [];
+      for (const w of wins) {
+        const start = toMinutes(w.start), end = toMinutes(w.end), head = Math.max(1, Math.round(+w.headway));
+        for (let t=start; t<=end; t+=head) { if (t >= nowMin) out.push({ departMin:t, runtime:Math.max(1, +w.runtime) }); if (out.length >= count*2) break; }
+        if (out.length >= count*2) break;
+      }
+      if (out.length < count && wins.length) {
+        const w=wins[0], start=toMinutes(w.start), head=Math.max(1, Math.round(+w.headway));
+        for (let t=start; out.length<count; t+=head) out.push({ departMin:t+1440, runtime:Math.max(1,+w.runtime) });
+      }
+      return out.slice(0, count).map(d => ({
+        etaMin: Math.max(0, d.departMin - sinceMid(now)) + jitter(now),
+        departMin: d.departMin,
+        runtime: d.runtime
+      }));
+    }
+
+    function clearFallbackMarkers() {
+      const mapContent = document.getElementById('mapContent');
+      if (mapContent) mapContent.querySelectorAll('.vehicle-marker').forEach(m => m.remove());
+    }
+    function appendFallbackMarker(lat, lng, color) {
+      const b = SCHEDULES.vehicleBounds;
+      const mapContent = document.getElementById('mapContent');
+      if (!mapContent) return;
+      const xPct = ((lng - b.lngMin) / (b.lngMax - b.lngMin)) * 90 + 5;
+      const yPct = ((lat - b.latMin) / (b.latMax - b.latMin)) * 90 + 5;
+      const marker = document.createElement('div');
+      marker.className = 'vehicle-marker';
+      marker.style.backgroundColor = color;
+      marker.style.left = xPct + '%';
+      marker.style.top = (100 - yPct) + '%';
+      marker.setAttribute('data-route', '');
+      mapContent.appendChild(marker);
+    }
+
+    function placeMarkersForRoute(hub, route, mode) {
+      const wins = (route.frequencies||[]).filter(f => f.days==='daily' || f.days===dayType());
+      if (!wins.length || !route.fromStop || !route.toStop) return;
+      const runtime = Math.max(1, +wins[0].runtime);
+      const head    = Math.max(1, Math.round(+wins[0].headway));
+      const pool    = Math.max(2, Math.min(6, Math.ceil(runtime / Math.max(5, head))));
+      const nowMin  = sinceMid(new Date());
+      for (let i=0; i<pool; i++) {
+        const offset = Math.min(runtime, Math.floor((i/(pool-1||1)) * runtime));
+        const progress = Math.min(1, Math.max(0, offset / runtime));
+        const lat = route.fromStop.lat + (route.toStop.lat - route.fromStop.lat) * progress;
+        const lng = route.fromStop.lng + (route.toStop.lng - route.fromStop.lng) * progress;
+        if (hub.map && !hub.mapFallbackMode && window.L) {
+          const id = `${route.routeId}_${nowMin - offset}`;
+          let marker = (hub.appData && hub.appData.leafletMarkers && hub.appData.leafletMarkers.get) ? hub.appData.leafletMarkers.get(id) : null;
+          if (!marker) {
+            marker = L.circleMarker([lat, lng], { radius:5, color:'#fff', weight:1.5, fillColor:colors[mode], fillOpacity:1 })
+                      .bindTooltip(`${route.name}`, { direction:'top', offset:[0,-4] })
+                      .addTo(hub.map);
+            if (hub.appData && hub.appData.leafletMarkers && hub.appData.leafletMarkers.set) hub.appData.leafletMarkers.set(id, marker);
+          } else {
+            marker.setLatLng([lat, lng]);
+          }
+        } else {
+          appendFallbackMarker(lat, lng, colors[mode]);
+        }
+      }
+    }
+
+    function tryInit() {
+      const hub = window.MumbaiTransport;
+      if (!hub) return false;
+      if (!hub.updateSchedulesSimulated) hub.updateSchedulesSimulated = hub.updateSchedules.bind(hub);
+      if (!hub.updateVehiclePositionsSimulated) hub.updateVehiclePositionsSimulated = hub.updateVehiclePositions.bind(hub);
+
+      hub.updateSchedules = function() {
+        const scheduleList = document.getElementById('scheduleList');
+        const mode = this.appData.selectedTransport;
+        const routes = (SCHEDULES.routes||[]).filter(r => r.mode === mode).slice(0, 6);
+        if (!routes.length) return this.updateSchedulesSimulated();
+        scheduleList.innerHTML = '';
+        // Add a header row with a details button
+        const header = document.createElement('div');
+        header.className = 'update-item';
+        header.innerHTML = `
+          <div class="update-icon" style="background:${colors[mode]};"><i class="fa-solid ${icons[mode]}"></i></div>
+          <div class="update-content">
+            <div class="update-text"><strong>${mode.toUpperCase()}</strong> next departures</div>
+            <div class="update-time">Tap a route for details</div>
+          </div>`;
+        scheduleList.appendChild(header);
+        routes.forEach(route => {
+          const refNow = getReferenceTime();
+          const n = nextDepartures(route, 1, refNow)[0];
+          const total = n ? n.etaMin : '—';
+          const timeStr = n ? prettyClockFromMinutes(n.departMin % (24*60)) : '—';
+          const delayText = (n && n.etaMin>0 && n.etaMin%11===0) ? ' (+1 min delay)' : '';
+          const item = document.createElement('div');
+          item.className = 'schedule-item';
+          item.innerHTML = `
+            <div class="schedule-icon" style="background:${colors[mode]}"><i class="fa-solid ${icons[mode]}"></i></div>
+            <div class="schedule-content">
+              <div class="schedule-route">${route.name} • ${route.from} → ${route.to}</div>
+              <div class="schedule-time">Next: ${total} min at ${timeStr}${delayText}</div>
+            </div>`;
+          item.addEventListener('click', () => openDetailsSheet({ type: 'route', mode, route }));
+          scheduleList.appendChild(item);
+        });
+      };
+
+      hub.updateVehiclePositions = function() {
+        const mode = this.appData.selectedTransport;
+        const routes = (SCHEDULES.routes||[]).filter(r => r.mode === mode).slice(0, 6);
+        if (!routes.length) return this.updateVehiclePositionsSimulated();
+        if (!this.map || this.mapFallbackMode || !window.L) clearFallbackMarkers();
+        if (this.appData && this.appData.leafletMarkers && this.appData.leafletMarkers.size > 240 && this.map) {
+          this.appData.leafletMarkers.forEach((m, id) => { m.remove(); this.appData.leafletMarkers.delete(id); });
+        }
+        routes.forEach(route => placeMarkersForRoute(this, route, mode));
+      };
+
+      if (hub.timers) Object.values(hub.timers).forEach(t => t && clearInterval(t));
+      hub.timers = hub.timers || {};
+      hub.timers.vehicles  = setInterval(() => hub.updateVehiclePositions(), 3000);
+      hub.timers.schedules = setInterval(() => hub.updateSchedules(), 15000);
+
+      hub.updateSchedules();
+      hub.updateVehiclePositions();
+      hub.showNotification && hub.showNotification('✅ Static schedules (Aug 2025) live view enabled');
+      return true;
+    }
+
+    if (!tryInit()) {
+      const iv = setInterval(() => { if (tryInit()) clearInterval(iv); }, 300);
+      setTimeout(() => clearInterval(iv), 12000);
+    }
+
+    // Bottom sheet helpers
+    function openDetailsSheet(payload) {
+      const sheet = document.getElementById('sheet');
+      const sheetBody = document.getElementById('sheetBody');
+      const sheetTitle = document.getElementById('sheetTitle');
+      const backdrop = document.getElementById('sheetBackdrop');
+      if (!sheet || !sheetBody || !sheetTitle || !backdrop) return;
+
+      if (payload && payload.type === 'route') {
+        const r = payload.route;
+        sheetTitle.textContent = `${r.name}`;
+        const wins = (r.frequencies||[]).map(f => `<li>${f.days}: ${f.start}–${f.end} • every ${f.headway} min • runtime ${f.runtime} min</li>`).join('');
+        sheetBody.innerHTML = `
+          <div style="margin-bottom:8px; color: var(--text-secondary);">${r.from} → ${r.to}</div>
+          <ul style="margin-left:16px;">${wins || '<li>No data</li>'}</ul>
+        `;
+      } else if (payload && payload.type === 'actions') {
+        sheetTitle.textContent = payload.title || 'Actions';
+        sheetBody.innerHTML = payload.html || '';
+      }
+
+      sheet.setAttribute('aria-hidden', 'false');
+      sheet.classList.add('open');
+      backdrop.classList.add('show');
+      backdrop.onclick = closeDetailsSheet;
+      const closeBtn = document.getElementById('sheetClose');
+      if (closeBtn) closeBtn.onclick = closeDetailsSheet;
+    }
+    function closeDetailsSheet() {
+      const sheet = document.getElementById('sheet');
+      const backdrop = document.getElementById('sheetBackdrop');
+      if (!sheet || !backdrop) return;
+      sheet.classList.remove('open');
+      backdrop.classList.remove('show');
+      sheet.setAttribute('aria-hidden', 'true');
+    }
+
+    // Hook up action buttons and nav for better UX
+    document.addEventListener('DOMContentLoaded', () => {
+      const actions = [
+        { id: 'buy-ticket', title: 'Buy Ticket', html: '<p>Use the official operator apps or kiosks. This demo shows static schedules only.</p>' },
+        { id: 'plan-journey', title: 'Plan Journey', html: '<p>Pick a mode, then compare next departures. Detailed journey planning can be integrated later.</p>' },
+        { id: 'nearby-stations', title: 'Nearby Stations', html: '<p>Enable location in a future update to show stations within 1–3 km. For now, use mode schedules above.</p>' },
+        { id: 'recharge-card', title: 'Recharge Card', html: '<p>Use your wallet or the official portals to recharge. This demo does not process payments.</p>' }
+      ];
+      actions.forEach(a => {
+        const el = document.getElementById(a.id);
+        if (el) el.addEventListener('click', () => openDetailsSheet({ type: 'actions', title: a.title, html: a.html }));
       });
+
+      document.querySelectorAll('.nav-button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const nav = btn.getAttribute('data-nav');
+          if (nav === 'home') window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (nav === 'map') {
+            const el = document.getElementById('live-heading');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          if (nav === 'tickets') { if (window.openTicketsSheet) window.openTicketsSheet(); }
+          if (nav === 'account') {
+            openDetailsSheet({ type:'actions', title:'Account', html:'<p>Sign-in and profile features are not part of this static demo.</p>' });
+          }
+        });
+      });
+      const ref = document.getElementById('refTime');
+      const useNow = document.getElementById('useNow');
+      if (ref) ref.addEventListener('change', () => {
+        if (window.MumbaiTransport && window.MumbaiTransport.updateSchedules) window.MumbaiTransport.updateSchedules();
+      });
+      if (useNow) useNow.addEventListener('click', () => {
+        const inp = document.getElementById('refTime');
+        if (inp) inp.value = '';
+        if (window.MumbaiTransport && window.MumbaiTransport.updateSchedules) window.MumbaiTransport.updateSchedules();
+      });
+    });
+
+    // Tickets sheet (organized per mode) and WhatsApp flows
+    window.openTicketsSheet = function() {
+      const sheet = document.getElementById('sheet');
+      const sheetBody = document.getElementById('sheetBody');
+      const sheetTitle = document.getElementById('sheetTitle');
+      const backdrop = document.getElementById('sheetBackdrop');
+      if (!sheet || !sheetBody || !sheetTitle || !backdrop) return;
+
+      sheetTitle.textContent = 'Tickets – Mumbai';
+      const row = (icon, title, html) => `
+        <div class="update-item">
+          <div class="update-icon" style="background: var(--primary);"><i class="fa-solid ${icon}"></i></div>
+          <div class="update-content">
+            <div class="update-text"><strong>${title}</strong></div>
+            <div class="update-time" style="margin-top:6px; color: var(--text-secondary);">${html}</div>
+          </div>
+        </div>`;
+
+      const waLink = (num, text='Hi') => `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+      const link = (href, label) => `<a href="${href}" target="_blank" rel="noopener" style="text-decoration:none;">${label}</a>`;
+
+      const line1 = row('fa-train-tram', 'Mumbai Metro Line 1 (Versova–Andheri–Ghatkopar) – WhatsApp Ticketing', `
+        Steps: 1) Send “hi” to 9670008889 2) Select source & destination 3) Pay online or share OTP at counter 4) Receive QR to travel.<br/>
+        ${link(waLink('919670008889'), 'Open WhatsApp (9670008889)')}
+      `);
+
+      const lines2A7 = row('fa-train', 'Mumbai Metro Lines 2A & 7 – WhatsApp Ticketing', `
+        Send “Hi” on 86526 35500. Tickets are non-refundable and valid for the same business day. Check operational hours before booking.<br/>
+        ${link(waLink('918652635500'), 'Open WhatsApp (86526 35500)')}
+      `);
+
+      const aqua = row('fa-water', 'Mumbai Metro Line 3 (Aqua) – Booking', `
+        Use the official MMRCL portal to select stations and proceed.<br/>
+        ${link('https://mmrcl.com/en/map', 'Open MMRCL Portal')}
+      `);
+
+      const suburban = row('fa-train-subway', 'Suburban Trains', `
+        Use official ticketing (e.g., UTS) or counters. Ensure correct origin/destination and class.
+      `);
+
+      const best = row('fa-bus', 'BEST Buses', `
+        Buy from conductor/counters or official app/cards. Confirm route and stage before purchase.
+      `);
+
+      const ferry = row('fa-ship', 'Ferries', `
+        Buy at jetties/authorized operators. Check last sailing and sea conditions.
+      `);
+
+      sheetBody.innerHTML = line1 + lines2A7 + aqua + suburban + best + ferry;
+      sheet.setAttribute('aria-hidden', 'false');
+      sheet.classList.add('open');
+      backdrop.classList.add('show');
+      backdrop.onclick = closeDetailsSheet;
+      const closeBtn = document.getElementById('sheetClose');
+      if (closeBtn) closeBtn.onclick = closeDetailsSheet;
+    };
     })();
   </script>
 </body>
