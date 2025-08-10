@@ -649,6 +649,8 @@
           this.peakHours = [ {start: 7, end: 10}, {start: 18, end: 21} ];
 
           this.safeInit();
+          // Recover any pending transactions on app start
+          this.recoverPendingTransactions();
         }
 
         safeInit() {
@@ -2000,9 +2002,16 @@
           history.replaceState(null, '', this.updateHashParam('sheet', 'account'));
         }
 
-        // PhonePe UPI Payment Integration
+        // PhonePe UPI Payment Integration with Atomicity
         async initPhonePePayment(ticketData) {
           const transactionId = 'TXN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+          const transactionState = {
+            status: 'INITIATED',
+            transactionId,
+            ticketData,
+            timestamp: Date.now(),
+            attempts: 0
+          };
           
           const paymentPayload = {
             merchantId: window.PhonePeConfig.merchantId,
@@ -2019,20 +2028,34 @@
             }
           };
 
-          // Store transaction details in localStorage for later reference
-          localStorage.setItem('pendingTransaction', JSON.stringify({
-            ...ticketData,
-            transactionId,
-            timestamp: Date.now()
-          }));
-
           try {
-            // Simulate PhonePe payment flow (in real implementation, this would call PhonePe's API)
+            // Atomic Step 1: Store transaction state
+            localStorage.setItem('pendingTransaction', JSON.stringify(transactionState));
+            
+            // Atomic Step 2: Validate transaction data
+            if (!this.validateTransactionData(ticketData)) {
+              throw new Error('Invalid transaction data');
+            }
+            
+            // Atomic Step 3: Show payment modal
             await this.showPhonePePaymentModal(paymentPayload, ticketData);
+            
           } catch (error) {
-            console.error('PhonePe payment error:', error);
-            this.showNotification('❌ Payment failed. Please try again.');
+            console.error('PhonePe payment initialization error:', error);
+            // Rollback: Clear pending transaction
+            localStorage.removeItem('pendingTransaction');
+            this.showNotification('❌ Payment initialization failed. Please try again.');
           }
+        }
+
+        validateTransactionData(ticketData) {
+          return ticketData && 
+                 ticketData.from && 
+                 ticketData.to && 
+                 ticketData.from !== ticketData.to &&
+                 ticketData.amount > 0 &&
+                 ticketData.date &&
+                 ticketData.passengers > 0;
         }
 
         async showPhonePePaymentModal(payload, ticketData) {
@@ -2113,13 +2136,21 @@
           }
 
           try {
-            // In a real implementation, this would make an API call to your backend
-            // which would then communicate with PhonePe's API
-            
-            // Simulate API call delay
+            // Atomic Step 1: Update transaction state
+            const pendingTransaction = JSON.parse(localStorage.getItem('pendingTransaction') || '{}');
+            pendingTransaction.status = 'PROCESSING';
+            pendingTransaction.attempts++;
+            localStorage.setItem('pendingTransaction', JSON.stringify(pendingTransaction));
+
+            // Atomic Step 2: Validate transaction still exists
+            if (!pendingTransaction.transactionId) {
+              throw new Error('Transaction not found');
+            }
+
+            // Atomic Step 3: Simulate API call delay
             await new Promise(resolve => setTimeout(resolve, 2000));
             
-            // Simulate opening PhonePe app or web interface
+            // Atomic Step 4: Simulate opening PhonePe app or web interface
             const phonepeUrl = `phonepe://pay?pa=mumbaitransport@paytm&pn=Mumbai+Transport&tn=Metro+Ticket+${payload.merchantTransactionId}&am=${ticketData.amount}&cu=INR&mode=02`;
             
             // Try to open PhonePe app, fallback to web
@@ -2135,6 +2166,12 @@
             
           } catch (error) {
             console.error('Payment processing error:', error);
+            
+            // Rollback: Reset transaction state
+            const pendingTransaction = JSON.parse(localStorage.getItem('pendingTransaction') || '{}');
+            pendingTransaction.status = 'FAILED';
+            localStorage.setItem('pendingTransaction', JSON.stringify(pendingTransaction));
+            
             this.showNotification('❌ Payment processing failed. Please try again.');
             
             if (payBtn) {
@@ -2239,33 +2276,88 @@
         }
 
         async simulatePaymentSuccess(ticketData) {
-          // Generate ticket
-          const ticket = {
-            id: 'TKT_' + Date.now(),
-            ...ticketData,
-            status: 'CONFIRMED',
-            paymentMethod: 'PhonePe UPI',
-            transactionId: 'TXN_' + Date.now(),
-            qrCode: this.generateQRCode(),
-            validUntil: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours validity
-            issuedAt: new Date().toISOString()
-          };
+          try {
+            // Atomic Step 1: Validate pending transaction
+            const pendingTransaction = JSON.parse(localStorage.getItem('pendingTransaction') || '{}');
+            if (!pendingTransaction.transactionId) {
+              throw new Error('No pending transaction found');
+            }
 
-          // Save ticket
-          const savedTickets = JSON.parse(localStorage.getItem('userTickets') || '[]');
-          savedTickets.unshift(ticket);
-          localStorage.setItem('userTickets', JSON.stringify(savedTickets));
+            // Atomic Step 2: Generate ticket with transaction ID
+            const ticket = {
+              id: 'TKT_' + Date.now(),
+              ...ticketData,
+              status: 'CONFIRMED',
+              paymentMethod: 'PhonePe UPI',
+              transactionId: pendingTransaction.transactionId,
+              qrCode: this.generateQRCode(),
+              validUntil: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours validity
+              issuedAt: new Date().toISOString()
+            };
 
-          // Clear pending transaction
-          localStorage.removeItem('pendingTransaction');
+            // Atomic Step 3: Save ticket to storage
+            const savedTickets = JSON.parse(localStorage.getItem('userTickets') || '[]');
+            savedTickets.unshift(ticket);
+            localStorage.setItem('userTickets', JSON.stringify(savedTickets));
 
-          // Show success
-          await this.showTicketSuccess(ticket);
+            // Atomic Step 4: Update transaction state to completed
+            pendingTransaction.status = 'COMPLETED';
+            pendingTransaction.ticketId = ticket.id;
+            localStorage.setItem('pendingTransaction', JSON.stringify(pendingTransaction));
+
+            // Atomic Step 5: Show success
+            await this.showTicketSuccess(ticket);
+
+            // Atomic Step 6: Clean up after successful completion
+            setTimeout(() => {
+              localStorage.removeItem('pendingTransaction');
+            }, 5000); // Keep for 5 seconds for debugging
+
+          } catch (error) {
+            console.error('Payment success processing error:', error);
+            
+            // Rollback: Mark transaction as failed
+            const pendingTransaction = JSON.parse(localStorage.getItem('pendingTransaction') || '{}');
+            pendingTransaction.status = 'FAILED';
+            pendingTransaction.error = error.message;
+            localStorage.setItem('pendingTransaction', JSON.stringify(pendingTransaction));
+            
+            this.showNotification('❌ Ticket generation failed. Please contact support.');
+          }
         }
 
         generateQRCode() {
           // Generate a simple QR-like code for demo
           return 'QR_' + Math.random().toString(36).substr(2, 12).toUpperCase();
+        }
+
+        // Transaction recovery mechanism for atomicity
+        recoverPendingTransactions() {
+          try {
+            const pendingTransaction = JSON.parse(localStorage.getItem('pendingTransaction') || '{}');
+            
+            if (pendingTransaction.status === 'PROCESSING') {
+              // Check if transaction is stale (older than 5 minutes)
+              const isStale = Date.now() - pendingTransaction.timestamp > 5 * 60 * 1000;
+              
+              if (isStale) {
+                // Rollback stale transaction
+                pendingTransaction.status = 'FAILED';
+                pendingTransaction.error = 'Transaction timeout';
+                localStorage.setItem('pendingTransaction', JSON.stringify(pendingTransaction));
+                
+                console.log('Recovered stale transaction:', pendingTransaction.transactionId);
+                this.showNotification('⚠️ Previous transaction timed out. Please try again.');
+              } else {
+                // Transaction still in progress, show status
+                console.log('Transaction in progress:', pendingTransaction.transactionId);
+              }
+            }
+          } catch (error) {
+            console.error('Transaction recovery error:', error);
+            // Clear corrupted transaction data
+            localStorage.removeItem('pendingTransaction');
+          }
         }
 
         async showTicketSuccess(ticket) {
