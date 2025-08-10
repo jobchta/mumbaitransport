@@ -210,6 +210,11 @@
       margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important;
     }
 
+    /* Embed mode tweaks */
+    body.embedded .bottom-nav { display: none; }
+    body.embedded .header { padding-top: 12px; }
+    body.embedded .app { height: 100%; }
+
     @media (prefers-reduced-motion: reduce) {
       * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     }
@@ -1041,6 +1046,39 @@
         }, 30000);
 
         window.MumbaiTransport = transportHub;
+        // Handle embed mode
+        const params = new URLSearchParams(window.location.search);
+        const isEmbed = params.get('embed') === '1';
+        if (isEmbed) {
+          document.body.classList.add('embedded');
+          const mode = params.get('mode');
+          const section = params.get('section');
+          if (mode) {
+            const card = document.querySelector(`[data-transport="${mode}"]`);
+            if (card) card.click();
+          }
+          if (section === 'map') {
+            const el = document.getElementById('live-heading');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          // Post a ready signal
+          try { parent.postMessage({ type: 'mumbai-transport-ready' }, '*'); } catch(_) {}
+        }
+
+        // Listen for parent navigation commands
+        window.addEventListener('message', (e) => {
+          const msg = e.data || {};
+          if (msg.type === 'mumbai-transport-nav') {
+            if (msg.mode) {
+              const card = document.querySelector(`[data-transport="${msg.mode}"]`);
+              if (card) card.click();
+            }
+            if (msg.section === 'map') {
+              const el = document.getElementById('live-heading');
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        });
       }
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', boot);
