@@ -1578,11 +1578,14 @@
               <div style="margin: 16px 0;">
                 <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--primary);">Quick Ticket Booking</h4>
                 <button id="quick-metro-ticket" class="btn btn-primary" style="width: 100%; margin-bottom: 8px; background: linear-gradient(135deg, #5F259F, #8E44AD); border: none;">
-                  <i class="fa-solid fa-ticket"></i> Buy Metro Ticket with PhonePe
+                  <i class="fa-solid fa-ticket"></i> Buy Line 1 Metro Ticket with PhonePe
                 </button>
                 <button id="view-my-tickets" class="btn btn-secondary" style="width: 100%;">
                   <i class="fa-solid fa-list"></i> View My Tickets
                 </button>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px; text-align: center;">
+                  <i class="fa-solid fa-info-circle"></i> PhonePe booking available only for Metro Line 1 (Versova ↔ Ghatkopar)
+                </p>
               </div>
               
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;">
@@ -1667,7 +1670,7 @@
           const content = `
             <div style="padding: 20px;">
               <h3 style="margin: 0 0 16px 0; text-align: center; color: var(--primary);">
-                <i class="fa-solid fa-ticket"></i> Quick Metro Ticket
+                <i class="fa-solid fa-ticket"></i> Metro Line 1 Ticket
               </h3>
               
               <div style="background: var(--background); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
@@ -1675,20 +1678,48 @@
                   <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">Route</label>
                   <select id="ticket-route" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
                     <option value="M1">Metro Line 1 (Blue) - Versova ↔ Ghatkopar</option>
-                    <option value="M2A">Metro Line 2A (Yellow) - Dahisar ↔ DN Nagar</option>
-                    <option value="M7">Metro Line 7 (Red) - Andheri E ↔ Dahisar E</option>
-                    <option value="M3">Metro Line 3 (Pink) - Colaba ↔ SEEPZ</option>
                   </select>
+                  <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                    <i class="fa-solid fa-info-circle"></i> PhonePe booking currently available only for Metro Line 1
+                  </p>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                   <div>
                     <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">From</label>
-                    <input type="text" id="ticket-from" placeholder="Start station" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                    <select id="ticket-from" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                      <option value="">Select station</option>
+                      <option value="Versova">Versova</option>
+                      <option value="DN Nagar">DN Nagar</option>
+                      <option value="Azad Nagar">Azad Nagar</option>
+                      <option value="Andheri">Andheri</option>
+                      <option value="Western Express Highway">Western Express Highway</option>
+                      <option value="Chakala">Chakala</option>
+                      <option value="Airport Road">Airport Road</option>
+                      <option value="Marol Naka">Marol Naka</option>
+                      <option value="Saki Naka">Saki Naka</option>
+                      <option value="Asalpha">Asalpha</option>
+                      <option value="Jagruti Nagar">Jagruti Nagar</option>
+                      <option value="Ghatkopar">Ghatkopar</option>
+                    </select>
                   </div>
                   <div>
                     <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">To</label>
-                    <input type="text" id="ticket-to" placeholder="End station" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                    <select id="ticket-to" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                      <option value="">Select station</option>
+                      <option value="Versova">Versova</option>
+                      <option value="DN Nagar">DN Nagar</option>
+                      <option value="Azad Nagar">Azad Nagar</option>
+                      <option value="Andheri">Andheri</option>
+                      <option value="Western Express Highway">Western Express Highway</option>
+                      <option value="Chakala">Chakala</option>
+                      <option value="Airport Road">Airport Road</option>
+                      <option value="Marol Naka">Marol Naka</option>
+                      <option value="Saki Naka">Saki Naka</option>
+                      <option value="Asalpha">Asalpha</option>
+                      <option value="Jagruti Nagar">Jagruti Nagar</option>
+                      <option value="Ghatkopar">Ghatkopar</option>
+                    </select>
                   </div>
                 </div>
                 
@@ -1716,7 +1747,7 @@
               </div>
               
               <button id="proceed-payment" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; background: linear-gradient(135deg, #5F259F, #8E44AD); border: none;">
-                <i class="fa-solid fa-credit-card"></i> Proceed to Pay with PhonePe
+                <i class="fa-solid fa-credit-card"></i> Pay with PhonePe (Line 1 Only)
               </button>
               
               <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin: 12px 0 0 0;">
@@ -1725,7 +1756,7 @@
             </div>
           `;
           
-          this.openSheet('Book Metro Ticket', content);
+          this.openSheet('Book Metro Line 1 Ticket', content);
           
           setTimeout(() => {
             const proceedBtn = document.getElementById('proceed-payment');
@@ -1748,15 +1779,15 @@
               proceedBtn.addEventListener('click', () => {
                 const ticketData = {
                   route: routeSelect.options[routeSelect.selectedIndex].text,
-                  from: document.getElementById('ticket-from').value || 'Selected Station',
-                  to: document.getElementById('ticket-to').value || 'Destination',
+                  from: document.getElementById('ticket-from').value,
+                  to: document.getElementById('ticket-to').value,
                   date: document.getElementById('ticket-date').value,
                   passengers: passengersSelect.value,
                   amount: parseInt(fareDisplay.textContent.replace('₹', ''))
                 };
                 
-                if (!ticketData.from || !ticketData.to || ticketData.from === 'Selected Station') {
-                  this.showNotification('⚠️ Please enter valid stations');
+                if (!ticketData.from || !ticketData.to || ticketData.from === ticketData.to) {
+                  this.showNotification('⚠️ Please select different stations');
                   return;
                 }
                 
