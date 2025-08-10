@@ -522,8 +522,8 @@
     <div class="notification" role="alert">This app needs JavaScript enabled.</div>
   </noscript>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <!-- Leaflet JS with fallback CDN -->
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="(function(){var s=document.createElement('script');s.defer=true;s.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';document.head.appendChild(s);})()"></script>
 
   <script>
     // Mumbai Transport Hub - robust single-file app
