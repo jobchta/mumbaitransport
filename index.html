@@ -191,6 +191,13 @@
     .nav-button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
     .nav-icon { font-size: 20px; }
 
+    /* Mini bottom map */
+    .mini-map { position: fixed; left: 12px; right: 12px; bottom: 140px; height: 84px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); z-index: 1100; display: none; }
+    .mini-map.show { display: block; }
+    #miniMap { height: 100%; width: 100%; filter: saturate(1.1) contrast(1.03); }
+    .mini-map-overlay { position: absolute; right: 8px; top: 8px; z-index: 2; }
+    .mini-map-overlay .chip { background: rgba(0,0,0,0.55); color: #fff; border-color: rgba(255,255,255,0.2); }
+
     .live-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; color: var(--error); background: rgba(220, 58, 66, 0.1); padding: 2px 6px; border-radius: 10px; margin-left: 8px; }
     .live-indicator::before { content: ""; display: block; width: 6px; height: 6px; background: var(--error); border-radius: 50%; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%{opacity:1} 50%{opacity:0.4} 100%{opacity:1} }
@@ -533,6 +540,12 @@
     <button class="fab-main" id="fab-main" aria-label="Open quick menu"><i class="fa-solid fa-plus"></i></button>
   </div>
 
+  <!-- Mini bottom map -->
+  <div class="mini-map" id="miniMapWrap" aria-hidden="true">
+    <div class="mini-map-overlay"><span class="chip" id="miniMapStatus">Live</span></div>
+    <div id="miniMap"></div>
+  </div>
+
   <!-- Bottom Sheet Modal -->
   <div class="sheet-backdrop" id="sheetBackdrop"></div>
   <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
@@ -578,7 +591,9 @@
             routes: this.initializeRoutes(),
             updates: [],
             searchTimer: null,
-            reduceMotion: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            reduceMotion: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+            recentSearches: JSON.parse(localStorage.getItem('mth.recentSearches')||'[]').slice(0,8),
+            savedTrips: JSON.parse(localStorage.getItem('mth.savedTrips')||'[]').slice(0,8)
           };
 
           this.map = null;
@@ -731,6 +746,18 @@
           }
           const mode = params.get('mode');
           if (mode) this.selectTransport(mode);
+
+          // Deep-link sheet via hash
+          const sheet = this.readHashParam('sheet');
+          if (sheet === 'tickets') this.openTicketsSheet();
+          else if (sheet === 'journey') this.openJourneySheet();
+          else if (sheet === 'nearby') this.openNearbySheet();
+          else if (sheet === 'recharge') this.openRechargeSheet();
+          else if (sheet === 'account') this.openAccountSheet();
+          else if (sheet && sheet.startsWith('mode=')) {
+            const m = sheet.split('=')[1];
+            this.openDetailsSheet(m);
+          }
         }
 
         scrollToSection(headingId) {
@@ -740,6 +767,8 @@
         initMap() {
           const fallback = document.getElementById('mapFallback');
           const leafletDiv = document.getElementById('leafletMap');
+          const miniWrap = document.getElementById('miniMapWrap');
+          const miniDiv = document.getElementById('miniMap');
           try {
             if (window.L && leafletDiv) {
               this.map = L.map('leafletMap', { zoomControl: false, attributionControl: false }).setView([19.076, 72.8777], 11);
@@ -748,6 +777,13 @@
               }).addTo(this.map);
               fallback.hidden = true;
               leafletDiv.hidden = false;
+
+              // Mini map
+              if (miniDiv) {
+                this.miniMap = L.map('miniMap', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false }).setView([19.076, 72.8777], 11);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(this.miniMap);
+                miniWrap.classList.add('show');
+              }
             } else {
               throw new Error('Leaflet not available yet');
             }
@@ -818,6 +854,18 @@
               if (this.map && !this.mapFallbackMode) {
                 const marker = this.appData.leafletMarkers.get(v.id);
                 if (marker) marker.setLatLng([v.lat, v.lng]);
+                // Sync a subset to mini map for performance
+                if (this.miniMap && Math.random() < 0.15) {
+                  if (!this.miniMarkers) this.miniMarkers = new Map();
+                  let m = this.miniMarkers.get(v.id);
+                  if (!m) {
+                    m = L.circleMarker([v.lat, v.lng], { radius: 3, color: '#fff', weight: 1, fillColor: v.color, fillOpacity: 1 });
+                    m.addTo(this.miniMap);
+                    this.miniMarkers.set(v.id, m);
+                  } else {
+                    m.setLatLng([v.lat, v.lng]);
+                  }
+                }
               } else if (mapContent) {
                 // Render fallback markers in a simple grid (not geo-accurate)
                 const marker = document.createElement('div');
@@ -1035,9 +1083,38 @@
                 <div class="schedule-route">${route.name} • ${route.from} → ${route.to}</div>
                 <div class="schedule-time">Next: ${totalTime} min${delayText} • ${route.transport.toUpperCase()}</div>
               </div>
+              <button class="chip" data-save="${route.transport}:${route.id}"><i class="fa-solid fa-bookmark"></i> Save</button>
             `;
             scheduleList.appendChild(item);
           });
+
+          // Save recent search
+          this.addRecentSearch(query);
+          // Bind save buttons
+          scheduleList.querySelectorAll('[data-save]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const [transport, id] = btn.getAttribute('data-save').split(':');
+              this.saveTrip({ transport, id });
+              this.showNotification('⭐ Saved to Trips');
+            });
+          });
+        }
+
+        addRecentSearch(q) {
+          const list = this.appData.recentSearches.filter(s => s !== q);
+          list.unshift(q);
+          this.appData.recentSearches = list.slice(0,8);
+          localStorage.setItem('mth.recentSearches', JSON.stringify(this.appData.recentSearches));
+        }
+
+        saveTrip(trip) {
+          const key = `${trip.transport}:${trip.id}`;
+          const exists = this.appData.savedTrips.find(t => `${t.transport}:${t.id}` === key);
+          if (!exists) {
+            this.appData.savedTrips.unshift(trip);
+            this.appData.savedTrips = this.appData.savedTrips.slice(0,8);
+            localStorage.setItem('mth.savedTrips', JSON.stringify(this.appData.savedTrips));
+          }
         }
 
         findNearbyStations() {
@@ -1164,6 +1241,8 @@
 
         openDetailsSheet(transport) {
           const routes = window.MUMBAI_SCHEDULES?.routes?.filter(r => r.mode === transport) || [];
+          const hash = `mode=${encodeURIComponent(transport)}`;
+          history.replaceState(null, '', this.updateHashParam('sheet', hash));
           let content = `<h3>${transport.toUpperCase()} Details</h3>`;
           
           if (routes.length > 0) {
@@ -1202,6 +1281,7 @@
           `;
           this.openSheet('Buy Tickets', content);
           this.bindTicketsTabs();
+          history.replaceState(null, '', this.updateHashParam('sheet', 'tickets'));
         }
 
         renderTicketsTab(tab) {
@@ -1275,6 +1355,7 @@
             </ul>
           `;
           this.openSheet('Plan Journey', content);
+          history.replaceState(null, '', this.updateHashParam('sheet', 'journey'));
         }
 
         openNearbySheet() {
@@ -1290,6 +1371,7 @@
           `;
           this.openSheet('Nearby Stations', content);
           this.bindNearbyTabs();
+          history.replaceState(null, '', this.updateHashParam('sheet', 'nearby'));
         }
 
         renderNearbyTab(tab) {
@@ -1343,6 +1425,7 @@
           `;
           this.openSheet('Recharge Cards', content);
           this.bindRechargeTabs();
+          history.replaceState(null, '', this.updateHashParam('sheet', 'recharge'));
         }
 
         renderRechargeTab(tab) {
@@ -1415,6 +1498,20 @@
             </ul>
           `;
           this.openSheet('Account & Settings', content);
+          history.replaceState(null, '', this.updateHashParam('sheet', 'account'));
+        }
+
+        // Deep link helpers
+        updateHashParam(key, value) {
+          const url = new URL(location.href);
+          const hash = new URLSearchParams(url.hash.replace(/^#/, ''));
+          hash.set(key, value);
+          url.hash = hash.toString();
+          return url.toString();
+        }
+        readHashParam(key) {
+          const hash = new URLSearchParams((location.hash||'').replace(/^#/, ''));
+          return hash.get(key);
         }
 
         // Auto Fare Estimator (Mumbai, Aug 2025)
