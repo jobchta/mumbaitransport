@@ -375,6 +375,11 @@
 
       <section aria-labelledby="departures-heading">
         <h2 class="section-title" id="departures-heading"><i class="fa-solid fa-clock"></i> Next Departures</h2>
+        <div class="schedule-controls" style="display:flex; gap:8px; align-items:center; margin: 0 0 8px 0;">
+          <label for="refTime" style="font-size:12px; color:var(--text-secondary);">Check time:</label>
+          <input type="time" id="refTime" style="padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text-primary);">
+          <button id="useNow" type="button" style="padding:6px 10px; border:1px solid var(--border); background:var(--background); color:var(--text-secondary); border-radius:8px; cursor:pointer;">Now</button>
+        </div>
         <div class="schedule-list" id="scheduleList" role="list"></div>
       </section>
 
@@ -1257,6 +1262,23 @@
     const dayType   = (d=new Date()) => ([0,6].includes(d.getDay()) ? 'weekend' : 'weekday');
     const peak      = (h) => (h>=7 && h<=10) || (h>=18 && h<=21);
     const jitter    = (now=new Date()) => peak(now.getHours()) ? (Math.random()<0.5?0:1) : 0;
+    function getReferenceTime() {
+      const inp = document.getElementById('refTime');
+      const val = inp && inp.value;
+      if (!val) return new Date();
+      const [hh, mm] = val.split(':').map(Number);
+      const d = new Date();
+      d.setHours(hh || 0, mm || 0, 0, 0);
+      return d;
+    }
+    function prettyClockFromMinutes(mins) {
+      const m = ((mins % 1440) + 1440) % 1440;
+      const h = Math.floor(m / 60);
+      const mi = m % 60;
+      const d = new Date();
+      d.setHours(h, mi, 0, 0);
+      return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(d);
+    }
 
     function nextDepartures(routeDef, count=6, now=new Date()) {
       const nowMin = sinceMid(now);
@@ -1271,7 +1293,11 @@
         const w=wins[0], start=toMinutes(w.start), head=Math.max(1, Math.round(+w.headway));
         for (let t=start; out.length<count; t+=head) out.push({ departMin:t+1440, runtime:Math.max(1,+w.runtime) });
       }
-      return out.slice(0, count).map(d => ({ etaMin: Math.max(0, d.departMin - sinceMid(now)) + jitter(now), runtime: d.runtime }));
+      return out.slice(0, count).map(d => ({
+        etaMin: Math.max(0, d.departMin - sinceMid(now)) + jitter(now),
+        departMin: d.departMin,
+        runtime: d.runtime
+      }));
     }
 
     function clearFallbackMarkers() {
@@ -1345,8 +1371,10 @@
           </div>`;
         scheduleList.appendChild(header);
         routes.forEach(route => {
-          const n = nextDepartures(route, 1)[0];
+          const refNow = getReferenceTime();
+          const n = nextDepartures(route, 1, refNow)[0];
           const total = n ? n.etaMin : '—';
+          const timeStr = n ? prettyClockFromMinutes(n.departMin % (24*60)) : '—';
           const delayText = (n && n.etaMin>0 && n.etaMin%11===0) ? ' (+1 min delay)' : '';
           const item = document.createElement('div');
           item.className = 'schedule-item';
@@ -1354,7 +1382,7 @@
             <div class="schedule-icon" style="background:${colors[mode]}"><i class="fa-solid ${icons[mode]}"></i></div>
             <div class="schedule-content">
               <div class="schedule-route">${route.name} • ${route.from} → ${route.to}</div>
-              <div class="schedule-time">Next: ${total} min${delayText}</div>
+              <div class="schedule-time">Next: ${total} min at ${timeStr}${delayText}</div>
             </div>`;
           item.addEventListener('click', () => openDetailsSheet({ type: 'route', mode, route }));
           scheduleList.appendChild(item);
@@ -1453,6 +1481,16 @@
             openDetailsSheet({ type:'actions', title:'Account', html:'<p>Sign-in and profile features are not part of this static demo.</p>' });
           }
         });
+      });
+      const ref = document.getElementById('refTime');
+      const useNow = document.getElementById('useNow');
+      if (ref) ref.addEventListener('change', () => {
+        if (window.MumbaiTransport && window.MumbaiTransport.updateSchedules) window.MumbaiTransport.updateSchedules();
+      });
+      if (useNow) useNow.addEventListener('click', () => {
+        const inp = document.getElementById('refTime');
+        if (inp) inp.value = '';
+        if (window.MumbaiTransport && window.MumbaiTransport.updateSchedules) window.MumbaiTransport.updateSchedules();
       });
     });
   })();
