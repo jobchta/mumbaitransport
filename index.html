@@ -599,8 +599,10 @@
             this.appData.searchTimer = setTimeout(() => this.performSearch(q), 220);
           });
 
-          document.getElementById('buy-ticket').addEventListener('click', () =>
-            this.showNotification('🎫 Redirecting to ticket booking...'));
+          document.getElementById('buy-ticket').addEventListener('click', () => {
+            if (window.openTicketsSheet) window.openTicketsSheet();
+            else this.showNotification('🎫 Redirecting to ticket booking...');
+          });
           document.getElementById('plan-journey').addEventListener('click', () =>
             this.showNotification('🗺️ Opening route planner...'));
           document.getElementById('nearby-stations').addEventListener('click', () =>
@@ -1474,9 +1476,7 @@
             const el = document.getElementById('live-heading');
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
-          if (nav === 'tickets') {
-            openDetailsSheet({ type:'actions', title:'Tickets', html:'<p>Tickets can be purchased via operator apps or counters. This demo shows schedules only.</p>' });
-          }
+          if (nav === 'tickets') { if (window.openTicketsSheet) window.openTicketsSheet(); }
           if (nav === 'account') {
             openDetailsSheet({ type:'actions', title:'Account', html:'<p>Sign-in and profile features are not part of this static demo.</p>' });
           }
@@ -1493,7 +1493,64 @@
         if (window.MumbaiTransport && window.MumbaiTransport.updateSchedules) window.MumbaiTransport.updateSchedules();
       });
     });
-  })();
+
+    // Tickets sheet (organized per mode) and WhatsApp flows
+    window.openTicketsSheet = function() {
+      const sheet = document.getElementById('sheet');
+      const sheetBody = document.getElementById('sheetBody');
+      const sheetTitle = document.getElementById('sheetTitle');
+      const backdrop = document.getElementById('sheetBackdrop');
+      if (!sheet || !sheetBody || !sheetTitle || !backdrop) return;
+
+      sheetTitle.textContent = 'Tickets – Mumbai';
+      const row = (icon, title, html) => `
+        <div class="update-item">
+          <div class="update-icon" style="background: var(--primary);"><i class="fa-solid ${icon}"></i></div>
+          <div class="update-content">
+            <div class="update-text"><strong>${title}</strong></div>
+            <div class="update-time" style="margin-top:6px; color: var(--text-secondary);">${html}</div>
+          </div>
+        </div>`;
+
+      const waLink = (num, text='Hi') => `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+      const link = (href, label) => `<a href="${href}" target="_blank" rel="noopener" style="text-decoration:none;">${label}</a>`;
+
+      const line1 = row('fa-train-tram', 'Mumbai Metro Line 1 (Versova–Andheri–Ghatkopar) – WhatsApp Ticketing', `
+        Steps: 1) Send “hi” to 9670008889 2) Select source & destination 3) Pay online or share OTP at counter 4) Receive QR to travel.<br/>
+        ${link(waLink('919670008889'), 'Open WhatsApp (9670008889)')}
+      `);
+
+      const lines2A7 = row('fa-train', 'Mumbai Metro Lines 2A & 7 – WhatsApp Ticketing', `
+        Send “Hi” on 86526 35500. Tickets are non-refundable and valid for the same business day. Check operational hours before booking.<br/>
+        ${link(waLink('918652635500'), 'Open WhatsApp (86526 35500)')}
+      `);
+
+      const aqua = row('fa-water', 'Mumbai Metro Line 3 (Aqua) – Booking', `
+        Use the official MMRCL portal to select stations and proceed.<br/>
+        ${link('https://mmrcl.com/en/map', 'Open MMRCL Portal')}
+      `);
+
+      const suburban = row('fa-train-subway', 'Suburban Trains', `
+        Use official ticketing (e.g., UTS) or counters. Ensure correct origin/destination and class.
+      `);
+
+      const best = row('fa-bus', 'BEST Buses', `
+        Buy from conductor/counters or official app/cards. Confirm route and stage before purchase.
+      `);
+
+      const ferry = row('fa-ship', 'Ferries', `
+        Buy at jetties/authorized operators. Check last sailing and sea conditions.
+      `);
+
+      sheetBody.innerHTML = line1 + lines2A7 + aqua + suburban + best + ferry;
+      sheet.setAttribute('aria-hidden', 'false');
+      sheet.classList.add('open');
+      backdrop.classList.add('show');
+      backdrop.onclick = closeDetailsSheet;
+      const closeBtn = document.getElementById('sheetClose');
+      if (closeBtn) closeBtn.onclick = closeDetailsSheet;
+    };
+    })();
   </script>
 </body>
 </html>
