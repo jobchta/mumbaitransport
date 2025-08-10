@@ -2266,6 +2266,11 @@
       setTimeout(() => clearInterval(iv), 12000);
     }
     })();
+
+    // Initialize the application
+    window.addEventListener('load', () => {
+      window.MumbaiTransport = new MumbaiTransportHub();
+    });
   </script>
 </body>
 </html>
