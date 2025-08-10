@@ -206,6 +206,69 @@
     @media (max-width: 380px) {
       .action-grid, .transport-grid { grid-template-columns: 1fr; }
     }
+
+    /* Bottom Sheet Modal */
+    .sheet-backdrop {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5);
+      z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+    }
+    .sheet-backdrop.show { opacity: 1; visibility: visible; }
+
+    .sheet {
+      position: fixed; bottom: 0; left: 0; right: 0; max-height: 80vh; background: var(--surface);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-lg);
+      transform: translateY(100%); transition: transform 0.3s ease; z-index: 1001;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .sheet.show { transform: translateY(0); }
+
+    .sheet-header {
+      padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex;
+      align-items: center; justify-content: space-between; flex-shrink: 0; position: relative;
+    }
+    .sheet-handle {
+      position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+      width: 32px; height: 4px; background: var(--border); border-radius: 2px;
+    }
+    .sheet-title { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-top: 8px; }
+    .sheet-close {
+      width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--background);
+      border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+    }
+    .sheet-close:hover { background: var(--surface-hover); }
+
+    .sheet-body {
+      padding: 20px; overflow-y: auto; flex: 1; color: var(--text-primary); line-height: 1.6;
+    }
+    .sheet-body h3 { margin: 0 0 12px 0; color: var(--text-primary); }
+    .sheet-body p { margin: 0 0 16px 0; }
+    .sheet-body .frequency-item {
+      background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .sheet-body .frequency-item strong { color: var(--primary); }
+
+    /* Time Selector */
+    .schedule-controls {
+      display: flex; gap: 8px; align-items: center; margin: 0 0 16px 0; padding: 12px;
+      background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-md);
+    }
+    .schedule-controls label { font-size: 12px; color: var(--text-secondary); }
+    .schedule-controls input[type="time"] {
+      padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface); color: var(--text-primary); font-size: 14px;
+    }
+    .schedule-controls button {
+      padding: 6px 12px; border: 1px solid var(--border); background: var(--surface);
+      color: var(--text-secondary); border-radius: var(--radius-sm); cursor: pointer;
+      font-size: 12px; transition: all 0.2s ease;
+    }
+    .schedule-controls button:hover { background: var(--surface-hover); }
+
+    /* Embed mode - hide bottom nav */
+    body.embedded .bottom-nav { display: none; }
+    body.embedded .content { padding-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -360,6 +423,11 @@
 
       <section aria-labelledby="departures-heading">
         <h2 class="section-title" id="departures-heading"><i class="fa-solid fa-clock"></i> Next Departures</h2>
+        <div class="schedule-controls">
+          <label for="refTime">Check time:</label>
+          <input type="time" id="refTime" />
+          <button id="useNow" type="button">Now</button>
+        </div>
         <div class="schedule-list" id="scheduleList" role="list"></div>
       </section>
 
@@ -433,6 +501,21 @@
         Account
       </button>
     </nav>
+  </div>
+
+  <!-- Bottom Sheet Modal -->
+  <div class="sheet-backdrop" id="sheetBackdrop"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+    <div class="sheet-header">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" id="sheetTitle">Details</div>
+      <button class="sheet-close" id="sheetClose" type="button" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="sheet-body" id="sheetBody">
+      <p>Loading...</p>
+    </div>
   </div>
 
   <noscript>
@@ -531,10 +614,12 @@
         setupEventListeners() {
           document.getElementById('theme-toggle').addEventListener('click', () => this.toggleTheme());
 
+          // Transport cards open detail sheet
           document.querySelectorAll('.transport-card').forEach(card => {
             card.addEventListener('click', () => {
               const transport = card.dataset.transport;
               this.selectTransport(transport);
+              this.openDetailsSheet(transport);
             });
           });
 
@@ -545,22 +630,37 @@
             this.appData.searchTimer = setTimeout(() => this.performSearch(q), 220);
           });
 
-          document.getElementById('buy-ticket').addEventListener('click', () =>
-            this.showNotification('🎫 Redirecting to ticket booking...'));
-          document.getElementById('plan-journey').addEventListener('click', () =>
-            this.showNotification('🗺️ Opening route planner...'));
-          document.getElementById('nearby-stations').addEventListener('click', () =>
-            this.findNearbyStations());
-          document.getElementById('recharge-card').addEventListener('click', () =>
-            this.showNotification('💳 Opening recharge portal...'));
+          // Action buttons open relevant sheets
+          document.getElementById('buy-ticket').addEventListener('click', () => this.openTicketsSheet());
+          document.getElementById('plan-journey').addEventListener('click', () => this.openJourneySheet());
+          document.getElementById('nearby-stations').addEventListener('click', () => this.openNearbySheet());
+          document.getElementById('recharge-card').addEventListener('click', () => this.openRechargeSheet());
 
+          // Navigation buttons
           document.querySelectorAll('.nav-button').forEach(btn => {
             btn.addEventListener('click', () => {
               document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
               btn.classList.add('active');
-              this.showNotification(`📱 ${btn.textContent.trim()} section`);
+              const nav = btn.dataset.nav;
+              if (nav === 'tickets') this.openTicketsSheet();
+              else if (nav === 'account') this.openAccountSheet();
+              else if (nav === 'map') this.scrollToSection('live-heading');
+              else this.scrollToSection('modes-heading');
             });
           });
+
+          // Time selector
+          document.getElementById('useNow').addEventListener('click', () => {
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('refTime').value = timeStr;
+            this.updateSchedules();
+          });
+
+          document.getElementById('refTime').addEventListener('change', () => this.updateSchedules());
+
+          // Sheet controls
+          this.setupSheetControls();
 
           document.addEventListener('visibilitychange', () => {
             if (document.hidden) this.pauseUpdates();
@@ -568,6 +668,34 @@
           });
 
           window.addEventListener('beforeunload', () => this.cleanup());
+
+          // URL params for embed mode
+          this.handleURLParams();
+        }
+
+        setupSheetControls() {
+          const backdrop = document.getElementById('sheetBackdrop');
+          const closeBtn = document.getElementById('sheetClose');
+          
+          [backdrop, closeBtn].forEach(el => {
+            el?.addEventListener('click', () => this.closeSheet());
+          });
+
+          // Prevent sheet content clicks from closing
+          document.getElementById('sheet')?.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        handleURLParams() {
+          const params = new URLSearchParams(window.location.search);
+          if (params.get('embed') === '1') {
+            document.body.classList.add('embedded');
+          }
+          const mode = params.get('mode');
+          if (mode) this.selectTransport(mode);
+        }
+
+        scrollToSection(headingId) {
+          document.getElementById(headingId)?.scrollIntoView({ behavior: 'smooth' });
         }
 
         initMap() {
@@ -973,6 +1101,250 @@
 
         randomInRange(min, max) { return Math.random() * (max - min) + min; }
         escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+        // Bottom Sheet Methods
+        openSheet(title, content) {
+          document.getElementById('sheetTitle').textContent = title;
+          document.getElementById('sheetBody').innerHTML = content;
+          document.getElementById('sheetBackdrop').classList.add('show');
+          document.getElementById('sheet').classList.add('show');
+          document.getElementById('sheet').setAttribute('aria-hidden', 'false');
+        }
+
+        closeSheet() {
+          document.getElementById('sheetBackdrop').classList.remove('show');
+          document.getElementById('sheet').classList.remove('show');
+          document.getElementById('sheet').setAttribute('aria-hidden', 'true');
+        }
+
+        openDetailsSheet(transport) {
+          const routes = window.MUMBAI_SCHEDULES?.routes?.filter(r => r.mode === transport) || [];
+          let content = `<h3>${transport.toUpperCase()} Details</h3>`;
+          
+          if (routes.length > 0) {
+            content += '<div class="frequency-list">';
+            routes.forEach(route => {
+              content += `
+                <div class="frequency-item">
+                  <div>
+                    <strong>${route.name}</strong><br>
+                    <span style="color: var(--text-secondary); font-size: 13px;">${route.from} → ${route.to}</span>
+                  </div>
+                  <div style="text-align: right; font-size: 12px; color: var(--text-muted);">
+                    ${route.frequencies?.[0]?.headway || 'N/A'} min intervals
+                  </div>
+                </div>
+              `;
+            });
+            content += '</div>';
+          } else {
+            content += '<p>No detailed schedule information available for this transport mode.</p>';
+          }
+          
+          this.openSheet(`${transport.toUpperCase()} Information`, content);
+        }
+
+        openTicketsSheet() {
+          const content = `
+            <h3>🎫 Buy Tickets</h3>
+            
+            <h4>Metro Lines</h4>
+            <div class="frequency-item">
+              <div>
+                <strong>Line 1 (Blue) - Versova to Ghatkopar</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">WhatsApp Ticketing Available</span>
+              </div>
+            </div>
+            <p><strong>How to book:</strong></p>
+            <ol>
+              <li>Send 'hi' to <strong>9670008889</strong></li>
+              <li>Click link to select source & destination</li>
+              <li>Pay online for e-ticket or share OTP for paper ticket</li>
+              <li>Receive WhatsApp QR code to travel</li>
+            </ol>
+
+            <div class="frequency-item">
+              <div>
+                <strong>Lines 2A & 7 (Yellow & Red)</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">WhatsApp Ticketing Available</span>
+              </div>
+            </div>
+            <p><strong>How to book:</strong></p>
+            <ol>
+              <li>Send 'Hi' to <strong>86526 35500</strong></li>
+              <li>Select route and make payment via Bank card/UPI</li>
+              <li>Valid for same business day only</li>
+              <li>Non-refundable once issued</li>
+            </ol>
+
+            <div class="frequency-item">
+              <div>
+                <strong>Line 3 (Aqua) - Partial Operations</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">Official MMRCL Portal</span>
+              </div>
+            </div>
+            <p>Book tickets through the official MMRCL portal for Aqua Line services.</p>
+
+            <h4>Other Transport</h4>
+            <p><strong>Local Trains:</strong> Book via UTS app or station counters</p>
+            <p><strong>BEST Buses:</strong> Pay via prepaid card, mobile app, or cash</p>
+            <p><strong>Ferry:</strong> Tickets available at boarding points</p>
+          `;
+          this.openSheet('Buy Tickets', content);
+        }
+
+        openJourneySheet() {
+          const content = `
+            <h3>🗺️ Plan Your Journey</h3>
+            <p>Plan efficient routes across Mumbai's transport network:</p>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Multi-modal Planning</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">Combine Metro, Trains, Buses</span>
+              </div>
+            </div>
+            
+            <p><strong>Tips for efficient travel:</strong></p>
+            <ul>
+              <li>Use Metro for East-West connectivity</li>
+              <li>Local trains for North-South routes</li>
+              <li>BEST buses for local area coverage</li>
+              <li>Check peak hour timings (7-10 AM, 6-9 PM)</li>
+            </ul>
+            
+            <p><strong>Integration points:</strong></p>
+            <ul>
+              <li>Andheri: Metro Line 1 ↔ Western/Metro Line 7</li>
+              <li>Ghatkopar: Metro Line 1 ↔ Central Line</li>
+              <li>Churchgate/CST: Major train terminuses</li>
+            </ul>
+          `;
+          this.openSheet('Plan Journey', content);
+        }
+
+        openNearbySheet() {
+          const content = `
+            <h3>📍 Nearby Stations</h3>
+            <p>Stations within 3km radius:</p>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Churchgate Station</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">0.3 km • Western Line</span>
+              </div>
+              <div style="color: var(--success); font-size: 12px;">2 min walk</div>
+            </div>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Marine Lines</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">0.8 km • Western Line</span>
+              </div>
+              <div style="color: var(--success); font-size: 12px;">8 min walk</div>
+            </div>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Charni Road</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">1.2 km • Western Line</span>
+              </div>
+              <div style="color: var(--warning); font-size: 12px;">12 min walk</div>
+            </div>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>CST Terminus</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">1.5 km • Central/Harbour Lines</span>
+              </div>
+              <div style="color: var(--warning); font-size: 12px;">15 min walk</div>
+            </div>
+            
+            <p><em>Location access required for precise nearby stations.</em></p>
+          `;
+          this.openSheet('Nearby Stations', content);
+        }
+
+        openRechargeSheet() {
+          const content = `
+            <h3>💳 Recharge Travel Cards</h3>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Metro Cards</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">Line 1, 2A, 7 Smart Cards</span>
+              </div>
+            </div>
+            <p>Recharge at metro stations, authorized retailers, or mobile apps.</p>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Local Train Season Pass</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">Monthly/Quarterly passes</span>
+              </div>
+            </div>
+            <p>Available at railway booking counters and UTS app.</p>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>BEST Prepaid Cards</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">Bus travel cards</span>
+              </div>
+            </div>
+            <p>Recharge at BEST depots, authorized centers, or online.</p>
+            
+            <p><strong>Digital Options:</strong></p>
+            <ul>
+              <li>Mumbai Metro app</li>
+              <li>UTS app for trains</li>
+              <li>BEST mobile app</li>
+              <li>PayTM, GPay integration</li>
+            </ul>
+          `;
+          this.openSheet('Recharge Cards', content);
+        }
+
+        openAccountSheet() {
+          const content = `
+            <h3>👤 Account & Settings</h3>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Theme Settings</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">Light/Dark mode toggle</span>
+              </div>
+            </div>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Notifications</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">Service alerts & updates</span>
+              </div>
+            </div>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Saved Routes</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">Quick access to frequent routes</span>
+              </div>
+            </div>
+            
+            <div class="frequency-item">
+              <div>
+                <strong>Language</strong><br>
+                <span style="color: var(--text-secondary); font-size: 13px;">English, हिंदी, मराठी</span>
+              </div>
+            </div>
+            
+            <p><strong>Data & Privacy:</strong></p>
+            <ul>
+              <li>Location data used only for nearby stations</li>
+              <li>No personal data stored on servers</li>
+              <li>All preferences saved locally</li>
+            </ul>
+          `;
+          this.openSheet('Account & Settings', content);
+        }
       }
 
       let transportHub;
@@ -997,6 +1369,10 @@
         }, 30000);
 
         window.MumbaiTransport = transportHub;
+        
+        // Expose functions globally for embedded use
+        window.openTicketsSheet = () => transportHub.openTicketsSheet();
+        window.openDetailsSheet = (transport) => transportHub.openDetailsSheet(transport);
       });
     })();
   </script>
@@ -1292,3 +1668,4 @@
   </script>
 </body>
 </html>
+
