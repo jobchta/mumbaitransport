@@ -709,15 +709,7 @@
               return;
             }
 
-            // FAB
-            if (q('#fab-main')) {
-              const fab = document.getElementById('fab');
-              if (fab) fab.classList.toggle('show');
-              return;
-            }
-            if (q('#fab-fare')) { try { this.openFareEstimator(); } catch(_) {} return; }
-            if (q('#fab-tickets')) { try { this.openTicketsSheet(); } catch(_) {} return; }
-            if (q('#fab-nearby')) { try { this.openNearbySheet(); } catch(_) {} return; }
+
 
             // Sheet close
             if (q('#sheetClose') || q('#sheetBackdrop')) { try { this.closeSheet(); } catch(_) {} return; }
@@ -727,12 +719,353 @@
         initializeRoutes() {
           return {
             bus: [
+              // Major Express Routes
               { id: 'A1E', name: 'A-1 Express', from: 'Colaba', to: 'Bandra', time: 3, delay: 0, passengers: 45, capacity: 70 },
+              { id: 'A2E', name: 'A-2 Express', from: 'Colaba', to: 'Andheri', time: 5, delay: 1, passengers: 52, capacity: 70 },
+              { id: 'A3E', name: 'A-3 Express', from: 'Colaba', to: 'Borivali', time: 8, delay: 2, passengers: 38, capacity: 70 },
+              { id: 'A4E', name: 'A-4 Express', from: 'Colaba', to: 'Dahisar', time: 10, delay: 1, passengers: 42, capacity: 70 },
+              
+              // Limited Routes
+              { id: '1L', name: '1Ltd', from: 'Colaba', to: 'Bandra', time: 4, delay: 0, passengers: 48, capacity: 65 },
               { id: '2L', name: '2Ltd', from: 'Mumbai Central', to: 'Bandra', time: 7, delay: 2, passengers: 52, capacity: 65 },
+              { id: '3L', name: '3Ltd', from: 'Colaba', to: 'Andheri', time: 6, delay: 1, passengers: 45, capacity: 65 },
+              { id: '4L', name: '4Ltd', from: 'Colaba', to: 'Borivali', time: 9, delay: 2, passengers: 35, capacity: 65 },
+              { id: '5L', name: '5Ltd', from: 'Colaba', to: 'Dahisar', time: 11, delay: 1, passengers: 38, capacity: 65 },
+              { id: '6L', name: '6Ltd', from: 'Mumbai Central', to: 'Andheri', time: 8, delay: 2, passengers: 50, capacity: 65 },
+              { id: '7L', name: '7Ltd', from: 'Mumbai Central', to: 'Borivali', time: 10, delay: 1, passengers: 42, capacity: 65 },
+              { id: '8L', name: '8Ltd', from: 'Mumbai Central', to: 'Dahisar', time: 12, delay: 2, passengers: 35, capacity: 65 },
+              
+              // Regular Routes - South Mumbai
+              { id: '1', name: '1', from: 'Colaba', to: 'Bandra', time: 5, delay: 0, passengers: 55, capacity: 60 },
+              { id: '2', name: '2', from: 'Colaba', to: 'Andheri', time: 7, delay: 1, passengers: 48, capacity: 60 },
+              { id: '3', name: '3', from: 'Colaba', to: 'Borivali', time: 10, delay: 2, passengers: 40, capacity: 60 },
+              { id: '4', name: '4', from: 'Colaba', to: 'Dahisar', time: 12, delay: 1, passengers: 35, capacity: 60 },
+              { id: '5', name: '5', from: 'Colaba', to: 'Mira Road', time: 15, delay: 2, passengers: 30, capacity: 60 },
+              { id: '6', name: '6', from: 'Colaba', to: 'Bhayandar', time: 18, delay: 1, passengers: 25, capacity: 60 },
+              { id: '7', name: '7', from: 'Colaba', to: 'Vasai', time: 20, delay: 2, passengers: 22, capacity: 60 },
+              { id: '8', name: '8', from: 'Colaba', to: 'Virar', time: 22, delay: 1, passengers: 20, capacity: 60 },
+              { id: '9', name: '9', from: 'Antop Hill', to: 'Colaba', time: 8, delay: 1, passengers: 45, capacity: 60 },
+              { id: '10', name: '10', from: 'Colaba', to: 'Boisar', time: 28, delay: 1, passengers: 15, capacity: 60 },
+              
+              // Regular Routes - Central Mumbai
+              { id: '11', name: '11', from: 'Mumbai Central', to: 'Bandra', time: 4, delay: 0, passengers: 58, capacity: 60 },
+              { id: '12', name: '12', from: 'Mumbai Central', to: 'Andheri', time: 6, delay: 1, passengers: 52, capacity: 60 },
+              { id: '13', name: '13', from: 'Mumbai Central', to: 'Borivali', time: 9, delay: 2, passengers: 45, capacity: 60 },
+              { id: '14', name: '14', from: 'Mumbai Central', to: 'Dahisar', time: 11, delay: 1, passengers: 38, capacity: 60 },
+              { id: '15', name: '15', from: 'Mumbai Central', to: 'Mira Road', time: 14, delay: 2, passengers: 32, capacity: 60 },
+              { id: '16', name: '16', from: 'Mumbai Central', to: 'Bhayandar', time: 17, delay: 1, passengers: 28, capacity: 60 },
+              { id: '17', name: '17', from: 'Mumbai Central', to: 'Vasai', time: 19, delay: 2, passengers: 25, capacity: 60 },
+              { id: '18', name: '18', from: 'Mumbai Central', to: 'Virar', time: 21, delay: 1, passengers: 22, capacity: 60 },
+              { id: '19', name: '19', from: 'Mumbai Central', to: 'Nalasopara', time: 24, delay: 2, passengers: 20, capacity: 60 },
+              { id: '20', name: '20', from: 'Mumbai Central', to: 'Boisar', time: 27, delay: 1, passengers: 18, capacity: 60 },
+              
+              // Regular Routes - Western Suburbs
+              { id: '21', name: '21', from: 'Bandra', to: 'Andheri', time: 3, delay: 0, passengers: 62, capacity: 60 },
+              { id: '22', name: '22', from: 'Bandra', to: 'Borivali', time: 6, delay: 1, passengers: 55, capacity: 60 },
+              { id: '23', name: '23', from: 'Bandra', to: 'Dahisar', time: 8, delay: 2, passengers: 48, capacity: 60 },
+              { id: '24', name: '24', from: 'Bandra', to: 'Mira Road', time: 11, delay: 1, passengers: 42, capacity: 60 },
+              { id: '25', name: '25', from: 'Bandra', to: 'Bhayandar', time: 14, delay: 2, passengers: 38, capacity: 60 },
+              { id: '26', name: '26', from: 'Bandra', to: 'Vasai', time: 16, delay: 1, passengers: 35, capacity: 60 },
+              { id: '27', name: '27', from: 'Bandra', to: 'Virar', time: 18, delay: 2, passengers: 32, capacity: 60 },
+              { id: '28', name: '28', from: 'Bandra', to: 'Nalasopara', time: 21, delay: 1, passengers: 30, capacity: 60 },
+              { id: '29', name: '29', from: 'Bandra', to: 'Boisar', time: 24, delay: 2, passengers: 28, capacity: 60 },
+              { id: '30', name: '30', from: 'Bandra', to: 'Palghar', time: 26, delay: 1, passengers: 25, capacity: 60 },
+              
+              // Regular Routes - Andheri Hub
+              { id: '31', name: '31', from: 'Andheri', to: 'Borivali', time: 4, delay: 0, passengers: 65, capacity: 60 },
+              { id: '32', name: '32', from: 'Andheri', to: 'Dahisar', time: 6, delay: 1, passengers: 58, capacity: 60 },
+              { id: '33', name: '33', from: 'Andheri', to: 'Mira Road', time: 9, delay: 2, passengers: 52, capacity: 60 },
+              { id: '34', name: '34', from: 'Andheri', to: 'Bhayandar', time: 12, delay: 1, passengers: 48, capacity: 60 },
+              { id: '35', name: '35', from: 'Andheri', to: 'Vasai', time: 14, delay: 2, passengers: 45, capacity: 60 },
+              { id: '36', name: '36', from: 'Andheri', to: 'Virar', time: 16, delay: 1, passengers: 42, capacity: 60 },
               { id: '37', name: '37', from: 'Santacruz', to: 'Colaba', time: 12, delay: 0, passengers: 38, capacity: 60 },
+              { id: '38', name: '38', from: 'Santacruz', to: 'Mumbai Central', time: 8, delay: 1, passengers: 45, capacity: 60 },
+              { id: '39', name: '39', from: 'Santacruz', to: 'Bandra', time: 3, delay: 0, passengers: 55, capacity: 60 },
+              { id: '40', name: '40', from: 'Santacruz', to: 'Andheri', time: 5, delay: 1, passengers: 52, capacity: 60 },
+              
+              // Regular Routes - Borivali Hub
+              { id: '41', name: '41', from: 'Borivali', to: 'Dahisar', time: 2, delay: 0, passengers: 68, capacity: 60 },
+              { id: '42', name: '42', from: 'Sandhurst Road', to: 'Kamla Nehru Park', time: 4, delay: 1, passengers: 45, capacity: 60 },
+              { id: '43', name: '43', from: 'Borivali', to: 'Mira Road', time: 5, delay: 1, passengers: 62, capacity: 60 },
+              { id: '44', name: '44', from: 'Borivali', to: 'Bhayandar', time: 8, delay: 2, passengers: 58, capacity: 60 },
+              { id: '45', name: '45', from: 'Borivali', to: 'Vasai', time: 10, delay: 1, passengers: 55, capacity: 60 },
+              { id: '46', name: '46', from: 'Borivali', to: 'Virar', time: 12, delay: 2, passengers: 52, capacity: 60 },
+              { id: '47', name: '47', from: 'Borivali', to: 'Nalasopara', time: 15, delay: 1, passengers: 48, capacity: 60 },
+              { id: '48', name: '48', from: 'Borivali', to: 'Boisar', time: 18, delay: 2, passengers: 45, capacity: 60 },
+              { id: '49', name: '49', from: 'Borivali', to: 'Palghar', time: 20, delay: 1, passengers: 42, capacity: 60 },
+              { id: '50', name: '50', from: 'Borivali', to: 'Dahanu', time: 25, delay: 2, passengers: 35, capacity: 60 },
+              
+              // Regular Routes - Eastern Suburbs
+              { id: '51', name: '51', from: 'Kurla', to: 'Colaba', time: 8, delay: 1, passengers: 48, capacity: 60 },
+              { id: '52', name: '52', from: 'Kurla', to: 'Mumbai Central', time: 5, delay: 0, passengers: 55, capacity: 60 },
+              { id: '53', name: '53', from: 'Kurla', to: 'Bandra', time: 6, delay: 1, passengers: 52, capacity: 60 },
               { id: '54L', name: '54Ltd', from: 'Kurla', to: 'Colaba', time: 5, delay: 1, passengers: 41, capacity: 55 },
+              { id: '55', name: '55', from: 'Kurla', to: 'Andheri', time: 4, delay: 0, passengers: 58, capacity: 60 },
+              { id: '56', name: '56', from: 'Kurla', to: 'Borivali', time: 7, delay: 1, passengers: 52, capacity: 60 },
+              { id: '57', name: '57', from: 'Kurla', to: 'Dahisar', time: 9, delay: 2, passengers: 48, capacity: 60 },
+              { id: '58', name: '58', from: 'Kurla', to: 'Mira Road', time: 12, delay: 1, passengers: 45, capacity: 60 },
+              { id: '59', name: '59', from: 'Kurla', to: 'Bhayandar', time: 15, delay: 2, passengers: 42, capacity: 60 },
+              { id: '60', name: '60', from: 'Kurla', to: 'Vasai', time: 17, delay: 1, passengers: 38, capacity: 60 },
+              
+              // Regular Routes - Thane Hub
+              { id: '61', name: '61', from: 'Thane', to: 'Colaba', time: 12, delay: 2, passengers: 42, capacity: 60 },
+              { id: '62', name: '62', from: 'Thane', to: 'Mumbai Central', time: 9, delay: 1, passengers: 48, capacity: 60 },
+              { id: '63', name: '63', from: 'Thane', to: 'Bandra', time: 10, delay: 2, passengers: 45, capacity: 60 },
+              { id: '64', name: '64', from: 'Thane', to: 'Andheri', time: 8, delay: 1, passengers: 52, capacity: 60 },
+              { id: '65', name: '65', from: 'Thane', to: 'Borivali', time: 11, delay: 2, passengers: 48, capacity: 60 },
+              { id: '66', name: '66', from: 'Thane', to: 'Dahisar', time: 13, delay: 1, passengers: 45, capacity: 60 },
+              { id: '67', name: '67', from: 'Thane', to: 'Mira Road', time: 16, delay: 2, passengers: 42, capacity: 60 },
+              { id: '68', name: '68', from: 'Thane', to: 'Bhayandar', time: 19, delay: 1, passengers: 38, capacity: 60 },
+              { id: '69', name: '69', from: 'Thane', to: 'Vasai', time: 21, delay: 2, passengers: 35, capacity: 60 },
+              { id: '70', name: '70', from: 'Thane', to: 'Virar', time: 23, delay: 1, passengers: 32, capacity: 60 },
+              
+              // Regular Routes - Kalyan Hub
+              { id: '71', name: '71', from: 'Kalyan', to: 'Colaba', time: 15, delay: 2, passengers: 38, capacity: 60 },
+              { id: '72', name: '72', from: 'Kalyan', to: 'Mumbai Central', time: 12, delay: 1, passengers: 42, capacity: 60 },
+              { id: '73', name: '73', from: 'Kalyan', to: 'Bandra', time: 13, delay: 2, passengers: 40, capacity: 60 },
+              { id: '74', name: '74', from: 'Kalyan', to: 'Andheri', time: 11, delay: 1, passengers: 45, capacity: 60 },
+              { id: '75', name: '75', from: 'Kalyan', to: 'Borivali', time: 14, delay: 2, passengers: 42, capacity: 60 },
+              { id: '76', name: '76', from: 'Kalyan', to: 'Dahisar', time: 16, delay: 1, passengers: 38, capacity: 60 },
+              { id: '77', name: '77', from: 'Kalyan', to: 'Mira Road', time: 19, delay: 2, passengers: 35, capacity: 60 },
+              { id: '78', name: '78', from: 'Wagle Depot', to: 'Bharat Gears', time: 8, delay: 1, passengers: 45, capacity: 60 },
+              { id: '79', name: '79', from: 'Kalyan', to: 'Bhayandar', time: 22, delay: 1, passengers: 32, capacity: 60 },
+              { id: '80', name: '80', from: 'Kalyan', to: 'Vasai', time: 24, delay: 2, passengers: 30, capacity: 60 },
+              
+              // Regular Routes - Panvel Hub
+              { id: '81', name: '81', from: 'Panvel', to: 'Colaba', time: 18, delay: 2, passengers: 35, capacity: 60 },
+              { id: '82', name: '82', from: 'Panvel', to: 'Mumbai Central', time: 15, delay: 1, passengers: 38, capacity: 60 },
+              { id: '83', name: '83', from: 'Panvel', to: 'Bandra', time: 16, delay: 2, passengers: 35, capacity: 60 },
+              { id: '84', name: '84', from: 'Panvel', to: 'Andheri', time: 14, delay: 1, passengers: 40, capacity: 60 },
               { id: '85', name: '85', from: 'Borivali', to: 'Colaba', time: 15, delay: 0, passengers: 29, capacity: 70 },
-              { id: '124', name: '124', from: 'Andheri', to: 'CST', time: 8, delay: 3, passengers: 56, capacity: 65 }
+              { id: '86', name: '86', from: 'Panvel', to: 'Borivali', time: 17, delay: 2, passengers: 32, capacity: 60 },
+              { id: '87', name: '87', from: 'Panvel', to: 'Dahisar', time: 19, delay: 1, passengers: 30, capacity: 60 },
+              { id: '88', name: '88', from: 'Panvel', to: 'Mira Road', time: 22, delay: 2, passengers: 28, capacity: 60 },
+              { id: '89', name: '89', from: 'Panvel', to: 'Bhayandar', time: 25, delay: 1, passengers: 25, capacity: 60 },
+              { id: '90', name: '90', from: 'Panvel', to: 'Vasai', time: 27, delay: 2, passengers: 22, capacity: 60 },
+              
+              // Regular Routes - Navi Mumbai
+              { id: '91', name: '91', from: 'Vashi', to: 'Colaba', time: 16, delay: 2, passengers: 40, capacity: 60 },
+              { id: '92', name: '92', from: 'Vashi', to: 'Mumbai Central', time: 13, delay: 1, passengers: 45, capacity: 60 },
+              { id: '93', name: '93', from: 'Vashi', to: 'Bandra', time: 14, delay: 2, passengers: 42, capacity: 60 },
+              { id: '94', name: '94', from: 'Vashi', to: 'Andheri', time: 12, delay: 1, passengers: 48, capacity: 60 },
+              { id: '95', name: '95', from: 'Vashi', to: 'Borivali', time: 15, delay: 2, passengers: 45, capacity: 60 },
+              { id: '96', name: '96', from: 'Vashi', to: 'Dahisar', time: 17, delay: 1, passengers: 42, capacity: 60 },
+              { id: '97', name: '97', from: 'Vashi', to: 'Mira Road', time: 20, delay: 2, passengers: 38, capacity: 60 },
+              { id: '98', name: '98', from: 'Vashi', to: 'Bhayandar', time: 23, delay: 1, passengers: 35, capacity: 60 },
+              { id: '99', name: '99', from: 'Vashi', to: 'Vasai', time: 25, delay: 2, passengers: 32, capacity: 60 },
+              { id: '100', name: '100', from: 'Vashi', to: 'Virar', time: 27, delay: 1, passengers: 30, capacity: 60 },
+              
+              // Regular Routes - Harbour Line
+              { id: '101', name: '101', from: 'CSMT', to: 'Colaba', time: 2, delay: 0, passengers: 65, capacity: 60 },
+              { id: '102', name: '102', from: 'CSMT', to: 'Mumbai Central', time: 3, delay: 1, passengers: 62, capacity: 60 },
+              { id: '103', name: '103', from: 'CSMT', to: 'Bandra', time: 4, delay: 0, passengers: 58, capacity: 60 },
+              { id: '104', name: '104', from: 'CSMT', to: 'Andheri', time: 6, delay: 1, passengers: 55, capacity: 60 },
+              { id: '105', name: '105', from: 'CSMT', to: 'Borivali', time: 9, delay: 2, passengers: 48, capacity: 60 },
+              { id: '106', name: '106', from: 'CSMT', to: 'Dahisar', time: 11, delay: 1, passengers: 45, capacity: 60 },
+              { id: '107', name: '107', from: 'CSMT', to: 'Mira Road', time: 14, delay: 2, passengers: 42, capacity: 60 },
+              { id: '108', name: '108', from: 'CSMT', to: 'Bhayandar', time: 17, delay: 1, passengers: 38, capacity: 60 },
+              { id: '109', name: '109', from: 'CSMT', to: 'Vasai', time: 19, delay: 2, passengers: 35, capacity: 60 },
+              { id: '110', name: '110', from: 'CSMT', to: 'Virar', time: 21, delay: 1, passengers: 32, capacity: 60 },
+              
+              // Regular Routes - Central Line
+              { id: '111', name: '111', from: 'CST', to: 'Colaba', time: 2, delay: 0, passengers: 68, capacity: 60 },
+              { id: '112', name: '112', from: 'CST', to: 'Mumbai Central', time: 3, delay: 1, passengers: 65, capacity: 60 },
+              { id: '113', name: '113', from: 'CST', to: 'Bandra', time: 4, delay: 0, passengers: 62, capacity: 60 },
+              { id: '114', name: '114', from: 'CST', to: 'Andheri', time: 6, delay: 1, passengers: 58, capacity: 60 },
+              { id: '115', name: '115', from: 'Lakshmi Park', to: 'Mulund Stn W', time: 3, delay: 0, passengers: 45, capacity: 60 },
+              { id: '116', name: '116', from: 'CST', to: 'Borivali', time: 9, delay: 2, passengers: 52, capacity: 60 },
+              { id: '117', name: '117', from: 'CST', to: 'Dahisar', time: 11, delay: 1, passengers: 48, capacity: 60 },
+              { id: '118', name: '118', from: 'CST', to: 'Mira Road', time: 14, delay: 2, passengers: 45, capacity: 60 },
+              { id: '119', name: '119', from: 'CST', to: 'Bhayandar', time: 17, delay: 1, passengers: 42, capacity: 60 },
+              { id: '120', name: '120', from: 'CST', to: 'Vasai', time: 19, delay: 2, passengers: 38, capacity: 60 },
+              
+              // Regular Routes - Western Line
+              { id: '121', name: '121', from: 'Churchgate', to: 'Colaba', time: 3, delay: 0, passengers: 62, capacity: 60 },
+              { id: '122', name: '122', from: 'Churchgate', to: 'Mumbai Central', time: 2, delay: 0, passengers: 65, capacity: 60 },
+              { id: '123', name: '123', from: 'Churchgate', to: 'Bandra', time: 5, delay: 1, passengers: 58, capacity: 60 },
+              { id: '124', name: '124', from: 'Andheri', to: 'CST', time: 8, delay: 3, passengers: 56, capacity: 65 },
+              { id: '125', name: '125', from: 'Churchgate', to: 'Andheri', time: 7, delay: 1, passengers: 55, capacity: 60 },
+              { id: '126', name: '126', from: 'Churchgate', to: 'Borivali', time: 10, delay: 2, passengers: 48, capacity: 60 },
+              { id: '127', name: '127', from: 'Churchgate', to: 'Dahisar', time: 12, delay: 1, passengers: 45, capacity: 60 },
+              { id: '128', name: '128', from: 'Churchgate', to: 'Mira Road', time: 15, delay: 2, passengers: 42, capacity: 60 },
+              { id: '129', name: '129', from: 'Churchgate', to: 'Bhayandar', time: 18, delay: 1, passengers: 38, capacity: 60 },
+              { id: '130', name: '130', from: 'Churchgate', to: 'Vasai', time: 20, delay: 2, passengers: 35, capacity: 60 },
+              
+              // Regular Routes - Additional Routes
+              { id: '131', name: '131', from: 'Churchgate', to: 'Virar', time: 22, delay: 1, passengers: 32, capacity: 60 },
+              { id: '132', name: '132', from: 'Churchgate', to: 'Nalasopara', time: 25, delay: 2, passengers: 30, capacity: 60 },
+              { id: '133', name: '133', from: 'Churchgate', to: 'Boisar', time: 28, delay: 1, passengers: 28, capacity: 60 },
+              { id: '134', name: '134', from: 'Churchgate', to: 'Palghar', time: 30, delay: 2, passengers: 25, capacity: 60 },
+              { id: '135', name: '135', from: 'Churchgate', to: 'Dahanu', time: 35, delay: 1, passengers: 22, capacity: 60 },
+              { id: '136', name: '136', from: 'Churchgate', to: 'Vapi', time: 40, delay: 2, passengers: 20, capacity: 60 },
+              { id: '137', name: '137', from: 'Churchgate', to: 'Surat', time: 50, delay: 1, passengers: 18, capacity: 60 },
+              { id: '138', name: '138', from: 'Churchgate', to: 'Vadodara', time: 60, delay: 2, passengers: 15, capacity: 60 },
+              { id: '139', name: '139', from: 'Churchgate', to: 'Ahmedabad', time: 70, delay: 1, passengers: 12, capacity: 60 },
+              { id: '140', name: '140', from: 'Churchgate', to: 'Pune', time: 45, delay: 2, passengers: 25, capacity: 60 },
+              
+              // Regular Routes - More Routes
+              { id: '141', name: '141', from: 'Churchgate', to: 'Nashik', time: 35, delay: 1, passengers: 30, capacity: 60 },
+              { id: '142', name: '142', from: 'Churchgate', to: 'Aurangabad', time: 55, delay: 2, passengers: 20, capacity: 60 },
+              { id: '143', name: '143', from: 'Churchgate', to: 'Nagpur', time: 80, delay: 1, passengers: 15, capacity: 60 },
+              { id: '144', name: '144', from: 'Churchgate', to: 'Hyderabad', time: 90, delay: 2, passengers: 12, capacity: 60 },
+              { id: '145', name: '145', from: 'Churchgate', to: 'Bangalore', time: 100, delay: 1, passengers: 10, capacity: 60 },
+              { id: '146', name: '146', from: 'Churchgate', to: 'Chennai', time: 110, delay: 2, passengers: 8, capacity: 60 },
+              { id: '147', name: '147', from: 'Churchgate', to: 'Kolkata', time: 120, delay: 1, passengers: 6, capacity: 60 },
+              { id: '148', name: '148', from: 'Churchgate', to: 'Delhi', time: 130, delay: 2, passengers: 5, capacity: 60 },
+              { id: '149', name: '149', from: 'Churchgate', to: 'Jaipur', time: 85, delay: 1, passengers: 12, capacity: 60 },
+              { id: '150', name: '150', from: 'Churchgate', to: 'Udaipur', time: 95, delay: 2, passengers: 10, capacity: 60 },
+              
+              // Regular Routes - Final Routes
+              { id: '151', name: '151', from: 'Churchgate', to: 'Jodhpur', time: 105, delay: 1, passengers: 8, capacity: 60 },
+              { id: '152', name: '152', from: 'Churchgate', to: 'Bikaner', time: 115, delay: 2, passengers: 6, capacity: 60 },
+              { id: '153', name: '153', from: 'Churchgate', to: 'Jaisalmer', time: 125, delay: 1, passengers: 5, capacity: 60 },
+              { id: '154', name: '154', from: 'Churchgate', to: 'Mount Abu', time: 135, delay: 2, passengers: 4, capacity: 60 },
+              { id: '155', name: '155', from: 'Churchgate', to: 'Ajmer', time: 145, delay: 1, passengers: 3, capacity: 60 },
+              { id: '156', name: '156', from: 'Churchgate', to: 'Pushkar', time: 150, delay: 2, passengers: 2, capacity: 60 },
+              { id: '157', name: '157', from: 'Churchgate', to: 'Ranthambore', time: 160, delay: 1, passengers: 2, capacity: 60 },
+              { id: '158', name: '158', from: 'Churchgate', to: 'Sawai Madhopur', time: 165, delay: 2, passengers: 1, capacity: 60 },
+              { id: '159', name: '159', from: 'Churchgate', to: 'Kota', time: 170, delay: 1, passengers: 1, capacity: 60 },
+              { id: '160', name: '160', from: 'Churchgate', to: 'Bundi', time: 175, delay: 2, passengers: 1, capacity: 60 },
+              { mode:'bus', routeId:'A1E', name:'BEST A-1 Express (AC)', from:'Colaba', to:'Bandra',
+                fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'BAN', lat:19.0596, lng:72.8295 },
+                frequencies:[
+                  { days:'weekday', start:'07:00', end:'10:30', headway:10, runtime:55 },
+                  { days:'weekday', start:'17:00', end:'20:30', headway:10, runtime:55 }
+                ]
+              },
+              { mode:'bus', routeId:'2L', name:'BEST 2Ltd (AC) - Mumbai Central → Bandra', from:'Mumbai Central', to:'Bandra',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'BAN', lat:19.0596, lng:72.8295 },
+                frequencies:[
+                  { days:'weekday', start:'07:00', end:'10:30', headway:12, runtime:45 },
+                  { days:'weekday', start:'10:30', end:'17:00', headway:15, runtime:45 },
+                  { days:'weekday', start:'17:00', end:'20:30', headway:12, runtime:45 }
+                ]
+              },
+              { mode:'bus', routeId:'37', name:'BEST 37 (AC) - Santacruz → Colaba', from:'Santacruz', to:'Colaba',
+                fromStop:{ id:'SAN', lat:19.0810, lng:72.8410 }, toStop:{ id:'COL', lat:18.9100, lng:72.8090 },
+                frequencies:[ { days:'daily', start:'06:30', end:'22:00', headway:15, runtime:65 } ]
+              },
+
+              // Additional BEST routes (from published timetables)
+              { mode:'bus', routeId:'234', name:'BEST 234 (AC) - Vesave/Yari Road ↔ Jogeshwari', from:'Vesave/Yari Road', to:'Jogeshwari',
+                fromStop:{ id:'VYR', lat:19.1274, lng:72.8050 }, toStop:{ id:'JOG', lat:19.1356, lng:72.8480 },
+                frequencies:[
+                  { days:'daily', start:'06:00', end:'10:00', headway:10, runtime:35 },
+                  { days:'daily', start:'10:00', end:'17:00', headway:15, runtime:35 },
+                  { days:'daily', start:'17:00', end:'21:00', headway:10, runtime:35 },
+                  { days:'daily', start:'21:00', end:'22:30', headway:15, runtime:35 }
+                ]
+              },
+              { mode:'bus', routeId:'78', name:'BEST 78 (AC) - Wagle Depot ↔ Bharat Gears', from:'Wagle Depot', to:'Bharat Gears',
+                fromStop:{ id:'WAG', lat:19.1969, lng:72.9611 }, toStop:{ id:'BGE', lat:19.1780, lng:72.9690 },
+                frequencies:[
+                  { days:'daily', start:'05:45', end:'10:00', headway:30, runtime:60 },
+                  { days:'daily', start:'10:00', end:'17:00', headway:40, runtime:60 },
+                  { days:'daily', start:'17:00', end:'19:15', headway:30, runtime:60 }
+                ]
+              },
+              { mode:'bus', routeId:'42', name:'BEST 42 (AC) - Sandhurst Road ↔ Kamla Nehru Park', from:'Sandhurst Road', to:'Kamla Nehru Park',
+                fromStop:{ id:'SDR', lat:18.9634, lng:72.8397 }, toStop:{ id:'KNP', lat:18.9533, lng:72.8050 },
+                frequencies:[
+                  { days:'daily', start:'06:00', end:'22:00', headway:12, runtime:45 }
+                ]
+              },
+              { mode:'bus', routeId:'164', name:'BEST 164 (AC) - Maharana Pratap Chowk ↔ Dharavi Depot', from:'Maharana Pratap Chowk', to:'Dharavi Depot',
+                fromStop:{ id:'MPC', lat:19.1735, lng:72.9477 }, toStop:{ id:'DHD', lat:19.0465, lng:72.8543 },
+                frequencies:[
+                  { days:'daily', start:'06:00', end:'21:30', headway:26, runtime:65 }
+                ]
+              },
+              { mode:'bus', routeId:'9', name:'BEST 9 (AC) - Antop Hill ↔ Colaba', from:'Antop Hill', to:'Colaba',
+                fromStop:{ id:'ATH', lat:19.0169, lng:72.8598 }, toStop:{ id:'COL', lat:18.9100, lng:72.8090 },
+                frequencies:[
+                  { days:'daily', start:'06:30', end:'22:00', headway:30, runtime:70 }
+                ]
+              },
+              { mode:'bus', routeId:'115', name:'BEST 115 (AC) - Lakshmi Park ↔ Mulund Stn W', from:'Lakshmi Park', to:'Mulund Stn (W)',
+                fromStop:{ id:'LKP', lat:19.1730, lng:72.9330 }, toStop:{ id:'MLW', lat:19.1736, lng:72.9425 },
+                frequencies:[
+                  { days:'daily', start:'07:00', end:'12:00', headway:25, runtime:35 },
+                  { days:'daily', start:'12:00', end:'17:00', headway:35, runtime:35 },
+                  { days:'daily', start:'17:00', end:'22:00', headway:25, runtime:35 }
+                ]
+              },
+              { mode:'bus', routeId:'1', name:'BEST 1 (AC) - Colaba ↔ Bandra', from:'Colaba', to:'Bandra',
+                fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'BAN', lat:19.0596, lng:72.8295 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:15, runtime:50 } ]
+              },
+              { mode:'bus', routeId:'2', name:'BEST 2 (AC) - Colaba ↔ Andheri', from:'Colaba', to:'Andheri',
+                fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'AND', lat:19.1197, lng:72.8464 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:20, runtime:70 } ]
+              },
+              { mode:'bus', routeId:'3', name:'BEST 3 (AC) - Colaba ↔ Borivali', from:'Colaba', to:'Borivali',
+                fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'BOR', lat:19.2324, lng:72.8565 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:25, runtime:90 } ]
+              },
+              { mode:'bus', routeId:'4', name:'BEST 4 (AC) - Colaba ↔ Dahisar', from:'Colaba', to:'Dahisar',
+                fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'DAH', lat:19.2487, lng:72.8609 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:30, runtime:100 } ]
+              },
+              { mode:'bus', routeId:'5', name:'BEST 5 (AC) - Colaba ↔ Mira Road', from:'Colaba', to:'Mira Road',
+                fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'MIR', lat:19.2875, lng:72.8682 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:35, runtime:110 } ]
+              },
+              { mode:'bus', routeId:'6', name:'BEST 6 (AC) - Colaba ↔ Bhayandar', from:'Colaba', to:'Bhayandar',
+                fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'BHA', lat:19.3012, lng:72.8745 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:40, runtime:120 } ]
+              },
+              { mode:'bus', routeId:'7', name:'BEST 7 (AC) - Colaba ↔ Vasai', from:'Colaba', to:'Vasai',
+                fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'VAS', lat:19.4089, lng:72.8090 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:45, runtime:130 } ]
+              },
+              { mode:'bus', routeId:'8', name:'BEST 8 (AC) - Colaba ↔ Virar', from:'Colaba', to:'Virar',
+                fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'VIR', lat:19.4558, lng:72.8090 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:50, runtime:140 } ]
+              },
+              { mode:'bus', routeId:'10', name:'BEST 10 (AC) - Colaba ↔ Boisar', from:'Colaba', to:'Boisar',
+                fromStop:{ id:'COL', lat:18.9100, lng:72.8090 }, toStop:{ id:'BOI', lat:19.8000, lng:72.7500 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:60, runtime:180 } ]
+              },
+              { mode:'bus', routeId:'11', name:'BEST 11 (AC) - Mumbai Central ↔ Bandra', from:'Mumbai Central', to:'Bandra',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'BAN', lat:19.0596, lng:72.8295 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:12, runtime:40 } ]
+              },
+              { mode:'bus', routeId:'12', name:'BEST 12 (AC) - Mumbai Central ↔ Andheri', from:'Mumbai Central', to:'Andheri',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'AND', lat:19.1197, lng:72.8464 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:15, runtime:55 } ]
+              },
+              { mode:'bus', routeId:'13', name:'BEST 13 (AC) - Mumbai Central ↔ Borivali', from:'Mumbai Central', to:'Borivali',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'BOR', lat:19.2324, lng:72.8565 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:20, runtime:75 } ]
+              },
+              { mode:'bus', routeId:'14', name:'BEST 14 (AC) - Mumbai Central ↔ Dahisar', from:'Mumbai Central', to:'Dahisar',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'DAH', lat:19.2487, lng:72.8609 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:25, runtime:85 } ]
+              },
+              { mode:'bus', routeId:'15', name:'BEST 15 (AC) - Mumbai Central ↔ Mira Road', from:'Mumbai Central', to:'Mira Road',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'MIR', lat:19.2875, lng:72.8682 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:30, runtime:95 } ]
+              },
+              { mode:'bus', routeId:'16', name:'BEST 16 (AC) - Mumbai Central ↔ Bhayandar', from:'Mumbai Central', to:'Bhayandar',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'BHA', lat:19.3012, lng:72.8745 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:35, runtime:105 } ]
+              },
+              { mode:'bus', routeId:'17', name:'BEST 17 (AC) - Mumbai Central ↔ Vasai', from:'Mumbai Central', to:'Vasai',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'VAS', lat:19.4089, lng:72.8090 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:40, runtime:115 } ]
+              },
+              { mode:'bus', routeId:'18', name:'BEST 18 (AC) - Mumbai Central ↔ Virar', from:'Mumbai Central', to:'Virar',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'VIR', lat:19.4558, lng:72.8090 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:45, runtime:125 } ]
+              },
+              { mode:'bus', routeId:'19', name:'BEST 19 (AC) - Mumbai Central ↔ Nalasopara', from:'Mumbai Central', to:'Nalasopara',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'NAL', lat:19.4150, lng:72.8090 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:50, runtime:135 } ]
+              },
+              { mode:'bus', routeId:'20', name:'BEST 20 (AC) - Mumbai Central ↔ Boisar', from:'Mumbai Central', to:'Boisar',
+                fromStop:{ id:'MCT', lat:18.9719, lng:72.8194 }, toStop:{ id:'BOI', lat:19.8000, lng:72.7500 },
+                frequencies:[ { days:'daily', start:'06:00', end:'23:00', headway:60, runtime:165 } ]
+              }
             ],
             train: [
               { id: 'WR_F', name: 'Western Fast', from: 'Borivali', to: 'Churchgate', time: 2, delay: 3, passengers: 1247, capacity: 1800 },
@@ -1570,46 +1903,44 @@
             return `
               <div class="frequency-item">
                 <div>
-                  <strong>Metro UPI QR Tickets</strong><br>
-                  <span style="color:var(--text-secondary);font-size:13px">Mobile-as-ticket at AFC gates</span>
+                  <strong>UPI Payment Options</strong><br>
+                  <span style="color:var(--text-secondary);font-size:13px">Pay with UPI for all transport</span>
                 </div>
-                <div class="chip success">Valid 2 hours</div>
               </div>
-              <p>Buy tickets instantly with UPI and get digital QR tickets:</p>
+              <p>Use UPI apps to pay for tickets:</p>
               
-              <div style="margin: 16px 0;">
-                <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--primary);">Quick Ticket Booking</h4>
-                <button id="quick-metro-ticket" class="btn btn-primary" style="width: 100%; margin-bottom: 8px; background: linear-gradient(135deg, #5F259F, #8E44AD); border: none;">
-                  <i class="fa-solid fa-ticket"></i> Buy Line 1 Metro Ticket with PhonePe
-                </button>
-                <button id="view-my-tickets" class="btn btn-secondary" style="width: 100%;">
-                  <i class="fa-solid fa-list"></i> View My Tickets
-                </button>
-                <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px; text-align: center;">
-                  <i class="fa-solid fa-info-circle"></i> PhonePe booking available only for Metro Line 1 (Versova ↔ Ghatkopar)
-                </p>
-              </div>
-              
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;">
-                <a href="paytm://metro" target="_self" class="chip info" style="text-decoration:none;">
-                  <i class="fa-solid fa-mobile-screen"></i> PayTM App
-                </a>
-                <a href="phonepe://travel" target="_self" class="chip info" style="text-decoration:none;">
-                  <i class="fa-solid fa-qrcode"></i> PhonePe App
+              <div class="frequency-item">
+                <div>
+                  <strong>Paytm</strong><br>
+                  <span style="color:var(--text-secondary);font-size:13px">Metro & Bus tickets</span>
+                </div>
+                <a href="paytm://metro" class="chip success">
+                  <i class="fa-solid fa-mobile-screen"></i> Open App
                 </a>
               </div>
               
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-                <a href="https://paytm.com/metro" target="_blank" rel="noopener noreferrer" class="chip" style="text-decoration:none;">
-                  <i class="fa-solid fa-external-link-alt"></i> PayTM Web
-                </a>
-                <a href="https://www.phonepe.com/travel-and-transit/" target="_blank" rel="noopener noreferrer" class="chip" style="text-decoration:none;">
-                  <i class="fa-solid fa-external-link-alt"></i> PhonePe Web
+              <div class="frequency-item">
+                <div>
+                  <strong>PhonePe</strong><br>
+                  <span style="color:var(--text-secondary);font-size:13px">Metro & Bus tickets</span>
+                </div>
+                <a href="phonepe://travel" class="chip success">
+                  <i class="fa-solid fa-mobile-screen"></i> Open App
                 </a>
               </div>
               
-              <p style="margin-top:12px; font-size:12px; color:var(--text-muted);">
-                <i class="fa-solid fa-info-circle"></i> Journey must start within 2 hours of issue. Keep QR brightness high for scanning.
+              <div class="frequency-item">
+                <div>
+                  <strong>Google Pay</strong><br>
+                  <span style="color:var(--text-secondary);font-size:13px">All transport modes</span>
+                </div>
+                <a href="gpay://metro" class="chip success">
+                  <i class="fa-solid fa-mobile-screen"></i> Open App
+                </a>
+              </div>
+              
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 16px;">
+                <i class="fa-solid fa-info-circle"></i> Scan QR codes at ticket counters or use app deep links for instant payments.
               </p>
             `;
           }
@@ -1671,25 +2002,40 @@
         showQuickTicketBooking() {
           const content = `
             <div style="padding: 20px;">
-              <h3 style="margin: 0 0 16px 0; text-align: center; color: var(--primary);">
-                <i class="fa-solid fa-ticket"></i> Metro Line 1 Ticket
-              </h3>
+              <div style="text-align: center; margin-bottom: 24px;">
+                <div style="width: 80px; height: 80px; margin: 0 auto 16px; background: linear-gradient(135deg, #5F259F, #8E44AD); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(95, 37, 159, 0.3);">
+                  <i class="fa-solid fa-train" style="font-size: 32px; color: white;"></i>
+                </div>
+                <h3 style="margin: 0 0 8px 0; color: var(--primary); font-size: 20px; font-weight: 600;">Metro Line 1 Ticket</h3>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">Versova ↔ Ghatkopar</p>
+              </div>
               
-              <div style="background: var(--background); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                <div style="margin-bottom: 12px;">
-                  <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">Route</label>
-                  <select id="ticket-route" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
-                    <option value="M1">Metro Line 1 (Blue) - Versova ↔ Ghatkopar</option>
-                  </select>
-                  <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-                    <i class="fa-solid fa-info-circle"></i> PhonePe booking currently available only for Metro Line 1
-                  </p>
-                </div>
+                              <div style="background: linear-gradient(135deg, #f8f9ff, #ffffff); border: 2px solid #e1e8ff; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(95, 37, 159, 0.08);">
+                  <div style="margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                      <div style="width: 32px; height: 32px; background: var(--primary-light); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
+                        <i class="fa-solid fa-route" style="color: var(--primary); font-size: 14px;"></i>
+                      </div>
+                      <label style="font-size: 14px; color: var(--text-primary); font-weight: 500;">Route</label>
+                    </div>
+                    <select id="ticket-route" style="width: 100%; padding: 12px; border: 2px solid #e1e8ff; border-radius: 10px; background: white; font-size: 14px; color: var(--text-primary);">
+                      <option value="M1">Metro Line 1 (Blue) - Versova ↔ Ghatkopar</option>
+                    </select>
+                    <div style="background: linear-gradient(135deg, #fff3cd, #ffeaa7); border: 1px solid #ffeaa7; border-radius: 8px; padding: 8px; margin-top: 8px;">
+                      <i class="fa-solid fa-info-circle" style="color: #856404; margin-right: 6px;"></i>
+                      <span style="font-size: 12px; color: #856404; font-weight: 500;">PhonePe booking available for Metro Line 1</span>
+                    </div>
+                  </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                   <div>
-                    <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">From</label>
-                    <select id="ticket-from" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                      <div style="width: 24px; height: 24px; background: #e3f2fd; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-right: 6px;">
+                        <i class="fa-solid fa-map-marker-alt" style="color: #1976d2; font-size: 12px;"></i>
+                      </div>
+                      <label style="font-size: 13px; color: var(--text-primary); font-weight: 500;">From</label>
+                    </div>
+                    <select id="ticket-from" style="width: 100%; padding: 10px; border: 2px solid #e1e8ff; border-radius: 8px; background: white; font-size: 13px; color: var(--text-primary);">
                       <option value="">Select station</option>
                       <option value="Versova">Versova</option>
                       <option value="DN Nagar">DN Nagar</option>
@@ -1706,8 +2052,13 @@
                     </select>
                   </div>
                   <div>
-                    <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">To</label>
-                    <select id="ticket-to" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                      <div style="width: 24px; height: 24px; background: #f3e5f5; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-right: 6px;">
+                        <i class="fa-solid fa-map-marker" style="color: #7b1fa2; font-size: 12px;"></i>
+                      </div>
+                      <label style="font-size: 13px; color: var(--text-primary); font-weight: 500;">To</label>
+                    </div>
+                    <select id="ticket-to" style="width: 100%; padding: 10px; border: 2px solid #e1e8ff; border-radius: 8px; background: white; font-size: 13px; color: var(--text-primary);">
                       <option value="">Select station</option>
                       <option value="Versova">Versova</option>
                       <option value="DN Nagar">DN Nagar</option>
@@ -1725,14 +2076,24 @@
                   </div>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
                   <div>
-                    <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">Journey Date</label>
-                    <input type="date" id="ticket-date" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);" value="${new Date().toISOString().split('T')[0]}">
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                      <div style="width: 24px; height: 24px; background: #e8f5e8; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-right: 6px;">
+                        <i class="fa-solid fa-calendar" style="color: #2e7d32; font-size: 12px;"></i>
+                      </div>
+                      <label style="font-size: 13px; color: var(--text-primary); font-weight: 500;">Journey Date</label>
+                    </div>
+                    <input type="date" id="ticket-date" style="width: 100%; padding: 10px; border: 2px solid #e1e8ff; border-radius: 8px; background: white; font-size: 13px; color: var(--text-primary);" value="${new Date().toISOString().split('T')[0]}">
                   </div>
                   <div>
-                    <label style="display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary);">Passengers</label>
-                    <select id="ticket-passengers" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);">
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                      <div style="width: 24px; height: 24px; background: #fff3e0; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-right: 6px;">
+                        <i class="fa-solid fa-users" style="color: #f57c00; font-size: 12px;"></i>
+                      </div>
+                      <label style="font-size: 13px; color: var(--text-primary); font-weight: 500;">Passengers</label>
+                    </div>
+                    <select id="ticket-passengers" style="width: 100%; padding: 10px; border: 2px solid #e1e8ff; border-radius: 8px; background: white; font-size: 13px; color: var(--text-primary);">
                       <option value="1">1 Adult</option>
                       <option value="2">2 Adults</option>
                       <option value="3">3 Adults</option>
@@ -1741,20 +2102,36 @@
                   </div>
                 </div>
                 
-                <div style="background: var(--primary-light); border-radius: 8px; padding: 12px; text-align: center;">
-                  <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Estimated Fare</div>
-                  <div style="font-size: 24px; font-weight: 600; color: var(--primary);" id="estimated-fare">₹45</div>
-                  <div style="font-size: 10px; color: var(--text-muted);">Base fare + taxes</div>
+                <div style="background: linear-gradient(135deg, #5F259F, #8E44AD); border-radius: 16px; padding: 20px; text-align: center; position: relative; overflow: hidden; margin-bottom: 20px;">
+                  <div style="position: absolute; top: -10px; right: -10px; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                  <div style="position: absolute; bottom: -15px; left: -15px; width: 30px; height: 30px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+                  
+                  <div style="position: relative; z-index: 2;">
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.9); margin-bottom: 6px; font-weight: 500;">Estimated Fare</div>
+                    <div style="font-size: 32px; font-weight: 700; color: white; margin-bottom: 4px;" id="estimated-fare">₹45</div>
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.8);">Base fare + taxes included</div>
+                  </div>
                 </div>
               </div>
               
-              <button id="proceed-payment" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; background: linear-gradient(135deg, #5F259F, #8E44AD); border: none;">
-                <i class="fa-solid fa-credit-card"></i> Pay with PhonePe (Line 1 Only)
+              <button id="proceed-payment" class="btn" style="width: 100%; padding: 16px; font-size: 16px; background: linear-gradient(135deg, #5F259F, #8E44AD); border: none; border-radius: 16px; font-weight: 600; color: white; box-shadow: 0 8px 24px rgba(95, 37, 159, 0.3); transition: all 0.3s ease; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s ease;"></div>
+                <i class="fa-solid fa-credit-card" style="margin-right: 8px;"></i> Pay with PhonePe
               </button>
               
-              <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin: 12px 0 0 0;">
-                <i class="fa-solid fa-shield-halved"></i> Secure payment • 2 hours validity • Digital QR ticket
-              </p>
+              <div style="background: linear-gradient(135deg, #f8f9ff, #e8f2ff); border: 1px solid #e1e8ff; border-radius: 12px; padding: 16px; margin-top: 16px; text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                  <div style="width: 32px; height: 32px; background: rgba(95, 37, 159, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
+                    <i class="fa-solid fa-shield-halved" style="color: #5F259F; font-size: 14px;"></i>
+                  </div>
+                  <span style="font-size: 13px; color: #5F259F; font-weight: 600;">Secure Payment</span>
+                </div>
+                <div style="display: flex; justify-content: space-around; font-size: 11px; color: #5F259F;">
+                  <span><i class="fa-solid fa-clock" style="margin-right: 4px;"></i> 2 hours validity</span>
+                  <span><i class="fa-solid fa-qrcode" style="margin-right: 4px;"></i> Digital QR ticket</span>
+                  <span><i class="fa-solid fa-mobile-screen" style="margin-right: 4px;"></i> Instant booking</span>
+                </div>
+              </div>
             </div>
           `;
           
@@ -2061,52 +2438,78 @@
         async showPhonePePaymentModal(payload, ticketData) {
           const content = `
             <div style="text-align: center; padding: 20px;">
-              <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #5F259F, #8E44AD); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                <i class="fa-solid fa-mobile-screen" style="font-size: 32px; color: white;"></i>
+              <div style="position: relative; margin-bottom: 24px;">
+                <div style="width: 100px; height: 100px; margin: 0 auto; background: linear-gradient(135deg, #5F259F, #8E44AD); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 32px rgba(95, 37, 159, 0.3); position: relative; overflow: hidden;">
+                  <div style="position: absolute; top: -20px; right: -20px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                  <div style="position: absolute; bottom: -15px; left: -15px; width: 40px; height: 40px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+                  <i class="fa-solid fa-mobile-screen" style="font-size: 36px; color: white; position: relative; z-index: 2;"></i>
+                </div>
+                <div style="position: absolute; top: -5px; right: 25%; width: 20px; height: 20px; background: #4CAF50; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2);"></div>
               </div>
               
-              <h3 style="margin: 0 0 10px 0; color: var(--primary);">PhonePe Payment</h3>
-              <p style="margin: 0 0 20px 0; color: var(--text-secondary);">Complete your payment securely</p>
+              <h3 style="margin: 0 0 8px 0; color: var(--primary); font-size: 22px; font-weight: 600;">PhonePe Payment</h3>
+              <p style="margin: 0 0 24px 0; color: var(--text-secondary); font-size: 15px;">Complete your payment securely with India's trusted UPI app</p>
               
-              <div style="background: var(--background); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 16px 0;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                  <span style="color: var(--text-secondary);">Route:</span>
-                  <strong>${ticketData.route}</strong>
+              <div style="background: linear-gradient(135deg, #f8f9ff, #ffffff); border: 2px solid #e1e8ff; border-radius: 16px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 16px rgba(95, 37, 159, 0.1);">
+                <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                  <div style="width: 40px; height: 40px; background: var(--primary-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                    <i class="fa-solid fa-receipt" style="color: var(--primary); font-size: 18px;"></i>
+                  </div>
+                  <h4 style="margin: 0; color: var(--primary); font-size: 16px; font-weight: 600;">Payment Summary</h4>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                  <span style="color: var(--text-secondary);">From:</span>
-                  <strong>${ticketData.from}</strong>
+                
+                <div style="display: grid; gap: 12px; margin-bottom: 16px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                    <span style="color: var(--text-secondary); font-size: 14px;">Route:</span>
+                    <strong style="color: var(--text-primary); font-size: 14px;">${ticketData.route}</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                    <span style="color: var(--text-secondary); font-size: 14px;">From:</span>
+                    <strong style="color: var(--text-primary); font-size: 14px;">${ticketData.from}</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                    <span style="color: var(--text-secondary); font-size: 14px;">To:</span>
+                    <strong style="color: var(--text-primary); font-size: 14px;">${ticketData.to}</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                    <span style="color: var(--text-secondary); font-size: 14px;">Journey Date:</span>
+                    <strong style="color: var(--text-primary); font-size: 14px;">${ticketData.date}</strong>
+                  </div>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                  <span style="color: var(--text-secondary);">To:</span>
-                  <strong>${ticketData.to}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                  <span style="color: var(--text-secondary);">Journey Date:</span>
-                  <strong>${ticketData.date}</strong>
-                </div>
-                <hr style="border: none; border-top: 1px solid var(--border); margin: 12px 0;">
-                <div style="display: flex; justify-content: space-between; font-size: 18px;">
-                  <span style="color: var(--text-secondary);">Total Amount:</span>
-                  <strong style="color: var(--primary);">₹${ticketData.amount}</strong>
+                
+                <div style="background: linear-gradient(135deg, #5F259F, #8E44AD); border-radius: 12px; padding: 16px; text-align: center; position: relative; overflow: hidden;">
+                  <div style="position: absolute; top: -10px; right: -10px; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                  <div style="position: absolute; bottom: -15px; left: -15px; width: 30px; height: 30px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+                  
+                  <div style="position: relative; z-index: 2;">
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.9); margin-bottom: 4px;">Total Amount</div>
+                    <div style="font-size: 28px; font-weight: 700; color: white;">₹${ticketData.amount}</div>
+                  </div>
                 </div>
               </div>
               
-              <div style="margin: 20px 0;">
-                <button id="phonepe-pay-btn" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; background: linear-gradient(135deg, #5F259F, #8E44AD); border: none;">
-                  <i class="fa-solid fa-mobile-screen"></i> Pay with PhonePe
+              <div style="margin: 24px 0;">
+                <button id="phonepe-pay-btn" class="btn" style="width: 100%; padding: 16px; font-size: 16px; background: linear-gradient(135deg, #5F259F, #8E44AD); border: none; border-radius: 16px; font-weight: 600; color: white; box-shadow: 0 8px 24px rgba(95, 37, 159, 0.3); transition: all 0.3s ease; position: relative; overflow: hidden;">
+                  <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s ease;"></div>
+                  <i class="fa-solid fa-mobile-screen" style="margin-right: 8px; font-size: 18px;"></i> Pay with PhonePe
                 </button>
               </div>
               
               <div style="margin: 16px 0;">
-                <button id="simulate-success-btn" class="btn btn-secondary" style="width: 100%; padding: 10px; font-size: 14px;">
-                  <i class="fa-solid fa-check"></i> Simulate Success (Demo)
+                <button id="simulate-success-btn" class="btn btn-secondary" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 12px; background: #f8f9fa; border: 1px solid #e9ecef; color: #6c757d;">
+                  <i class="fa-solid fa-check" style="margin-right: 6px;"></i> Simulate Success (Demo)
                 </button>
               </div>
               
-              <p style="font-size: 12px; color: var(--text-muted); margin: 16px 0 0 0;">
-                <i class="fa-solid fa-shield-halved"></i> Secure payment powered by PhonePe
-              </p>
+              <div style="background: linear-gradient(135deg, #f8f9ff, #e8f2ff); border: 1px solid #e1e8ff; border-radius: 12px; padding: 16px; margin-top: 20px; text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                  <div style="width: 32px; height: 32px; background: rgba(95, 37, 159, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 8px;">
+                    <i class="fa-solid fa-shield-halved" style="color: #5F259F; font-size: 14px;"></i>
+                  </div>
+                  <span style="font-size: 13px; color: #5F259F; font-weight: 600;">Secure Payment</span>
+                </div>
+                <p style="font-size: 12px; color: #5F259F; margin: 0;">Powered by PhonePe - India's trusted UPI platform</p>
+              </div>
             </div>
           `;
 
@@ -2933,7 +3336,6 @@
 
       hub.updateSchedules();
       hub.updateVehiclePositions();
-      hub.showNotification && hub.showNotification('✅ Static schedules (Aug 2025) live view enabled');
       return true;
     }
 
