@@ -402,6 +402,10 @@
             <span class="action-icon"><i class="fa-solid fa-wallet"></i></span>
             Recharge Card
           </button>
+          <button class="action-button" id="city-bus-info" type="button">
+            <span class="action-icon"><i class="fa-solid fa-bus"></i></span>
+            City Bus Info
+          </button>
         </div>
       </section>
 
@@ -1470,7 +1474,8 @@
         { id: 'buy-ticket', title: 'Buy Ticket', html: '<p>Use the official operator apps or kiosks. This demo shows static schedules only.</p>' },
         { id: 'plan-journey', title: 'Plan Journey', html: '<p>Pick a mode, then compare next departures. Detailed journey planning can be integrated later.</p>' },
         { id: 'nearby-stations', title: 'Nearby Stations', html: '<p>Enable location in a future update to show stations within 1–3 km. For now, use mode schedules above.</p>' },
-        { id: 'recharge-card', title: 'Recharge Card', html: '<p>Use your wallet or the official portals to recharge. This demo does not process payments.</p>' }
+        { id: 'recharge-card', title: 'Recharge Card', html: '<p>Use your wallet or the official portals to recharge. This demo does not process payments.</p>' },
+        { id: 'city-bus-info', title: 'City Bus Info', html: '<iframe src="https://mumbaicitybus.in/" style="border:none;width:100%;height:calc(100vh - 80px);"></iframe>' }
       ];
       actions.forEach(a => {
         const el = document.getElementById(a.id);
