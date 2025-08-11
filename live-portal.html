@@ -603,8 +603,17 @@
             if (window.openTicketsSheet) window.openTicketsSheet();
             else this.showNotification('🎫 Redirecting to ticket booking...');
           });
-          document.getElementById('plan-journey').addEventListener('click', () =>
-            this.showNotification('🗺️ Opening route planner...'));
+          document.getElementById('plan-journey').addEventListener('click', () => {
+                const sheet = document.getElementById('sheet');
+                const backdrop = document.getElementById('sheetBackdrop');
+                const sheetTitle = document.getElementById('sheetTitle');
+                const sheetBody = document.getElementById('sheetBody');
+                sheetTitle.textContent = 'Journey Planner';
+                sheetBody.innerHTML = '<iframe src="journey-planner.html" style="border:none;width:100%;height:calc(100vh - 80px);"></iframe>';
+                sheet.setAttribute('aria-hidden', 'false');
+                sheet.classList.add('open');
+                backdrop.classList.add('show');
+              });
           document.getElementById('nearby-stations').addEventListener('click', () =>
             this.findNearbyStations());
           document.getElementById('recharge-card').addEventListener('click', () =>
@@ -744,7 +753,7 @@
           const colors = { bus: '#5E6AD2', train: '#00B87A', metro: '#8B5CF6', ferry: '#0EA5E9', monorail: '#10B981' };
           const icons = { bus: 'fa-bus', train: 'fa-train-subway', metro: 'fa-train-tram', ferry: 'fa-ship', monorail: 'fa-train' };
 
-          routes.slice(0, 8).forEach(route => {
+          routes.forEach(route => {
             const item = document.createElement('div');
             item.className = 'schedule-item';
             const totalTime = (route.time || 0) + (route.delay || 0);
