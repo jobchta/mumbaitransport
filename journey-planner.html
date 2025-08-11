@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mumbai Journey Planner - Real-Time Transport</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .planner {
+      padding: 20px;
+    }
+
+    .location-input-group {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .location-input {
+      width: 100%;
+      padding: 16px 50px 16px 50px;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .location-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+
+    .location-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #667eea;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .location-btn:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .swap-btn {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: white;
+      border: 2px solid #e9ecef;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      color: #667eea;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .swap-btn:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .journey-options {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .time-section {
+      margin-bottom: 16px;
+    }
+
+    .time-section label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #495057;
+    }
+
+    .time-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .time-btn {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #e9ecef;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+
+    .time-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .datetime-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .preferences {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .preference-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+
+    .plan-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .plan-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .plan-btn:active {
+      transform: translateY(0);
+    }
+
+    .results {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .route-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .route-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+
+    .route-header {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .route-time {
+      font-size: 18px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .route-cost {
+      background: #e8f5e8;
+      color: #28a745;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .route-steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .step-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: white;
+    }
+
+    .step-train { background: #28a745; }
+    .step-bus { background: #007bff; }
+    .step-metro { background: #6f42c1; }
+    .step-walk { background: #ffc107; color: #333; }
+
+    .route-details {
+      font-size: 13px;
+      color: #6c757d;
+    }
+
+    .live-departures {
+      margin-top: 24px;
+      padding: 20px;
+      background: #f8f9fa;
+    }
+
+    .departure-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .departure-route {
+      font-weight: 600;
+    }
+
+    .departure-time {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .quick-routes {
+      padding: 0 20px 20px;
+    }
+
+    .quick-routes h3 {
+      margin-bottom: 12px;
+      color: #495057;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .quick-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-card:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .quick-card i {
+      font-size: 20px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #6c757d;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .alert {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      color: #856404;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 20px;
+      font-size: 14px;
+    }
+
+    .suggestions {
+      background: rgba(102, 126, 234, 0.1);
+      max-height: 200px;
+      overflow-y: auto;
+      border-radius: 0 0 12px 12px;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: none;
+    }
+
+    .suggestion-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      background: white;
+    }
+
+    .suggestion-item:hover {
+      background: #f8f9fa;
+    }
+
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fa-solid fa-route"></i> Mumbai Journey Planner</h1>
+      <p>Real-time routes & departures</p>
+    </div>
+
+    <div class="planner">
+      <form id="journeyForm">
+        <div style="position: relative;">
+          <div class="location-input-group">
+            <div class="input-icon">
+              <i class="fa-solid fa-circle" style="color: #28a745;"></i>
+            </div>
+            <input 
+              type="text" 
+              id="fromInput" 
+              class="location-input" 
+              placeholder="From: Current location"
+              autocomplete="off"
+            />
+            <button type="button" id="useLocationBtn" class="location-btn">
+              <i class="fa-solid fa-location-crosshairs"></i>
+            </button>
+            <div id="fromSuggestions" class="suggestions"></div>
+          </div>
+
+          <button type="button" id="swapBtn" class="swap-btn">
+            <i class="fa-solid fa-arrow-up-down"></i>
+          </button>
+
+          <div class="location-input-group">
+            <div class="input-icon">
+              <i class="fa-solid fa-location-dot" style="color: #dc3545;"></i>
+            </div>
+            <input 
+              type="text" 
+              id="toInput" 
+              class="location-input" 
+              placeholder="To: Enter destination"
+              autocomplete="off"
+              required
+            />
+            <button type="button" id="mapBtn" class="location-btn">
+              <i class="fa-solid fa-map-pin"></i>
+            </button>
+            <div id="toSuggestions" class="suggestions"></div>
+          </div>
+        </div>
+
+        <div class="journey-options">
+          <div class="time-section">
+            <label>When do you want to travel?</label>
+            <div class="time-buttons">
+              <button type="button" class="time-btn active" data-time="now">
+                <i class="fa-solid fa-clock"></i> Now
+              </button>
+              <button type="button" class="time-btn" data-time="depart">
+                <i class="fa-solid fa-calendar"></i> Depart at
+              </button>
+              <button type="button" class="time-btn" data-time="arrive">
+                <i class="fa-solid fa-flag-checkered"></i> Arrive by
+              </button>
+            </div>
+            <input type="datetime-local" id="customDateTime" class="datetime-input" style="display: none;">
+          </div>
+
+          <div class="preferences">
+            <label class="preference-item">
+              <input type="checkbox" id="fastest" checked> 
+              <i class="fa-solid fa-bolt"></i> Fastest
+            </label>
+            <label class="preference-item">
+              <input type="checkbox" id="cheapest"> 
+              <i class="fa-solid fa-coins"></i> Cheapest
+            </label>
+            <label class="preference-item">
+              <input type="checkbox" id="accessible"> 
+              <i class="fa-solid fa-wheelchair"></i> Accessible
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="plan-btn">
+          <i class="fa-solid fa-route"></i> Find Best Routes
+        </button>
+      </form>
+
+      <div id="results" class="results">
+        <h3><i class="fa-solid fa-list"></i> Route Options</h3>
+        <div id="routesList"></div>
+      </div>
+    </div>
+
+    <div class="live-departures">
+      <h3><i class="fa-solid fa-clock"></i> Live Departures Nearby</h3>
+      <div id="departuresList">
+        <div class="loading">
+          <div class="spinner"></div>
+          Enable location to see live departures
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-routes">
+      <h3>Popular Routes</h3>
+      <div class="quick-grid">
+        <div class="quick-card" data-from="Churchgate" data-to="Andheri">
+          <i class="fa-solid fa-train"></i>
+          <div>Churchgate → Andheri</div>
+        </div>
+        <div class="quick-card" data-from="CST" data-to="Thane">
+          <i class="fa-solid fa-train"></i>
+          <div>CST → Thane</div>
+        </div>
+        <div class="quick-card" data-from="Bandra" data-to="Colaba">
+          <i class="fa-solid fa-bus"></i>
+          <div>Bandra → Colaba</div>
+        </div>
+        <div class="quick-card" data-from="Versova" data-to="Ghatkopar">
+          <i class="fa-solid fa-train-tram"></i>
+          <div>Metro Line 1</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mumbai locations with accurate coordinates
+    const MUMBAI_LOCATIONS = [
+      { name: 'Churchgate Station', coords: [18.9349, 72.8248], type: 'train' },
+      { name: 'CST Terminus', coords: [18.9398, 72.8354], type: 'train' },
+      { name: 'Dadar Station', coords: [19.0219, 72.8144], type: 'train' },
+      { name: 'Bandra Station', coords: [19.0596, 72.8295], type: 'train' },
+      { name: 'Andheri Station', coords: [19.1197, 72.8464], type: 'train' },
+      { name: 'Borivali Station', coords: [19.2324, 72.8565], type: 'train' },
+      { name: 'Thane Station', coords: [19.2183, 72.9781], type: 'train' },
+      { name: 'Kalyan Station', coords: [19.2433, 73.1355], type: 'train' },
+      { name: 'Panvel Station', coords: [18.9881, 73.1103], type: 'train' },
+      { name: 'Versova Metro', coords: [19.1274, 72.8050], type: 'metro' },
+      { name: 'Ghatkopar Metro', coords: [19.0769, 72.9080], type: 'metro' },
+      { name: 'Colaba Bus Depot', coords: [18.9100, 72.8090], type: 'bus' },
+      { name: 'Mumbai Central', coords: [18.9719, 72.8194], type: 'train' },
+      { name: 'Santacruz Station', coords: [19.0810, 72.8410], type: 'train' },
+      { name: 'Kurla Station', coords: [19.0669, 72.8830], type: 'train' },
+      { name: 'Vashi Station', coords: [19.0802, 72.9984], type: 'train' },
+      { name: 'Gateway of India', coords: [18.9218, 72.8347], type: 'ferry' },
+      { name: 'BKC', coords: [19.0625, 72.8690], type: 'bus' },
+      { name: 'Powai', coords: [19.1176, 72.9060], type: 'bus' },
+      { name: 'Worli Sea Face', coords: [19.0176, 72.8140], type: 'bus' }
+    ];
+
+    let userLocation = null;
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeApp();
+    });
+
+    function initializeApp() {
+      setupEventListeners();
+      getCurrentLocation();
+      loadLiveDepartures();
+      setDefaultDateTime();
+    }
+
+    function setupEventListeners() {
+      // Journey form
+      document.getElementById('journeyForm').addEventListener('submit', handleJourneySubmit);
+      
+      // Location buttons
+      document.getElementById('useLocationBtn').addEventListener('click', getCurrentLocation);
+      document.getElementById('swapBtn').addEventListener('click', swapLocations);
+      
+      // Time buttons
+      document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.addEventListener('click', handleTimeSelection);
+      });
+      
+      // Input autocomplete
+      setupAutocomplete('fromInput', 'fromSuggestions');
+      setupAutocomplete('toInput', 'toSuggestions');
+      
+      // Quick route cards
+      document.querySelectorAll('.quick-card').forEach(card => {
+        card.addEventListener('click', function() {
+          document.getElementById('fromInput').value = this.dataset.from;
+          document.getElementById('toInput').value = this.dataset.to;
+          findRoutes(this.dataset.from, this.dataset.to);
+        });
+      });
+    }
+
+    function getCurrentLocation() {
+      if (navigator.geolocation) {
+        const btn = document.getElementById('useLocationBtn');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            userLocation = [position.coords.latitude, position.coords.longitude];
+            document.getElementById('fromInput').value = 'Current Location';
+            btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+            loadLiveDepartures();
+          },
+          function(error) {
+            console.error('Location error:', error);
+            btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+            alert('Unable to get your location. Please enter manually.');
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by this browser.');
+      }
+    }
+
+    function swapLocations() {
+      const fromInput = document.getElementById('fromInput');
+      const toInput = document.getElementById('toInput');
+      const temp = fromInput.value;
+      fromInput.value = toInput.value;
+      toInput.value = temp;
+    }
+
+    function handleTimeSelection(event) {
+      document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      const customDateTime = document.getElementById('customDateTime');
+      if (event.target.dataset.time === 'now') {
+        customDateTime.style.display = 'none';
+      } else {
+        customDateTime.style.display = 'block';
+      }
+    }
+
+    function setDefaultDateTime() {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() + 30); // Default to 30 minutes from now
+      document.getElementById('customDateTime').value = now.toISOString().slice(0, 16);
+    }
+
+    function setupAutocomplete(inputId, suggestionsId) {
+      const input = document.getElementById(inputId);
+      const suggestions = document.getElementById(suggestionsId);
+      
+      input.addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        if (query.length < 2) {
+          suggestions.style.display = 'none';
+          return;
+        }
+        
+        const matches = MUMBAI_LOCATIONS.filter(location => 
+          location.name.toLowerCase().includes(query)
+        );
+        
+        suggestions.innerHTML = '';
+        matches.slice(0, 5).forEach(location => {
+          const item = document.createElement('div');
+          item.className = 'suggestion-item';
+          item.innerHTML = `
+            <div style="font-weight: 600;">${location.name}</div>
+            <div style="font-size: 12px; color: #6c757d; text-transform: capitalize;">${location.type}</div>
+          `;
+          item.addEventListener('click', function() {
+            input.value = location.name;
+            suggestions.style.display = 'none';
+          });
+          suggestions.appendChild(item);
+        });
+        
+        suggestions.style.display = matches.length > 0 ? 'block' : 'none';
+      });
+      
+      input.addEventListener('blur', function() {
+        setTimeout(() => suggestions.style.display = 'none', 200);
+      });
+    }
+
+    function handleJourneySubmit(event) {
+      event.preventDefault();
+      const from = document.getElementById('fromInput').value;
+      const to = document.getElementById('toInput').value;
+      
+      if (!from || !to) {
+        alert('Please enter both origin and destination');
+        return;
+      }
+      
+      findRoutes(from, to);
+    }
+
+    function findRoutes(from, to) {
+      const results = document.getElementById('results');
+      const routesList = document.getElementById('routesList');
+      
+      results.style.display = 'block';
+      routesList.innerHTML = '<div class="loading"><div class="spinner"></div>Finding best routes...</div>';
+      
+      // Simulate API call
+      setTimeout(() => {
+        const routes = generateRoutes(from, to);
+        displayRoutes(routes);
+      }, 2000);
+    }
+
+    function generateRoutes(from, to) {
+      // This would be replaced with actual API calls
+      const routes = [
+        {
+          duration: '45 min',
+          cost: '₹35',
+          steps: [
+            { type: 'walk', text: 'Walk to station', duration: '5 min' },
+            { type: 'train', text: 'Western Line Fast', duration: '35 min' },
+            { type: 'walk', text: 'Walk to destination', duration: '5 min' }
+          ],
+          departures: ['2 min', '8 min', '14 min'],
+          transfers: 0
+        },
+        {
+          duration: '52 min',
+          cost: '₹25',
+          steps: [
+            { type: 'walk', text: 'Walk to bus stop', duration: '3 min' },
+            { type: 'bus', text: 'BEST Bus A1E', duration: '44 min' },
+            { type: 'walk', text: 'Walk to destination', duration: '5 min' }
+          ],
+          departures: ['5 min', '15 min', '25 min'],
+          transfers: 0
+        },
+        {
+          duration: '38 min',
+          cost: '₹45',
+          steps: [
+            { type: 'walk', text: 'Walk to metro', duration: '8 min' },
+            { type: 'metro', text: 'Metro Line 1', duration: '22 min' },
+            { type: 'train', text: 'Western Line', duration: '8 min' }
+          ],
+          departures: ['3 min', '9 min', '15 min'],
+          transfers: 1
+        }
+      ];
+      
+      return routes;
+    }
+
+    function displayRoutes(routes) {
+      const routesList = document.getElementById('routesList');
+      routesList.innerHTML = '';
+      
+      routes.forEach((route, index) => {
+        const routeCard = document.createElement('div');
+        routeCard.className = 'route-card';
+        routeCard.onclick = () => selectRoute(route);
+        
+        const stepsHtml = route.steps.map(step => 
+          `<div class="step-icon step-${step.type}">
+            <i class="fa-solid fa-${getStepIcon(step.type)}"></i>
+          </div>`
+        ).join('');
+        
+        routeCard.innerHTML = `
+          <div class="route-header">
+            <div class="route-time">${route.duration}</div>
+            <div class="route-cost">${route.cost}</div>
+          </div>
+          <div class="route-steps">${stepsHtml}</div>
+          <div class="route-details">
+            ${route.transfers === 0 ? 'Direct route' : `${route.transfers} transfer${route.transfers > 1 ? 's' : ''}`} • 
+            Next departures: ${route.departures.join(', ')}
+          </div>
+        `;
+        
+        routesList.appendChild(routeCard);
+      });
+    }
+
+    function getStepIcon(type) {
+      const icons = {
+        walk: 'person-walking',
+        train: 'train',
+        bus: 'bus',
+        metro: 'train-tram'
+      };
+      return icons[type] || 'circle';
+    }
+
+    function selectRoute(route) {
+      alert(`Route selected! You will receive step-by-step navigation.
+      
+First step: ${route.steps[0].text}
+Next departure: ${route.departures[0]}
+Total time: ${route.duration}
+Total cost: ${route.cost}`);
+    }
+
+    function loadLiveDepartures() {
+      const departuresList = document.getElementById('departuresList');
+      
+      if (!userLocation) {
+        departuresList.innerHTML = `
+          <div class="loading">
+            <i class="fa-solid fa-location-crosshairs" style="font-size: 20px; margin-bottom: 8px;"></i>
+            <div>Enable location to see live departures</div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Simulate finding nearby departures
+      setTimeout(() => {
+        const departures = [
+          { route: 'Western Line Fast', destination: 'Churchgate', time: '2 min', platform: 'Platform 1' },
+          { route: 'BEST Bus A1E', destination: 'Colaba', time: '5 min', platform: 'Stop A' },
+          { route: 'Metro Line 1', destination: 'Ghatkopar', time: '7 min', platform: 'Platform 2' },
+          { route: 'Central Line', destination: 'CST', time: '12 min', platform: 'Platform 3' }
+        ];
+        
+        departuresList.innerHTML = departures.map(dep => `
+          <div class="departure-item">
+            <div>
+              <div class="departure-route">${dep.route}</div>
+              <div style="font-size: 12px; color: #6c757d;">${dep.destination} • ${dep.platform}</div>
+            </div>
+            <div class="departure-time">${dep.time}</div>
+          </div>
+        `).join('');
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
