@@ -3790,9 +3790,9 @@
     if (!tryInit()) {
       const iv = setInterval(() => { if (tryInit()) clearInterval(iv); }, 300);
       setTimeout(() => clearInterval(iv), 12000);
-        // Modern UI Enhancements
+        // Modern UI Enhancements (Safe - No conflicts with existing functionality)
         function enhanceUI() {
-          // Add smooth scrolling
+          // Add smooth scrolling only for anchor links
           document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
               e.preventDefault();
@@ -3806,18 +3806,7 @@
             });
           });
 
-          // Add hover effects to transport cards
-          document.querySelectorAll('.transport-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-              this.style.transform = 'translateY(-4px) scale(1.02)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-              this.style.transform = 'translateY(0) scale(1)';
-            });
-          });
-
-          // Add loading animations
+          // Add loading animations safely
           document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.transport-card');
             cards.forEach((card, index) => {
@@ -3825,7 +3814,7 @@
             });
           });
 
-          // Add search input focus effects
+          // Add search input focus effects safely
           const searchInput = document.getElementById('searchInput');
           if (searchInput) {
             searchInput.addEventListener('focus', function() {
@@ -3838,7 +3827,7 @@
           }
         }
 
-        // Initialize modern UI
+        // Initialize modern UI safely
         enhanceUI();
 
     }
