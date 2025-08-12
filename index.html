@@ -296,6 +296,172 @@
     /* Embed mode - hide bottom nav */
     body.embedded .bottom-nav { display: none; }
     body.embedded .content { padding-bottom: 20px; }
+  
+    /* Location-Aware System Styles */
+    .location-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-left: 12px;
+      transition: all 0.2s ease;
+    }
+    
+    .location-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .location-status {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .status-message {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .location-sections {
+      display: grid;
+      gap: 24px;
+    }
+
+    .location-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .subsection-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nearby-routes-grid,
+    .recommendations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .nearby-route-card,
+    .recommendation-card {
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .nearby-route-card:hover,
+    .recommendation-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+
+    .route-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .route-number {
+      background: var(--primary);
+      color: white;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .route-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .route-details {
+      margin-bottom: 8px;
+    }
+
+    .route-route {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .route-time {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .route-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .rec-route-number {
+      background: var(--primary);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .rec-route-details {
+      flex: 1;
+    }
+
+    .rec-route-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .rec-route-route {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .rec-favorite-btn {
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color 0.2s ease;
+    }
+
+    .rec-favorite-btn:hover {
+      color: #FFD700;
+    }
+
+    .favorite-routes {
+      min-height: 100px;
+    }
   </style>
 </head>
 <body>
@@ -510,6 +676,48 @@
             <span class="action-icon"><i class="fa-solid fa-indian-rupee-sign"></i></span>
             Fare Estimator (Auto)
           </button>
+        </div>
+      </section>
+      <section aria-labelledby="location-heading">
+        <h2 class="section-title" id="location-heading">
+          <i class="fa-solid fa-location-dot"></i> 
+          Personalized for Your Location
+          <button class="location-btn" onclick="locationSystem?.getUserLocation()">
+            <i class="fa-solid fa-crosshairs"></i> Update Location
+          </button>
+        </h2>
+        
+        <div class="location-status" id="location-status">
+          <div class="status-message">📍 Detecting your location...</div>
+        </div>
+
+        <div class="location-sections">
+          <div class="location-section">
+            <h3 class="subsection-title">
+              <i class="fa-solid fa-map-marker-alt"></i> Routes Near You
+            </h3>
+            <div id="nearby-routes-section" class="nearby-routes">
+              <p>Enable location access to see nearby routes</p>
+            </div>
+          </div>
+
+          <div class="location-section">
+            <h3 class="subsection-title">
+              <i class="fa-solid fa-clock"></i> Time-Based Recommendations
+            </h3>
+            <div id="time-recommendations-section" class="time-recommendations">
+              <p>Loading recommendations...</p>
+            </div>
+          </div>
+
+          <div class="location-section">
+            <h3 class="subsection-title">
+              <i class="fa-solid fa-star"></i> Your Favorite Routes
+            </h3>
+            <div id="favorite-routes-section" class="favorite-routes">
+              <p>Add routes to favorites to see them here</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -3510,6 +3718,226 @@
     if (!tryInit()) {
       const iv = setInterval(() => { if (tryInit()) clearInterval(iv); }, 300);
       setTimeout(() => clearInterval(iv), 12000);
+        // Location-Aware System
+        class LocationAwareSystem {
+          constructor() {
+            this.userLocation = null;
+            this.nearbyRoutes = [];
+            this.favoriteRoutes = JSON.parse(localStorage.getItem('favoriteRoutes') || '[]');
+            this.userPreferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+          }
+
+          // Get user's current location
+          async getUserLocation() {
+            return new Promise((resolve, reject) => {
+              if (!navigator.geolocation) {
+                console.log('Geolocation not supported');
+                resolve(null);
+                return;
+              }
+
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  this.userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                  };
+                  console.log('📍 User location detected:', this.userLocation);
+                  this.findNearbyRoutes();
+                  resolve(this.userLocation);
+                },
+                (error) => {
+                  console.log('Location access denied or error:', error.message);
+                  resolve(null);
+                },
+                { timeout: 10000, enableHighAccuracy: true }
+              );
+            });
+          }
+
+          // Find routes near user's location
+          findNearbyRoutes() {
+            if (!this.userLocation) return;
+
+            const allRoutes = this.getAllRoutes();
+            this.nearbyRoutes = allRoutes.filter(route => {
+              // Simple distance calculation (in real app, use proper geocoding)
+              const routeDistance = this.calculateDistance(route);
+              return routeDistance < 5; // Within 5km
+            });
+
+            console.log('🚌 Found', this.nearbyRoutes.length, 'nearby routes');
+            this.updateNearbyRoutesDisplay();
+          }
+
+          // Calculate distance to route (simplified)
+          calculateDistance(route) {
+            // This would use actual route coordinates in a real implementation
+            const routeCoords = this.getRouteCoordinates(route);
+            if (!routeCoords) return 999;
+
+            const latDiff = this.userLocation.lat - routeCoords.lat;
+            const lngDiff = this.userLocation.lng - routeCoords.lng;
+            return Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 111; // Rough km conversion
+          }
+
+          // Get route coordinates (mock data)
+          getRouteCoordinates(route) {
+            const routeCoords = {
+              '1': { lat: 18.9100, lng: 72.8090 }, // Colaba
+              '11': { lat: 18.9700, lng: 72.8200 }, // Mumbai Central
+              '21': { lat: 19.0600, lng: 72.8300 }, // Bandra
+              '31': { lat: 19.1200, lng: 72.8400 }, // Andheri
+              '41': { lat: 19.2300, lng: 72.8500 }, // Borivali
+              '242': { lat: 19.0600, lng: 72.8300 }, // Bandra Station
+            };
+            return routeCoords[route.id] || null;
+          }
+
+          // Get all available routes
+          getAllRoutes() {
+            const routes = [];
+            // Extract routes from the existing data
+            const routeData = window.MumbaiTransport?.routes?.bus || [];
+            routeData.forEach(route => {
+              routes.push({
+                id: route.id,
+                name: route.name,
+                from: route.from,
+                to: route.to,
+                time: route.time,
+                delay: route.delay,
+                passengers: route.passengers,
+                capacity: route.capacity
+              });
+            });
+            return routes;
+          }
+
+          // Update display with nearby routes
+          updateNearbyRoutesDisplay() {
+            const nearbySection = document.getElementById('nearby-routes-section');
+            if (!nearbySection) return;
+
+            if (this.nearbyRoutes.length === 0) {
+              nearbySection.innerHTML = '<p>No routes found nearby. Try enabling location access.</p>';
+              return;
+            }
+
+            let html = '<div class="nearby-routes-grid">';
+            this.nearbyRoutes.slice(0, 6).forEach(route => {
+              html += `
+                <div class="nearby-route-card">
+                  <div class="route-header">
+                    <span class="route-number">${route.id}</span>
+                    <span class="route-name">${route.name}</span>
+                  </div>
+                  <div class="route-details">
+                    <div class="route-route">${route.from} → ${route.to}</div>
+                    <div class="route-time">${route.time} min • ${route.delay} min delay</div>
+                  </div>
+                  <div class="route-status">
+                    <span class="status-indicator ${route.delay > 2 ? 'status-delayed' : 'status-active'}"></span>
+                    <span>${route.passengers}/${route.capacity} passengers</span>
+                  </div>
+                </div>
+              `;
+            });
+            html += '</div>';
+            nearbySection.innerHTML = html;
+          }
+
+          // Add route to favorites
+          addToFavorites(routeId) {
+            if (!this.favoriteRoutes.includes(routeId)) {
+              this.favoriteRoutes.push(routeId);
+              localStorage.setItem('favoriteRoutes', JSON.stringify(this.favoriteRoutes));
+              console.log('⭐ Added route', routeId, 'to favorites');
+            }
+          }
+
+          // Remove route from favorites
+          removeFromFavorites(routeId) {
+            this.favoriteRoutes = this.favoriteRoutes.filter(id => id !== routeId);
+            localStorage.setItem('favoriteRoutes', JSON.stringify(this.favoriteRoutes));
+            console.log('⭐ Removed route', routeId, 'from favorites');
+          }
+
+          // Get time-based recommendations
+          getTimeBasedRecommendations() {
+            const hour = new Date().getHours();
+            let recommendations = [];
+
+            if (hour >= 7 && hour <= 10) {
+              // Morning rush hour
+              recommendations = this.getAllRoutes().filter(route => 
+                route.from.includes('Bandra') || route.from.includes('Andheri') || route.from.includes('Borivali')
+              );
+            } else if (hour >= 17 && hour <= 20) {
+              // Evening rush hour
+              recommendations = this.getAllRoutes().filter(route => 
+                route.to.includes('Bandra') || route.to.includes('Andheri') || route.to.includes('Borivali')
+              );
+            } else {
+              // Off-peak
+              recommendations = this.getAllRoutes().slice(0, 10);
+            }
+
+            return recommendations.slice(0, 6);
+          }
+
+          // Initialize location awareness
+          init() {
+            console.log('📍 Initializing location-aware system...');
+            this.getUserLocation();
+            this.updateTimeBasedRecommendations();
+            
+            // Update every 5 minutes
+            setInterval(() => {
+              this.updateTimeBasedRecommendations();
+            }, 5 * 60 * 1000);
+          }
+
+          // Update time-based recommendations display
+          updateTimeBasedRecommendations() {
+            const recommendations = this.getTimeBasedRecommendations();
+            const recSection = document.getElementById('time-recommendations-section');
+            if (!recSection) return;
+
+            const hour = new Date().getHours();
+            let timeLabel = 'Recommended Routes';
+            if (hour >= 7 && hour <= 10) timeLabel = '🌅 Morning Rush Hour Routes';
+            else if (hour >= 17 && hour <= 20) timeLabel = '🌆 Evening Rush Hour Routes';
+            else timeLabel = '⏰ Off-Peak Routes';
+
+            let html = `<h3>${timeLabel}</h3><div class="recommendations-grid">`;
+            recommendations.forEach(route => {
+              html += `
+                <div class="recommendation-card">
+                  <div class="rec-route-number">${route.id}</div>
+                  <div class="rec-route-details">
+                    <div class="rec-route-name">${route.name}</div>
+                    <div class="rec-route-route">${route.from} → ${route.to}</div>
+                  </div>
+                  <button class="rec-favorite-btn" onclick="locationSystem.addToFavorites('${route.id}')">⭐</button>
+                </div>
+              `;
+            });
+            html += '</div>';
+            recSection.innerHTML = html;
+          }
+        }
+
+        // Initialize location system
+        let locationSystem;
+        document.addEventListener('DOMContentLoaded', function() {
+          locationSystem = new LocationAwareSystem();
+          locationSystem.init();
+        });
+
+        // Global access
+        window.locationSystem = locationSystem;
+
     }
     })();
   </script>
