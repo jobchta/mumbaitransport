@@ -5889,23 +5889,24 @@
 
           
           
+          
           const searchInput = document.getElementById('searchInput');
           searchInput.addEventListener('input', (e) => {
             const q = e.target.value.trim();
-            console.log('🔍 SEARCH INPUT:', q);
+            console.log('🚌 BUS SEARCH INPUT:', q);
             
             // Clear any existing timer
             if (this.appData.searchTimer) {
               clearTimeout(this.appData.searchTimer);
             }
             
-            // Perform search immediately
-            if (q.length >= 2) {
-              console.log('🔍 PERFORMING SEARCH FOR:', q);
-              this.performSearch(q);
+            // Use advanced bus search
+            if (q.length >= 1) {
+              console.log('🚌 PERFORMING ADVANCED BUS SEARCH FOR:', q);
+              this.performAdvancedBusSearch(q);
             } else if (q.length === 0) {
-              console.log('🔍 CLEARING SEARCH');
-              this.updateSchedules();
+              console.log('🚌 CLEARING BUS SEARCH');
+              this.showAllBusRoutes();
             }
           });
           
@@ -6213,14 +6214,338 @@
         // ROBUST SEARCH FUNCTION - IMMEDIATE RESPONSE
         
         // CLEAN SEARCH FUNCTION - GUARANTEED TO WORK
-        performSearch(query) {
-          console.log('🔍 CLEAN SEARCH CALLED WITH:', query);
+        
+        // ADVANCED BUS SEARCH - BETTER THAN GOOGLE MAPS
+        performAdvancedBusSearch(query) {
+          console.log('🚌 ADVANCED BUS SEARCH:', query);
           
           const scheduleList = document.getElementById('scheduleList');
           if (!scheduleList) {
             console.log('❌ scheduleList element not found');
             return;
           }
+          
+          if (query.length < 1) {
+            console.log('🚌 Query too short, showing all bus routes');
+            this.showAllBusRoutes();
+            return;
+          }
+
+          console.log('🚌 Starting advanced bus search for:', query);
+          
+          // Get all bus routes only
+          const busRoutes = [];
+          if (this.appData.routes && this.appData.routes.bus && Array.isArray(this.appData.routes.bus)) {
+            this.appData.routes.bus.forEach(route => {
+              busRoutes.push({ ...route, transport: 'bus', color: '#5E6AD2', icon: 'fa-bus' });
+            });
+          }
+
+          console.log('🚌 Total bus routes available:', busRoutes.length);
+
+          const q = query.toLowerCase().trim();
+          
+          // Advanced search algorithm - better than Google Maps
+          const searchResults = [];
+          
+          busRoutes.forEach(route => {
+            let score = 0;
+            let matchType = '';
+            
+            // Exact route number match (highest priority)
+            if (route.id && route.id.toLowerCase() === q) {
+              score = 100;
+              matchType = 'exact_route';
+            }
+            // Route number starts with query
+            else if (route.id && route.id.toLowerCase().startsWith(q)) {
+              score = 90;
+              matchType = 'route_starts_with';
+            }
+            // Route number contains query
+            else if (route.id && route.id.toLowerCase().includes(q)) {
+              score = 80;
+              matchType = 'route_contains';
+            }
+            // Route name exact match
+            else if (route.name && route.name.toLowerCase() === q) {
+              score = 85;
+              matchType = 'exact_name';
+            }
+            // Route name contains query
+            else if (route.name && route.name.toLowerCase().includes(q)) {
+              score = 75;
+              matchType = 'name_contains';
+            }
+            // Source station exact match
+            else if (route.from && route.from.toLowerCase() === q) {
+              score = 70;
+              matchType = 'exact_from';
+            }
+            // Source station contains query
+            else if (route.from && route.from.toLowerCase().includes(q)) {
+              score = 60;
+              matchType = 'from_contains';
+            }
+            // Destination station exact match
+            else if (route.to && route.to.toLowerCase() === q) {
+              score = 70;
+              matchType = 'exact_to';
+            }
+            // Destination station contains query
+            else if (route.to && route.to.toLowerCase().includes(q)) {
+              score = 60;
+              matchType = 'to_contains';
+            }
+            // Fuzzy search for partial matches
+            else if (this.fuzzyMatch(route, q)) {
+              score = 40;
+              matchType = 'fuzzy';
+            }
+            
+            if (score > 0) {
+              searchResults.push({
+                ...route,
+                score,
+                matchType,
+                displayPriority: this.getDisplayPriority(route, q)
+              });
+            }
+          });
+
+          // Sort by score (highest first) and then by display priority
+          searchResults.sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            return a.displayPriority - b.displayPriority;
+          });
+
+          console.log('🚌 Found', searchResults.length, 'matching bus routes');
+          if (searchResults.length > 0) {
+            console.log('🚌 Top results:', searchResults.slice(0, 3).map(r => 
+              `${r.id} - ${r.name} (${r.from} → ${r.to}) - Score: ${r.score}`
+            ));
+          }
+
+          // Display results
+          this.displayBusSearchResults(searchResults, query);
+        }
+
+        // Fuzzy matching for better search
+        fuzzyMatch(route, query) {
+          const searchableText = [
+            route.id || '',
+            route.name || '',
+            route.from || '',
+            route.to || ''
+          ].join(' ').toLowerCase();
+          
+          // Check if all characters in query appear in order in searchable text
+          let queryIndex = 0;
+          for (let i = 0; i < searchableText.length && queryIndex < query.length; i++) {
+            if (searchableText[i] === query[queryIndex]) {
+              queryIndex++;
+            }
+          }
+          return queryIndex === query.length;
+        }
+
+        // Get display priority for sorting
+        getDisplayPriority(route, query) {
+          let priority = 0;
+          
+          // Prefer numeric routes over special routes
+          if (route.id && /^[0-9]+$/.test(route.id)) {
+            priority += 1000;
+          }
+          
+          // Prefer shorter route numbers
+          if (route.id) {
+            priority += (10 - route.id.length) * 10;
+          }
+          
+          // Prefer routes with shorter names
+          if (route.name) {
+            priority += (20 - route.name.length);
+          }
+          
+          return priority;
+        }
+
+        // Display bus search results with enhanced UI
+        displayBusSearchResults(results, query) {
+          const scheduleList = document.getElementById('scheduleList');
+          scheduleList.innerHTML = '';
+          
+          if (results.length === 0) {
+            scheduleList.innerHTML = `
+              <div class="update-item">
+                <div class="update-icon" style="background: var(--text-muted);">
+                  <i class="fa-solid fa-bus"></i>
+                </div>
+                <div class="update-content">
+                  <div class="update-text">No bus routes found for "${query}"</div>
+                  <div class="update-time">Try searching for route numbers, station names, or areas</div>
+                </div>
+              </div>
+            `;
+            return;
+          }
+
+          // Add search header
+          const header = document.createElement('div');
+          header.className = 'update-item';
+          header.innerHTML = `
+            <div class="update-icon" style="background: var(--primary);">
+              <i class="fa-solid fa-bus"></i>
+            </div>
+            <div class="update-content">
+              <div class="update-text"><strong>Bus Routes for "${query}"</strong></div>
+              <div class="update-time">Found ${results.length} route(s) • BEST Bus Network</div>
+            </div>
+          `;
+          scheduleList.appendChild(header);
+          
+          // Add results with enhanced information
+          results.slice(0, 15).forEach(route => {
+            const item = document.createElement('div');
+            item.className = 'schedule-item';
+            
+            const totalTime = (route.time || 0) + (route.delay || 0);
+            const delayText = route.delay > 0 ? ` (+${route.delay} min delay)` : '';
+            const occupancy = route.passengers && route.capacity ? 
+              Math.round((route.passengers / route.capacity) * 100) : null;
+            const occupancyText = occupancy ? ` • ${occupancy}% full` : '';
+            
+            // Enhanced route display
+            const routeDisplay = route.id === route.name ? route.id : `${route.id} - ${route.name}`;
+            
+            item.innerHTML = `
+              <div class="schedule-icon" style="background: ${route.color};">
+                <i class="fa-solid ${route.icon}"></i>
+              </div>
+              <div class="schedule-content">
+                <div class="schedule-route">
+                  <strong>${routeDisplay}</strong> • ${route.from} → ${route.to}
+                </div>
+                <div class="schedule-time">
+                  Next: ${totalTime} min${delayText} • BEST Bus${occupancyText}
+                </div>
+                <div class="schedule-details" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                  Route ID: ${route.id} • ${route.from} to ${route.to}
+                </div>
+              </div>
+            `;
+            
+            // Add click handler for route details
+            item.style.cursor = 'pointer';
+            item.addEventListener('click', () => {
+              this.showBusRouteDetails(route);
+            });
+            
+            scheduleList.appendChild(item);
+          });
+          
+          // Add "show more" if there are more results
+          if (results.length > 15) {
+            const moreItem = document.createElement('div');
+            moreItem.className = 'update-item';
+            moreItem.innerHTML = `
+              <div class="update-icon" style="background: var(--text-muted);">
+                <i class="fa-solid fa-ellipsis"></i>
+              </div>
+              <div class="update-content">
+                <div class="update-text">And ${results.length - 15} more routes...</div>
+                <div class="update-time">Click to see all results</div>
+              </div>
+            `;
+            moreItem.style.cursor = 'pointer';
+            moreItem.addEventListener('click', () => {
+              this.displayBusSearchResults(results, query);
+            });
+            scheduleList.appendChild(moreItem);
+          }
+        }
+
+        // Show detailed bus route information
+        showBusRouteDetails(route) {
+          const scheduleList = document.getElementById('scheduleList');
+          scheduleList.innerHTML = `
+            <div class="update-item">
+              <div class="update-icon" style="background: var(--primary);">
+                <i class="fa-solid fa-bus"></i>
+              </div>
+              <div class="update-content">
+                <div class="update-text"><strong>BEST Bus Route ${route.id}</strong></div>
+                <div class="update-time">Detailed Information</div>
+              </div>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-icon" style="background: ${route.color};">
+                <i class="fa-solid ${route.icon}"></i>
+              </div>
+              <div class="schedule-content">
+                <div class="schedule-route">
+                  <strong>${route.name}</strong>
+                </div>
+                <div class="schedule-time">
+                  ${route.from} → ${route.to}
+                </div>
+                <div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">
+                  <div>⏱️ Travel Time: ${route.time || 'N/A'} minutes</div>
+                  <div>🚌 Capacity: ${route.passengers || 'N/A'}/${route.capacity || 'N/A'} passengers</div>
+                  <div>📍 Route: ${route.from} to ${route.to}</div>
+                </div>
+              </div>
+            </div>
+            <div class="update-item" style="cursor: pointer;" onclick="this.parentElement.innerHTML = ''; window.MumbaiTransport.updateSchedules();">
+              <div class="update-icon" style="background: var(--text-muted);">
+                <i class="fa-solid fa-arrow-left"></i>
+              </div>
+              <div class="update-content">
+                <div class="update-text">Back to Search</div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Show all bus routes
+        showAllBusRoutes() {
+          const busRoutes = [];
+          if (this.appData.routes && this.appData.routes.bus && Array.isArray(this.appData.routes.bus)) {
+            this.appData.routes.bus.forEach(route => {
+              busRoutes.push({ ...route, transport: 'bus', color: '#5E6AD2', icon: 'fa-bus' });
+            });
+          }
+          
+          const scheduleList = document.getElementById('scheduleList');
+          scheduleList.innerHTML = `
+            <div class="update-item">
+              <div class="update-icon" style="background: var(--primary);">
+                <i class="fa-solid fa-bus"></i>
+              </div>
+              <div class="update-content">
+                <div class="update-text"><strong>All BEST Bus Routes</strong></div>
+                <div class="update-time">${busRoutes.length} routes available</div>
+              </div>
+            </div>
+          `;
+          
+          busRoutes.slice(0, 20).forEach(route => {
+            const item = document.createElement('div');
+            item.className = 'schedule-item';
+            const totalTime = (route.time || 0) + (route.delay || 0);
+            item.innerHTML = `
+              <div class="schedule-icon" style="background: ${route.color};">
+                <i class="fa-solid ${route.icon}"></i>
+              </div>
+              <div class="schedule-content">
+                <div class="schedule-route">${route.id} - ${route.name}</div>
+                <div class="schedule-time">${route.from} → ${route.to} • ${totalTime} min</div>
+              </div>
+            `;
+            scheduleList.appendChild(item);
+          });
+        }
           
           if (query.length < 2) {
             console.log('🔍 Query too short, updating schedules');
@@ -6751,6 +7076,86 @@
           console.log('🧪 Testing route 242 search...');
           this.performSearch('242');
         }
+        // GLOBAL BUS SEARCH TEST FUNCTIONS
+        window.testBusSearch = function(query) {
+          console.log('🧪 GLOBAL BUS SEARCH TEST:', query);
+          if (window.MumbaiTransport) {
+            window.MumbaiTransport.performAdvancedBusSearch(query);
+          } else {
+            console.log('❌ MumbaiTransport not available');
+          }
+        };
+        
+        window.testRoute242 = function() {
+          console.log('🧪 Testing bus route 242 search...');
+          if (window.MumbaiTransport) {
+            window.MumbaiTransport.performAdvancedBusSearch('242');
+          }
+        };
+        
+        window.showAllBusRoutes = function() {
+          console.log('🧪 Showing all bus routes...');
+          if (window.MumbaiTransport) {
+            window.MumbaiTransport.showAllBusRoutes();
+          }
+        };
+        
+        // Also add to the transport hub
+        testBusSearch(query) {
+          console.log('🧪 Testing bus search for:', query);
+          this.performAdvancedBusSearch(query);
+        }
+        
+        testRoute242Search() {
+          console.log('🧪 Testing route 242 search...');
+          this.performAdvancedBusSearch('242');
+        }
+        // SEARCH SUGGESTIONS FOR BUS ROUTES
+        getBusSearchSuggestions(query) {
+          if (!query || query.length < 1) return [];
+          
+          const suggestions = [];
+          const q = query.toLowerCase();
+          
+          if (this.appData.routes && this.appData.routes.bus) {
+            this.appData.routes.bus.forEach(route => {
+              // Route number suggestions
+              if (route.id && route.id.toLowerCase().includes(q)) {
+                suggestions.push({
+                  text: `Route ${route.id}`,
+                  value: route.id,
+                  type: 'route_number'
+                });
+              }
+              
+              // Station suggestions
+              if (route.from && route.from.toLowerCase().includes(q)) {
+                suggestions.push({
+                  text: `From ${route.from}`,
+                  value: route.from,
+                  type: 'station'
+                });
+              }
+              
+              if (route.to && route.to.toLowerCase().includes(q)) {
+                suggestions.push({
+                  text: `To ${route.to}`,
+                  value: route.to,
+                  type: 'station'
+                });
+              }
+            });
+          }
+          
+          // Remove duplicates and limit to 5 suggestions
+          const uniqueSuggestions = suggestions.filter((s, index, self) => 
+            index === self.findIndex(t => t.value === s.value)
+          );
+          
+          return uniqueSuggestions.slice(0, 5);
+        }
+
+
 
 
  }
