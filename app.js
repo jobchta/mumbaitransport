@@ -1,34 +1,68 @@
-document.addEventListener('DOMContentLoaded', function() {
-  const commitInfoDiv = document.getElementById('commit-info');
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize the map
+  const map = L.map('map').setView([19.0760, 72.8777], 12); // Centered on Mumbai
 
-  if (commitInfoDiv) {
-    fetch('https://api.github.com/repos/jobchta/mumbaitransport/commits')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(commits => {
-        if (commits && commits.length > 0) {
-          const latestCommit = commits[0];
-          const commitSha = latestCommit.sha.substring(0, 7);
-          const commitMessage = latestCommit.commit.message.split('\n')[0]; // First line of message
-          commitInfoDiv.innerHTML = `
-            <span class="chip" style="background-color: var(--surface-hover);">
-              <i class="fa-solid fa-code-commit"></i>
-              <a href="https://github.com/jobchta/mumbaitransport/commit/${latestCommit.sha}" target="_blank" style="text-decoration: none; color: inherit;">
-                ${commitSha}
-              </a>: ${commitMessage}
-            </span>
-          `;
-        } else {
-          commitInfoDiv.textContent = 'Could not fetch commit information.';
-        }
-      })
-      .catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
-        commitInfoDiv.textContent = 'Error fetching commit info.';
+  // Add a tile layer from OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Basic bottom sheet interaction
+  const bottomSheet = document.getElementById('bottom-sheet');
+  const sheetHeader = document.querySelector('.sheet-header');
+
+  sheetHeader.addEventListener('click', () => {
+    bottomSheet.classList.toggle('sheet-hidden');
+  });
+
+  // Commute Hub interaction
+  const commuteHub = document.getElementById('commute-hub');
+  const commuteBtn = document.querySelector('.nav-btn[data-action="commute"]');
+  const closeCommuteHubBtn = document.getElementById('close-commute-hub');
+  const addCommuteBtn = document.getElementById('add-commute-btn');
+
+  commuteBtn.addEventListener('click', () => {
+    commuteHub.classList.remove('page-hidden');
+    commuteHub.classList.add('commute-hub-visible');
+  });
+
+  closeCommuteHubBtn.addEventListener('click', () => {
+    commuteHub.classList.add('page-hidden');
+    commuteHub.classList.remove('commute-hub-visible');
+  });
+
+  addCommuteBtn.addEventListener('click', () => {
+    console.log('Add new commute clicked');
+  });
+
+  // Route Planner interaction
+  const routePlanner = document.getElementById('route-planner');
+  const routesBtn = document.querySelector('.nav-btn[data-action="routes"]');
+  const closeRoutePlannerBtn = document.getElementById('close-route-planner');
+  const findRouteBtn = document.getElementById('find-route-btn');
+
+  routesBtn.addEventListener('click', () => {
+    routePlanner.classList.remove('page-hidden');
+    routePlanner.classList.add('route-planner-visible');
+  });
+
+  closeRoutePlannerBtn.addEventListener('click', () => {
+    routePlanner.classList.add('page-hidden');
+    routePlanner.classList.remove('route-planner-visible');
+  });
+
+  findRouteBtn.addEventListener('click', () => {
+    console.log('Find route clicked');
+  });
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(registration => {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, err => {
+        console.log('ServiceWorker registration failed: ', err);
       });
+    });
   }
 });
