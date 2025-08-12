@@ -3961,7 +3961,7 @@
           getAllRoutes() {
             const routes = [];
             // Extract routes from the existing data
-            const routeData = window.MumbaiTransport?.routes?.bus || [];
+            const routeData = window.MumbaiTransport?.appData?.routes?.bus || [];
             routeData.forEach(route => {
               routes.push({
                 id: route.id,
@@ -4154,7 +4154,7 @@
 
           // Update bus positions (simulated GPS data)
           updateBusPositions() {
-            const routes = window.MumbaiTransport?.routes?.bus || [];
+            const routes = window.MumbaiTransport?.appData?.routes?.bus || [];
             routes.forEach(route => {
               const busId = `bus_${route.id}_${Math.floor(Math.random() * 5) + 1}`;
               const progress = Math.random(); // 0 to 1 (start to end)
@@ -4204,7 +4204,7 @@
 
           // Update ETAs for all routes
           updateETAs() {
-            const routes = window.MumbaiTransport?.routes?.bus || [];
+            const routes = window.MumbaiTransport?.appData?.routes?.bus || [];
             routes.forEach(route => {
               const eta = this.calculateETA(route, Math.random());
               this.etaUpdates.set(route.id, {
@@ -4233,7 +4233,7 @@
 
           // Update crowd levels
           updateCrowdLevels() {
-            const routes = window.MumbaiTransport?.routes?.bus || [];
+            const routes = window.MumbaiTransport?.appData?.routes?.bus || [];
             routes.forEach(route => {
               const crowdLevel = this.calculateCrowdLevel(route);
               this.crowdLevels.set(route.id, {
@@ -4470,7 +4470,7 @@
 
           // Find direct bus route
           findDirectBusRoute(from, to) {
-            const routes = window.MumbaiTransport?.routes?.bus || [];
+            const routes = window.MumbaiTransport?.appData?.routes?.bus || [];
             return routes.find(route => 
               route.from.toLowerCase().includes(from.toLowerCase()) && 
               route.to.toLowerCase().includes(to.toLowerCase())
