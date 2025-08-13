@@ -6,54 +6,604 @@ addEventListener('fetch', event => {
 })
 
 async function handleRequest(request) {
-  const url = new URL(request.url)
-  
-  // Serve a simple HTML wrapper for the map
+  const url = new URL(request.url);
+
+  // Serve the full Mumbai Transport Hub application at the root
   if (url.pathname === '/') {
-    return new Response(`
-<!DOCTYPE html>
-<html lang="en">
+    const html = `<!DOCTYPE html>
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mumbai Metro Aqua Line - Interactive Map</title>
-    <style>
-        body { margin: 0; padding: 0; height: 100vh; overflow: hidden; }
-        iframe { width: 100%; height: 100%; border: none; }
-        .header { 
-            position: fixed; top: 0; left: 0; right: 0; 
-            background: linear-gradient(135deg, #00a3e0, #0078d4); 
-            color: white; padding: 10px 15px; z-index: 1000;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 14px; font-weight: 500;
-        }
-        .header h1 { margin: 0; font-size: 18px; }
-        .header p { margin: 5px 0 0 0; opacity: 0.9; }
-        .map-container { margin-top: 60px; height: calc(100vh - 60px); }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#5E6AD2" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Mumbai Transport Hub: Live map, schedules, and updates for BEST buses, local trains, metro, monorail, and ferries." />
+  <title>Mumbai Transport Hub | Real-Time Tracking</title>
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin />
+  <link rel="preconnect" href="https://maps.googleapis.com" crossorigin />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Leaflet for real map rendering -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Google Maps API for accurate journey calculations -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=geometry,places&callback=initGoogleMaps"></script>
+  <style>
+    :root {
+      --primary-hue: 235;
+      --primary-saturation: 58%;
+      --primary-lightness: 60%;
+      --primary: hsl(var(--primary-hue), var(--primary-saturation), var(--primary-lightness));
+      --primary-dark: hsl(var(--primary-hue), var(--primary-saturation), 45%);
+      --primary-light: hsl(var(--primary-hue), var(--primary-saturation), 96%);
+      --background: #F9FAFB;
+      --surface: #FFFFFF;
+      --surface-secondary: #F3F4F6;
+      --border: #E5E7EB;
+      --text-primary: #1F2937;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-full: 9999px;
+      --bottom-sheet-height: 60vh;
+      --bottom-sheet-peek: 180px;
+    }
+    [data-theme="dark"] {
+      --background: #111827;
+      --surface: #1F2937;
+      --surface-secondary: #374151;
+      --border: #374151;
+      --text-primary: #F9FAFB;
+      --text-secondary: #9CA3AF;
+      --text-tertiary: #6B7280;
+      --primary-light: hsl(var(--primary-hue), var(--primary-saturation), 20%);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background);
+      color: var(--text-primary);
+      font-size: 16px;
+      line-height: 1.5;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .app {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .map-container {
+      flex-grow: 1;
+      background-color: var(--surface-secondary);
+      position: relative;
+    }
+    #leafletMap {
+      height: 100%;
+      width: 100%;
+    }
+    .bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--bottom-sheet-height);
+      background-color: var(--surface);
+      border-top-left-radius: var(--radius-xl);
+      border-top-right-radius: var(--radius-xl);
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(calc(var(--bottom-sheet-height) - var(--bottom-sheet-peek)));
+      transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+      touch-action: none;
+    }
+    .bottom-sheet.full {
+      transform: translateY(0);
+    }
+    .sheet-handle {
+      padding: 12px;
+      cursor: grab;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .sheet-handle-bar {
+      width: 40px;
+      height: 5px;
+      background-color: var(--border);
+      border-radius: var(--radius-full);
+    }
+    .sheet-content {
+      padding: 0 16px 16px;
+      flex-grow: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .search-bar {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 1001;
+      display: flex;
+      gap: 8px;
+    }
+    .search-input {
+      flex-grow: 1;
+      padding: 12px 16px;
+      font-size: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background-color: var(--surface);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-md);
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+    .search-btn {
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background-color: var(--surface);
+      color: var(--text-secondary);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+    }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background-color: var(--surface);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      z-index: 1002;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .nav-button.active {
+      color: var(--primary);
+    }
+    .nav-button i {
+      font-size: 20px;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .action-card {
+      background-color: var(--surface-secondary);
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .action-card:hover {
+      background-color: var(--primary-light);
+    }
+    .action-card i {
+      font-size: 24px;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    .action-card-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .live-updates-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .update-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background-color: var(--surface-secondary);
+      border-radius: var(--radius-lg);
+    }
+    .update-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .update-icon.bus { background-color: var(--primary); }
+    .update-icon.train { background-color: var(--success); }
+    .update-icon.metro { background-color: #8B5CF6; }
+    .update-text {
+      flex-grow: 1;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .update-text strong {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .update-time {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+    .map-overlay-buttons {
+      position: fixed;
+      bottom: calc(var(--bottom-sheet-peek) + 20px);
+      right: 16px;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .map-btn {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      background-color: var(--surface);
+      color: var(--text-secondary);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+      transition: background-color 0.2s;
+    }
+    .map-btn:hover {
+      background-color: var(--surface-secondary);
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🚇 Mumbai Metro Aqua Line 3</h1>
-        <p>Interactive route map and station information</p>
-    </div>
+  <div class="app">
+    <!-- Map Container -->
     <div class="map-container">
-        <iframe src="https://mmrcl.com/en/map" 
-                allowfullscreen 
-                allow="geolocation; microphone; camera; midi; encrypted-media">
-        </iframe>
+      <div id="leafletMap"></div>
     </div>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search for a destination...">
+      <button class="search-btn" id="theme-toggle" aria-label="Toggle Theme">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+    </div>
+
+    <!-- Map Overlay Buttons -->
+    <div class="map-overlay-buttons">
+      <button class="map-btn" id="recenter-map" aria-label="Recenter Map">
+        <i class="fa-solid fa-location-crosshairs"></i>
+      </button>
+      <button class="map-btn" id="zoom-in-map" aria-label="Zoom In">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+      <button class="map-btn" id="zoom-out-map" aria-label="Zoom Out">
+        <i class="fa-solid fa-minus"></i>
+      </button>
+    </div>
+
+    <!-- Bottom Sheet -->
+    <div class="bottom-sheet" id="bottomSheet">
+      <div class="sheet-handle" id="sheetHandle">
+        <div class="sheet-handle-bar"></div>
+      </div>
+      <div class="sheet-content" id="sheetContent">
+        <!-- Content will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-button active" data-content="home">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-button" data-content="routes">
+        <i class="fa-solid fa-route"></i>
+        <span>Routes</span>
+      </button>
+      <button class="nav-button" data-content="tickets">
+        <i class="fa-solid fa-ticket"></i>
+        <span>Tickets</span>
+      </button>
+      <button class="nav-button" data-content="profile">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+      </button>
+    </nav>
+  </div>
+
+  <script data-cfasync="false">
+    (function() {
+      'use strict';
+
+      const $ = (selector) => document.querySelector(selector);
+      const $$ = (selector) => document.querySelectorAll(selector);
+
+      class ModernMumbaiTransportHub {
+        constructor() {
+          this.elements = {
+            app: $('.app'),
+            mapContainer: $('#leafletMap'),
+            bottomSheet: $('#bottomSheet'),
+            sheetHandle: $('#sheetHandle'),
+            sheetContent: $('#sheetContent'),
+            navButtons: $$('.nav-button'),
+            themeToggle: $('#theme-toggle'),
+            recenterBtn: $('#recenter-map'),
+            zoomInBtn: $('#zoom-in-map'),
+            zoomOutBtn: $('#zoom-out-map'),
+          };
+
+          this.state = {
+            isDragging: false,
+            startY: 0,
+            startHeight: 0,
+            currentContent: 'home'
+          };
+
+          this.map = null;
+          this.init();
+        }
+
+        init() {
+          this.initMap();
+          this.initBottomSheet();
+          this.initNavigation();
+          this.initTheme();
+          this.loadContent('home');
+        }
+
+        initMap() {
+          if (window.L) {
+            this.map = L.map(this.elements.mapContainer, {
+              zoomControl: false,
+              attributionControl: false,
+            }).setView([19.0760, 72.8777], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
+
+            this.elements.recenterBtn.addEventListener('click', () => this.map.setView([19.0760, 72.8777], 12));
+            this.elements.zoomInBtn.addEventListener('click', () => this.map.zoomIn());
+            this.elements.zoomOutBtn.addEventListener('click', () => this.map.zoomOut());
+
+          } else {
+            console.error('Leaflet not loaded');
+            this.elements.mapContainer.innerHTML = '<p style="text-align:center;padding:20px;">Map could not be loaded.</p>';
+          }
+        }
+
+        initBottomSheet() {
+          const { bottomSheet, sheetHandle } = this.elements;
+          sheetHandle.addEventListener('pointerdown', this.dragStart.bind(this));
+          document.addEventListener('pointermove', this.dragging.bind(this));
+          document.addEventListener('pointerup', this.dragEnd.bind(this));
+        }
+
+        dragStart(e) {
+          this.state.isDragging = true;
+          this.state.startY = e.pageY;
+          this.state.startHeight = this.elements.bottomSheet.clientHeight;
+          this.elements.bottomSheet.style.transition = 'none';
+        }
+
+        dragging(e) {
+          if (!this.state.isDragging) return;
+          const delta = this.state.startY - e.pageY;
+          const newHeight = this.state.startHeight + delta;
+          const peekHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bottom-sheet-peek'));
+          const maxHeight = window.innerHeight * 0.9;
+
+          if (newHeight > peekHeight && newHeight < maxHeight) {
+             this.elements.bottomSheet.style.transform = \`translateY(calc(100vh - \${newHeight}px))\`;
+          }
+        }
+
+        dragEnd() {
+          this.state.isDragging = false;
+          this.elements.bottomSheet.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
+          const currentHeight = this.elements.bottomSheet.clientHeight;
+          const peekHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bottom-sheet-peek'));
+
+          if (currentHeight > window.innerHeight * 0.5) {
+            this.elements.bottomSheet.classList.add('full');
+            this.elements.bottomSheet.style.transform = 'translateY(calc(100vh - 90vh))';
+          } else {
+            this.elements.bottomSheet.classList.remove('full');
+            this.elements.bottomSheet.style.transform = \`translateY(calc(100vh - \${peekHeight}px))\`;
+          }
+        }
+
+        initNavigation() {
+          this.elements.navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+              const content = button.dataset.content;
+              this.elements.navButtons.forEach(btn => btn.classList.remove('active'));
+              button.classList.add('active');
+              this.loadContent(content);
+            });
+          });
+        }
+
+        initTheme() {
+            const savedTheme = localStorage.getItem('mth-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            this.updateThemeIcon(savedTheme);
+
+            this.elements.themeToggle.addEventListener('click', () => {
+                let currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('mth-theme', newTheme);
+                this.updateThemeIcon(newTheme);
+            });
+        }
+
+        updateThemeIcon(theme) {
+            const icon = this.elements.themeToggle.querySelector('i');
+            icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+
+        loadContent(content) {
+          this.state.currentContent = content;
+          let html = '';
+          switch(content) {
+            case 'home':
+              html = this.getHomeContent();
+              break;
+            case 'routes':
+              html = this.getRoutesContent();
+              break;
+            case 'tickets':
+              html = this.getTicketsContent();
+              break;
+            case 'profile':
+              html = this.getProfileContent();
+              break;
+          }
+          this.elements.sheetContent.innerHTML = html;
+        }
+
+        getHomeContent() {
+          return \`
+            <div class="section-title">Quick Actions</div>
+            <div class="action-grid">
+              <div class="action-card" data-action="plan-journey">
+                <i class="fa-solid fa-route"></i>
+                <div class="action-card-title">Plan Journey</div>
+              </div>
+              <div class="action-card" data-action="live-status">
+                <i class="fa-solid fa-satellite-dish"></i>
+                <div class="action-card-title">Live Status</div>
+              </div>
+              <div class="action-card" data-action="buy-ticket">
+                <i class="fa-solid fa-ticket"></i>
+                <div class="action-card-title">Buy Ticket</div>
+              </div>
+              <div class="action-card" data-action="recharge-card">
+                <i class="fa-solid fa-credit-card"></i>
+                <div class="action-card-title">Recharge Card</div>
+              </div>
+            </div>
+            <div class="section-title">Live Updates</div>
+            <div class="live-updates-list">
+                \${this.getFakeUpdates()}
+            </div>
+          \`;
+        }
+
+        getFakeUpdates() {
+            const updates = [
+                { type: 'train', text: '<strong>Western Line:</strong> Minor delays of 5-10 mins reported.', time: '2m ago' },
+                { type: 'metro', text: '<strong>Line 1:</strong> Running on time. Peak hour frequency active.', time: '5m ago' },
+                { type: 'bus', text: '<strong>Route 242:</strong> Detour near Bandra Reclamation due to construction.', time: '12m ago' }
+            ];
+            return updates.map(u => \`
+                <div class="update-item">
+                    <div class="update-icon \${u.type}"><i class="fa-solid fa-\${u.type === 'bus' ? 'bus' : 'train'}"></i></div>
+                    <div class="update-text">\${u.text}</div>
+                    <div class="update-time">\${u.time}</div>
+                </div>
+            \`).join('');
+        }
+
+        getRoutesContent() {
+          return \`<div class="section-title">Routes & Schedules</div><p>Route planning and schedule information will be displayed here.</p>\`;
+        }
+
+        getTicketsContent() {
+          return \`<div class="section-title">Mobile Ticketing</div><p>Buy and manage your transport tickets here.</p>\`;
+        }
+
+        getProfileContent() {
+          return \`<div class="section-title">User Profile</div><p>User account settings and preferences will be available here.</p>\`;
+        }
+      }
+
+      window.addEventListener('load', () => {
+        new ModernMumbaiTransportHub();
+      });
+
+    })();
+  </script>
 </body>
-</html>`, {
+</html>`;
+    return new Response(html, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'X-Frame-Options': 'SAMEORIGIN',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      }
-    })
+      },
+    });
   }
   
-  return new Response('Not Found', { status: 404 })
+  return new Response('Not Found', { status: 404 });
 }
