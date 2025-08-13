@@ -1704,7 +1704,7 @@
                 <option value="fewest-transfers">Fewest Transfers</option>
               </select>
             </div>
-            <button class="plan-route-btn" onclick="planSmartRoute()">
+            <button class="plan-route-btn" id="plan-route-btn" onclick="planSmartRoute()">
               <i class="fa-solid fa-search"></i> Plan Route
             </button>
           </div>
@@ -1726,7 +1726,7 @@
         <div class="live-tracking">
           <div class="tracking-filters">
             <input type="text" id="track-route" placeholder="Enter route number (e.g., A1, 21, 242)" />
-            <button onclick="trackRoute()">Track Bus</button>
+            <button id="track-route-btn" onclick="trackRoute()">Track Bus</button>
           </div>
           
           <div class="tracking-results" id="tracking-results">
@@ -5574,6 +5574,29 @@
             console.error('❌ Simple route planner not available');
           }
         }, 1000);
+        
+        // Add event listeners to make buttons work
+        document.addEventListener('DOMContentLoaded', function() {
+          // Plan Route button
+          const planBtn = document.getElementById('plan-route-btn');
+          if (planBtn) {
+            planBtn.addEventListener('click', function() {
+              console.log('🚀 Plan Route button clicked');
+              planSmartRoute();
+            });
+          }
+          
+          // Track Route button
+          const trackBtn = document.getElementById('track-route-btn');
+          if (trackBtn) {
+            trackBtn.addEventListener('click', function() {
+              console.log('🚌 Track Route button clicked');
+              trackRoute();
+            });
+          }
+          
+          console.log('✅ Event listeners added successfully');
+        });
 
 
 
