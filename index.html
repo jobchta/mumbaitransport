@@ -906,6 +906,221 @@
       border-radius: var(--radius-lg);
       padding: 24px;
       margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .route-results {
+      margin-top: 20px;
+    }
+    
+    .no-routes {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    .route-options {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .route-option {
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      transition: all var(--transition-fast);
+    }
+    
+    .route-option.recommended {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .route-option:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .route-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    
+    .route-number {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .route-modes {
+      font-size: 18px;
+    }
+    
+    .recommended-badge {
+      background: var(--primary);
+      color: white;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .route-path {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .route-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .select-route-btn {
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .select-route-btn:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    /* Live Tracking Styles */
+    .live-tracking {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .tracking-filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .tracking-filters input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+    }
+    
+    .tracking-filters button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 12px 20px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    .tracking-results {
+      margin-top: 20px;
+    }
+    
+    .tracking-placeholder {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    .tracking-info {
+      display: grid;
+      gap: 20px;
+    }
+    
+    .eta-info,
+    .crowd-info,
+    .live-buses {
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+    
+    .eta-details,
+    .crowd-details {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    
+    .live-bus {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    
+    .bus-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .bus-status {
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .bus-status.in-transit {
+      background: var(--success);
+      color: white;
+    }
+    
+    .bus-status.starting {
+      background: var(--warning);
+      color: white;
+    }
+    
+    .bus-status.approaching {
+      background: var(--info);
+      color: white;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s ease;
     }
 
     .planner-inputs {
@@ -4821,9 +5036,16 @@
 
         // Initialize real-time tracking
         let realTimeSystem;
+        
+        // Initialize immediately and also on DOM ready
+        realTimeSystem = new RealTimeTrackingSystem();
+        realTimeSystem.init();
+        
         document.addEventListener('DOMContentLoaded', function() {
-          realTimeSystem = new RealTimeTrackingSystem();
-          realTimeSystem.init();
+          if (!realTimeSystem) {
+            realTimeSystem = new RealTimeTrackingSystem();
+            realTimeSystem.init();
+          }
         });
 
         // Global access
@@ -5012,9 +5234,16 @@
 
         // Initialize multi-modal system
         let multiModalSystem;
+        
+        // Initialize immediately and also on DOM ready
+        multiModalSystem = new MultiModalSystem();
+        multiModalSystem.init();
+        
         document.addEventListener('DOMContentLoaded', function() {
-          multiModalSystem = new MultiModalSystem();
-          multiModalSystem.init();
+          if (!multiModalSystem) {
+            multiModalSystem = new MultiModalSystem();
+            multiModalSystem.init();
+          }
         });
 
         // Global access
@@ -5030,21 +5259,41 @@
             return;
           }
           
-          const routes = multiModalSystem.calculateOptimalRoute(from, to, { [preference]: true });
-          displayRouteResults(routes);
+          // Ensure multiModalSystem is available
+          if (!window.multiModalSystem) {
+            console.error('Multi-modal system not initialized');
+            alert('System is initializing. Please try again in a moment.');
+            return;
+          }
+          
+          try {
+            const routes = window.multiModalSystem.calculateOptimalRoute(from, to, { [preference]: true });
+            displayRouteResults(routes);
+          } catch (error) {
+            console.error('Error planning route:', error);
+            alert('Error planning route. Please try again.');
+          }
         }
 
         function displayRouteResults(routes) {
           const resultsContainer = document.getElementById('route-results');
           
-          if (routes.length === 0) {
+          if (!resultsContainer) {
+            console.error('Route results container not found');
+            return;
+          }
+          
+          if (!routes || routes.length === 0) {
             resultsContainer.innerHTML = '<div class="no-routes">No routes found. Try different locations.</div>';
             return;
           }
           
           let html = '<div class="route-options">';
           routes.forEach((route, index) => {
-            const modeIcons = route.modes ? route.modes.map(mode => multiModalSystem.transportModes[mode].icon).join(' ') : '🚌';
+            let modeIcons = '🚌'; // Default bus icon
+            if (route.modes && window.multiModalSystem && window.multiModalSystem.transportModes) {
+              modeIcons = route.modes.map(mode => window.multiModalSystem.transportModes[mode]?.icon || '🚌').join(' ');
+            }
             
             html += `
               <div class="route-option ${index === 0 ? 'recommended' : ''}">
@@ -5086,11 +5335,23 @@
             return;
           }
           
-          const liveBuses = realTimeSystem.getLiveBusData(routeId);
-          const eta = realTimeSystem.getRouteETA(routeId);
-          const crowdLevel = realTimeSystem.getRouteCrowdLevel(routeId);
+          // Ensure realTimeSystem is available
+          if (!window.realTimeSystem) {
+            console.error('Real-time system not initialized');
+            alert('System is initializing. Please try again in a moment.');
+            return;
+          }
           
-          displayTrackingResults(routeId, liveBuses, eta, crowdLevel);
+          try {
+            const liveBuses = window.realTimeSystem.getLiveBusData(routeId);
+            const eta = window.realTimeSystem.getRouteETA(routeId);
+            const crowdLevel = window.realTimeSystem.getRouteCrowdLevel(routeId);
+            
+            displayTrackingResults(routeId, liveBuses, eta, crowdLevel);
+          } catch (error) {
+            console.error('Error tracking route:', error);
+            alert('Error tracking route. Please try again.');
+          }
         }
 
         function displayTrackingResults(routeId, buses, eta, crowdLevel) {
