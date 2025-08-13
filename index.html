@@ -5558,6 +5558,53 @@
           planSmartRoute();
         }
         
+        // SIMPLE WORKING TEST - Bypass all complex stuff
+        function quickTest() {
+          console.log('🚀 QUICK TEST - Direct route planning');
+          
+          const resultsContainer = document.getElementById('route-results');
+          if (!resultsContainer) {
+            console.error('Container not found');
+            return;
+          }
+          
+          const html = `
+            <div class="route-options">
+              <div class="route-option recommended">
+                <div class="route-header">
+                  <span class="route-number">Option 1</span>
+                  <span class="route-modes">🚌</span>
+                  <span class="recommended-badge">Recommended</span>
+                </div>
+                <div class="route-details">
+                  <div class="route-path">Colaba → Bandra</div>
+                  <div class="route-name">A-1 Express</div>
+                  <div class="route-stats">
+                    <span class="stat">
+                      <i class="fa-solid fa-clock"></i> 45 min
+                    </span>
+                    <span class="stat">
+                      <i class="fa-solid fa-indian-rupee-sign"></i> ₹15
+                    </span>
+                    <span class="stat">
+                      <i class="fa-solid fa-exchange-alt"></i> 0 transfers
+                    </span>
+                  </div>
+                </div>
+                <button class="select-route-btn" onclick="alert('Route selected!')">
+                  Select Route
+                </button>
+              </div>
+            </div>
+          `;
+          
+          resultsContainer.innerHTML = html;
+          console.log('✅ QUICK TEST - Routes displayed successfully');
+        }
+        
+        // Make both functions globally available
+        window.quickTest = quickTest;
+        
         // Make test function globally available
         window.testSmartRoutePlanning = testSmartRoutePlanning;
         
