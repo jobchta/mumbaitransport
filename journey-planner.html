@@ -520,6 +520,16 @@
         </div>
       </div>
     </div>
+
+    <div class="live-departures" id="commit-history-section">
+        <h3><i class="fa-solid fa-code-commit"></i> Latest Updates</h3>
+        <div id="commit-history-list">
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading latest updates...
+            </div>
+        </div>
+    </div>
   </div>
 
   <script>
@@ -559,6 +569,43 @@
       getCurrentLocation();
       loadLiveDepartures();
       setDefaultDateTime();
+      loadCommitHistory();
+    }
+
+    async function loadCommitHistory() {
+        const commitList = document.getElementById('commit-history-list');
+        const repoOwner = 'jobchta';
+        const repoName = 'mumbaitransport';
+        const url = `https://api.github.com/repos/${repoOwner}/${repoName}/commits?per_page=5`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const commits = await response.json();
+
+            commitList.innerHTML = '';
+            commits.forEach(commitData => {
+                const item = document.createElement('div');
+                item.className = 'departure-item'; // Re-using existing style
+                const commit = commitData.commit;
+                const author = commit.author.name;
+                const message = commit.message.split('\\n')[0]; // First line of commit message
+                const date = new Date(commit.author.date).toLocaleDateString();
+
+                item.innerHTML = `
+                    <div>
+                        <div class="departure-route" style="font-size: 14px;">${message}</div>
+                        <div style="font-size: 12px; color: #6c757d;">by ${author} on ${date}</div>
+                    </div>
+                `;
+                commitList.appendChild(item);
+            });
+        } catch (error) {
+            console.error('Error fetching commit history:', error);
+            commitList.innerHTML = '<div class="alert">Could not load latest updates.</div>';
+        }
     }
 
     function setupEventListeners() {
