@@ -1170,7 +1170,56 @@
             
             // Initialize the application
             initializeApp();
+            
+            // Add direct onclick handlers as backup
+            addDirectHandlers();
         });
+        
+        function addDirectHandlers() {
+            // Direct onclick handlers for immediate functionality
+            const planRouteBtn = document.getElementById('plan-route-btn');
+            const trackRouteBtn = document.getElementById('track-route-btn');
+            
+            if (planRouteBtn) {
+                planRouteBtn.onclick = function() {
+                    console.log('🔍 Direct Plan Route clicked');
+                    const fromInput = document.getElementById('from-location');
+                    const toInput = document.getElementById('to-location');
+                    
+                    if (fromInput && toInput) {
+                        const from = fromInput.value.trim();
+                        const to = toInput.value.trim();
+                        
+                        if (from && to) {
+                            console.log(`Planning route from ${from} to ${to}`);
+                            planRoute(from, to);
+                        } else {
+                            alert('Please enter both from and to locations');
+                        }
+                    }
+                };
+            }
+            
+            if (trackRouteBtn) {
+                trackRouteBtn.onclick = function() {
+                    console.log('🚌 Direct Track Route clicked');
+                    const routeInput = document.getElementById('track-route');
+                    
+                    if (routeInput) {
+                        const routeId = routeInput.value.trim();
+                        
+                        if (routeId) {
+                            console.log(`Tracking route ${routeId}`);
+                            trackRoute(routeId);
+                        } else {
+                            alert('Please enter a route number');
+                        }
+                    }
+                };
+            }
+            
+            console.log('✅ Direct handlers added');
+        }
         
         function initializeApp() {
             // Add smooth scrolling for navigation links
@@ -1261,10 +1310,13 @@
         
         function planRoute(from, to) {
             console.log(`🔍 Planning route from ${from} to ${to}`);
+            console.log('REAL_MUMBAI_TRANSPORT_DATA available:', !!window.REAL_MUMBAI_TRANSPORT_DATA);
             
             // Use the real Mumbai transport data system
             if (window.REAL_MUMBAI_TRANSPORT_DATA) {
+                console.log('✅ Using real data system');
                 const routes = findRealRoutes(from, to);
+                console.log('Found routes:', routes);
                 displayRouteResults(routes, from, to);
             } else {
                 // Fallback to demo data
@@ -1389,8 +1441,13 @@
         }
         
         function displayRouteResults(routes, from, to) {
+            console.log('Displaying route results for:', routes);
             const resultsContainer = document.getElementById('route-results');
-            if (!resultsContainer) return;
+            console.log('Results container found:', !!resultsContainer);
+            if (!resultsContainer) {
+                console.error('❌ Route results container not found!');
+                return;
+            }
             
             if (routes.length === 0) {
                 resultsContainer.innerHTML = `
