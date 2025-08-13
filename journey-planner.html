@@ -268,10 +268,53 @@
     .step-bus { background: #007bff; }
     .step-metro { background: #6f42c1; }
     .step-walk { background: #ffc107; color: #333; }
+    .step-subway { background: #fd7e14; }
 
     .route-details {
       font-size: 13px;
       color: #6c757d;
+    }
+
+    .route-card.active {
+      border-color: #667eea;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+    }
+
+    .step-separator {
+      color: #adb5bd;
+      font-size: 12px;
+    }
+
+    .detailed-steps {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .detailed-steps ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .detailed-step-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .detailed-step-item i {
+      color: #667eea;
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .detailed-step-item .step-duration {
+      margin-left: auto;
+      font-weight: 600;
+      color: #333;
     }
 
     .live-departures {
@@ -755,79 +798,82 @@
       
       results.style.display = 'block';
       routesList.innerHTML = '<div class="loading"><div class="spinner"></div>Finding best routes...</div>';
-      
-      // Simulate API call
-      setTimeout(() => {
-        const routes = generateRoutes(from, to);
-        displayRoutes(routes);
-      }, 2000);
-    }
 
-    function generateRoutes(from, to) {
-      // This would be replaced with actual API calls
-      const routes = [
-        {
-          duration: '45 min',
-          cost: '₹35',
-          steps: [
-            { type: 'walk', text: 'Walk to station', duration: '5 min' },
-            { type: 'train', text: 'Western Line Fast', duration: '35 min' },
-            { type: 'walk', text: 'Walk to destination', duration: '5 min' }
-          ],
-          departures: ['2 min', '8 min', '14 min'],
-          transfers: 0
+      if (typeof google === 'undefined' || !google.maps) {
+        routesList.innerHTML = '<div class="alert">Could not connect to Google Maps. Please check your connection.</div>';
+        return;
+      }
+
+      const directionsService = new google.maps.DirectionsService();
+      const request = {
+        origin: from,
+        destination: to,
+        travelMode: 'TRANSIT',
+        transitOptions: {
+          modes: ['BUS', 'TRAIN', 'SUBWAY'],
+          routingPreference: 'FEWER_TRANSFERS'
         },
-        {
-          duration: '52 min',
-          cost: '₹25',
-          steps: [
-            { type: 'walk', text: 'Walk to bus stop', duration: '3 min' },
-            { type: 'bus', text: 'BEST Bus A1E', duration: '44 min' },
-            { type: 'walk', text: 'Walk to destination', duration: '5 min' }
-          ],
-          departures: ['5 min', '15 min', '25 min'],
-          transfers: 0
-        },
-        {
-          duration: '38 min',
-          cost: '₹45',
-          steps: [
-            { type: 'walk', text: 'Walk to metro', duration: '8 min' },
-            { type: 'metro', text: 'Metro Line 1', duration: '22 min' },
-            { type: 'train', text: 'Western Line', duration: '8 min' }
-          ],
-          departures: ['3 min', '9 min', '15 min'],
-          transfers: 1
+        provideRouteAlternatives: true
+      };
+
+      directionsService.route(request, function(response, status) {
+        if (status === 'OK') {
+          displayRoutes(response.routes);
+        } else {
+          routesList.innerHTML = `<div class="alert">Could not find a route. Status: ${status}</div>`;
         }
-      ];
-      
-      return routes;
+      });
     }
 
     function displayRoutes(routes) {
       const routesList = document.getElementById('routesList');
       routesList.innerHTML = '';
       
-      routes.forEach((route, index) => {
+      routes.slice(0, 3).forEach((route, index) => {
+        const leg = route.legs[0];
         const routeCard = document.createElement('div');
         routeCard.className = 'route-card';
-        routeCard.onclick = () => selectRoute(route);
+        // Add a data attribute to store the detailed steps, to be shown on click
+        routeCard.dataset.routeIndex = index;
+        routeCard.onclick = () => selectRoute(routeCard, route);
         
-        const stepsHtml = route.steps.map(step => 
-          `<div class="step-icon step-${step.type}">
-            <i class="fa-solid fa-${getStepIcon(step.type)}"></i>
+        const stepsIconsHtml = leg.steps.map(step => {
+          let type = (step.travel_mode || 'walk').toLowerCase();
+          if (type === 'transit') {
+            type = (step.transit.line.vehicle.type || 'train').toLowerCase();
+          }
+          return `<div class="step-icon step-${type}">
+            <i class="fa-solid fa-${getStepIcon(type)}"></i>
           </div>`
-        ).join('');
+        }).join('<i class="fa-solid fa-chevron-right step-separator"></i>');
         
+        const transfers = leg.steps.filter(s => s.travel_mode === 'TRANSIT').length - 1;
+
+        const detailedStepsHtml = leg.steps.map(step => {
+            const icon = getStepIcon((step.travel_mode || 'walk').toLowerCase());
+            let line_name = '';
+            if(step.transit && step.transit.line){
+                line_name = step.transit.line.short_name || step.transit.line.name;
+            }
+            return `<li class="detailed-step-item">
+                <i class="fa-solid fa-${icon}"></i>
+                <span>${step.instructions}</span>
+                <strong class="step-duration">${step.duration.text}</strong>
+            </li>`;
+        }).join('');
+
         routeCard.innerHTML = `
           <div class="route-header">
-            <div class="route-time">${route.duration}</div>
-            <div class="route-cost">${route.cost}</div>
+            <div class="route-time">${leg.duration.text}</div>
+            <div class="route-cost">${route.fare ? route.fare.text : 'N/A'}</div>
           </div>
-          <div class="route-steps">${stepsHtml}</div>
+          <div class="route-steps">${stepsIconsHtml}</div>
           <div class="route-details">
-            ${route.transfers === 0 ? 'Direct route' : `${route.transfers} transfer${route.transfers > 1 ? 's' : ''}`} • 
-            Next departures: ${route.departures.join(', ')}
+            ${transfers <= 0 ? 'Direct route' : `${transfers} transfer${transfers > 1 ? 's' : ''}`} •
+            ${leg.departure_time.text} - ${leg.arrival_time.text}
+          </div>
+          <div class="detailed-steps" style="display: none;">
+            <ul>${detailedStepsHtml}</ul>
           </div>
         `;
         
@@ -840,18 +886,19 @@
         walk: 'person-walking',
         train: 'train',
         bus: 'bus',
-        metro: 'train-tram'
+        metro: 'train-tram',
+        subway: 'train-subway'
       };
       return icons[type] || 'circle';
     }
 
-    function selectRoute(route) {
-      alert(`Route selected! You will receive step-by-step navigation.
-      
-First step: ${route.steps[0].text}
-Next departure: ${route.departures[0]}
-Total time: ${route.duration}
-Total cost: ${route.cost}`);
+    function selectRoute(cardElement, route) {
+        const details = cardElement.querySelector('.detailed-steps');
+        if (details) {
+            const isVisible = details.style.display === 'block';
+            details.style.display = isVisible ? 'none' : 'block';
+            cardElement.classList.toggle('active', !isVisible);
+        }
     }
 
     function loadLiveDepartures() {
