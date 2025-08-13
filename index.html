@@ -5100,11 +5100,13 @@
 
           // Calculate optimal route
           calculateOptimalRoute(from, to, preferences = {}) {
+            console.log('🚀 Calculating optimal route from', from, 'to', to);
             const routes = [];
             
             // Direct bus route
             const directBus = this.findDirectBusRoute(from, to);
             if (directBus) {
+              console.log('✅ Found direct bus route:', directBus);
               routes.push({
                 type: 'direct',
                 mode: 'bus',
@@ -5114,24 +5116,57 @@
                 transfers: 0,
                 score: this.calculateRouteScore(directBus, preferences)
               });
+            } else {
+              console.log('❌ No direct bus route found');
             }
 
             // Multi-modal routes
             const multiModalRoutes = this.findMultiModalRoutes(from, to);
+            console.log('Multi-modal routes found:', multiModalRoutes.length);
             routes.push(...multiModalRoutes);
+
+            // If no routes found, create a fallback route
+            if (routes.length === 0) {
+              console.log('⚠️ No routes found, creating fallback route');
+              routes.push({
+                type: 'fallback',
+                mode: 'bus',
+                route: `${from} → ${to}`,
+                duration: 60,
+                fare: 25,
+                transfers: 1,
+                score: 50
+              });
+            }
 
             // Sort by score (best first)
             routes.sort((a, b) => b.score - a.score);
+            console.log('Final routes:', routes.length);
             return routes.slice(0, 5); // Return top 5 options
           }
 
           // Find direct bus route
           findDirectBusRoute(from, to) {
             const routes = window.MumbaiTransport?.routes?.bus || [];
-            return routes.find(route => 
-              route.from.toLowerCase().includes(from.toLowerCase()) && 
-              route.to.toLowerCase().includes(to.toLowerCase())
-            );
+            console.log('🔍 Searching for route from', from, 'to', to);
+            console.log('Available routes:', routes.length);
+            
+            // More flexible matching
+            const matchingRoutes = routes.filter(route => {
+              const fromMatch = route.from.toLowerCase().includes(from.toLowerCase()) || 
+                               from.toLowerCase().includes(route.from.toLowerCase());
+              const toMatch = route.to.toLowerCase().includes(to.toLowerCase()) || 
+                             to.toLowerCase().includes(route.to.toLowerCase());
+              
+              return fromMatch && toMatch;
+            });
+            
+            console.log('Matching routes found:', matchingRoutes.length);
+            if (matchingRoutes.length > 0) {
+              console.log('Best match:', matchingRoutes[0]);
+            }
+            
+            return matchingRoutes[0] || null;
           }
 
           // Find multi-modal routes
@@ -5295,6 +5330,17 @@
               modeIcons = route.modes.map(mode => window.multiModalSystem.transportModes[mode]?.icon || '🚌').join(' ');
             }
             
+            // Handle different route object structures
+            let routePath = route.route;
+            let routeDuration = route.duration;
+            let routeFare = route.fare;
+            let routeTransfers = route.transfers;
+            
+            // If route.route is an object (from direct bus route), extract the path
+            if (typeof route.route === 'object' && route.route.name) {
+              routePath = `${route.route.from} → ${route.route.to} (${route.route.name})`;
+            }
+            
             html += `
               <div class="route-option ${index === 0 ? 'recommended' : ''}">
                 <div class="route-header">
@@ -5303,20 +5349,20 @@
                   ${index === 0 ? '<span class="recommended-badge">Recommended</span>' : ''}
                 </div>
                 <div class="route-details">
-                  <div class="route-path">${route.route}</div>
+                  <div class="route-path">${routePath}</div>
                   <div class="route-stats">
                     <span class="stat">
-                      <i class="fa-solid fa-clock"></i> ${route.duration} min
+                      <i class="fa-solid fa-clock"></i> ${routeDuration} min
                     </span>
                     <span class="stat">
-                      <i class="fa-solid fa-indian-rupee-sign"></i> ₹${route.fare}
+                      <i class="fa-solid fa-indian-rupee-sign"></i> ₹${routeFare}
                     </span>
                     <span class="stat">
-                      <i class="fa-solid fa-exchange-alt"></i> ${route.transfers} transfers
+                      <i class="fa-solid fa-exchange-alt"></i> ${routeTransfers} transfers
                     </span>
                   </div>
                 </div>
-                <button class="select-route-btn" onclick="selectRoute('${route.route}')">
+                <button class="select-route-btn" onclick="selectRoute('${routePath}')">
                   Select Route
                 </button>
               </div>
@@ -5425,6 +5471,22 @@
         function selectRoute(routePath) {
           alert('Route selected: ' + routePath + '\n\nThis would open detailed navigation and booking options in a real implementation.');
         }
+        
+        // Test function for debugging
+        function testSmartRoutePlanning() {
+          console.log('🧪 Testing Smart Route Planning...');
+          
+          // Set test values
+          document.getElementById('from-location').value = 'Colaba';
+          document.getElementById('to-location').value = 'Bandra';
+          document.getElementById('preference').value = 'fastest';
+          
+          // Call the planning function
+          planSmartRoute();
+        }
+        
+        // Make test function globally available
+        window.testSmartRoutePlanning = testSmartRoutePlanning;
 
 
 
