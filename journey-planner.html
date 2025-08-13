@@ -5,517 +5,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mumbai Journey Planner - Real-Time Transport</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.0/dist/tailwind.min.css" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f8f9fa;
-      color: #333;
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 400px;
-      margin: 0 auto;
-      background: white;
-      min-height: 100vh;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    }
-
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .header h1 {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    .header p {
-      opacity: 0.9;
-      font-size: 14px;
-    }
-
-    .planner {
-      padding: 20px;
-    }
-
-    .location-input-group {
-      position: relative;
-      margin-bottom: 12px;
-    }
-
-    .location-input {
-      width: 100%;
-      padding: 16px 50px 16px 50px;
-      border: 2px solid #e9ecef;
-      border-radius: 12px;
-      font-size: 16px;
-      transition: all 0.3s ease;
-    }
-
-    .location-input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 2;
-    }
-
-    .location-btn {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: #667eea;
-      font-size: 18px;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 6px;
-      transition: background 0.2s ease;
-    }
-
-    .location-btn:hover {
-      background: rgba(102, 126, 234, 0.1);
-    }
-
-    .swap-btn {
-      position: absolute;
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: white;
-      border: 2px solid #e9ecef;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 10;
-      color: #667eea;
-      font-size: 16px;
-      transition: all 0.3s ease;
-    }
-
-    .swap-btn:hover {
-      background: #667eea;
-      color: white;
-      transform: translateY(-50%) rotate(180deg);
-    }
-
-    .journey-options {
-      background: #f8f9fa;
-      padding: 16px;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
-
-    .time-section {
-      margin-bottom: 16px;
-    }
-
-    .time-section label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #495057;
-    }
-
-    .time-buttons {
-      display: flex;
-      gap: 8px;
-    }
-
-    .time-btn {
-      flex: 1;
-      padding: 10px;
-      border: 2px solid #e9ecef;
-      background: white;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 14px;
-    }
-
-    .time-btn.active {
+    .active {
       background: #667eea;
       color: white;
       border-color: #667eea;
     }
-
-    .datetime-input {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e9ecef;
-      border-radius: 8px;
-      font-size: 14px;
-      margin-top: 8px;
-    }
-
-    .preferences {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .preference-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14px;
-    }
-
-    .plan-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      padding: 16px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .plan-btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .plan-btn:active {
-      transform: translateY(0);
-    }
-
-    .results {
-      margin-top: 20px;
-      display: none;
-    }
-
-    .route-card {
-      background: white;
-      border: 1px solid #e9ecef;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .route-card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      transform: translateY(-2px);
-    }
-
-    .route-header {
-      display: flex;
-      justify-content: between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .route-time {
-      font-size: 18px;
-      font-weight: 600;
-      color: #667eea;
-    }
-
-    .route-cost {
-      background: #e8f5e8;
-      color: #28a745;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .route-steps {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .step-icon {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: white;
-    }
-
-    .step-train { background: #28a745; }
-    .step-bus { background: #007bff; }
+    .step-walk { background: #28a745; }
+    .step-train { background: #007bff; }
     .step-metro { background: #6f42c1; }
-    .step-walk { background: #ffc107; color: #333; }
-
-    .route-details {
-      font-size: 13px;
-      color: #6c757d;
-    }
-
-    .live-departures {
-      margin-top: 24px;
-      padding: 20px;
-      background: #f8f9fa;
-    }
-
-    .departure-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px;
-      background: white;
-      border-radius: 8px;
-      margin-bottom: 8px;
-    }
-
-    .departure-route {
-      font-weight: 600;
-    }
-
-    .departure-time {
-      color: #667eea;
-      font-weight: 600;
-    }
-
-    .quick-routes {
-      padding: 0 20px 20px;
-    }
-
-    .quick-routes h3 {
-      margin-bottom: 12px;
-      color: #495057;
-    }
-
-    .quick-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .quick-card {
-      background: white;
-      border: 1px solid #e9ecef;
-      border-radius: 8px;
-      padding: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .quick-card:hover {
-      background: #667eea;
-      color: white;
-    }
-
-    .quick-card i {
-      font-size: 20px;
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: #6c757d;
-    }
-
-    .spinner {
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #667eea;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 12px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .alert {
-      background: #fff3cd;
-      border: 1px solid #ffeaa7;
-      color: #856404;
-      padding: 12px;
-      border-radius: 8px;
-      margin: 12px 20px;
-      font-size: 14px;
-    }
-
-    .suggestions {
-      background: rgba(102, 126, 234, 0.1);
-      max-height: 200px;
-      overflow-y: auto;
-      border-radius: 0 0 12px 12px;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      display: none;
-    }
-
-    .suggestion-item {
-      padding: 12px 16px;
-      cursor: pointer;
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-      background: white;
-    }
-
-    .suggestion-item:hover {
-      background: #f8f9fa;
-    }
-
-    .suggestion-item:last-child {
-      border-bottom: none;
-    }
+    .step-bus { background: #ffc107; color: #333; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1><i class="fa-solid fa-route"></i> Mumbai Journey Planner</h1>
-      <p>Real-time routes & departures</p>
+  <div class="max-w-md mx-auto min-h-screen bg-white shadow-lg">
+    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-5 text-center">
+      <h1 class="text-2xl mb-2"><i class="fa-solid fa-route"></i> Mumbai Journey Planner</h1>
+      <p class="text-sm opacity-90">Real-time routes & departures</p>
     </div>
 
-    <div class="planner">
+    <div class="p-5">
       <form id="journeyForm">
-        <div style="position: relative;">
-          <div class="location-input-group">
-            <div class="input-icon">
+        <div class="relative mb-3">
+          <div class="relative mb-3">
+            <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
               <i class="fa-solid fa-circle" style="color: #28a745;"></i>
             </div>
             <input 
               type="text" 
               id="fromInput" 
-              class="location-input" 
+              class="w-full py-4 pl-12 pr-12 border-2 border-gray-200 rounded-xl text-base transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" 
               placeholder="From: Current location"
               autocomplete="off"
             />
-            <button type="button" id="useLocationBtn" class="location-btn">
+            <button type="button" id="useLocationBtn" class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-transparent border-none text-indigo-500 text-xl cursor-pointer p-2 rounded-md hover:bg-indigo-100">
               <i class="fa-solid fa-location-crosshairs"></i>
             </button>
-            <div id="fromSuggestions" class="suggestions"></div>
+            <div id="fromSuggestions" class="suggestions absolute left-0 right-0 top-full bg-indigo-100 max-h-52 overflow-y-auto rounded-b-xl z-10 hidden"></div>
           </div>
 
-          <button type="button" id="swapBtn" class="swap-btn">
+          <button type="button" id="swapBtn" class="absolute right-5 top-1/2 -translate-y-1/2 bg-white border-2 border-gray-200 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer z-10 text-indigo-500 text-base transition-all duration-300 hover:bg-indigo-500 hover:text-white hover:rotate-180">
             <i class="fa-solid fa-arrow-up-down"></i>
           </button>
 
-          <div class="location-input-group">
-            <div class="input-icon">
+          <div class="relative mb-3">
+            <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
               <i class="fa-solid fa-location-dot" style="color: #dc3545;"></i>
             </div>
             <input 
               type="text" 
               id="toInput" 
-              class="location-input" 
+              class="w-full py-4 pl-12 pr-12 border-2 border-gray-200 rounded-xl text-base transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" 
               placeholder="To: Enter destination"
               autocomplete="off"
               required
             />
-            <button type="button" id="mapBtn" class="location-btn">
+            <button type="button" id="mapBtn" class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-transparent border-none text-indigo-500 text-xl cursor-pointer p-2 rounded-md hover:bg-indigo-100">
               <i class="fa-solid fa-map-pin"></i>
             </button>
-            <div id="toSuggestions" class="suggestions"></div>
+            <div id="toSuggestions" class="suggestions absolute left-0 right-0 top-full bg-indigo-100 max-h-52 overflow-y-auto rounded-b-xl z-10 hidden"></div>
           </div>
         </div>
 
-        <div class="journey-options">
-          <div class="time-section">
-            <label>When do you want to travel?</label>
-            <div class="time-buttons">
-              <button type="button" class="time-btn active" data-time="now">
+        <div class="bg-gray-100 p-4 rounded-xl my-5">
+          <div class="mb-4">
+            <label class="block font-semibold mb-2 text-gray-600">When do you want to travel?</label>
+            <div class="flex gap-2">
+              <button type="button" class="time-btn active flex-1 py-2 px-3 border-2 border-gray-200 bg-white rounded-lg cursor-pointer text-sm transition-all duration-200" data-time="now">
                 <i class="fa-solid fa-clock"></i> Now
               </button>
-              <button type="button" class="time-btn" data-time="depart">
+              <button type="button" class="time-btn flex-1 py-2 px-3 border-2 border-gray-200 bg-white rounded-lg cursor-pointer text-sm transition-all duration-200" data-time="depart">
                 <i class="fa-solid fa-calendar"></i> Depart at
               </button>
-              <button type="button" class="time-btn" data-time="arrive">
+              <button type="button" class="time-btn flex-1 py-2 px-3 border-2 border-gray-200 bg-white rounded-lg cursor-pointer text-sm transition-all duration-200" data-time="arrive">
                 <i class="fa-solid fa-flag-checkered"></i> Arrive by
               </button>
             </div>
-            <input type="datetime-local" id="customDateTime" class="datetime-input" style="display: none;">
+            <input type="datetime-local" id="customDateTime" class="w-full py-3 border-2 border-gray-200 rounded-lg text-sm mt-2 hidden">
           </div>
 
-          <div class="preferences">
-            <label class="preference-item">
-              <input type="checkbox" id="fastest" checked> 
+          <div class="flex flex-wrap gap-3">
+            <label class="preference-item flex items-center gap-1.5 text-sm">
+              <input type="checkbox" id="fastest" checked class="mr-1">
               <i class="fa-solid fa-bolt"></i> Fastest
             </label>
-            <label class="preference-item">
-              <input type="checkbox" id="cheapest"> 
+            <label class="preference-item flex items-center gap-1.5 text-sm">
+              <input type="checkbox" id="cheapest" class="mr-1">
               <i class="fa-solid fa-coins"></i> Cheapest
             </label>
-            <label class="preference-item">
-              <input type="checkbox" id="accessible"> 
+            <label class="preference-item flex items-center gap-1.5 text-sm">
+              <input type="checkbox" id="accessible" class="mr-1">
               <i class="fa-solid fa-wheelchair"></i> Accessible
             </label>
           </div>
         </div>
 
-        <button type="submit" class="plan-btn">
+        <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-none py-4 rounded-xl text-lg font-semibold cursor-pointer transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0">
           <i class="fa-solid fa-route"></i> Find Best Routes
         </button>
       </form>
 
-      <div id="results" class="results">
-        <h3><i class="fa-solid fa-list"></i> Route Options</h3>
+      <div id="results" class="mt-5 hidden">
+        <h3 class="text-xl font-semibold mb-2"><i class="fa-solid fa-list"></i> Route Options</h3>
         <div id="routesList"></div>
       </div>
     </div>
 
-    <div class="live-departures">
-      <h3><i class="fa-solid fa-clock"></i> Live Departures Nearby</h3>
+    <div class="mt-6 p-5 bg-gray-100">
+      <h3 class="text-xl font-semibold mb-2"><i class="fa-solid fa-clock"></i> Live Departures Nearby</h3>
       <div id="departuresList">
-        <div class="loading">
-          <div class="spinner"></div>
+        <div class="loading text-center p-5 text-gray-600">
+          <div class="spinner border-2 border-gray-200 border-t-2 border-t-indigo-500 rounded-full w-8 h-8 animate-spin mx-auto mb-3"></div>
           Enable location to see live departures
         </div>
       </div>
     </div>
 
-    <div class="quick-routes">
-      <h3>Popular Routes</h3>
-      <div class="quick-grid">
-        <div class="quick-card" data-from="Churchgate" data-to="Andheri">
-          <i class="fa-solid fa-train"></i>
+    <div class="px-5 pb-5">
+      <h3 class="text-xl font-semibold mb-3">Popular Routes</h3>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="quick-card bg-white border border-gray-200 rounded-lg p-3 text-center cursor-pointer transition-all duration-200 hover:bg-indigo-500 hover:text-white" data-from="Churchgate" data-to="Andheri">
+          <i class="fa-solid fa-train text-2xl mb-1 block"></i>
           <div>Churchgate → Andheri</div>
         </div>
-        <div class="quick-card" data-from="CST" data-to="Thane">
-          <i class="fa-solid fa-train"></i>
+        <div class="quick-card bg-white border border-gray-200 rounded-lg p-3 text-center cursor-pointer transition-all duration-200 hover:bg-indigo-500 hover:text-white" data-from="CST" data-to="Thane">
+          <i class="fa-solid fa-train text-2xl mb-1 block"></i>
           <div>CST → Thane</div>
         </div>
-        <div class="quick-card" data-from="Bandra" data-to="Colaba">
-          <i class="fa-solid fa-bus"></i>
+        <div class="quick-card bg-white border border-gray-200 rounded-lg p-3 text-center cursor-pointer transition-all duration-200 hover:bg-indigo-500 hover:text-white" data-from="Bandra" data-to="Colaba">
+          <i class="fa-solid fa-bus text-2xl mb-1 block"></i>
           <div>Bandra → Colaba</div>
         </div>
-        <div class="quick-card" data-from="Versova" data-to="Ghatkopar">
-          <i class="fa-solid fa-train-tram"></i>
+        <div class="quick-card bg-white border border-gray-200 rounded-lg p-3 text-center cursor-pointer transition-all duration-200 hover:bg-indigo-500 hover:text-white" data-from="Versova" data-to="Ghatkopar">
+          <i class="fa-solid fa-train-tram text-2xl mb-1 block"></i>
           <div>Metro Line 1</div>
         </div>
       </div>
@@ -655,7 +278,7 @@
         suggestions.innerHTML = '';
         matches.slice(0, 5).forEach(location => {
           const item = document.createElement('div');
-          item.className = 'suggestion-item';
+          item.className = 'suggestion-item p-3 cursor-pointer border-b border-gray-200 bg-white hover:bg-gray-100';
           item.innerHTML = `
             <div style="font-weight: 600;">${location.name}</div>
             <div style="font-size: 12px; color: #6c757d; text-transform: capitalize;">${location.type}</div>
@@ -693,7 +316,7 @@
       const routesList = document.getElementById('routesList');
       
       results.style.display = 'block';
-      routesList.innerHTML = '<div class="loading"><div class="spinner"></div>Finding best routes...</div>';
+      routesList.innerHTML = '<div class="loading text-center p-5"><div class="spinner border-2 border-gray-200 border-t-2 border-t-indigo-500 rounded-full w-8 h-8 animate-spin mx-auto mb-3"></div>Finding best routes...</div>';
       
       // Simulate API call
       setTimeout(() => {
@@ -749,22 +372,24 @@
       
       routes.forEach((route, index) => {
         const routeCard = document.createElement('div');
-        routeCard.className = 'route-card';
+        routeCard.className = 'bg-white border border-gray-200 rounded-xl p-4 mb-3 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5';
         routeCard.onclick = () => selectRoute(route);
         
         const stepsHtml = route.steps.map(step => 
-          `<div class="step-icon step-${step.type}">
+          `<div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] text-white ${'step-' + step.type}">
             <i class="fa-solid fa-${getStepIcon(step.type)}"></i>
           </div>`
         ).join('');
         
         routeCard.innerHTML = `
-          <div class="route-header">
-            <div class="route-time">${route.duration}</div>
-            <div class="route-cost">${route.cost}</div>
+          <div class="flex justify-between items-center mb-3">
+            <div class="text-lg font-semibold text-indigo-500">${route.duration}</div>
+            <div class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-semibold">${route.cost}</div>
           </div>
-          <div class="route-steps">${stepsHtml}</div>
-          <div class="route-details">
+          <div class="flex items-center gap-2 mb-2">
+            ${stepsHtml}
+          </div>
+          <div class="text-sm text-gray-600">
             ${route.transfers === 0 ? 'Direct route' : `${route.transfers} transfer${route.transfers > 1 ? 's' : ''}`} • 
             Next departures: ${route.departures.join(', ')}
           </div>
@@ -798,8 +423,8 @@ Total cost: ${route.cost}`);
       
       if (!userLocation) {
         departuresList.innerHTML = `
-          <div class="loading">
-            <i class="fa-solid fa-location-crosshairs" style="font-size: 20px; margin-bottom: 8px;"></i>
+          <div class="loading text-center p-5 text-gray-600">
+            <i class="fa-solid fa-location-crosshairs text-2xl mb-2"></i>
             <div>Enable location to see live departures</div>
           </div>
         `;
@@ -816,12 +441,12 @@ Total cost: ${route.cost}`);
         ];
         
         departuresList.innerHTML = departures.map(dep => `
-          <div class="departure-item">
+          <div class="flex justify-between items-center p-3 bg-white rounded-lg mb-2">
             <div>
-              <div class="departure-route">${dep.route}</div>
-              <div style="font-size: 12px; color: #6c757d;">${dep.destination} • ${dep.platform}</div>
+              <div class="font-semibold">${dep.route}</div>
+              <div class="text-sm text-gray-600">${dep.destination} • ${dep.platform}</div>
             </div>
-            <div class="departure-time">${dep.time}</div>
+            <div class="text-indigo-500 font-semibold">${dep.time}</div>
           </div>
         `).join('');
       }, 1000);
