@@ -565,11 +565,25 @@
     });
 
     function initializeApp() {
+      handleURLParams(); // Add this call
       setupEventListeners();
       getCurrentLocation();
       loadLiveDepartures();
       setDefaultDateTime();
       loadCommitHistory();
+    }
+
+    function handleURLParams() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('embed') === '1') {
+        document.body.classList.add('embedded');
+        // In embed mode, we might want to hide certain elements
+        const header = document.querySelector('.header');
+        if(header) header.style.display = 'none';
+        const container = document.querySelector('.container');
+        if(container) container.style.boxShadow = 'none';
+      }
+      // Future params like mode or section can be handled here
     }
 
     async function loadCommitHistory() {
