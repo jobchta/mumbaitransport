@@ -1,586 +1,878 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#5E6AD2" />
-  <meta name="color-scheme" content="light dark" />
-  <meta name="description" content="Mumbai Transport Hub: Live map, schedules, and updates for BEST buses, local trains, metro, monorail, and ferries." />
-  <title>Mumbai Transport Hub | Real-Time Tracking</title>
-
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-  <link rel="preconnect" href="https://unpkg.com" crossorigin />
-  <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin />
-  <link rel="preconnect" href="https://maps.googleapis.com" crossorigin />
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-  <!-- Leaflet for real map rendering -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
-  <!-- Google Maps API for accurate journey calculations -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=geometry,places&callback=initGoogleMaps"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mumbai Journey Planner - Real-Time Transport</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      --primary-hue: 235;
-      --primary-saturation: 58%;
-      --primary-lightness: 60%;
-      --primary: hsl(var(--primary-hue), var(--primary-saturation), var(--primary-lightness));
-      --primary-dark: hsl(var(--primary-hue), var(--primary-saturation), 45%);
-      --primary-light: hsl(var(--primary-hue), var(--primary-saturation), 96%);
-      --background: #F9FAFB;
-      --surface: #FFFFFF;
-      --surface-secondary: #F3F4F6;
-      --border: #E5E7EB;
-      --text-primary: #1F2937;
-      --text-secondary: #6B7280;
-      --text-tertiary: #9CA3AF;
-      --success: #10B981;
-      --warning: #F59E0B;
-      --error: #EF4444;
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --radius-xl: 16px;
-      --radius-full: 9999px;
-      --bottom-sheet-height: 60vh;
-      --bottom-sheet-peek: 180px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    [data-theme="dark"] {
-      --background: #111827;
-      --surface: #1F2937;
-      --surface-secondary: #374151;
-      --border: #374151;
-      --text-primary: #F9FAFB;
-      --text-secondary: #9CA3AF;
-      --text-tertiary: #6B7280;
-      --primary-light: hsl(var(--primary-hue), var(--primary-saturation), 20%);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--background);
-      color: var(--text-primary);
-      font-size: 16px;
-      line-height: 1.5;
-      overflow: hidden;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      transition: background-color 0.2s, color 0.2s;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
     }
-    .app {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .planner {
+      padding: 20px;
+    }
+
+    .location-input-group {
       position: relative;
+      margin-bottom: 12px;
     }
-    .map-container {
-      flex-grow: 1;
-      background-color: var(--surface-secondary);
-      position: relative;
-    }
-    #leafletMap {
-      height: 100%;
+
+    .location-input {
       width: 100%;
+      padding: 16px 50px 16px 50px;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
     }
-    .bottom-sheet {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: var(--bottom-sheet-height);
-      background-color: var(--surface);
-      border-top-left-radius: var(--radius-xl);
-      border-top-right-radius: var(--radius-xl);
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      transform: translateY(calc(var(--bottom-sheet-height) - var(--bottom-sheet-peek)));
-      transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-      touch-action: none;
+
+    .location-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
-    .bottom-sheet.full {
-      transform: translateY(0);
-    }
-    .sheet-handle {
-      padding: 12px;
-      cursor: grab;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .sheet-handle-bar {
-      width: 40px;
-      height: 5px;
-      background-color: var(--border);
-      border-radius: var(--radius-full);
-    }
-    .sheet-content {
-      padding: 0 16px 16px;
-      flex-grow: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .search-bar {
-      position: fixed;
-      top: 16px;
+
+    .input-icon {
+      position: absolute;
       left: 16px;
-      right: 16px;
-      z-index: 1001;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+
+    .location-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #667eea;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .location-btn:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .swap-btn {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: white;
+      border: 2px solid #e9ecef;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      color: #667eea;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .swap-btn:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .journey-options {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .time-section {
+      margin-bottom: 16px;
+    }
+
+    .time-section label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #495057;
+    }
+
+    .time-buttons {
       display: flex;
       gap: 8px;
     }
-    .search-input {
-      flex-grow: 1;
-      padding: 12px 16px;
-      font-size: 16px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      background-color: var(--surface);
-      color: var(--text-primary);
-      box-shadow: var(--shadow-md);
-      outline: none;
-    }
-    .search-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-light);
-    }
-    .search-btn {
-      width: 48px;
-      height: 48px;
-      flex-shrink: 0;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      background-color: var(--surface);
-      color: var(--text-secondary);
-      font-size: 18px;
+
+    .time-btn {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #e9ecef;
+      background: white;
+      border-radius: 8px;
       cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+
+    .time-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .datetime-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .preferences {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .preference-item {
       display: flex;
       align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow-md);
+      gap: 6px;
+      font-size: 14px;
     }
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 70px;
-      background-color: var(--surface);
-      border-top: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      z-index: 1002;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    }
-    .nav-button {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      background: none;
+
+    .plan-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
       border: none;
-      color: var(--text-tertiary);
-      font-size: 12px;
-      font-weight: 500;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
-      transition: color 0.2s;
+      transition: transform 0.2s ease;
     }
-    .nav-button.active {
-      color: var(--primary);
+
+    .plan-btn:hover {
+      transform: translateY(-2px);
     }
-    .nav-button i {
-      font-size: 20px;
+
+    .plan-btn:active {
+      transform: translateY(0);
     }
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border-width: 0;
+
+    .results {
+      margin-top: 20px;
+      display: none;
     }
-    .section-title {
+
+    .route-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .route-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+
+    .route-header {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .route-time {
       font-size: 18px;
       font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--text-primary);
+      color: #667eea;
     }
-    .action-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
+
+    .route-cost {
+      background: #e8f5e8;
+      color: #28a745;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
     }
-    .action-card {
-      background-color: var(--surface-secondary);
-      padding: 16px;
-      border-radius: var(--radius-lg);
-      text-align: center;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .action-card:hover {
-      background-color: var(--primary-light);
-    }
-    .action-card i {
-      font-size: 24px;
-      color: var(--primary);
+
+    .route-steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 8px;
     }
-    .action-card-title {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-secondary);
-    }
-    .live-updates-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .update-item {
+
+    .step-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: center;
+      font-size: 10px;
+      color: white;
+    }
+
+    .step-train { background: #28a745; }
+    .step-bus { background: #007bff; }
+    .step-metro { background: #6f42c1; }
+    .step-walk { background: #ffc107; color: #333; }
+
+    .route-details {
+      font-size: 13px;
+      color: #6c757d;
+    }
+
+    .live-departures {
+      margin-top: 24px;
+      padding: 20px;
+      background: #f8f9fa;
+    }
+
+    .departure-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 12px;
-      background-color: var(--surface-secondary);
-      border-radius: var(--radius-lg);
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 8px;
     }
-    .update-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: var(--radius-full);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      flex-shrink: 0;
+
+    .departure-route {
+      font-weight: 600;
     }
-    .update-icon.bus { background-color: var(--primary); }
-    .update-icon.train { background-color: var(--success); }
-    .update-icon.metro { background-color: #8B5CF6; }
-    .update-text {
-      flex-grow: 1;
-      font-size: 14px;
-      color: var(--text-secondary);
+
+    .departure-time {
+      color: #667eea;
+      font-weight: 600;
     }
-    .update-text strong {
-      color: var(--text-primary);
-      font-weight: 500;
+
+    .quick-routes {
+      padding: 0 20px 20px;
     }
-    .update-time {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      flex-shrink: 0;
+
+    .quick-routes h3 {
+      margin-bottom: 12px;
+      color: #495057;
     }
-    .map-overlay-buttons {
-      position: fixed;
-      bottom: calc(var(--bottom-sheet-peek) + 20px);
-      right: 16px;
-      z-index: 1001;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
-    .map-btn {
-      width: 48px;
-      height: 48px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-full);
-      background-color: var(--surface);
-      color: var(--text-secondary);
-      font-size: 18px;
+
+    .quick-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow-md);
-      transition: background-color 0.2s;
+      transition: all 0.2s ease;
     }
-    .map-btn:hover {
-      background-color: var(--surface-secondary);
+
+    .quick-card:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .quick-card i {
+      font-size: 20px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #6c757d;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .alert {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      color: #856404;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 20px;
+      font-size: 14px;
+    }
+
+    .suggestions {
+      background: rgba(102, 126, 234, 0.1);
+      max-height: 200px;
+      overflow-y: auto;
+      border-radius: 0 0 12px 12px;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: none;
+    }
+
+    .suggestion-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      background: white;
+    }
+
+    .suggestion-item:hover {
+      background: #f8f9fa;
+    }
+
+    .suggestion-item:last-child {
+      border-bottom: none;
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <!-- Map Container -->
-    <div class="map-container">
-      <div id="leafletMap"></div>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fa-solid fa-route"></i> Mumbai Journey Planner</h1>
+      <p>Real-time routes & departures</p>
     </div>
 
-    <!-- Search Bar -->
-    <div class="search-bar">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search for a destination...">
-      <button class="search-btn" id="theme-toggle" aria-label="Toggle Theme">
-        <i class="fa-solid fa-moon"></i>
-      </button>
-    </div>
+    <div class="planner">
+      <form id="journeyForm">
+        <div style="position: relative;">
+          <div class="location-input-group">
+            <div class="input-icon">
+              <i class="fa-solid fa-circle" style="color: #28a745;"></i>
+            </div>
+            <input
+              type="text"
+              id="fromInput"
+              class="location-input"
+              placeholder="From: Current location"
+              autocomplete="off"
+            />
+            <button type="button" id="useLocationBtn" class="location-btn">
+              <i class="fa-solid fa-location-crosshairs"></i>
+            </button>
+            <div id="fromSuggestions" class="suggestions"></div>
+          </div>
 
-    <!-- Map Overlay Buttons -->
-    <div class="map-overlay-buttons">
-      <button class="map-btn" id="recenter-map" aria-label="Recenter Map">
-        <i class="fa-solid fa-location-crosshairs"></i>
-      </button>
-      <button class="map-btn" id="zoom-in-map" aria-label="Zoom In">
-        <i class="fa-solid fa-plus"></i>
-      </button>
-      <button class="map-btn" id="zoom-out-map" aria-label="Zoom Out">
-        <i class="fa-solid fa-minus"></i>
-      </button>
-    </div>
+          <button type="button" id="swapBtn" class="swap-btn">
+            <i class="fa-solid fa-arrow-up-down"></i>
+          </button>
 
-    <!-- Bottom Sheet -->
-    <div class="bottom-sheet" id="bottomSheet">
-      <div class="sheet-handle" id="sheetHandle">
-        <div class="sheet-handle-bar"></div>
+          <div class="location-input-group">
+            <div class="input-icon">
+              <i class="fa-solid fa-location-dot" style="color: #dc3545;"></i>
+            </div>
+            <input
+              type="text"
+              id="toInput"
+              class="location-input"
+              placeholder="To: Enter destination"
+              autocomplete="off"
+              required
+            />
+            <button type="button" id="mapBtn" class="location-btn">
+              <i class="fa-solid fa-map-pin"></i>
+            </button>
+            <div id="toSuggestions" class="suggestions"></div>
+          </div>
+        </div>
+
+        <div class="journey-options">
+          <div class="time-section">
+            <label>When do you want to travel?</label>
+            <div class="time-buttons">
+              <button type="button" class="time-btn active" data-time="now">
+                <i class="fa-solid fa-clock"></i> Now
+              </button>
+              <button type="button" class="time-btn" data-time="depart">
+                <i class="fa-solid fa-calendar"></i> Depart at
+              </button>
+              <button type="button" class="time-btn" data-time="arrive">
+                <i class="fa-solid fa-flag-checkered"></i> Arrive by
+              </button>
+            </div>
+            <input type="datetime-local" id="customDateTime" class="datetime-input" style="display: none;">
+          </div>
+
+          <div class="preferences">
+            <label class="preference-item">
+              <input type="checkbox" id="fastest" checked>
+              <i class="fa-solid fa-bolt"></i> Fastest
+            </label>
+            <label class="preference-item">
+              <input type="checkbox" id="cheapest">
+              <i class="fa-solid fa-coins"></i> Cheapest
+            </label>
+            <label class="preference-item">
+              <input type="checkbox" id="accessible">
+              <i class="fa-solid fa-wheelchair"></i> Accessible
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="plan-btn">
+          <i class="fa-solid fa-route"></i> Find Best Routes
+        </button>
+      </form>
+
+      <div id="results" class="results">
+        <h3><i class="fa-solid fa-list"></i> Route Options</h3>
+        <div id="routesList"></div>
       </div>
-      <div class="sheet-content" id="sheetContent">
-        <!-- Content will be dynamically inserted here -->
+    </div>
+
+    <div class="live-departures">
+      <h3><i class="fa-solid fa-clock"></i> Live Departures Nearby</h3>
+      <div id="departuresList">
+        <div class="loading">
+          <div class="spinner"></div>
+          Enable location to see live departures
+        </div>
       </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-      <button class="nav-button active" data-content="home">
-        <i class="fa-solid fa-house"></i>
-        <span>Home</span>
-      </button>
-      <button class="nav-button" data-content="routes">
-        <i class="fa-solid fa-route"></i>
-        <span>Routes</span>
-      </button>
-      <button class="nav-button" data-content="tickets">
-        <i class="fa-solid fa-ticket"></i>
-        <span>Tickets</span>
-      </button>
-      <button class="nav-button" data-content="profile">
-        <i class="fa-solid fa-user"></i>
-        <span>Profile</span>
-      </button>
-    </nav>
+    <div class="quick-routes">
+      <h3>Popular Routes</h3>
+      <div class="quick-grid">
+        <div class="quick-card" data-from="Churchgate" data-to="Andheri">
+          <i class="fa-solid fa-train"></i>
+          <div>Churchgate → Andheri</div>
+        </div>
+        <div class="quick-card" data-from="CST" data-to="Thane">
+          <i class="fa-solid fa-train"></i>
+          <div>CST → Thane</div>
+        </div>
+        <div class="quick-card" data-from="Bandra" data-to="Colaba">
+          <i class="fa-solid fa-bus"></i>
+          <div>Bandra → Colaba</div>
+        </div>
+        <div class="quick-card" data-from="Versova" data-to="Ghatkopar">
+          <i class="fa-solid fa-train-tram"></i>
+          <div>Metro Line 1</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="live-departures" id="commit-history-section">
+        <h3><i class="fa-solid fa-code-commit"></i> Latest Updates</h3>
+        <div id="commit-history-list">
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading latest updates...
+            </div>
+        </div>
+    </div>
   </div>
 
-  <script data-cfasync="false">
-    (function() {
-      'use strict';
+  <script>
+    // Mumbai locations with accurate coordinates
+    const MUMBAI_LOCATIONS = [
+      { name: 'Churchgate Station', coords: [18.9349, 72.8248], type: 'train' },
+      { name: 'CST Terminus', coords: [18.9398, 72.8354], type: 'train' },
+      { name: 'Dadar Station', coords: [19.0219, 72.8144], type: 'train' },
+      { name: 'Bandra Station', coords: [19.0596, 72.8295], type: 'train' },
+      { name: 'Andheri Station', coords: [19.1197, 72.8464], type: 'train' },
+      { name: 'Borivali Station', coords: [19.2324, 72.8565], type: 'train' },
+      { name: 'Thane Station', coords: [19.2183, 72.9781], type: 'train' },
+      { name: 'Kalyan Station', coords: [19.2433, 73.1355], type: 'train' },
+      { name: 'Panvel Station', coords: [18.9881, 73.1103], type: 'train' },
+      { name: 'Versova Metro', coords: [19.1274, 72.8050], type: 'metro' },
+      { name: 'Ghatkopar Metro', coords: [19.0769, 72.9080], type: 'metro' },
+      { name: 'Colaba Bus Depot', coords: [18.9100, 72.8090], type: 'bus' },
+      { name: 'Mumbai Central', coords: [18.9719, 72.8194], type: 'train' },
+      { name: 'Santacruz Station', coords: [19.0810, 72.8410], type: 'train' },
+      { name: 'Kurla Station', coords: [19.0669, 72.8830], type: 'train' },
+      { name: 'Vashi Station', coords: [19.0802, 72.9984], type: 'train' },
+      { name: 'Gateway of India', coords: [18.9218, 72.8347], type: 'ferry' },
+      { name: 'BKC', coords: [19.0625, 72.8690], type: 'bus' },
+      { name: 'Powai', coords: [19.1176, 72.9060], type: 'bus' },
+      { name: 'Worli Sea Face', coords: [19.0176, 72.8140], type: 'bus' }
+    ];
 
-      const $ = (selector) => document.querySelector(selector);
-      const $$ = (selector) => document.querySelectorAll(selector);
+    let userLocation = null;
 
-      class ModernMumbaiTransportHub {
-        constructor() {
-          this.elements = {
-            app: $('.app'),
-            mapContainer: $('#leafletMap'),
-            bottomSheet: $('#bottomSheet'),
-            sheetHandle: $('#sheetHandle'),
-            sheetContent: $('#sheetContent'),
-            navButtons: $$('.nav-button'),
-            themeToggle: $('#theme-toggle'),
-            recenterBtn: $('#recenter-map'),
-            zoomInBtn: $('#zoom-in-map'),
-            zoomOutBtn: $('#zoom-out-map'),
-          };
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeApp();
+    });
 
-          this.state = {
-            isDragging: false,
-            startY: 0,
-            startHeight: 0,
-            currentContent: 'home'
-          };
+    function initializeApp() {
+      setupEventListeners();
+      getCurrentLocation();
+      loadLiveDepartures();
+      setDefaultDateTime();
+      loadCommitHistory();
+    }
 
-          this.map = null;
-          this.init();
-        }
+    async function loadCommitHistory() {
+        const commitList = document.getElementById('commit-history-list');
+        const repoOwner = 'jobchta';
+        const repoName = 'mumbaitransport';
+        const url = `https://api.github.com/repos/${repoOwner}/${repoName}/commits?per_page=5`;
 
-        init() {
-          this.initMap();
-          this.initBottomSheet();
-          this.initNavigation();
-          this.initTheme();
-          this.loadContent('home');
-        }
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const commits = await response.json();
 
-        initMap() {
-          if (window.L) {
-            this.map = L.map(this.elements.mapContainer, {
-              zoomControl: false,
-              attributionControl: false,
-            }).setView([19.0760, 72.8777], 12);
+            commitList.innerHTML = '';
+            commits.forEach(commitData => {
+                const item = document.createElement('div');
+                item.className = 'departure-item'; // Re-using existing style
+                const commit = commitData.commit;
+                const author = commit.author.name;
+                const message = commit.message.split('\\n')[0]; // First line of commit message
+                const date = new Date(commit.author.date).toLocaleDateString();
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
-
-            this.elements.recenterBtn.addEventListener('click', () => this.map.setView([19.0760, 72.8777], 12));
-            this.elements.zoomInBtn.addEventListener('click', () => this.map.zoomIn());
-            this.elements.zoomOutBtn.addEventListener('click', () => this.map.zoomOut());
-
-          } else {
-            console.error('Leaflet not loaded');
-            this.elements.mapContainer.innerHTML = '<p style="text-align:center;padding:20px;">Map could not be loaded.</p>';
-          }
-        }
-
-        initBottomSheet() {
-          const { bottomSheet, sheetHandle } = this.elements;
-          sheetHandle.addEventListener('pointerdown', this.dragStart.bind(this));
-          document.addEventListener('pointermove', this.dragging.bind(this));
-          document.addEventListener('pointerup', this.dragEnd.bind(this));
-        }
-
-        dragStart(e) {
-          this.state.isDragging = true;
-          this.state.startY = e.pageY;
-          this.state.startHeight = this.elements.bottomSheet.clientHeight;
-          this.elements.bottomSheet.style.transition = 'none';
-        }
-
-        dragging(e) {
-          if (!this.state.isDragging) return;
-          const delta = this.state.startY - e.pageY;
-          const newHeight = this.state.startHeight + delta;
-          const peekHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bottom-sheet-peek'));
-          const maxHeight = window.innerHeight * 0.9;
-
-          if (newHeight > peekHeight && newHeight < maxHeight) {
-             this.elements.bottomSheet.style.transform = `translateY(calc(100vh - ${newHeight}px))`;
-          }
-        }
-
-        dragEnd() {
-          this.state.isDragging = false;
-          this.elements.bottomSheet.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
-          const currentHeight = this.elements.bottomSheet.clientHeight;
-          const peekHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bottom-sheet-peek'));
-
-          if (currentHeight > window.innerHeight * 0.5) {
-            this.elements.bottomSheet.classList.add('full');
-            this.elements.bottomSheet.style.transform = 'translateY(calc(100vh - 90vh))';
-          } else {
-            this.elements.bottomSheet.classList.remove('full');
-            this.elements.bottomSheet.style.transform = `translateY(calc(100vh - ${peekHeight}px))`;
-          }
-        }
-
-        initNavigation() {
-          this.elements.navButtons.forEach(button => {
-            button.addEventListener('click', () => {
-              const content = button.dataset.content;
-              this.elements.navButtons.forEach(btn => btn.classList.remove('active'));
-              button.classList.add('active');
-              this.loadContent(content);
+                item.innerHTML = `
+                    <div>
+                        <div class="departure-route" style="font-size: 14px;">${message}</div>
+                        <div style="font-size: 12px; color: #6c757d;">by ${author} on ${date}</div>
+                    </div>
+                `;
+                commitList.appendChild(item);
             });
-          });
+        } catch (error) {
+            console.error('Error fetching commit history:', error);
+            commitList.innerHTML = '<div class="alert">Could not load latest updates.</div>';
         }
+    }
 
-        initTheme() {
-            const savedTheme = localStorage.getItem('mth-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            this.updateThemeIcon(savedTheme);
+    function setupEventListeners() {
+      // Journey form
+      document.getElementById('journeyForm').addEventListener('submit', handleJourneySubmit);
 
-            this.elements.themeToggle.addEventListener('click', () => {
-                let currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('mth-theme', newTheme);
-                this.updateThemeIcon(newTheme);
-            });
-        }
+      // Location buttons
+      document.getElementById('useLocationBtn').addEventListener('click', getCurrentLocation);
+      document.getElementById('swapBtn').addEventListener('click', swapLocations);
 
-        updateThemeIcon(theme) {
-            const icon = this.elements.themeToggle.querySelector('i');
-            icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        }
-
-        loadContent(content) {
-          this.state.currentContent = content;
-          let html = '';
-          switch(content) {
-            case 'home':
-              html = this.getHomeContent();
-              break;
-            case 'routes':
-              html = this.getRoutesContent();
-              break;
-            case 'tickets':
-              html = this.getTicketsContent();
-              break;
-            case 'profile':
-              html = this.getProfileContent();
-              break;
-          }
-          this.elements.sheetContent.innerHTML = html;
-        }
-
-        getHomeContent() {
-          return `
-            <div class="section-title">Quick Actions</div>
-            <div class="action-grid">
-              <div class="action-card" data-action="plan-journey">
-                <i class="fa-solid fa-route"></i>
-                <div class="action-card-title">Plan Journey</div>
-              </div>
-              <div class="action-card" data-action="live-status">
-                <i class="fa-solid fa-satellite-dish"></i>
-                <div class="action-card-title">Live Status</div>
-              </div>
-              <div class="action-card" data-action="buy-ticket">
-                <i class="fa-solid fa-ticket"></i>
-                <div class="action-card-title">Buy Ticket</div>
-              </div>
-              <div class="action-card" data-action="recharge-card">
-                <i class="fa-solid fa-credit-card"></i>
-                <div class="action-card-title">Recharge Card</div>
-              </div>
-            </div>
-            <div class="section-title">Live Updates</div>
-            <div class="live-updates-list">
-                ${this.getFakeUpdates()}
-            </div>
-          `;
-        }
-
-        getFakeUpdates() {
-            const updates = [
-                { type: 'train', text: '<strong>Western Line:</strong> Minor delays of 5-10 mins reported.', time: '2m ago' },
-                { type: 'metro', text: '<strong>Line 1:</strong> Running on time. Peak hour frequency active.', time: '5m ago' },
-                { type: 'bus', text: '<strong>Route 242:</strong> Detour near Bandra Reclamation due to construction.', time: '12m ago' }
-            ];
-            return updates.map(u => `
-                <div class="update-item">
-                    <div class="update-icon ${u.type}"><i class="fa-solid fa-${u.type === 'bus' ? 'bus' : 'train'}"></i></div>
-                    <div class="update-text">${u.text}</div>
-                    <div class="update-time">${u.time}</div>
-                </div>
-            `).join('');
-        }
-
-        getRoutesContent() {
-          return `<div class="section-title">Routes & Schedules</div><p>Route planning and schedule information will be displayed here.</p>`;
-        }
-
-        getTicketsContent() {
-          return `<div class="section-title">Mobile Ticketing</div><p>Buy and manage your transport tickets here.</p>`;
-        }
-
-        getProfileContent() {
-          return `<div class="section-title">User Profile</div><p>User account settings and preferences will be available here.</p>`;
-        }
-      }
-
-      window.addEventListener('load', () => {
-        new ModernMumbaiTransportHub();
+      // Time buttons
+      document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.addEventListener('click', handleTimeSelection);
       });
 
-    })();
+      // Input autocomplete
+      setupAutocomplete('fromInput', 'fromSuggestions');
+      setupAutocomplete('toInput', 'toSuggestions');
+
+      // Quick route cards
+      document.querySelectorAll('.quick-card').forEach(card => {
+        card.addEventListener('click', function() {
+          document.getElementById('fromInput').value = this.dataset.from;
+          document.getElementById('toInput').value = this.dataset.to;
+          findRoutes(this.dataset.from, this.dataset.to);
+        });
+      });
+    }
+
+    function getCurrentLocation() {
+      if (navigator.geolocation) {
+        const btn = document.getElementById('useLocationBtn');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            userLocation = [position.coords.latitude, position.coords.longitude];
+            document.getElementById('fromInput').value = 'Current Location';
+            btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+            loadLiveDepartures();
+          },
+          function(error) {
+            console.error('Location error:', error);
+            btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+            alert('Unable to get your location. Please enter manually.');
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by this browser.');
+      }
+    }
+
+    function swapLocations() {
+      const fromInput = document.getElementById('fromInput');
+      const toInput = document.getElementById('toInput');
+      const temp = fromInput.value;
+      fromInput.value = toInput.value;
+      toInput.value = temp;
+    }
+
+    function handleTimeSelection(event) {
+      document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const customDateTime = document.getElementById('customDateTime');
+      if (event.target.dataset.time === 'now') {
+        customDateTime.style.display = 'none';
+      } else {
+        customDateTime.style.display = 'block';
+      }
+    }
+
+    function setDefaultDateTime() {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() + 30); // Default to 30 minutes from now
+      document.getElementById('customDateTime').value = now.toISOString().slice(0, 16);
+    }
+
+    function setupAutocomplete(inputId, suggestionsId) {
+      const input = document.getElementById(inputId);
+      const suggestions = document.getElementById(suggestionsId);
+
+      input.addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        if (query.length < 2) {
+          suggestions.style.display = 'none';
+          return;
+        }
+
+        const matches = MUMBAI_LOCATIONS.filter(location =>
+          location.name.toLowerCase().includes(query)
+        );
+
+        suggestions.innerHTML = '';
+        matches.slice(0, 5).forEach(location => {
+          const item = document.createElement('div');
+          item.className = 'suggestion-item';
+          item.innerHTML = `
+            <div style="font-weight: 600;">${location.name}</div>
+            <div style="font-size: 12px; color: #6c757d; text-transform: capitalize;">${location.type}</div>
+          `;
+          item.addEventListener('click', function() {
+            input.value = location.name;
+            suggestions.style.display = 'none';
+          });
+          suggestions.appendChild(item);
+        });
+
+        suggestions.style.display = matches.length > 0 ? 'block' : 'none';
+      });
+
+      input.addEventListener('blur', function() {
+        setTimeout(() => suggestions.style.display = 'none', 200);
+      });
+    }
+
+    function handleJourneySubmit(event) {
+      event.preventDefault();
+      const from = document.getElementById('fromInput').value;
+      const to = document.getElementById('toInput').value;
+
+      if (!from || !to) {
+        alert('Please enter both origin and destination');
+        return;
+      }
+
+      findRoutes(from, to);
+    }
+
+    function findRoutes(from, to) {
+      const results = document.getElementById('results');
+      const routesList = document.getElementById('routesList');
+
+      results.style.display = 'block';
+      routesList.innerHTML = '<div class="loading"><div class="spinner"></div>Finding best routes...</div>';
+
+      // Simulate API call
+      setTimeout(() => {
+        const routes = generateRoutes(from, to);
+        displayRoutes(routes);
+      }, 2000);
+    }
+
+    function generateRoutes(from, to) {
+      // This would be replaced with actual API calls
+      const routes = [
+        {
+          duration: '45 min',
+          cost: '₹35',
+          steps: [
+            { type: 'walk', text: 'Walk to station', duration: '5 min' },
+            { type: 'train', text: 'Western Line Fast', duration: '35 min' },
+            { type: 'walk', text: 'Walk to destination', duration: '5 min' }
+          ],
+          departures: ['2 min', '8 min', '14 min'],
+          transfers: 0
+        },
+        {
+          duration: '52 min',
+          cost: '₹25',
+          steps: [
+            { type: 'walk', text: 'Walk to bus stop', duration: '3 min' },
+            { type: 'bus', text: 'BEST Bus A1E', duration: '44 min' },
+            { type: 'walk', text: 'Walk to destination', duration: '5 min' }
+          ],
+          departures: ['5 min', '15 min', '25 min'],
+          transfers: 0
+        },
+        {
+          duration: '38 min',
+          cost: '₹45',
+          steps: [
+            { type: 'walk', text: 'Walk to metro', duration: '8 min' },
+            { type: 'metro', text: 'Metro Line 1', duration: '22 min' },
+            { type: 'train', text: 'Western Line', duration: '8 min' }
+          ],
+          departures: ['3 min', '9 min', '15 min'],
+          transfers: 1
+        }
+      ];
+
+      return routes;
+    }
+
+    function displayRoutes(routes) {
+      const routesList = document.getElementById('routesList');
+      routesList.innerHTML = '';
+
+      routes.forEach((route, index) => {
+        const routeCard = document.createElement('div');
+        routeCard.className = 'route-card';
+        routeCard.onclick = () => selectRoute(route);
+
+        const stepsHtml = route.steps.map(step =>
+          `<div class="step-icon step-${step.type}">
+            <i class="fa-solid fa-${getStepIcon(step.type)}"></i>
+          </div>`
+        ).join('');
+
+        routeCard.innerHTML = `
+          <div class="route-header">
+            <div class="route-time">${route.duration}</div>
+            <div class="route-cost">${route.cost}</div>
+          </div>
+          <div class="route-steps">${stepsHtml}</div>
+          <div class="route-details">
+            ${route.transfers === 0 ? 'Direct route' : `${route.transfers} transfer${route.transfers > 1 ? 's' : ''}`} •
+            Next departures: ${route.departures.join(', ')}
+          </div>
+        `;
+
+        routesList.appendChild(routeCard);
+      });
+    }
+
+    function getStepIcon(type) {
+      const icons = {
+        walk: 'person-walking',
+        train: 'train',
+        bus: 'bus',
+        metro: 'train-tram'
+      };
+      return icons[type] || 'circle';
+    }
+
+    function selectRoute(route) {
+      alert(`Route selected! You will receive step-by-step navigation.
+
+First step: ${route.steps[0].text}
+Next departure: ${route.departures[0]}
+Total time: ${route.duration}
+Total cost: ${route.cost}`);
+    }
+
+    function loadLiveDepartures() {
+      const departuresList = document.getElementById('departuresList');
+
+      if (!userLocation) {
+        departuresList.innerHTML = `
+          <div class="loading">
+            <i class="fa-solid fa-location-crosshairs" style="font-size: 20px; margin-bottom: 8px;"></i>
+            <div>Enable location to see live departures</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Simulate finding nearby departures
+      setTimeout(() => {
+        const departures = [
+          { route: 'Western Line Fast', destination: 'Churchgate', time: '2 min', platform: 'Platform 1' },
+          { route: 'BEST Bus A1E', destination: 'Colaba', time: '5 min', platform: 'Stop A' },
+          { route: 'Metro Line 1', destination: 'Ghatkopar', time: '7 min', platform: 'Platform 2' },
+          { route: 'Central Line', destination: 'CST', time: '12 min', platform: 'Platform 3' }
+        ];
+
+        departuresList.innerHTML = departures.map(dep => `
+          <div class="departure-item">
+            <div>
+              <div class="departure-route">${dep.route}</div>
+              <div style="font-size: 12px; color: #6c757d;">${dep.destination} • ${dep.platform}</div>
+            </div>
+            <div class="departure-time">${dep.time}</div>
+          </div>
+        `).join('');
+      }, 1000);
+    }
   </script>
 </body>
 </html>
