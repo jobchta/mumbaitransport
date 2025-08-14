@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 BEAST MODE Mumbai Transport</title>
+    
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #eef2ff;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --gradient-secondary: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            --gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-full: 9999px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gradient-dark);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* BEAST MODE Header */
+        .beast-header {
+            background: var(--gradient-glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-lg);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: var(--gradient-primary);
+        }
+
+        /* BEAST MODE Hero */
+        .beast-hero {
+            margin-top: 80px;
+            padding: 4rem 2rem;
+            text-align: center;
+            background: var(--gradient-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .beast-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--gray);
+            margin-bottom: 2rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        /* BEAST MODE Main Container */
+        .beast-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            min-height: calc(100vh - 400px);
+        }
+
+        /* BEAST MODE Card */
+        .beast-card {
+            background: var(--gradient-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-2xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-2xl);
+            transition: all 0.3s ease;
+        }
+
+        .beast-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-2xl), 0 0 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .card-subtitle {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        /* BEAST MODE Form */
+        .beast-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: var(--radius-lg);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: var(--gray);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1.25rem;
+        }
+
+        .beast-btn {
+            padding: 1rem 2rem;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: var(--radius-lg);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .beast-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .beast-btn:active {
+            transform: translateY(0);
+        }
+
+        .beast-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .beast-btn.secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* BEAST MODE Map */
+        .beast-map {
+            height: 400px;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            margin-top: 1rem;
+        }
+
+        /* BEAST MODE Results */
+        .beast-results {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .route-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .route-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .route-item.recommended {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .route-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .route-number {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .route-badge {
+            background: var(--gradient-secondary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .route-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .route-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        .route-stat i {
+            color: var(--primary);
+        }
+
+        /* BEAST MODE Controls */
+        .beast-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: var(--radius-lg);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .control-btn.active {
+            background: var(--gradient-primary);
+            border-color: var(--primary);
+        }
+
+        /* BEAST MODE Loading */
+        .beast-loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* BEAST MODE Toast */
+        .beast-toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            z-index: 10000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* BEAST MODE Responsive */
+        @media (max-width: 768px) {
+            .beast-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+        }
+
+        /* BEAST MODE Animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <!-- BEAST MODE Header -->
+    <header class="beast-header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <span>BEAST MODE Transport</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#planning" class="nav-link active">Route Planning</a></li>
+                    <li><a href="#tracking" class="nav-link">Live Tracking</a></li>
+                    <li><a href="#map" class="nav-link">Interactive Map</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- BEAST MODE Hero -->
+    <section class="beast-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">🚀 BEAST MODE Mumbai Transport</h1>
+            <p class="hero-subtitle">The most powerful transport navigation system ever created</p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Routes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Live Tracking</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BEAST MODE Main Content -->
+    <main class="beast-container">
+        <!-- Route Planning Card -->
+        <div class="beast-card fade-in">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-route"></i>
+                </div>
+                <div>
+                    <h2 class="card-title">BEAST MODE Route Planning</h2>
+                    <p class="card-subtitle">Find the fastest routes with AI-powered optimization</p>
+                </div>
+            </div>
+            
+            <form class="beast-form" id="route-form">
+                <div class="form-group">
+                    <i class="fas fa-map-marker-alt form-icon"></i>
+                    <input type="text" class="form-input" id="from-location" placeholder="Where are you starting from?" required>
+                </div>
+                
+                <div class="form-group">
+                    <i class="fas fa-map-marker-alt form-icon"></i>
+                    <input type="text" class="form-input" id="to-location" placeholder="Where do you want to go?" required>
+                </div>
+                
+                <button type="submit" class="beast-btn" id="plan-route-btn">
+                    <i class="fas fa-bolt"></i>
+                    Find BEAST Route
+                </button>
+            </form>
+            
+            <div class="beast-results" id="route-results"></div>
+        </div>
+
+        <!-- Interactive Map Card -->
+        <div class="beast-card fade-in">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div>
+                    <h2 class="card-title">Interactive BEAST Map</h2>
+                    <p class="card-subtitle">Real-time visualization with traffic and transit layers</p>
+                </div>
+            </div>
+            
+            <div class="beast-controls">
+                <button class="control-btn" id="toggle-traffic" onclick="toggleTraffic()">
+                    <i class="fas fa-car"></i> Traffic
+                </button>
+                <button class="control-btn" id="toggle-transit" onclick="toggleTransit()">
+                    <i class="fas fa-subway"></i> Transit
+                </button>
+                <button class="control-btn" id="toggle-bicycling" onclick="toggleBicycling()">
+                    <i class="fas fa-bicycle"></i> Bicycling
+                </button>
+                <button class="control-btn" id="my-location" onclick="getMyLocation()">
+                    <i class="fas fa-crosshairs"></i> My Location
+                </button>
+            </div>
+            
+            <div id="beast-map" class="beast-map"></div>
+        </div>
+    </main>
+
+    <script>
+        // BEAST MODE Variables
+        let map;
+        let directionsService;
+        let directionsRenderer;
+        let autocompleteFrom;
+        let autocompleteTo;
+        let trafficLayer;
+        let transitLayer;
+        let bicyclingLayer;
+        let currentRoute;
+
+        // Initialize BEAST MODE
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 BEAST MODE Transport System Initialized!');
+            initBeastModeMaps();
+            setupBeastModeEventListeners();
+        });
+
+        // Initialize BEAST MODE Google Maps
+        function initBeastModeMaps() {
+            map = new google.maps.Map(document.getElementById('beast-map'), {
+                center: { lat: 19.0760, lng: 72.8777 },
+                zoom: 12,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+                styles: getBeastModeMapStyle()
+            });
+
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: true
+            });
+
+            trafficLayer = new google.maps.TrafficLayer();
+            transitLayer = new google.maps.TransitLayer();
+            bicyclingLayer = new google.maps.BicyclingLayer();
+
+            autocompleteFrom = new google.maps.places.Autocomplete(
+                document.getElementById('from-location'),
+                { bounds: new google.maps.LatLngBounds(
+                    new google.maps.LatLng(18.8964, 72.7962),
+                    new google.maps.LatLng(19.2189, 72.9780)
+                )}
+            );
+
+            autocompleteTo = new google.maps.places.Autocomplete(
+                document.getElementById('to-location'),
+                { bounds: new google.maps.LatLngBounds(
+                    new google.maps.LatLng(18.8964, 72.7962),
+                    new google.maps.LatLng(19.2189, 72.9780)
+                )}
+            );
+
+            console.log('🗺️ BEAST MODE Maps initialized!');
+        }
+
+        // BEAST MODE Map Style
+        function getBeastModeMapStyle() {
+            return [
+                {
+                    "featureType": "all",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"weight": "2.00"}]
+                },
+                {
+                    "featureType": "all",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#9c9c9c"}]
+                },
+                {
+                    "featureType": "all",
+                    "elementType": "labels.text",
+                    "stylers": [{"visibility": "on"}]
+                },
+                {
+                    "featureType": "landscape",
+                    "elementType": "all",
+                    "stylers": [{"color": "#1e293b"}]
+                },
+                {
+                    "featureType": "landscape",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#0f172a"}]
+                },
+                {
+                    "featureType": "landscape.man_made",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#1e293b"}]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "all",
+                    "stylers": [{"visibility": "off"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "all",
+                    "stylers": [{"saturation": -100}, {"lightness": 45}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#334155"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#cbd5e1"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#0f172a"}]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "all",
+                    "stylers": [{"visibility": "simplified"}]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "labels.icon",
+                    "stylers": [{"visibility": "off"}]
+                },
+                {
+                    "featureType": "transit",
+                    "elementType": "all",
+                    "stylers": [{"visibility": "off"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "all",
+                    "stylers": [{"color": "#0ea5e9"}, {"visibility": "on"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#0284c7"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#ffffff"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#0f172a"}]
+                }
+            ];
+        }
+
+        // Setup BEAST MODE Event Listeners
+        function setupBeastModeEventListeners() {
+            const routeForm = document.getElementById('route-form');
+            routeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const from = document.getElementById('from-location').value;
+                const to = document.getElementById('to-location').value;
+                
+                if (from && to) {
+                    planBeastModeRoute(from, to);
+                }
+            });
+        }
+
+        // BEAST MODE Route Planning
+        function planBeastModeRoute(from, to) {
+            const btn = document.getElementById('plan-route-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="beast-loading"></span> Finding BEAST Route...';
+            btn.disabled = true;
+
+            directionsService.route({
+                origin: from,
+                destination: to,
+                travelMode: google.maps.TravelMode.TRANSIT,
+                provideRouteAlternatives: true
+            }, (response, status) => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+
+                if (status === 'OK') {
+                    console.log('🚀 BEAST MODE: Route found!');
+                    displayBeastModeResults(response.routes, from, to);
+                    showRouteOnBeastModeMap(response.routes[0]);
+                    currentRoute = response.routes[0];
+                    showBeastModeToast('BEAST Route found! 🚀', 'success');
+                } else {
+                    showBeastModeToast('Could not find route. Try different locations.', 'error');
+                }
+            });
+        }
+
+        // Display BEAST MODE Results
+        function displayBeastModeResults(routes, from, to) {
+            const resultsContainer = document.getElementById('route-results');
+            resultsContainer.style.display = 'block';
+            
+            let html = '';
+            
+            routes.forEach((route, index) => {
+                const isRecommended = index === 0;
+                const leg = route.legs[0];
+                
+                html += `
+                    <div class="route-item ${isRecommended ? 'recommended' : ''}" onclick="selectBeastModeRoute(${index}, routes)">
+                        <div class="route-header">
+                            <div class="route-info">
+                                <span class="route-number">Route ${index + 1}</span>
+                                <span>🚌</span>
+                            </div>
+                            ${isRecommended ? '<span class="route-badge">BEAST MODE</span>' : ''}
+                        </div>
+                        <div class="route-stats">
+                            <div class="route-stat">
+                                <i class="fas fa-clock"></i>
+                                <span>${leg.duration.text}</span>
+                            </div>
+                            <div class="route-stat">
+                                <i class="fas fa-road"></i>
+                                <span>${leg.distance.text}</span>
+                            </div>
+                            <div class="route-stat">
+                                <i class="fas fa-exchange-alt"></i>
+                                <span>${route.legs[0].steps.filter(step => step.travel_mode === 'TRANSIT').length} transfers</span>
+                            </div>
+                            <div class="route-stat">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <span>Click to view</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+        }
+
+        // Show route on BEAST MODE map
+        function showRouteOnBeastModeMap(route) {
+            directionsRenderer.setDirections({
+                routes: [route],
+                request: {
+                    origin: route.legs[0].start_address,
+                    destination: route.legs[0].end_address,
+                    travelMode: google.maps.TravelMode.TRANSIT
+                }
+            });
+
+            addBeastModeMarker(route.legs[0].start_location, 'A', 'Start', '#10b981');
+            addBeastModeMarker(route.legs[0].end_location, 'B', 'End', '#ef4444');
+        }
+
+        // BEAST MODE Map Controls
+        function toggleTraffic() {
+            const btn = document.getElementById('toggle-traffic');
+            if (btn.classList.contains('active')) {
+                trafficLayer.setMap(null);
+                btn.classList.remove('active');
+            } else {
+                trafficLayer.setMap(map);
+                btn.classList.add('active');
+            }
+        }
+
+        function toggleTransit() {
+            const btn = document.getElementById('toggle-transit');
+            if (btn.classList.contains('active')) {
+                transitLayer.setMap(null);
+                btn.classList.remove('active');
+            } else {
+                transitLayer.setMap(map);
+                btn.classList.add('active');
+            }
+        }
+
+        function toggleBicycling() {
+            const btn = document.getElementById('toggle-bicycling');
+            if (btn.classList.contains('active')) {
+                bicyclingLayer.setMap(null);
+                btn.classList.remove('active');
+            } else {
+                bicyclingLayer.setMap(map);
+                btn.classList.add('active');
+            }
+        }
+
+        function getMyLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        map.setCenter(pos);
+                        map.setZoom(15);
+                        
+                        addBeastModeMarker(pos, '📍', 'Your Location', '#f59e0b');
+                        showBeastModeToast('Location found! 🎯', 'success');
+                    },
+                    () => {
+                        showBeastModeToast('Location access denied.', 'error');
+                    }
+                );
+            } else {
+                showBeastModeToast('Geolocation not supported.', 'error');
+            }
+        }
+
+        // BEAST MODE Utility Functions
+        function addBeastModeMarker(position, label, title, color) {
+            return new google.maps.Marker({
+                position: position,
+                map: map,
+                title: title,
+                label: {
+                    text: label,
+                    color: 'white'
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: color,
+                    fillOpacity: 1,
+                    strokeColor: 'white',
+                    strokeWeight: 2
+                }
+            });
+        }
+
+        function selectBeastModeRoute(routeIndex, routes) {
+            const selectedRoute = routes[routeIndex];
+            showRouteOnBeastModeMap(selectedRoute);
+            currentRoute = selectedRoute;
+            showBeastModeToast('Route selected! 🎯', 'success');
+        }
+
+        function showBeastModeToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'beast-toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
