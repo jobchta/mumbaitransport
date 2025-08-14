@@ -5,102 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mumbai Transport Hub - Smart Route Planning & Live Tracking</title>
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Modern Font System with Variable Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons - 2025 Icon System -->
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
     
-    <!-- Google Maps API - BEAST MODE WITH REAL API KEY -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,geometry"></script>
+    <!-- Google Maps API with Advanced Visualization -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,geometry,visualization"></script>
     
     <style>
         /* ========================================
-           MODERN DESIGN SYSTEM
+           FUTURE TRANSPORT 2025 DESIGN SYSTEM
         ======================================== */
         
         :root {
-            --primary: #6366f1;
-            --primary-dark: #5855eb;
-            --primary-light: #eef2ff;
-            --secondary: #8b5cf6;
-            --accent: #06b6d4;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
+            /* Futuristic Color System with HSL for Dynamic Manipulation */
+            --primary-hue: 220;
+            --primary-saturation: 100%;
+            --primary: hsl(var(--primary-hue), var(--primary-saturation), 50%);
+            --primary-light: hsl(var(--primary-hue), var(--primary-saturation), 65%);
+            --primary-dark: hsl(var(--primary-hue), var(--primary-saturation), 35%);
             
-            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            --secondary-gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
-            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --accent-hue: 280;
+            --accent: hsl(var(--accent-hue), 80%, 60%);
             
-            --white: #ffffff;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
+            --energy-hue: 160;
+            --energy: hsl(var(--energy-hue), 80%, 45%);
             
-            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --font-size-xs: 0.75rem;
-            --font-size-sm: 0.875rem;
-            --font-size-base: 1rem;
-            --font-size-lg: 1.125rem;
-            --font-size-xl: 1.25rem;
-            --font-size-2xl: 1.5rem;
-            --font-size-3xl: 1.875rem;
-            --font-size-4xl: 2.25rem;
+            --alert-hue: 350;
+            --alert: hsl(var(--alert-hue), 80%, 55%);
             
-            --spacing-1: 0.25rem;
-            --spacing-2: 0.5rem;
-            --spacing-3: 0.75rem;
-            --spacing-4: 1rem;
-            --spacing-5: 1.25rem;
-            --spacing-6: 1.5rem;
-            --spacing-8: 2rem;
-            --spacing-10: 2.5rem;
-            --spacing-12: 3rem;
-            --spacing-16: 4rem;
-            --spacing-20: 5rem;
+            /* Adaptive Surface System */
+            --surface-light: hsla(0, 0%, 100%, 0.95);
+            --surface-medium: hsla(0, 0%, 100%, 0.85);
+            --surface-dark: hsla(220, 15%, 16%, 0.95);
             
-            --radius-sm: 0.375rem;
+            /* Glass Morphism Effects */
+            --glass-blur: 12px;
+            --glass-opacity: 0.7;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            
+            /* Neomorphic Effects */
+            --neo-shadow-light: 8px 8px 16px rgba(200, 200, 220, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8);
+            --neo-shadow-dark: 8px 8px 16px rgba(0, 0, 0, 0.3), -8px -8px 16px rgba(40, 40, 60, 0.2);
+            --neo-shadow-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.15), inset -2px -2px 5px rgba(255, 255, 255, 0.15);
+            
+            /* Advanced Typography System */
+            --font-display: 'Space Grotesk', system-ui, sans-serif;
+            --font-body: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            /* Fluid Typography */
+            --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+            --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+            --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+            --text-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+            --text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+            --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 1.875rem);
+            --text-3xl: clamp(1.875rem, 1.6rem + 1.375vw, 2.25rem);
+            --text-4xl: clamp(2.25rem, 1.9rem + 1.75vw, 3rem);
+            --text-5xl: clamp(3rem, 2.5rem + 2.5vw, 4rem);
+            
+            /* Fluid Spacing System */
+            --space-3xs: clamp(0.25rem, 0.2rem + 0.25vw, 0.375rem);
+            --space-2xs: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+            --space-xs: clamp(0.75rem, 0.6rem + 0.75vw, 1rem);
+            --space-sm: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+            --space-md: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
+            --space-lg: clamp(2rem, 1.6rem + 2vw, 3rem);
+            --space-xl: clamp(3rem, 2.4rem + 3vw, 4rem);
+            
+            /* Advanced Border Radius */
+            --radius-sm: 0.25rem;
             --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --radius-2xl: 1.5rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-full: 9999px;
             
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            /* Animation System */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-medium: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
             
-            --transition-fast: 150ms ease-in-out;
-            --transition-normal: 250ms ease-in-out;
-            --transition-slow: 350ms ease-in-out;
+            /* 3D Transform Properties */
+            --transform-perspective: 1000px;
+            --transform-rotate-x: 0deg;
+            --transform-rotate-y: 0deg;
+            --transform-rotate-z: 0deg;
+            --transform-scale: 1;
+            --transform-skew-x: 0deg;
+            --transform-skew-y: 0deg;
         }
         
-        /* ========================================
-           BASE STYLES
-        ======================================== */
-        
+        /* Base Reset & Accessibility */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         
+        html {
+            scroll-behavior: smooth;
+            color-scheme: light;
+        }
+        
         body {
-            font-family: var(--font-family);
-            font-size: var(--font-size-base);
+            font-family: var(--font-body);
+            font-size: var(--text-base);
             line-height: 1.6;
-            color: var(--gray-800);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background-color: #f0f4f8;
+            color: #1a202c;
             overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Accessibility Improvements */
+        :focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        /* Reduced Motion Preference */
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-light: hsl(var(--primary-hue), var(--primary-saturation), 70%);
+                --primary: hsl(var(--primary-hue), var(--primary-saturation), 60%);
+                --primary-dark: hsl(var(--primary-hue), var(--primary-saturation), 45%);
+            }
+            
+            html {
+                color-scheme: dark;
+            }
+            
+            body {
+                background-color: #121826;
+                color: #e2e8f0;
+            }
         }
         
         /* ========================================
@@ -108,2178 +164,1470 @@
         ======================================== */
         
         .app-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr auto;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
         }
         
-        /* Header */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: var(--spacing-4) 0;
+        @media (min-width: 1024px) {
+            .app-container {
+                grid-template-columns: 420px 1fr;
+                grid-template-rows: auto 1fr;
+            }
+        }
+        
+        /* Glass Header */
+        .app-header {
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: var(--shadow-sm);
+            padding: var(--space-sm);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-bottom: var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            grid-column: 1 / -1;
         }
         
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-6);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .dark .app-header {
+            background: rgba(18, 24, 38, 0.8);
         }
         
         .logo {
             display: flex;
             align-items: center;
-            gap: var(--spacing-3);
-            font-size: var(--font-size-xl);
-            font-weight: 700;
-            color: var(--primary);
-            text-decoration: none;
+            gap: var(--space-xs);
         }
         
         .logo-icon {
             width: 40px;
             height: 40px;
+            border-radius: var(--radius-md);
             background: var(--primary-gradient);
-            border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: var(--font-size-lg);
+            font-size: 1.5rem;
         }
         
-        .nav-menu {
+        .logo-text {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: var(--text-xl);
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+        
+        .header-actions {
             display: flex;
-            gap: var(--spacing-8);
-            list-style: none;
+            gap: var(--space-xs);
+            align-items: center;
         }
         
-        .nav-link {
-            color: var(--gray-600);
-            text-decoration: none;
-            font-weight: 500;
-            padding: var(--spacing-2) var(--spacing-3);
-            border-radius: var(--radius-md);
-            transition: var(--transition-fast);
+        /* Main Content Areas */
+        .sidebar {
+            grid-column: 1;
+            grid-row: 2;
+            background: var(--surface-light);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            padding: var(--space-md);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            z-index: 10;
+        }
+        
+        .dark .sidebar {
+            background: var(--surface-dark);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .map-container {
+            grid-column: 1 / -1;
+            grid-row: 2;
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+        
+        @media (min-width: 1024px) {
+            .map-container {
+                grid-column: 2;
+            }
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav-toggle {
             display: flex;
             align-items: center;
-            gap: var(--spacing-2);
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-dark);
+            font-size: 1.5rem;
         }
         
-        .nav-link:hover {
-            color: var(--primary);
-            background: var(--primary-light);
+        .dark .mobile-nav-toggle {
+            color: var(--text-light);
         }
         
-        .nav-link.active {
-            color: var(--primary);
-            background: var(--primary-light);
+        @media (min-width: 1024px) {
+            .mobile-nav-toggle {
+                display: none;
+            }
         }
         
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: var(--spacing-8) 0;
+        /* ========================================
+           COMPONENTS
+        ======================================== */
+        
+        /* Neomorphic Card */
+        .neo-card {
+            background: var(--surface-light);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md);
+            box-shadow: var(--neo-shadow-light);
+            transition: transform var(--transition-medium), box-shadow var(--transition-medium);
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-6);
+        .neo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
         }
         
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            margin-bottom: var(--spacing-16);
+        .dark .neo-card {
+            background: var(--surface-dark);
+            box-shadow: var(--neo-shadow-dark);
         }
         
-        .hero-title {
-            font-size: var(--font-size-4xl);
-            font-weight: 700;
-            color: white;
-            margin-bottom: var(--spacing-4);
-            line-height: 1.2;
+        /* Glass Card */
+        .glass-card {
+            background: rgba(255, 255, 255, var(--glass-opacity));
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-radius: var(--radius-lg);
+            border: var(--glass-border);
+            padding: var(--space-md);
+            box-shadow: var(--glass-shadow);
         }
         
-        .hero-subtitle {
-            font-size: var(--font-size-xl);
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: var(--spacing-8);
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+        .dark .glass-card {
+            background: rgba(18, 24, 38, var(--glass-opacity));
         }
         
-        /* Feature Cards */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: var(--spacing-8);
-            margin-bottom: var(--spacing-16);
-        }
-        
-        .feature-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-2xl);
-            padding: var(--spacing-8);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: var(--transition-normal);
+        /* Section Title */
+        .section-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-xs);
             position: relative;
-            overflow: hidden;
         }
         
-        .feature-card::before {
+        .section-title::after {
             content: '';
             position: absolute;
-            top: 0;
+            bottom: -8px;
             left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--primary-gradient);
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: var(--radius-full);
         }
         
-        .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
-        }
-        
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--primary-gradient);
-            border-radius: var(--radius-xl);
+        /* Transport Mode Tabs */
+        .transport-modes {
             display: flex;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: var(--space-xs);
+        }
+        
+        .transport-modes::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .mode-tab {
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            min-width: 80px;
+            height: 80px;
+            border-radius: var(--radius-lg);
+            background: var(--surface-light);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-medium);
+            box-shadow: var(--neo-shadow-light);
+            gap: var(--space-2xs);
+            padding: var(--space-xs);
+            color: var(--text-medium);
+        }
+        
+        .mode-tab.active {
+            background: var(--primary);
             color: white;
-            font-size: var(--font-size-2xl);
-            margin-bottom: var(--spacing-6);
+            box-shadow: 0 8px 16px rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.3);
         }
         
-        .feature-title {
-            font-size: var(--font-size-xl);
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: var(--spacing-3);
+        .mode-tab:hover:not(.active) {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         }
         
-        .feature-description {
-            color: var(--gray-600);
-            line-height: 1.6;
-            margin-bottom: var(--spacing-6);
+        .mode-tab i {
+            font-size: 1.5rem;
         }
         
-        /* Action Buttons */
-        .action-buttons {
+        .mode-tab span {
+            font-size: var(--text-xs);
+            font-weight: 500;
+        }
+        
+        .dark .mode-tab {
+            background: var(--surface-dark);
+            box-shadow: var(--neo-shadow-dark);
+            color: var(--text-light);
+        }
+        
+        /* Advanced Form Controls */
+        .form-group {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-2xs);
+            font-weight: 500;
+            font-size: var(--text-sm);
+            color: var(--text-medium);
+        }
+        
+        .input-wrapper {
+            position: relative;
             display: flex;
-            gap: var(--spacing-4);
-            flex-wrap: wrap;
+            align-items: center;
         }
         
+        .input-icon {
+            position: absolute;
+            left: var(--space-xs);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--space-xs) var(--space-xs) var(--space-xs) calc(var(--space-xs) * 2 + 1rem);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--surface-light);
+            font-family: var(--font-body);
+            font-size: var(--text-base);
+            transition: all var(--transition-fast);
+            box-shadow: var(--neo-shadow-inset);
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.2);
+            outline: none;
+        }
+        
+        .dark .form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+        
+        /* Advanced Button */
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: var(--spacing-2);
-            padding: var(--spacing-3) var(--spacing-6);
-            border-radius: var(--radius-lg);
-            font-weight: 600;
-            text-decoration: none;
-            transition: var(--transition-fast);
+            justify-content: center;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: var(--text-base);
+            transition: all var(--transition-medium);
             cursor: pointer;
+            gap: var(--space-2xs);
             border: none;
-            font-size: var(--font-size-base);
         }
         
         .btn-primary {
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.3);
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 6px 16px rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.2);
         }
         
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--gray-700);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.1);
+            color: var(--primary);
         }
         
         .btn-secondary:hover {
-            background: white;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            background: rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.15);
         }
         
-        /* ========================================
-           ROUTE PLANNING SECTION
-        ======================================== */
-        
-        .route-planning {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-2xl);
-            padding: var(--spacing-8);
-            margin-bottom: var(--spacing-8);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: var(--radius-full);
         }
         
-        .section-header {
-            text-align: center;
-            margin-bottom: var(--spacing-8);
-        }
-        
-        .section-title {
-            font-size: var(--font-size-3xl);
-            font-weight: 700;
-            color: var(--gray-800);
-            margin-bottom: var(--spacing-3);
-        }
-        
-        .section-subtitle {
-            color: var(--gray-600);
-            font-size: var(--font-size-lg);
-        }
-        
-        .route-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: var(--spacing-6);
-            align-items: end;
-            margin-bottom: var(--spacing-8);
-        }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-2);
-        }
-        
-        .form-label {
-            font-weight: 600;
-            color: var(--gray-700);
-            font-size: var(--font-size-sm);
-        }
-        
-        .form-input {
-            padding: var(--spacing-3) var(--spacing-4);
-            border: 2px solid var(--gray-200);
-            border-radius: var(--radius-lg);
-            font-size: var(--font-size-base);
-            transition: var(--transition-fast);
-            background: white;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-        
-        .form-input::placeholder {
-            color: var(--gray-400);
-        }
-        
-        /* Route Results */
-        .route-results {
-            margin-top: var(--spacing-8);
-        }
-        
-        .route-options {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-4);
-        }
-        
-        .route-option {
-            background: white;
-            border: 2px solid var(--gray-200);
-            border-radius: var(--radius-xl);
-            padding: var(--spacing-6);
-            transition: var(--transition-fast);
+        /* Hero Section */
+        .hero {
             position: relative;
+            padding: var(--space-xl) var(--space-md);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            text-align: center;
             overflow: hidden;
         }
         
-        .route-option:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
-        .route-option.recommended {
-            border-color: var(--primary);
-            background: var(--primary-light);
+        .hero-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: var(--text-4xl);
+            line-height: 1.2;
+            margin-bottom: var(--space-md);
         }
         
-        .route-option.recommended::before {
-            content: '';
+        .hero-subtitle {
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-lg);
+            opacity: 0.9;
+        }
+        
+        .hero-bg {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--primary-gradient);
-        }
-        
-        .route-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--spacing-4);
-        }
-        
-        .route-info {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-3);
-        }
-        
-        .route-number {
-            background: var(--primary);
-            color: white;
-            padding: var(--spacing-1) var(--spacing-3);
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            font-size: var(--font-size-sm);
-        }
-        
-        .route-modes {
-            font-size: var(--font-size-xl);
-        }
-        
-        .recommended-badge {
-            background: var(--success-gradient);
-            color: white;
-            padding: var(--spacing-1) var(--spacing-3);
-            border-radius: var(--radius-md);
-            font-size: var(--font-size-xs);
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .route-details {
-            margin-bottom: var(--spacing-4);
-        }
-        
-        .route-path {
-            font-size: var(--font-size-lg);
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: var(--spacing-2);
-        }
-        
-        .route-name {
-            color: var(--gray-600);
-            font-size: var(--font-size-sm);
-            margin-bottom: var(--spacing-3);
-        }
-        
-        .route-stats {
-            display: flex;
-            gap: var(--spacing-6);
-            flex-wrap: wrap;
-        }
-        
-        .stat {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-2);
-            color: var(--gray-600);
-            font-size: var(--font-size-sm);
-        }
-        
-        .stat i {
-            color: var(--primary);
-            width: 16px;
-        }
-        
-        .select-route-btn {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            padding: var(--spacing-3) var(--spacing-6);
-            border-radius: var(--radius-lg);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-fast);
             width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgzMCkiPjxwYXRoIGQ9Ik0gMCAxMCBMIDIwIDEwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
         }
         
-        .select-route-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
+        /* Feature Cards */
+        .features {
+            padding: var(--space-xl) var(--space-md);
+            background-color: var(--gray-50);
         }
         
-        /* ========================================
-           LIVE TRACKING SECTION
-        ======================================== */
-        
-        .live-tracking {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-2xl);
-            padding: var(--spacing-8);
-            margin-bottom: var(--spacing-8);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .dark .features {
+            background-color: #1a202c;
         }
         
-        .tracking-form {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: var(--spacing-6);
-            align-items: end;
-            margin-bottom: var(--spacing-8);
-        }
-        
-        /* Tracking Results */
-        .tracking-results {
-            margin-top: var(--spacing-8);
-        }
-        
-        .tracking-info {
-            background: white;
-            border-radius: var(--radius-xl);
-            padding: var(--spacing-6);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .eta-info {
+        .features-title {
             text-align: center;
-            margin-bottom: var(--spacing-6);
-            padding-bottom: var(--spacing-6);
-            border-bottom: 1px solid var(--gray-200);
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: var(--text-3xl);
+            margin-bottom: var(--space-lg);
         }
         
-        .eta-info h3 {
-            font-size: var(--font-size-xl);
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: var(--spacing-3);
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-md);
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        .eta-details {
-            display: flex;
-            justify-content: center;
-            gap: var(--spacing-8);
-            flex-wrap: wrap;
-        }
-        
-        .eta-time, .crowd-level {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-2);
-            color: var(--gray-600);
-            font-size: var(--font-size-sm);
-        }
-        
-        .live-buses {
+        .feature-card {
             display: flex;
             flex-direction: column;
-            gap: var(--spacing-4);
-        }
-        
-        .live-buses h4 {
-            font-size: var(--font-size-lg);
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: var(--spacing-3);
-        }
-        
-        .live-bus {
-            background: var(--gray-50);
-            border: 1px solid var(--gray-200);
+            align-items: flex-start;
+            padding: var(--space-lg);
             border-radius: var(--radius-lg);
-            padding: var(--spacing-4);
+            background: var(--surface-light);
+            box-shadow: var(--neo-shadow-light);
+            transition: transform var(--transition-medium), box-shadow var(--transition-medium);
         }
         
-        .bus-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--spacing-3);
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
         }
         
-        .bus-id {
-            font-weight: 600;
-            color: var(--gray-800);
-            font-size: var(--font-size-sm);
+        .dark .feature-card {
+            background: var(--surface-dark);
+            box-shadow: var(--neo-shadow-dark);
         }
         
-        .bus-status {
-            padding: var(--spacing-1) var(--spacing-3);
-            border-radius: var(--radius-md);
-            font-size: var(--font-size-xs);
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .bus-status.in-transit {
-            background: var(--success);
-            color: white;
-        }
-        
-        .bus-status.starting {
-            background: var(--warning);
-            color: white;
-        }
-        
-        .bus-status.arriving {
-            background: var(--accent);
-            color: white;
-        }
-        
-        .bus-progress {
-            margin-bottom: var(--spacing-3);
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--gray-200);
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            margin-bottom: var(--spacing-2);
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: var(--primary-gradient);
-            border-radius: var(--radius-sm);
-            transition: width var(--transition-slow);
-        }
-        
-        .progress-text {
-            font-size: var(--font-size-xs);
-            color: var(--gray-500);
-            text-align: center;
-        }
-        
-        .bus-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: var(--font-size-xs);
-            color: var(--gray-600);
-        }
-        
-        .passengers, .arrival {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-1);
-        }
-        
-        /* ========================================
-           RESPONSIVE DESIGN
-        ======================================== */
-        
-        @media (max-width: 768px) {
-            .header-content {
-                padding: 0 var(--spacing-4);
-            }
-            
-            .nav-menu {
-                display: none;
-            }
-            
-            .container {
-                padding: 0 var(--spacing-4);
-            }
-            
-            .hero-title {
-                font-size: var(--font-size-3xl);
-            }
-            
-            .hero-subtitle {
-                font-size: var(--font-size-lg);
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .route-form {
-                grid-template-columns: 1fr;
-                gap: var(--spacing-4);
-            }
-            
-            .tracking-form {
-                grid-template-columns: 1fr;
-                gap: var(--spacing-4);
-            }
-            
-            .route-stats {
-                gap: var(--spacing-4);
-            }
-            
-            .eta-details {
-                gap: var(--spacing-4);
-            }
-        }
-        
-        /* ========================================
-           BEAST MODE: INTERACTIVE MAP STYLES
-        ======================================== */
-        
-        .interactive-map-section {
-            margin-top: var(--spacing-8);
-            background: white;
-            border-radius: var(--radius-2xl);
-            padding: var(--spacing-8);
-            box-shadow: var(--shadow-xl);
-        }
-        
-        .map-controls {
-            display: flex;
-            gap: var(--spacing-3);
-            margin-bottom: var(--spacing-6);
-            flex-wrap: wrap;
-        }
-        
-        .map-control-btn {
-            background: var(--gray-100);
-            border: 2px solid var(--gray-200);
-            color: var(--gray-700);
-            padding: var(--spacing-3) var(--spacing-4);
+        .feature-icon {
+            width: 64px;
+            height: 64px;
             border-radius: var(--radius-lg);
-            font-size: var(--font-size-sm);
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition-fast);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
             display: flex;
             align-items: center;
-            gap: var(--spacing-2);
-        }
-        
-        .map-control-btn:hover {
-            background: var(--primary-light);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-        
-        .map-control-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-        
-        .interactive-map {
-            width: 100%;
-            height: 400px;
-            border-radius: var(--radius-xl);
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-            margin-bottom: var(--spacing-6);
-        }
-        
-        .route-actions {
-            display: flex;
-            gap: var(--spacing-4);
             justify-content: center;
+            margin-bottom: var(--space-md);
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .feature-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .feature-description {
+            color: var(--gray-600);
+            font-size: var(--text-base);
+        }
+        
+        .dark .feature-description {
+            color: var(--gray-400);
+        }
+        
+        /* Call to Action */
+        .cta {
+            padding: var(--space-xl) var(--space-md);
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+        }
+        
+        .cta-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: var(--text-3xl);
+            margin-bottom: var(--space-md);
+        }
+        
+        .cta-description {
+            font-size: var(--text-lg);
+            max-width: 600px;
+            margin: 0 auto var(--space-lg);
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            display: flex;
             flex-wrap: wrap;
+            gap: var(--space-md);
+            justify-content: center;
         }
         
-        .route-actions .btn {
-            min-width: 140px;
+        .btn-cta {
+            padding: var(--space-sm) var(--space-lg);
+            font-size: var(--text-lg);
+            border-radius: var(--radius-lg);
+            background: white;
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
-        /* Enhanced Route Results with Map Integration */
-        .route-option {
-            cursor: pointer;
-            position: relative;
+        .btn-cta:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         }
         
-        .route-option:hover::after {
-            content: 'Click to view on map';
-            position: absolute;
-            top: var(--spacing-2);
-            right: var(--spacing-2);
+        .btn-cta-secondary {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        
+        .btn-cta-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: var(--space-lg) var(--space-md);
+            background-color: var(--gray-900);
+            color: var(--gray-300);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
+        }
+        
+        .footer-logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .footer-logo-text {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: var(--text-lg);
+            color: white;
+        }
+        
+        .footer-description {
+            margin-bottom: var(--space-md);
+            max-width: 300px;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .footer-social-link {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--gray-800);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-300);
+            transition: all var(--transition-fast);
+        }
+        
+        .footer-social-link:hover {
             background: var(--primary);
             color: white;
-            padding: var(--spacing-1) var(--spacing-2);
-            border-radius: var(--radius-sm);
-            font-size: var(--font-size-xs);
+            transform: translateY(-4px);
+        }
+        
+        .footer-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: var(--text-lg);
+            color: white;
+            margin-bottom: var(--space-md);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-link {
+            margin-bottom: var(--space-xs);
+        }
+        
+        .footer-link a {
+            color: var(--gray-400);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2xs);
+        }
+        
+        .footer-link a:hover {
+            color: var(--primary-light);
+        }
+        
+        .footer-link a i {
+            font-size: 0.75rem;
+        }
+        
+        .footer-bottom {
+            margin-top: var(--space-lg);
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--gray-800);
+            text-align: center;
+            font-size: var(--text-sm);
+            color: var(--gray-500);
+        }
+        
+        /* 3D Card Effect */
+        .card-3d {
+            transform-style: preserve-3d;
+            perspective: var(--transform-perspective);
+            transition: transform var(--transition-medium);
+        }
+        
+        .card-3d:hover {
+            --transform-rotate-y: 5deg;
+            --transform-rotate-x: -5deg;
+            transform: 
+                perspective(var(--transform-perspective))
+                rotateX(var(--transform-rotate-x))
+                rotateY(var(--transform-rotate-y))
+                scale(var(--transform-scale));
+        }
+        
+        /* Live Indicators */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2xs);
+            font-size: var(--text-xs);
             font-weight: 500;
+            color: var(--energy);
         }
         
-        /* ========================================
-           ANIMATIONS
-        ======================================== */
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: var(--radius-full);
+            background: var(--energy);
+            animation: pulse 2s infinite;
         }
         
-        .fade-in {
-            animation: fadeIn 0.6s ease-out;
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(var(--energy-hue), 80%, 45%, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(var(--energy-hue), 80%, 45%, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(var(--energy-hue), 80%, 45%, 0);
+            }
         }
         
-        /* Loading States */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
+        /* AI Assistant Button */
+        .ai-assistant-btn {
+            position: fixed;
+            bottom: var(--space-md);
+            right: var(--space-md);
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: none;
+            cursor: pointer;
+            z-index: 100;
+            transition: all var(--transition-bounce);
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .ai-assistant-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            transition: all var(--transition-medium);
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark .theme-toggle {
+            color: var(--text-light);
+        }
+        
+        .dark .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 <body>
     <div class="app-container">
         <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <a href="#" class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-bus"></i>
-                    </div>
-                    <span>Mumbai Transport Hub</span>
-                </a>
-                
-                <nav>
-                    <ul class="nav-menu">
-                        <li class="nav-item">
-                            <a href="#route-planning" class="nav-link active">
-                                <i class="fas fa-route"></i>
-                                Route Planning
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#live-tracking" class="nav-link">
-                                <i class="fas fa-satellite-dish"></i>
-                                Live Tracking
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#features" class="nav-link">
-                                <i class="fas fa-star"></i>
-                                Features
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+        <header class="app-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="ph ph-train"></i>
+                </div>
+                <div class="logo-text">Mumbai Transport</div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                    <i class="ph ph-sun"></i>
+                </button>
+                <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle navigation">
+                    <i class="ph ph-list"></i>
+                </button>
             </div>
         </header>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="container">
-                <!-- Hero Section -->
-                <section class="hero fade-in">
-                    <h1 class="hero-title">Smart Mumbai Transport Hub</h1>
-                    <p class="hero-subtitle">
-                        Plan your journey with real-time BEST bus routes, local trains, and metro connections. 
-                        Get live tracking and accurate ETAs for seamless travel across Mumbai.
-                    </p>
-                </section>
-
-                <!-- Features Section -->
-                <section id="features" class="features-grid">
-                    <div class="feature-card fade-in">
-                        <div class="feature-icon">
-                            <i class="fas fa-route"></i>
-                        </div>
-                        <h3 class="feature-title">Smart Route Planning</h3>
-                        <p class="feature-description">
-                            Find the best routes using real BEST bus data, local trains, and metro connections. 
-                            Get multi-modal options with accurate timings and fares.
-                        </p>
-                        <div class="action-buttons">
-                            <a href="#route-planning" class="btn btn-primary">
-                                <i class="fas fa-search"></i>
-                                Plan Route
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="feature-card fade-in">
-                        <div class="feature-icon">
-                            <i class="fas fa-satellite-dish"></i>
-                        </div>
-                        <h3 class="feature-title">Live Bus Tracking</h3>
-                        <p class="feature-description">
-                            Track buses in real-time with accurate ETAs, current locations, and passenger counts. 
-                            Never miss your bus again with live updates.
-                        </p>
-                        <div class="action-buttons">
-                            <a href="#live-tracking" class="btn btn-primary">
-                                <i class="fas fa-location-arrow"></i>
-                                Track Bus
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="feature-card fade-in">
-                        <div class="feature-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <h3 class="feature-title">Real-Time Updates</h3>
-                        <p class="feature-description">
-                            Get real-time information using actual Mumbai transport schedules. 
-                            Accurate ETAs based on real departure timings and route data.
-                        </p>
-                        <div class="action-buttons">
-                            <a href="#route-planning" class="btn btn-secondary">
-                                <i class="fas fa-info-circle"></i>
-                                Learn More
-                            </a>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Route Planning Section -->
-                <section id="route-planning" class="route-planning fade-in">
-                    <div class="section-header">
-                        <h2 class="section-title">Smart Route Planning</h2>
-                        <p class="section-subtitle">Find the best route using real Mumbai transport data</p>
-                    </div>
-
-                    <form class="route-form" id="route-form">
-                        <div class="form-group">
-                            <label for="from-location" class="form-label">
-                                <i class="fas fa-map-marker-alt"></i>
-                                From
-                            </label>
-                            <input 
-                                type="text" 
-                                id="from-location" 
-                                class="form-input" 
-                                placeholder="Enter starting point (e.g., Colaba, Bandra)"
-                                value="Colaba"
-                                required
-                            >
-                        </div>
-
-                        <div class="form-group">
-                            <label for="to-location" class="form-label">
-                                <i class="fas fa-map-marker"></i>
-                                To
-                            </label>
-                            <input 
-                                type="text" 
-                                id="to-location" 
-                                class="form-input" 
-                                placeholder="Enter destination (e.g., Andheri, Thane)"
-                                value="Bandra"
-                                required
-                            >
-                        </div>
-
-                        <button type="submit" class="btn btn-primary" id="plan-route-btn">
-                            <i class="fas fa-search"></i>
-                            Plan Route
-                        </button>
-                    </form>
-
-                    <div id="route-results" class="route-results"></div>
-                    
-                    <!-- BEAST MODE: Interactive Map Section -->
-                    <div id="interactive-map-section" class="interactive-map-section" style="display: none;">
-                        <div class="section-header">
-                            <h2 class="section-title">
-                                <i class="fas fa-map-marked-alt"></i>
-                                Interactive Route Map
-                            </h2>
-                            <p class="section-subtitle">Visualize your route with real-time traffic and transit options</p>
-                        </div>
-                        
-                        <div class="map-controls">
-                            <button class="map-control-btn" id="toggle-traffic" onclick="toggleTraffic()">
-                                <i class="fas fa-car"></i> Traffic
-                            </button>
-                            <button class="map-control-btn" id="toggle-transit" onclick="toggleTransit()">
-                                <i class="fas fa-subway"></i> Transit
-                            </button>
-                            <button class="map-control-btn" id="toggle-bicycling" onclick="toggleBicycling()">
-                                <i class="fas fa-bicycle"></i> Bicycling
-                            </button>
-                            <button class="map-control-btn" id="my-location" onclick="getMyLocation()">
-                                <i class="fas fa-crosshairs"></i> My Location
-                            </button>
-                        </div>
-                        
-                        <div id="interactive-map" class="interactive-map"></div>
-                        
-                        <div class="route-actions">
-                            <button class="btn btn-secondary" onclick="saveRoute()">
-                                <i class="fas fa-heart"></i> Save Route
-                            </button>
-                            <button class="btn btn-primary" onclick="shareRoute()">
-                                <i class="fas fa-share-alt"></i> Share Route
-                            </button>
-                            <button class="btn btn-secondary" onclick="getDirections()">
-                                <i class="fas fa-directions"></i> Get Directions
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Live Tracking Section -->
-                <section id="live-tracking" class="live-tracking fade-in">
-                    <div class="section-header">
-                        <h2 class="section-title">Live Bus Tracking</h2>
-                        <p class="section-subtitle">Track buses in real-time with accurate ETAs</p>
-                    </div>
-
-                    <form class="tracking-form" id="tracking-form">
-                        <div class="form-group">
-                            <label for="track-route" class="form-label">
-                                <i class="fas fa-bus"></i>
-                                Route Number
-                            </label>
-                            <input 
-                                type="text" 
-                                id="track-route" 
-                                class="form-input" 
-                                placeholder="Enter route number (e.g., 41, 42, 234)"
-                                value="41"
-                                required
-                            >
-                        </div>
-
-                        <button type="submit" class="btn btn-primary" id="track-route-btn">
-                            <i class="fas fa-satellite-dish"></i>
-                            Track Bus
-                        </button>
-                    </form>
-
-                    <div id="tracking-results" class="tracking-results"></div>
-                </section>
-            </div>
-        </main>
-    </div>
-
-    <!-- Real Mumbai Transport Data System -->
-    <script>
-        // REAL MUMBAI TRANSPORT DATA SYSTEM
-        // Using actual BEST bus routes, local train data, and GTFS data
         
-        const REAL_MUMBAI_TRANSPORT_DATA = {
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-bg"></div>
+            <div class="hero-content">
+                <h1 class="hero-title">Smart Route Planning & Live Tracking</h1>
+                <p class="hero-subtitle">Plan your journey with real-time BEST bus routes, local trains, and metro connections. Get live tracking and accurate ETAs for seamless travel across Mumbai.</p>
+                <div class="cta-buttons">
+                    <a href="#journey-planner" class="btn btn-cta">Plan Your Journey</a>
+                    <a href="#features" class="btn btn-cta btn-cta-secondary">Explore Features</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <h2 class="features-title">Discover Mumbai Transport Hub</h2>
+            <div class="features-grid">
+                <div class="feature-card card-3d">
+                    <div class="feature-icon">
+                        <i class="ph ph-map-trifold"></i>
+                    </div>
+                    <h3 class="feature-title">Smart Route Planning</h3>
+                    <p class="feature-description">Find the best routes using real BEST bus data, local trains, and metro connections. Get multi-modal options with accurate timings and fares.</p>
+                </div>
+                
+                <div class="feature-card card-3d">
+                    <div class="feature-icon">
+                        <i class="ph ph-bus"></i>
+                    </div>
+                    <h3 class="feature-title">Live Bus Tracking</h3>
+                    <p class="feature-description">Track buses in real-time with accurate ETAs, current locations, and passenger counts. Never miss your bus again with live updates.</p>
+                </div>
+                
+                <div class="feature-card card-3d">
+                    <div class="feature-icon">
+                        <i class="ph ph-clock-clockwise"></i>
+                    </div>
+                    <h3 class="feature-title">Real-Time Updates</h3>
+                    <p class="feature-description">Get real-time information using actual Mumbai transport schedules. Accurate ETAs based on real departure timings and route data.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Journey Planner Section -->
+        <section class="journey-planner" id="journey-planner">
+            <div class="app-container">
+                <!-- Sidebar -->
+                <aside class="sidebar" id="sidebar">
+                    <div class="section-title">Plan Your Journey</div>
+                    
+                    <!-- Transport Modes -->
+                    <div class="transport-modes">
+                        <button class="mode-tab active" data-mode="all">
+                            <i class="ph ph-shuffle"></i>
+                            <span>All</span>
+                        </button>
+                        <button class="mode-tab" data-mode="metro">
+                            <i class="ph ph-train"></i>
+                            <span>Metro</span>
+                        </button>
+                        <button class="mode-tab" data-mode="bus">
+                            <i class="ph ph-bus"></i>
+                            <span>Bus</span>
+                        </button>
+                        <button class="mode-tab" data-mode="train">
+                            <i class="ph ph-train-regional"></i>
+                            <span>Train</span>
+                        </button>
+                        <button class="mode-tab" data-mode="taxi">
+                            <i class="ph ph-taxi"></i>
+                            <span>Taxi</span>
+                        </button>
+                        <button class="mode-tab" data-mode="auto">
+                            <i class="ph ph-car"></i>
+                            <span>Auto</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Journey Form -->
+                    <form id="journey-form">
+                        <div class="form-group">
+                            <label class="form-label" for="from">From</label>
+                            <div class="input-wrapper">
+                                <i class="ph ph-map-pin input-icon"></i>
+                                <input type="text" id="from" class="form-input" placeholder="Current location or address">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="to">To</label>
+                            <div class="input-wrapper">
+                                <i class="ph ph-map-pin-line input-icon"></i>
+                                <input type="text" id="to" class="form-input" placeholder="Destination">
+                                <button type="button" class="location-swap" id="swap-locations">
+                                    <i class="ph ph-arrows-down-up"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">When</label>
+                            <div class="input-wrapper">
+                                <i class="ph ph-clock input-icon"></i>
+                                <select class="form-input" id="departure-time">
+                                    <option value="now">Leave now</option>
+                                    <option value="depart">Depart at</option>
+                                    <option value="arrive">Arrive by</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="time-selector" style="display: none;">
+                            <div class="input-wrapper">
+                                <i class="ph ph-calendar input-icon"></i>
+                                <input type="datetime-local" class="form-input" id="custom-time">
+                            </div>
+                        </div>
+                        
+                        <div class="preferences">
+                            <div class="preference-chip active">
+                                <i class="ph ph-lightning"></i>
+                                <span>Fastest</span>
+                            </div>
+                            <div class="preference-chip">
+                                <i class="ph ph-wallet"></i>
+                                <span>Cheapest</span>
+                            </div>
+                            <div class="preference-chip">
+                                <i class="ph ph-footprints"></i>
+                                <span>Less walking</span>
+                            </div>
+                            <div class="preference-chip">
+                                <i class="ph ph-wheelchair"></i>
+                                <span>Accessible</span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="ph ph-magnifying-glass"></i>
+                            Find Routes
+                        </button>
+                    </form>
+                    
+                    <!-- Route Results -->
+                    <div class="route-results" id="route-results" style="display: none;">
+                        <div class="section-title">Best Routes</div>
+                        
+                        <div class="live-indicator">
+                            <span class="live-dot"></span>
+                            Live traffic updates
+                        </div>
+                        
+                        <div class="route-option active card-3d">
+                            <div class="route-header">
+                                <div class="route-time">38 min</div>
+                                <div class="route-price">₹30</div>
+                            </div>
+                            
+                            <div class="route-meta">
+                                <div class="route-meta-item">
+                                    <i class="ph ph-clock"></i>
+                                    <span>Depart 5:45 PM</span>
+                                </div>
+                                <div class="route-meta-item">
+                                    <i class="ph ph-footprints"></i>
+                                    <span>400m walk</span>
+                                </div>
+                            </div>
+                            
+                            <div class="route-segments">
+                                <div class="segment">
+                                    <div class="segment-icon walk">W</div>
+                                </div>
+                                <div class="segment-connector"></div>
+                                <div class="segment">
+                                    <div class="segment-icon metro">M</div>
+                                    <span>Line 1</span>
+                                </div>
+                                <div class="segment-connector"></div>
+                                <div class="segment">
+                                    <div class="segment-icon walk">W</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="route-option card-3d">
+                            <div class="route-header">
+                                <div class="route-time">42 min</div>
+                                <div class="route-price">₹25</div>
+                            </div>
+                            
+                            <div class="route-meta">
+                                <div class="route-meta-item">
+                                    <i class="ph ph-clock"></i>
+                                    <span>Depart 5:50 PM</span>
+                                </div>
+                                <div class="route-meta-item">
+                                    <i class="ph ph-footprints"></i>
+                                    <span>200m walk</span>
+                                </div>
+                            </div>
+                            
+                            <div class="route-segments">
+                                <div class="segment">
+                                    <div class="segment-icon walk">W</div>
+                                </div>
+                                <div class="segment-connector"></div>
+                                <div class="segment">
+                                    <div class="segment-icon bus">B</div>
+                                    <span>Route 21</span>
+                                </div>
+                                <div class="segment-connector"></div>
+                                <div class="segment">
+                                    <div class="segment-icon walk">W</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                
+                <!-- Map Container -->
+                <div id="map" class="map-container"></div>
+            </div>
+        </section>
+        
+        <!-- Call to Action -->
+        <section class="cta">
+            <h2 class="cta-title">Ready to Transform Your Mumbai Commute?</h2>
+            <p class="cta-description">Download our mobile app for an even better experience with offline maps, journey alerts, and personalized recommendations.</p>
+            <div class="cta-buttons">
+                <a href="#" class="btn btn-cta">
+                    <i class="ph ph-device-mobile"></i>
+                    Download App
+                </a>
+                <a href="#" class="btn btn-cta btn-cta-secondary">
+                    <i class="ph ph-info"></i>
+                    Learn More
+                </a>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">
+                        <div class="footer-logo-icon">
+                            <i class="ph ph-train"></i>
+                        </div>
+                        <div class="footer-logo-text">Mumbai Transport</div>
+                    </div>
+                    <p class="footer-description">Providing real-time transport information and journey planning for Mumbai's public transportation network.</p>
+                    <div class="footer-social">
+                        <a href="#" class="footer-social-link">
+                            <i class="ph ph-twitter-logo"></i>
+                        </a>
+                        <a href="#" class="footer-social-link">
+                            <i class="ph ph-facebook-logo"></i>
+                        </a>
+                        <a href="#" class="footer-social-link">
+                            <i class="ph ph-instagram-logo"></i>
+                        </a>
+                        <a href="#" class="footer-social-link">
+                            <i class="ph ph-youtube-logo"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-links-container">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Home</a></li>
+                        <li class="footer-link"><a href="#features"><i class="ph ph-caret-right"></i> Features</a></li>
+                        <li class="footer-link"><a href="#journey-planner"><i class="ph ph-caret-right"></i> Journey Planner</a></li>
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Live Map</a></li>
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Schedules</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links-container">
+                    <h3 class="footer-title">Transport Modes</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> BEST Bus</a></li>
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Local Trains</a></li>
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Metro</a></li>
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Monorail</a></li>
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Ferry Services</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links-container">
+                    <h3 class="footer-title">Support</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Help Center</a></li>
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> FAQs</a></li>
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Contact Us</a></li>
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Privacy Policy</a></li>
+                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
             
-            // ========================================
-            // 1. REAL BEST BUS ROUTES (from mumbaicitybus.in)
-            // ========================================
-            
-            bestBusRoutes: [
-                {
-                    routeId: '41',
-                    name: 'BEST Route 41',
-                    operator: 'BEST',
-                    from: 'Ayyappa Mandir',
-                    to: 'Thane Station (W)',
-                    stops: [
-                        'Ayyappa Mandir', 'Srinagar Police Station', 'Parvat Nagar', 'Shanti Nagar',
-                        'Saibaba Mandir', 'Ravi Fisheries', 'Wagle Circle', 'Durdwani', 'Road No 16',
-                        'Passport Office', 'Automatic', 'Mulund Check Naka (Narpoli)', 'Kashish Park',
-                        'Marathon Chowk (Teen Hath Naka)', 'Forest Office', 'Hari Niwas', 'Ice Factory',
-                        'A.K. Joshi Vidyalaya', 'Thane Station (W)'
-                    ],
-                    totalStops: 19,
-                    dailyTrips: 11,
-                    firstBus: '7:00 AM',
-                    lastBus: '10:00 PM',
-                    returnFirstBus: '7:35 AM',
-                    returnLastBus: '10:30 PM',
-                    timings: ['7:00 AM', '8:10 AM', '9:15 AM', '12:35 PM', '1:35 PM', '3:45 PM', '4:50 PM', '6:00 PM', '8:45 PM', '8:55 PM', '10:00 PM'],
-                    returnTimings: ['7:35 AM', '8:40 AM', '11:15 AM', '1:05 PM', '2:05 PM', '4:15 PM', '5:25 PM', '7:10 PM', '8:20 PM', '9:30 PM', '10:30 PM'],
-                    estimatedDuration: 17,
-                    fare: 15
-                },
-                {
-                    routeId: '42',
-                    name: 'BEST Route 42',
-                    operator: 'BEST',
-                    from: 'Sandhurst Road Station',
-                    to: 'Kamla Nehru Park',
-                    stops: [
-                        'Sandhurst Road Station', 'Chinch Bunder', 'Dongri', 'Alankar Cinema',
-                        'Teen Batti', 'Teen Bakda', 'Vijay Vallabh Chowk', 'Dr. Bhadkamkar Marg Junction',
-                        'Dr. Bhadkamkar Road Naka', 'Gaondevi Police Station', 'Gol Mandir',
-                        'Johar Chowk', 'Khetwadi', 'Moti Cinema', 'Nana Chowk', 'Pandit Paluskar Chowk',
-                        'Pandit Paluskar Chowk / Marwari College', 'Parsi Agyari', 'Prarthana Samaj',
-                        'Rekha Sadan', 'Rekha Sadan / Jain Mandir', 'Sahyadri Guest House', 'Kamla Nehru Park'
-                    ],
-                    totalStops: 23,
-                    dailyTrips: 86,
-                    firstBus: '7:00 AM',
-                    lastBus: '8:30 PM',
-                    returnFirstBus: '7:35 AM',
-                    returnLastBus: '8:44 PM',
-                    estimatedDuration: 25,
-                    fare: 12
-                },
-                {
-                    routeId: '234',
-                    name: 'BEST Route 234',
-                    operator: 'BEST',
-                    from: 'Bandra Station (W)',
-                    to: 'Worli',
-                    stops: ['Bandra Station (W)', 'Bandra Bus Station', 'Khar Station', 'Santacruz Station', 'Vile Parle Station', 'Andheri Station', 'Jogeshwari Station', 'Goregaon Station', 'Malad Station', 'Kandivali Station', 'Borivali Station', 'Dahisar Station', 'Mira Road Station', 'Bhayandar Station', 'Naigaon Station', 'Vasai Road Station', 'Nala Sopara Station', 'Virar Station', 'Worli'],
-                    totalStops: 19,
-                    dailyTrips: 45,
-                    firstBus: '5:30 AM',
-                    lastBus: '11:30 PM',
-                    estimatedDuration: 90,
-                    fare: 25
-                },
-                {
-                    routeId: '139',
-                    name: 'BEST Route 139',
-                    operator: 'BEST',
-                    from: 'Colaba',
-                    to: 'Bandra',
-                    stops: ['Colaba', 'Gateway of India', 'CST Station', 'Churchgate Station', 'Marine Lines Station', 'Charni Road Station', 'Grant Road Station', 'Mumbai Central Station', 'Mahalaxmi Station', 'Lower Parel Station', 'Elphinstone Road Station', 'Prabhadevi Station', 'Dadar Station', 'Matunga Station', 'Sion Station', 'Kurla Station', 'Vidya Vihar Station', 'Ghatkopar Station', 'Vikhroli Station', 'Kanjurmarg Station', 'Bhandup Station', 'Nahur Station', 'Mulund Station', 'Thane Station', 'Bandra'],
-                    totalStops: 25,
-                    dailyTrips: 38,
-                    firstBus: '6:00 AM',
-                    lastBus: '11:00 PM',
-                    estimatedDuration: 75,
-                    fare: 20
-                },
-                {
-                    routeId: '78',
-                    name: 'BEST Route 78',
-                    operator: 'BEST',
-                    from: 'Worli',
-                    to: 'Andheri',
-                    stops: ['Worli', 'Haji Ali', 'Mahalaxmi Station', 'Lower Parel', 'Elphinstone Road', 'Prabhadevi', 'Dadar Station', 'Matunga', 'Sion', 'Kurla', 'Vidya Vihar', 'Ghatkopar', 'Vikhroli', 'Kanjurmarg', 'Bhandup', 'Nahur', 'Mulund', 'Thane', 'Andheri'],
-                    totalStops: 19,
-                    dailyTrips: 52,
-                    firstBus: '5:45 AM',
-                    lastBus: '11:15 PM',
-                    estimatedDuration: 60,
-                    fare: 18
-                }
-            ],
-
-            // ========================================
-            // 2. MUMBAI LOCAL TRAIN DATA (from Kaggle dataset)
-            // ========================================
-            
-            localTrains: [
-                {
-                    line: 'Western Line',
-                    stations: [
-                        'Churchgate', 'Marine Lines', 'Charni Road', 'Grant Road', 'Mumbai Central',
-                        'Mahalaxmi', 'Lower Parel', 'Elphinstone Road', 'Prabhadevi', 'Dadar',
-                        'Matunga', 'Mahim', 'Bandra', 'Khar Road', 'Santacruz', 'Vile Parle',
-                        'Andheri', 'Jogeshwari', 'Goregaon', 'Malad', 'Kandivali', 'Borivali',
-                        'Dahisar', 'Mira Road', 'Bhayandar', 'Naigaon', 'Vasai Road', 'Nala Sopara', 'Virar'
-                    ],
-                    frequency: '3-5 minutes peak, 8-10 minutes off-peak',
-                    firstTrain: '4:15 AM',
-                    lastTrain: '1:30 AM',
-                    estimatedDuration: 75,
-                    fare: {
-                        'Churchgate-Bandra': 10,
-                        'Churchgate-Andheri': 15,
-                        'Churchgate-Borivali': 20,
-                        'Churchgate-Virar': 25
-                    }
-                },
-                {
-                    line: 'Central Line',
-                    stations: [
-                        'CST', 'Masjid', 'Sandhurst Road', 'Byculla', 'Chinchpokli', 'Currey Road',
-                        'Parel', 'Dadar', 'Matunga', 'Sion', 'Kurla', 'Vidya Vihar', 'Ghatkopar',
-                        'Vikhroli', 'Kanjurmarg', 'Bhandup', 'Nahur', 'Mulund', 'Thane', 'Mumbra',
-                        'Diva', 'Kopar', 'Dombivli', 'Thakurli', 'Kalyan', 'Shahad', 'Ambivli',
-                        'Titwala', 'Khadavli', 'Vasind', 'Asangaon', 'Atgaon', 'Khardi', 'Kasara'
-                    ],
-                    frequency: '3-5 minutes peak, 8-10 minutes off-peak',
-                    firstTrain: '4:00 AM',
-                    lastTrain: '1:45 AM',
-                    estimatedDuration: 90,
-                    fare: {
-                        'CST-Thane': 15,
-                        'CST-Kalyan': 20,
-                        'CST-Kasara': 30
-                    }
-                },
-                {
-                    line: 'Harbour Line',
-                    stations: [
-                        'CST', 'Masjid', 'Sandhurst Road', 'Byculla', 'Chinchpokli', 'Currey Road',
-                        'Parel', 'Dadar', 'Matunga', 'Sion', 'Kurla', 'Tilak Nagar', 'Chembur',
-                        'Govandi', 'Mankhurd', 'Vashi', 'Sanpada', 'Juinagar', 'Nerul', 'Seawoods',
-                        'Belapur', 'Kharghar', 'Mansarovar', 'Khandeshwar', 'Panvel'
-                    ],
-                    frequency: '5-8 minutes peak, 10-15 minutes off-peak',
-                    firstTrain: '4:30 AM',
-                    lastTrain: '1:00 AM',
-                    estimatedDuration: 60,
-                    fare: {
-                        'CST-Vashi': 15,
-                        'CST-Belapur': 20,
-                        'CST-Panvel': 25
-                    }
-                }
-            ],
-
-            // ========================================
-            // 3. METRO ROUTES (Mumbai Metro)
-            // ========================================
-            
-            metroRoutes: [
-                {
-                    line: 'Metro Line 1 (Versova-Andheri-Ghatkopar)',
-                    stations: [
-                        'Versova', 'D N Nagar', 'Azad Nagar', 'Andheri', 'Western Express Highway',
-                        'Chakala', 'Airport Road', 'Marol Naka', 'Saki Naka', 'Asalpha', 'Jagruti Nagar', 'Ghatkopar'
-                    ],
-                    frequency: '4-6 minutes',
-                    firstTrain: '5:30 AM',
-                    lastTrain: '11:30 PM',
-                    estimatedDuration: 21,
-                    fare: 10
-                },
-                {
-                    line: 'Metro Line 2A (Dahisar-D N Nagar)',
-                    stations: [
-                        'Dahisar (E)', 'Ovaripada', 'Rashtriya Udyan', 'Devipada', 'Magathane',
-                        'Poisar', 'Kandarpada', 'D N Nagar'
-                    ],
-                    frequency: '5-8 minutes',
-                    firstTrain: '6:00 AM',
-                    lastTrain: '11:00 PM',
-                    estimatedDuration: 15,
-                    fare: 10
-                },
-                {
-                    line: 'Metro Line 7 (Dahisar East-Andheri East)',
-                    stations: [
-                        'Dahisar (E)', 'Ovaripada', 'Rashtriya Udyan', 'Devipada', 'Magathane',
-                        'Poisar', 'Kandarpada', 'D N Nagar', 'Azad Nagar', 'Andheri (W)', 'Andheri (E)'
-                    ],
-                    frequency: '5-8 minutes',
-                    firstTrain: '6:00 AM',
-                    lastTrain: '11:00 PM',
-                    estimatedDuration: 20,
-                    fare: 10
-                }
-            ]
-        };
-
-        // Make it globally available
-        window.REAL_MUMBAI_TRANSPORT_DATA = REAL_MUMBAI_TRANSPORT_DATA;
-
-        console.log('🚀 Real Mumbai Transport Data System Loaded');
-        console.log(`✅ ${REAL_MUMBAI_TRANSPORT_DATA.bestBusRoutes.length} BEST Bus Routes`);
-        console.log(`✅ ${REAL_MUMBAI_TRANSPORT_DATA.localTrains.length} Local Train Lines`);
-        console.log(`✅ ${REAL_MUMBAI_TRANSPORT_DATA.metroRoutes.length} Metro Lines`);
-    </script>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mumbai Transport Hub. All rights reserved.</p>
+            </div>
+        </footer>
+        
+        <!-- AI Assistant Button -->
+        <button class="ai-assistant-btn" id="ai-assistant">
+            <i class="ph ph-robot"></i>
+        </button>
+    </div>
     
-    <!-- Main application script -->
     <script>
-        // Modern UI Application Script
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 BEAST MODE: Modern Mumbai Transport Hub UI Loaded');
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        // Check for saved theme preference or respect OS preference
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            body.classList.add('dark');
+            themeToggle.innerHTML = '<i class="ph ph-moon"></i>';
+        } else {
+            themeToggle.innerHTML = '<i class="ph ph-sun"></i>';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
             
-            // Initialize the application
-            initializeApp();
+            if (body.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeToggle.innerHTML = '<i class="ph ph-moon"></i>';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeToggle.innerHTML = '<i class="ph ph-sun"></i>';
+            }
             
-            // Add direct onclick handlers as backup
-            addDirectHandlers();
-            
-            // Initialize BEAST MODE Google Maps
-            initBeastModeMaps();
+            // Update map style if map is initialized
+            if (window.map) {
+                updateMapStyle();
+            }
         });
         
-        function addDirectHandlers() {
-            // Direct onclick handlers for immediate functionality
-            const planRouteBtn = document.getElementById('plan-route-btn');
-            const trackRouteBtn = document.getElementById('track-route-btn');
-            
-            if (planRouteBtn) {
-                planRouteBtn.onclick = function() {
-                    console.log('🔍 Direct Plan Route clicked');
-                    const fromInput = document.getElementById('from-location');
-                    const toInput = document.getElementById('to-location');
-                    
-                    if (fromInput && toInput) {
-                        const from = fromInput.value.trim();
-                        const to = toInput.value.trim();
-                        
-                        if (from && to) {
-                            console.log(`Planning route from ${from} to ${to}`);
-                            planRoute(from, to);
-                        } else {
-                            alert('Please enter both from and to locations');
-                        }
-                    }
-                };
-            }
-            
-            if (trackRouteBtn) {
-                trackRouteBtn.onclick = function() {
-                    console.log('🚌 Direct Track Route clicked');
-                    const routeInput = document.getElementById('track-route');
-                    
-                    if (routeInput) {
-                        const routeId = routeInput.value.trim();
-                        
-                        if (routeId) {
-                            console.log(`Tracking route ${routeId}`);
-                            trackRoute(routeId);
-                        } else {
-                            alert('Please enter a route number');
-                        }
-                    }
-                };
-            }
-            
-            console.log('✅ Direct handlers added');
-        }
+        // Mobile Navigation Toggle
+        const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+        const sidebar = document.getElementById('sidebar');
         
-        function initializeApp() {
-            // Add smooth scrolling for navigation links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
+        mobileNavToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                mobileNavToggle.innerHTML = '<i class="ph ph-x"></i>';
+            } else {
+                mobileNavToggle.innerHTML = '<i class="ph ph-list"></i>';
+            }
+        });
+        
+        // Transport Mode Tabs
+        const modeTabs = document.querySelectorAll('.mode-tab');
+        
+        modeTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                modeTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const mode = tab.dataset.mode;
+                // Filter routes based on mode
+                console.log(`Selected mode: ${mode}`);
+                
+                // Here you would filter routes and update the map
             });
-            
-            // Initialize route planning
-            initializeRoutePlanning();
-            
-            // Initialize live tracking
-            initializeLiveTracking();
-            
-            // Add navigation active state
-            updateNavigationState();
-        }
+        });
         
-        function initializeRoutePlanning() {
-            const routeForm = document.getElementById('route-form');
-            const planRouteBtn = document.getElementById('plan-route-btn');
+        // Location Swap Functionality
+        const swapLocationsBtn = document.getElementById('swap-locations');
+        const fromInput = document.getElementById('from');
+        const toInput = document.getElementById('to');
+        
+        swapLocationsBtn.addEventListener('click', () => {
+            const fromValue = fromInput.value;
+            fromInput.value = toInput.value;
+            toInput.value = fromValue;
             
-            if (routeForm) {
-                routeForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const fromInput = document.getElementById('from-location');
-                    const toInput = document.getElementById('to-location');
-                    
-                    if (fromInput && toInput) {
-                        const from = fromInput.value.trim();
-                        const to = toInput.value.trim();
-                        
-                        if (from && to) {
-                            // Show loading state
-                            planRouteBtn.innerHTML = '<span class="loading"></span> Planning...';
-                            planRouteBtn.disabled = true;
-                            
-                            // Simulate route planning (replace with real implementation)
-                            setTimeout(() => {
-                                planRoute(from, to);
-                                planRouteBtn.innerHTML = '<i class="fas fa-search"></i> Plan Route';
-                                planRouteBtn.disabled = false;
-                            }, 1000);
-                        }
-                    }
-                });
+            // Animate the swap button
+            swapLocationsBtn.style.transform = 'translateY(-50%) rotate(180deg)';
+            setTimeout(() => {
+                swapLocationsBtn.style.transform = 'translateY(-50%)';
+            }, 500);
+        });
+        
+        // Departure Time Selector
+        const departureTimeSelect = document.getElementById('departure-time');
+        const timeSelector = document.getElementById('time-selector');
+        
+        departureTimeSelect.addEventListener('change', () => {
+            if (departureTimeSelect.value === 'now') {
+                timeSelector.style.display = 'none';
+            } else {
+                timeSelector.style.display = 'block';
+                
+                // Set default time to current time + 30 minutes
+                const now = new Date();
+                now.setMinutes(now.getMinutes() + 30);
+                
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                
+                document.getElementById('custom-time').value = `${year}-${month}-${day}T${hours}:${minutes}`;
             }
-        }
+        });
         
-        function initializeLiveTracking() {
-            const trackingForm = document.getElementById('tracking-form');
-            const trackRouteBtn = document.getElementById('track-route-btn');
+        // Preference Chips
+        const preferenceChips = document.querySelectorAll('.preference-chip');
+        
+        preferenceChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                preferenceChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            });
+        });
+        
+        // Journey Form Submission
+        const journeyForm = document.getElementById('journey-form');
+        const routeResults = document.getElementById('route-results');
+        
+        journeyForm.addEventListener('submit', (e) => {
+            e.preventDefault();
             
-            if (trackingForm) {
-                trackingForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const routeInput = document.getElementById('track-route');
-                    
-                    if (routeInput) {
-                        const routeId = routeInput.value.trim();
-                        
-                        if (routeId) {
-                            // Show loading state
-                            trackRouteBtn.innerHTML = '<span class="loading"></span> Tracking...';
-                            trackRouteBtn.disabled = true;
-                            
-                            // Simulate live tracking (replace with real implementation)
-                            setTimeout(() => {
-                                trackRoute(routeId);
-                                trackRouteBtn.innerHTML = '<i class="fas fa-satellite-dish"></i> Track Bus';
-                                trackRouteBtn.disabled = false;
-                            }, 1000);
-                        }
-                    }
-                });
-            }
-        }
+            // Show loading state
+            const submitBtn = journeyForm.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="ph ph-circle-notch ph-spin"></i> Finding Routes...';
+            submitBtn.disabled = true;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Show results
+                routeResults.style.display = 'block';
+                
+                // Reset button
+                submitBtn.innerHTML = '<i class="ph ph-magnifying-glass"></i> Find Routes';
+                submitBtn.disabled = false;
+                
+                // Draw route on map
+                if (window.map) {
+                    drawRoute();
+                }
+                
+                // Scroll to results on mobile
+                if (window.innerWidth < 1024) {
+                    routeResults.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 1500);
+        });
         
-        // BEAST MODE: Google Maps Integration Variables
+        // Route Option Selection
+        const routeOptions = document.querySelectorAll('.route-option');
+        
+        routeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                routeOptions.forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+                
+                // Update route on map
+                if (window.map) {
+                    // Here you would update the route display
+                    console.log('Selected new route');
+                }
+            });
+        });
+        
+        // AI Assistant
+        const aiAssistant = document.getElementById('ai-assistant');
+        
+        aiAssistant.addEventListener('click', () => {
+            // Show AI assistant modal or chat interface
+            alert('AI Travel Assistant: How can I help you plan your journey today?');
+        });
+        
+        // Initialize Google Maps
         let map;
         let directionsService;
         let directionsRenderer;
         let autocompleteFrom;
         let autocompleteTo;
-        let trafficLayer;
-        let transitLayer;
-        let bicyclingLayer;
-        let currentRoute;
-
-        // Initialize BEAST MODE Google Maps
-        function initBeastModeMaps() {
-            // Initialize map
-            map = new google.maps.Map(document.getElementById('interactive-map'), {
-                center: { lat: 19.0760, lng: 72.8777 }, // Mumbai center
+        
+        function initMap() {
+            // Mumbai coordinates
+            const mumbai = { lat: 19.0760, lng: 72.8777 };
+            
+            // Map options
+            const mapOptions = {
+                center: mumbai,
                 zoom: 12,
+                mapId: 'future_mumbai_transport',
+                disableDefaultUI: true,
+                zoomControl: true,
                 mapTypeControl: false,
+                scaleControl: true,
                 streetViewControl: false,
-                fullscreenControl: false,
-                styles: getBeastModeMapStyle()
-            });
-
-            // Initialize services
+                rotateControl: false,
+                fullscreenControl: true
+            };
+            
+            // Create the map
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+            
+            // Initialize directions service and renderer
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer({
                 map: map,
-                suppressMarkers: true
-            });
-
-            // Initialize layers
-            trafficLayer = new google.maps.TrafficLayer();
-            transitLayer = new google.maps.TransitLayer();
-            bicyclingLayer = new google.maps.BicyclingLayer();
-
-            // Initialize autocomplete
-            autocompleteFrom = new google.maps.places.Autocomplete(
-                document.getElementById('from-location'),
-                { bounds: new google.maps.LatLngBounds(
-                    new google.maps.LatLng(18.8964, 72.7962),
-                    new google.maps.LatLng(19.2189, 72.9780)
-                )}
-            );
-
-            autocompleteTo = new google.maps.places.Autocomplete(
-                document.getElementById('to-location'),
-                { bounds: new google.maps.LatLngBounds(
-                    new google.maps.LatLng(18.8964, 72.7962),
-                    new google.maps.LatLng(19.2189, 72.9780)
-                )}
-            );
-
-            console.log('🚀 BEAST MODE Google Maps initialized!');
-        }
-
-        // BEAST MODE Map Style
-        function getBeastModeMapStyle() {
-            return [
-                {
-                    "featureType": "all",
-                    "elementType": "geometry.fill",
-                    "stylers": [{"weight": "2.00"}]
-                },
-                {
-                    "featureType": "all",
-                    "elementType": "geometry.stroke",
-                    "stylers": [{"color": "#9c9c9c"}]
-                },
-                {
-                    "featureType": "all",
-                    "elementType": "labels.text",
-                    "stylers": [{"visibility": "on"}]
-                },
-                {
-                    "featureType": "landscape",
-                    "elementType": "all",
-                    "stylers": [{"color": "#f2f2f2"}]
-                },
-                {
-                    "featureType": "landscape",
-                    "elementType": "geometry.fill",
-                    "stylers": [{"color": "#ffffff"}]
-                },
-                {
-                    "featureType": "landscape.man_made",
-                    "elementType": "geometry.fill",
-                    "stylers": [{"color": "#ffffff"}]
-                },
-                {
-                    "featureType": "poi",
-                    "elementType": "all",
-                    "stylers": [{"visibility": "off"}]
-                },
-                {
-                    "featureType": "road",
-                    "elementType": "all",
-                    "stylers": [{"saturation": -100}, {"lightness": 45}]
-                },
-                {
-                    "featureType": "road",
-                    "elementType": "geometry.fill",
-                    "stylers": [{"color": "#eeeeee"}]
-                },
-                {
-                    "featureType": "road",
-                    "elementType": "labels.text.fill",
-                    "stylers": [{"color": "#7b7b7b"}]
-                },
-                {
-                    "featureType": "road",
-                    "elementType": "labels.text.stroke",
-                    "stylers": [{"color": "#ffffff"}]
-                },
-                {
-                    "featureType": "road.highway",
-                    "elementType": "all",
-                    "stylers": [{"visibility": "simplified"}]
-                },
-                {
-                    "featureType": "road.arterial",
-                    "elementType": "labels.icon",
-                    "stylers": [{"visibility": "off"}]
-                },
-                {
-                    "featureType": "transit",
-                    "elementType": "all",
-                    "stylers": [{"visibility": "off"}]
-                },
-                {
-                    "featureType": "water",
-                    "elementType": "all",
-                    "stylers": [{"color": "#46bcec"}, {"visibility": "on"}]
-                },
-                {
-                    "featureType": "water",
-                    "elementType": "geometry.fill",
-                    "stylers": [{"color": "#c8d7d4"}]
-                },
-                {
-                    "featureType": "water",
-                    "elementType": "labels.text.fill",
-                    "stylers": [{"color": "#070707"}]
-                },
-                {
-                    "featureType": "water",
-                    "elementType": "labels.text.stroke",
-                    "stylers": [{"color": "#ffffff"}]
+                suppressMarkers: true,
+                polylineOptions: {
+                    strokeColor: getComputedStyle(document.documentElement).getPropertyValue('--primary'),
+                    strokeWeight: 5,
+                    strokeOpacity: 0.7
                 }
-            ];
-        }
-
-        function planRoute(from, to) {
-            console.log(`🔍 BEAST MODE: Planning route from ${from} to ${to}`);
-            console.log('REAL_MUMBAI_TRANSPORT_DATA available:', !!window.REAL_MUMBAI_TRANSPORT_DATA);
+            });
             
-            // Show loading state
-            const btn = document.getElementById('plan-route-btn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="loading"></span> Finding Best Route...';
-            btn.disabled = true;
-
-            // Use Google Maps Directions API for BEAST MODE routing
-            if (directionsService) {
-                directionsService.route({
+            // Apply custom map style based on theme
+            updateMapStyle();
+            
+            // Initialize autocomplete for location inputs
+            autocompleteFrom = new google.maps.places.Autocomplete(
+                document.getElementById('from'),
+                { componentRestrictions: { country: 'in' } }
+            );
+            
+            autocompleteTo = new google.maps.places.Autocomplete(
+                document.getElementById('to'),
+                { componentRestrictions: { country: 'in' } }
+            );
+            
+            // Bias autocomplete results to current map bounds
+            autocompleteFrom.bindTo('bounds', map);
+            autocompleteTo.bindTo('bounds', map);
+        }
+        
+        // Update map style based on theme
+        function updateMapStyle() {
+            const isDark = document.body.classList.contains('dark');
+            
+            const lightStyle = [
+                { elementType: 'geometry', stylers: [{ color: '#f5f5f5' }] },
+                { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+                { elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
+                { elementType: 'labels.text.stroke', stylers: [{ color: '#f5f5f5' }] },
+                { featureType: 'administrative.land_parcel', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
+                { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#eeeeee' }] },
+                { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+                { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#e5e5e5' }] },
+                { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
+                { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
+                { featureType: 'road.arterial', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+                { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#dadada' }] },
+                { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
+                { featureType: 'road.local', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
+                { featureType: 'transit.line', elementType: 'geometry', stylers: [{ color: '#e5e5e5' }] },
+                { featureType: 'transit.station', elementType: 'geometry', stylers: [{ color: '#eeeeee' }] },
+                { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c9c9c9' }] },
+                { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] }
+            ];
+            
+            const darkStyle = [
+                { elementType: 'geometry', stylers: [{ color: '#212121' }] },
+                { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+                { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+                { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },
+                { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
+                { featureType: 'administrative.country', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
+                { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
+                { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
+                { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+                { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#181818' }] },
+                { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
+                { featureType: 'poi.park', elementType: 'labels.text.stroke', stylers: [{ color: '#1b1b1b' }] },
+                { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#2c2c2c' }] },
+                { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#8a8a8a' }] },
+                { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#373737' }] },
+                { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#3c3c3c' }] },
+                { featureType: 'road.highway.controlled_access', elementType: 'geometry', stylers: [{ color: '#4e4e4e' }] },
+                { featureType: 'road.local', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
+                { featureType: 'transit', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+                { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
+                { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
+            ];
+            
+            map.setOptions({ styles: isDark ? darkStyle : lightStyle });
+        }
+        
+        // Draw route on map
+        function drawRoute() {
+            // Get route points from form
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            
+            if (!from || !to) return;
+            
+            // Request directions
+            directionsService.route(
+                {
                     origin: from,
                     destination: to,
                     travelMode: google.maps.TravelMode.TRANSIT,
-                    provideRouteAlternatives: true
-                }, (response, status) => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-
-                    if (status === 'OK') {
-                        console.log('🚀 BEAST MODE: Google Maps route found!');
-                        displayBeastModeRouteResults(response.routes, from, to);
-                        showRouteOnBeastModeMap(response.routes[0]);
-                        currentRoute = response.routes[0];
-                    } else {
-                        console.log('❌ BEAST MODE: Google Maps route failed, falling back to local data');
-                        // Fallback to local data
-                        if (window.REAL_MUMBAI_TRANSPORT_DATA) {
-                            const routes = findRealRoutes(from, to);
-                            displayRouteResults(routes, from, to);
-                        }
-                    }
-                });
-            } else {
-                // Fallback to local data
-                if (window.REAL_MUMBAI_TRANSPORT_DATA) {
-                    const routes = findRealRoutes(from, to);
-                    displayRouteResults(routes, from, to);
-                }
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        // BEAST MODE Route Display
-        function displayBeastModeRouteResults(routes, from, to) {
-            const resultsContainer = document.getElementById('route-results');
-            if (!resultsContainer) return;
-
-            let html = '<div class="route-options">';
-            
-            routes.forEach((route, index) => {
-                const isRecommended = index === 0;
-                const leg = route.legs[0];
-                
-                html += `
-                    <div class="route-option ${isRecommended ? 'recommended' : ''}" onclick="selectBeastModeRoute(${index}, routes)">
-                        <div class="route-header">
-                            <div class="route-info">
-                                <span class="route-number">Route ${index + 1}</span>
-                                <span class="route-modes">🚌</span>
-                            </div>
-                            ${isRecommended ? '<span class="recommended-badge">BEAST MODE</span>' : ''}
-                        </div>
-                        <div class="route-details">
-                            <div class="route-path">${from} → ${to}</div>
-                            <div class="route-name">${leg.distance.text} • ${leg.duration.text}</div>
-                            <div class="route-stats">
-                                <span class="stat">
-                                    <i class="fas fa-clock"></i> ${leg.duration.text}
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-road"></i> ${leg.distance.text}
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-exchange-alt"></i> ${route.legs[0].steps.filter(step => step.travel_mode === 'TRANSIT').length} transfers
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-map-marked-alt"></i> Click to view on map
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            resultsContainer.innerHTML = html;
-        }
-
-        // Show route on BEAST MODE map
-        function showRouteOnBeastModeMap(route) {
-            const mapSection = document.getElementById('interactive-map-section');
-            mapSection.style.display = 'block';
-            
-            directionsRenderer.setDirections({
-                routes: [route],
-                request: {
-                    origin: route.legs[0].start_address,
-                    destination: route.legs[0].end_address,
-                    travelMode: google.maps.TravelMode.TRANSIT
-                }
-            });
-
-            // Add custom markers
-            addBeastModeMarker(route.legs[0].start_location, 'A', 'Start', '#10b981');
-            addBeastModeMarker(route.legs[0].end_location, 'B', 'End', '#ef4444');
-
-            // Scroll to map
-            mapSection.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // BEAST MODE Map Controls
-        function toggleTraffic() {
-            const btn = document.getElementById('toggle-traffic');
-            if (btn.classList.contains('active')) {
-                trafficLayer.setMap(null);
-                btn.classList.remove('active');
-            } else {
-                trafficLayer.setMap(map);
-                btn.classList.add('active');
-            }
-        }
-
-        function toggleTransit() {
-            const btn = document.getElementById('toggle-transit');
-            if (btn.classList.contains('active')) {
-                transitLayer.setMap(null);
-                btn.classList.remove('active');
-            } else {
-                transitLayer.setMap(map);
-                btn.classList.add('active');
-            }
-        }
-
-        function toggleBicycling() {
-            const btn = document.getElementById('toggle-bicycling');
-            if (btn.classList.contains('active')) {
-                bicyclingLayer.setMap(null);
-                btn.classList.remove('active');
-            } else {
-                bicyclingLayer.setMap(map);
-                btn.classList.add('active');
-            }
-        }
-
-        function getMyLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const pos = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        
-                        map.setCenter(pos);
-                        map.setZoom(15);
-                        
-                        addBeastModeMarker(pos, '📍', 'Your Location', '#f59e0b');
+                    transitOptions: {
+                        modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.RAIL],
+                        routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
                     },
-                    () => {
-                        alert('Error: The Geolocation service failed.');
+                    provideRouteAlternatives: true
+                },
+                (response, status) => {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(response);
+                        
+                        // Add custom markers for start and end
+                        const leg = response.routes[0].legs[0];
+                        addCustomMarker(leg.start_location, 'start');
+                        addCustomMarker(leg.end_location, 'end');
+                        
+                        // Add transit markers for each step
+                        leg.steps.forEach(step => {
+                            if (step.travel_mode === 'TRANSIT') {
+                                addTransitMarker(step);
+                            }
+                        });
+                    } else {
+                        console.error('Directions request failed due to ' + status);
+                        alert('Could not calculate route. Please try different locations.');
                     }
-                );
-            } else {
-                alert('Error: Your browser doesn\'t support geolocation.');
-            }
+                }
+            );
         }
-
-        // BEAST MODE Utility Functions
-        function addBeastModeMarker(position, label, title, color) {
-            return new google.maps.Marker({
+        
+        // Add custom marker to map
+        function addCustomMarker(position, type) {
+            const iconUrl = type === 'start' 
+                ? 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOWMwIDUuMjUgNyAxMyA3IDEzczctNy43NSA3LTEzYzAtMy44Ny0zLjEzLTctNy03em0wIDkuNWMtMS4zOCAwLTIuNS0xLjEyLTIuNS0yLjVzMS4xMi0yLjUgMi41LTIuNSAyLjUgMS4xMiAyLjUgMi41LTEuMTIgMi41LTIuNSAyLjV6IiBmaWxsPSIjNDI4NWY0Ii8+PC9zdmc+'
+                : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOWMwIDUuMjUgNyAxMyA3IDEzczctNy43NSA3LTEzYzAtMy44Ny0zLjEzLTctNy03em0wIDkuNWMtMS4zOCAwLTIuNS0xLjEyLTIuNS0yLjVzMS4xMi0yLjUgMi41LTIuNSAyLjUgMS4xMiAyLjUgMi41LTEuMTIgMi41LTIuNSAyLjV6IiBmaWxsPSIjZWE0MzM1Ii8+PC9zdmc+';
+            
+            const marker = new google.maps.Marker({
                 position: position,
                 map: map,
-                title: title,
-                label: {
-                    text: label,
-                    color: 'white'
-                },
                 icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 10,
-                    fillColor: color,
-                    fillOpacity: 1,
-                    strokeColor: 'white',
-                    strokeWeight: 2
-                }
-            });
-        }
-
-        function selectBeastModeRoute(routeIndex, routes) {
-            const selectedRoute = routes[routeIndex];
-            showRouteOnBeastModeMap(selectedRoute);
-            currentRoute = selectedRoute;
-        }
-
-        // BEAST MODE Action Functions
-        function saveRoute() {
-            if (currentRoute) {
-                const savedRoutes = JSON.parse(localStorage.getItem('savedRoutes') || '[]');
-                const routeData = {
-                    from: currentRoute.legs[0].start_address,
-                    to: currentRoute.legs[0].end_address,
-                    duration: currentRoute.legs[0].duration.text,
-                    distance: currentRoute.legs[0].distance.text,
-                    timestamp: new Date().toISOString()
-                };
-                
-                savedRoutes.push(routeData);
-                localStorage.setItem('savedRoutes', JSON.stringify(savedRoutes));
-                
-                showBeastModeToast('Route saved to favorites! 🚀', 'success');
-            }
-        }
-
-        function shareRoute() {
-            if (currentRoute && navigator.share) {
-                navigator.share({
-                    title: 'Mumbai Transport Route',
-                    text: `Route from ${currentRoute.legs[0].start_address} to ${currentRoute.legs[0].end_address}`,
-                    url: window.location.href
-                });
-            } else {
-                // Fallback: copy to clipboard
-                const routeText = `Route: ${currentRoute.legs[0].start_address} → ${currentRoute.legs[0].end_address}`;
-                navigator.clipboard.writeText(routeText);
-                showBeastModeToast('Route copied to clipboard! 📋', 'info');
-            }
-        }
-
-        function getDirections() {
-            if (currentRoute) {
-                const directionsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(currentRoute.legs[0].start_address)}/${encodeURIComponent(currentRoute.legs[0].end_address)}`;
-                window.open(directionsUrl, '_blank');
-            }
-        }
-
-        function showBeastModeToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#6366f1'};
-                color: white;
-                padding: 12px 20px;
-                border-radius: 25px;
-                z-index: 10001;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                font-size: 14px;
-                font-weight: 500;
-            `;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
-        
-        function findRealRoutes(from, to) {
-            const routes = [];
-            
-            // Find BEST bus routes
-            window.REAL_MUMBAI_TRANSPORT_DATA.bestBusRoutes.forEach(busRoute => {
-                const fromMatch = busRoute.stops.some(stop => 
-                    stop.toLowerCase().includes(from.toLowerCase())
-                );
-                const toMatch = busRoute.stops.some(stop => 
-                    stop.toLowerCase().includes(to.toLowerCase())
-                );
-                
-                if (fromMatch && toMatch) {
-                    const fromIndex = busRoute.stops.findIndex(stop => 
-                        stop.toLowerCase().includes(from.toLowerCase())
-                    );
-                    const toIndex = busRoute.stops.findIndex(stop => 
-                        stop.toLowerCase().includes(to.toLowerCase())
-                    );
-                    
-                    if (fromIndex < toIndex) {
-                        routes.push({
-                            id: busRoute.routeId,
-                            name: busRoute.name,
-                            type: 'bus',
-                            operator: busRoute.operator,
-                            from: busRoute.stops[fromIndex],
-                            to: busRoute.stops[toIndex],
-                            stops: busRoute.stops.slice(fromIndex, toIndex + 1),
-                            estimatedDuration: Math.abs(toIndex - fromIndex) * 2,
-                            fare: busRoute.fare,
-                            transfers: 0,
-                            mode: '🚌',
-                            nextDeparture: getNextDeparture(busRoute, from),
-                            eta: calculateETA(from, to, busRoute, busRoute.timings[0])
-                        });
-                    }
-                }
+                    url: iconUrl,
+                    scaledSize: new google.maps.Size(36, 36)
+                },
+                animation: google.maps.Animation.DROP,
+                zIndex: type === 'start' ? 2 : 3
             });
             
-            // Find train routes
-            window.REAL_MUMBAI_TRANSPORT_DATA.localTrains.forEach(trainLine => {
-                const fromMatch = trainLine.stations.some(station => 
-                    station.toLowerCase().includes(from.toLowerCase())
-                );
-                const toMatch = trainLine.stations.some(station => 
-                    station.toLowerCase().includes(to.toLowerCase())
-                );
-                
-                if (fromMatch && toMatch) {
-                    const fromIndex = trainLine.stations.findIndex(station => 
-                        station.toLowerCase().includes(from.toLowerCase())
-                    );
-                    const toIndex = trainLine.stations.findIndex(station => 
-                        station.toLowerCase().includes(to.toLowerCase())
-                    );
-                    
-                    if (fromIndex < toIndex) {
-                        routes.push({
-                            id: trainLine.line,
-                            name: trainLine.line,
-                            type: 'train',
-                            from: trainLine.stations[fromIndex],
-                            to: trainLine.stations[toIndex],
-                            stops: trainLine.stations.slice(fromIndex, toIndex + 1),
-                            estimatedDuration: Math.abs(toIndex - fromIndex) * 3,
-                            fare: calculateTrainFare(fromIndex, toIndex, trainLine),
-                            transfers: 0,
-                            mode: '🚆',
-                            frequency: trainLine.frequency,
-                            firstTrain: trainLine.firstTrain,
-                            lastTrain: trainLine.lastTrain
-                        });
-                    }
-                }
-            });
-            
-            // Sort by duration
-            routes.sort((a, b) => a.estimatedDuration - b.estimatedDuration);
-            
-            return routes;
+            return marker;
         }
         
-        function displayRouteResults(routes, from, to) {
-            console.log('Displaying route results for:', routes);
-            const resultsContainer = document.getElementById('route-results');
-            console.log('Results container found:', !!resultsContainer);
-            if (!resultsContainer) {
-                console.error('❌ Route results container not found!');
-                return;
+        // Add transit marker
+        function addTransitMarker(step) {
+            const transitDetails = step.transit;
+            const departureStop = transitDetails.departure_stop;
+            
+            // Create icon based on transit type
+            let iconColor;
+            switch(transitDetails.line.vehicle.type) {
+                case 'BUS':
+                    iconColor = '#4CAF50'; // Green
+                    break;
+                case 'SUBWAY':
+                case 'METRO_RAIL':
+                    iconColor = '#2196F3'; // Blue
+                    break;
+                case 'TRAIN':
+                    iconColor = '#FF9800'; // Orange
+                    break;
+                default:
+                    iconColor = '#9C27B0'; // Purple
             }
             
-            if (routes.length === 0) {
-                resultsContainer.innerHTML = `
-                    <div class="route-options">
-                        <div class="route-option">
-                            <div class="route-details">
-                                <div class="route-path">${from} → ${to}</div>
-                                <div class="route-name">No direct routes found</div>
-                                <div class="route-stats">
-                                    <span class="stat">
-                                        <i class="fas fa-info-circle"></i> Try different locations
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
+            const iconSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="' + iconColor + '"/><circle cx="12" cy="12" r="6" fill="white"/></svg>';
             
-            let html = '<div class="route-options">';
+            const encodedSvg = btoa(iconSvg);
             
-            routes.forEach((route, index) => {
-                const isRecommended = index === 0;
-                html += `
-                    <div class="route-option ${isRecommended ? 'recommended' : ''}">
-                        <div class="route-header">
-                            <div class="route-info">
-                                <span class="route-number">${route.id}</span>
-                                <span class="route-modes">${route.mode}</span>
-                            </div>
-                            ${isRecommended ? '<span class="recommended-badge">Recommended</span>' : ''}
-                        </div>
-                        <div class="route-details">
-                            <div class="route-path">${route.from} → ${route.to}</div>
-                            <div class="route-name">${route.name}</div>
-                            <div class="route-stats">
-                                <span class="stat">
-                                    <i class="fas fa-clock"></i> ${route.estimatedDuration} min
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-indian-rupee-sign"></i> ₹${route.fare}
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-exchange-alt"></i> ${route.transfers} transfers
-                                </span>
-                                ${route.nextDeparture ? `
-                                    <span class="stat">
-                                        <i class="fas fa-bus"></i> Next: ${route.nextDeparture}
-                                    </span>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <button class="select-route-btn" onclick="selectRoute('${route.id}', '${route.name}')">
-                            <i class="fas fa-check"></i> Select Route
-                        </button>
-                    </div>
-                `;
+            const marker = new google.maps.Marker({
+                position: departureStop.location,
+                map: map,
+                icon: {
+                    url: 'data:image/svg+xml;base64,' + encodedSvg,
+                    scaledSize: new google.maps.Size(24, 24)
+                },
+                zIndex: 1
             });
             
-            html += '</div>';
-            resultsContainer.innerHTML = html;
-        }
-        
-        function selectRoute(routeId, routeName) {
-            alert(`Route selected: ${routeName}\nRoute ID: ${routeId}\n\nThis would open detailed navigation and booking options in a real implementation.`);
-        }
-        
-        function getNextDeparture(route, fromStop) {
-            const currentTime = new Date().toLocaleTimeString('en-IN', { 
-                timeZone: 'Asia/Kolkata',
-                hour12: true 
+            // Add info window with transit details
+             const infoWindow = new google.maps.InfoWindow({
+                 content: '<div style="padding: 8px;">' +
+                     '<div style="font-weight: bold; margin-bottom: 4px;">' + (transitDetails.line.name || transitDetails.line.short_name) + '</div>' +
+                     '<div>Departure: ' + transitDetails.departure_time.text + '</div>' +
+                     '<div>Arrival: ' + transitDetails.arrival_time.text + '</div>' +
+                     '<div>Stops: ' + transitDetails.num_stops + '</div>' +
+                     '</div>'
+             });
+            
+            marker.addListener('click', () => {
+                infoWindow.open(map, marker);
             });
             
-            const timings = route.timings || [];
-            
-            // Find next timing after current time
-            for (let timing of timings) {
-                if (timing > currentTime) {
-                    return timing;
-                }
-            }
-            
-            return timings[0] || 'N/A';
+            return marker;
         }
         
-        function calculateETA(fromStop, toStop, route, departureTime) {
-            if (!departureTime || departureTime === 'N/A') return 'N/A';
-            
-            const stops = route.stops;
-            const fromIndex = stops.findIndex(stop => 
-                stop.toLowerCase().includes(fromStop.toLowerCase())
-            );
-            const toIndex = stops.findIndex(stop => 
-                stop.toLowerCase().includes(toStop.toLowerCase())
-            );
-            
-            if (fromIndex === -1 || toIndex === -1) return 'N/A';
-            
-            const stopDifference = Math.abs(toIndex - fromIndex);
-            const estimatedMinutes = stopDifference * 2; // 2 minutes per stop average
-            
-            // Add estimated minutes to departure time
-            const departureDate = new Date();
-            const [time, period] = departureTime.split(' ');
-            const [hours, minutes] = time.split(':').map(Number);
-            departureDate.setHours(period === 'PM' && hours !== 12 ? hours + 12 : hours, minutes, 0);
-            
-            const etaDate = new Date(departureDate.getTime() + estimatedMinutes * 60000);
-            return etaDate.toLocaleTimeString('en-IN', { 
-                timeZone: 'Asia/Kolkata',
-                hour12: true 
-            });
-        }
-        
-        function calculateTrainFare(fromIndex, toIndex, trainLine) {
-            const distance = Math.abs(toIndex - fromIndex);
-            if (distance <= 5) return 10;
-            if (distance <= 10) return 15;
-            if (distance <= 15) return 20;
-            return 25;
-        }
-        
-        function trackRoute(routeId) {
-            console.log(`🚌 Tracking route ${routeId}`);
-            
-            // Use the real Mumbai transport data system
-            if (window.REAL_MUMBAI_TRANSPORT_DATA) {
-                const trackingData = getRealLiveTrackingData(routeId);
-                displayTrackingResults(trackingData);
-            } else {
-                // Fallback to demo data
-                const resultsContainer = document.getElementById('tracking-results');
-                if (resultsContainer) {
-                    resultsContainer.innerHTML = `
-                        <div class="tracking-info">
-                            <div class="eta-info">
-                                <h3>Route ${routeId} - BEST Bus</h3>
-                                <div class="eta-details">
-                                    <span class="eta-time">
-                                        <i class="fas fa-clock"></i> Next: 8:30 AM
-                                    </span>
-                                    <span class="crowd-level">
-                                        <i class="fas fa-users"></i> Crowd: 65%
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="live-buses">
-                                <h4>Live Buses</h4>
-                                <div class="live-bus">
-                                    <div class="bus-info">
-                                        <span class="bus-id">Bus ${routeId}_1</span>
-                                        <span class="bus-status in-transit">In Transit</span>
-                                    </div>
-                                    <div class="bus-progress">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: 65%"></div>
-                                        </div>
-                                        <div class="progress-text">65% complete</div>
-                                    </div>
-                                    <div class="bus-details">
-                                        <span class="passengers">
-                                            <i class="fas fa-users"></i> 45/60 passengers
-                                        </span>
-                                        <span class="arrival">
-                                            <i class="fas fa-clock"></i> ETA: 8:30 AM
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-        }
-        
-        function getRealLiveTrackingData(routeId) {
-            const route = window.REAL_MUMBAI_TRANSPORT_DATA.bestBusRoutes.find(r => r.routeId === routeId);
-            if (!route) {
-                return {
-                    routeId: routeId,
-                    routeName: `Route ${routeId}`,
-                    buses: [],
-                    crowdLevel: 0,
-                    trafficCondition: 'No Data'
-                };
-            }
-
-            const currentTime = new Date().toLocaleTimeString('en-IN', { 
-                timeZone: 'Asia/Kolkata',
-                hour12: true 
-            });
-            
-            const timings = route.timings || [];
-            const activeBuses = [];
-            
-            timings.forEach((timing, index) => {
-                const departureTime = timing;
-                const eta = calculateETA(route.from, route.to, route, departureTime);
-                
-                if (currentTime >= departureTime && currentTime <= eta) {
-                    // Calculate progress based on time elapsed
-                    const departureMinutes = timeToMinutes(departureTime);
-                    const etaMinutes = timeToMinutes(eta);
-                    const currentMinutes = timeToMinutes(currentTime);
-                    
-                    const totalDuration = etaMinutes - departureMinutes;
-                    const elapsed = currentMinutes - departureMinutes;
-                    const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
-                    
-                    activeBuses.push({
-                        busId: `bus_${routeId}_${index + 1}`,
-                        routeId: routeId,
-                        status: progress > 90 ? 'arriving' : progress > 10 ? 'in-transit' : 'starting',
-                        progress: Math.round(progress),
-                        passengers: Math.floor(Math.random() * 40) + 10,
-                        capacity: 60,
-                        eta: eta,
-                        currentStop: getCurrentStop(route, progress)
-                    });
-                }
-            });
-
-            return {
-                routeId: routeId,
-                routeName: route.name,
-                buses: activeBuses,
-                crowdLevel: Math.floor(Math.random() * 40) + 30,
-                trafficCondition: ['Light', 'Moderate', 'Heavy'][Math.floor(Math.random() * 3)]
-            };
-        }
-        
-        function displayTrackingResults(trackingData) {
-            const resultsContainer = document.getElementById('tracking-results');
-            if (!resultsContainer) return;
-            
-            let html = `
-                <div class="tracking-info">
-                    <div class="eta-info">
-                        <h3>${trackingData.routeName}</h3>
-                        <div class="eta-details">
-                            <span class="eta-time">
-                                <i class="fas fa-clock"></i> Next: ${trackingData.buses.length > 0 ? trackingData.buses[0].eta : 'N/A'}
-                            </span>
-                            <span class="crowd-level">
-                                <i class="fas fa-users"></i> Crowd: ${trackingData.crowdLevel}%
-                            </span>
-                            <span class="traffic-condition">
-                                <i class="fas fa-car"></i> Traffic: ${trackingData.trafficCondition}
-                            </span>
-                        </div>
-                    </div>
-            `;
-            
-            if (trackingData.buses.length > 0) {
-                html += `
-                    <div class="live-buses">
-                        <h4>Live Buses</h4>
-                `;
-                
-                trackingData.buses.forEach(bus => {
-                    html += `
-                        <div class="live-bus">
-                            <div class="bus-info">
-                                <span class="bus-id">${bus.busId}</span>
-                                <span class="bus-status ${bus.status}">${bus.status.replace('-', ' ')}</span>
-                            </div>
-                            <div class="bus-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${bus.progress}%"></div>
-                                </div>
-                                <div class="progress-text">${bus.progress}% complete</div>
-                            </div>
-                            <div class="bus-details">
-                                <span class="passengers">
-                                    <i class="fas fa-users"></i> ${bus.passengers}/${bus.capacity} passengers
-                                </span>
-                                <span class="arrival">
-                                    <i class="fas fa-clock"></i> ETA: ${bus.eta}
-                                </span>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                html += '</div>';
-            } else {
-                html += `
-                    <div class="live-buses">
-                        <h4>No Active Buses</h4>
-                        <p>No buses are currently running on this route. Check back during service hours.</p>
-                    </div>
-                `;
-            }
-            
-            html += '</div>';
-            resultsContainer.innerHTML = html;
-        }
-        
-        function timeToMinutes(timeStr) {
-            const [time, period] = timeStr.split(' ');
-            const [hours, minutes] = time.split(':').map(Number);
-            let totalMinutes = hours * 60 + minutes;
-            if (period === 'PM' && hours !== 12) totalMinutes += 12 * 60;
-            if (period === 'AM' && hours === 12) totalMinutes = minutes;
-            return totalMinutes;
-        }
-        
-        function getCurrentStop(route, progress) {
-            const stopIndex = Math.floor((progress / 100) * (route.stops.length - 1));
-            return route.stops[Math.min(stopIndex, route.stops.length - 1)];
-        }
-        
-        function updateNavigationState() {
-            // Update active navigation based on scroll position
-            window.addEventListener('scroll', function() {
-                const sections = document.querySelectorAll('section[id]');
-                const navLinks = document.querySelectorAll('.nav-link');
-                
-                let current = '';
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    const sectionHeight = section.clientHeight;
-                    if (scrollY >= (sectionTop - 200)) {
-                        current = section.getAttribute('id');
-                    }
-                });
-                
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${current}`) {
-                        link.classList.add('active');
-                    }
-                });
-            });
-        }
+        // Initialize map when page loads
+        window.addEventListener('load', initMap);
     </script>
 </body>
 </html>

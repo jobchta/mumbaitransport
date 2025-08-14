@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mumbai Transport - Elegant Journey Planning</title>
+    
+    <!-- Google Fonts - Elegant combination -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,geometry"></script>
+    
+    <style>
+        /* ========================================
+           ELEGANT DESIGN SYSTEM
+        ======================================== */
+        
+        :root {
+            /* Sophisticated Color Palette */
+            --primary: #3a5a78; /* Deep blue */
+            --primary-dark: #2c4660;
+            --primary-light: #4d6d8c;
+            --secondary: #d4a373; /* Warm gold */
+            --accent: #e76f51; /* Terracotta */
+            --success: #588157;
+            --warning: #e9c46a;
+            --error: #e63946;
+            
+            /* Subtle Gradients */
+            --primary-gradient: linear-gradient(135deg, #3a5a78 0%, #4d6d8c 100%);
+            --secondary-gradient: linear-gradient(135deg, #d4a373 0%, #e9c46a 100%);
+            
+            /* Elegant Neutrals */
+            --bg-white: #ffffff;
+            --bg-light: #f8f9fa;
+            --bg-medium: #e9ecef;
+            --bg-dark: #212529;
+            --text-dark: #212529;
+            --text-medium: #495057;
+            --text-muted: #6c757d;
+            --text-light: #adb5bd;
+            --border-color: #dee2e6;
+            
+            /* Typography */
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+            
+            /* Spacing */
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-5: 1.25rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --spacing-10: 2.5rem;
+            --spacing-12: 3rem;
+            --spacing-16: 4rem;
+            --spacing-20: 5rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --radius-full: 9999px;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.05), 0 10px 10px rgba(0, 0, 0, 0.04);
+            
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ========================================
+           BASE STYLES
+        ======================================== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text-dark);
+        }
+        
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+        
+        a:hover {
+            color: var(--primary-dark);
+        }
+        
+        /* ========================================
+           LAYOUT COMPONENTS
+        ======================================== */
+        
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--spacing-4) 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            font-family: var(--font-heading);
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-lg);
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: var(--spacing-2);
+            list-style: none;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            color: var(--text-medium);
+            text-decoration: none;
+            font-weight: 500;
+            padding: var(--spacing-3) var(--spacing-4);
+            border-radius: var(--radius-md);
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+        
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(58, 90, 120, 0.05);
+        }
+        
+        .nav-link.active {
+            color: var(--bg-white);
+            background: var(--primary);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-medium);
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-6) 0;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-6);
+        }
+        
+        /* Map Container */
+        .map-container {
+            height: calc(100vh - 80px);
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            background: var(--bg-white);
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Floating Panel */
+        .floating-panel {
+            position: absolute;
+            top: var(--spacing-6);
+            left: var(--spacing-6);
+            width: 360px;
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            z-index: 10;
+            overflow: hidden;
+            transition: var(--transition-normal);
+        }
+        
+        .panel-header {
+            background: var(--primary-gradient);
+            padding: var(--spacing-4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .panel-title {
+            font-family: var(--font-heading);
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+        
+        .panel-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        
+        .panel-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .panel-content {
+            padding: var(--spacing-4);
+        }
+        
+        /* Transport Mode Tabs */
+        .transport-modes {
+            display: flex;
+            gap: var(--spacing-2);
+            margin-bottom: var(--spacing-4);
+            background: var(--bg-medium);
+            padding: var(--spacing-1);
+            border-radius: var(--radius-md);
+        }
+        
+        .mode-tab {
+            flex: 1;
+            padding: var(--spacing-2) var(--spacing-1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-2);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            color: var(--text-medium);
+            font-weight: 500;
+            font-size: var(--font-size-sm);
+        }
+        
+        .mode-tab:hover {
+            color: var(--primary);
+        }
+        
+        .mode-tab.active {
+            background: var(--bg-white);
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Route Form */
+        .route-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-4);
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .location-inputs {
+            position: relative;
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .location-line {
+            position: absolute;
+            left: 20px;
+            top: 40px;
+            bottom: 20px;
+            width: 2px;
+            background: var(--primary-light);
+            z-index: 1;
+        }
+        
+        .location-dot {
+            position: absolute;
+            left: 15px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            z-index: 2;
+        }
+        
+        .location-dot.start {
+            top: 20px;
+            background: var(--success);
+        }
+        
+        .location-dot.end {
+            bottom: 0;
+            background: var(--primary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-3) var(--spacing-4);
+            padding-left: var(--spacing-10);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-base);
+            transition: var(--transition-fast);
+            background: var(--bg-white);
+            color: var(--text-dark);
+            margin-bottom: var(--spacing-3);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 90, 120, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .swap-locations {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            cursor: pointer;
+            position: absolute;
+            right: var(--spacing-3);
+            top: 50%;
+            transform: translateY(-50%);
+            transition: var(--transition-fast);
+            z-index: 3;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .swap-locations:hover {
+            background: var(--primary-light);
+            color: white;
+            border-color: var(--primary-light);
+            transform: translateY(-50%) rotate(180deg);
+        }
+        
+        /* Time Selector */
+        .time-selector {
+            display: flex;
+            gap: var(--spacing-2);
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .time-option {
+            flex: 1;
+            padding: var(--spacing-2);
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-medium);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-size: var(--font-size-sm);
+        }
+        
+        .time-option:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .time-option.active {
+            background: rgba(58, 90, 120, 0.05);
+            color: var(--primary);
+            border-color: var(--primary-light);
+            font-weight: 500;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-3);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-2);
+            padding: var(--spacing-3) var(--spacing-6);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition-fast);
+            cursor: pointer;
+            border: none;
+            font-size: var(--font-size-base);
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            flex: 1;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-white);
+            color: var(--text-medium);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            color: var(--primary);
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .btn-icon {
+            width: 42px;
+            padding: var(--spacing-3);
+        }
+        
+        /* Map Controls */
+        .map-controls {
+            position: absolute;
+            top: var(--spacing-6);
+            right: var(--spacing-6);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2);
+            z-index: 10;
+        }
+        
+        .map-control-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .map-control-btn:hover {
+            background: var(--primary-light);
+            color: white;
+            border-color: var(--primary-light);
+        }
+        
+        /* Results Panel */
+        .results-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-white);
+            border-top-left-radius: var(--radius-xl);
+            border-top-right-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            padding: var(--spacing-6);
+            transform: translateY(calc(100% - 60px));
+            transition: var(--transition-normal);
+            z-index: 20;
+            max-height: 70%;
+            overflow-y: auto;
+        }
+        
+        .results-panel.expanded {
+            transform: translateY(0);
+        }
+        
+        .results-handle {
+            width: 50px;
+            height: 5px;
+            background: var(--text-light);
+            border-radius: 10px;
+            margin: 0 auto var(--spacing-4) auto;
+            cursor: pointer;
+        }
+        
+        .results-title {
+            font-family: var(--font-heading);
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .route-summary {
+            display: flex;
+            gap: var(--spacing-6);
+            margin-bottom: var(--spacing-6);
+            padding-bottom: var(--spacing-6);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-1);
+        }
+        
+        .summary-value {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .summary-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        /* Route Steps */
+        .route-steps {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-4);
+        }
+        
+        .step-item {
+            display: flex;
+            gap: var(--spacing-4);
+        }
+        
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(58, 90, 120, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-1);
+            color: var(--text-dark);
+        }
+        
+        .step-details {
+            font-size: var(--font-size-sm);
+            color: var(--text-medium);
+        }
+        
+        .step-time {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            margin-top: var(--spacing-1);
+        }
+        
+        /* Recent Searches */
+        .recent-searches {
+            margin-top: var(--spacing-4);
+            padding-top: var(--spacing-4);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .recent-searches-title {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--text-medium);
+            margin-bottom: var(--spacing-3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .recent-search-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            padding: var(--spacing-2) 0;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        
+        .recent-search-item:hover {
+            color: var(--primary);
+        }
+        
+        .recent-search-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-medium);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-medium);
+            flex-shrink: 0;
+        }
+        
+        .recent-search-content {
+            flex: 1;
+        }
+        
+        .recent-search-route {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: var(--spacing-1);
+        }
+        
+        .recent-search-date {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .floating-panel {
+                width: calc(100% - var(--spacing-8));
+                max-width: 360px;
+            }
+            
+            .map-controls {
+                top: auto;
+                bottom: calc(var(--spacing-20) + 60px);
+            }
+            
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg-white);
+                flex-direction: column;
+                padding: var(--spacing-4);
+                gap: var(--spacing-2);
+                box-shadow: var(--shadow-md);
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .floating-panel {
+                left: var(--spacing-4);
+                right: var(--spacing-4);
+                width: auto;
+                max-width: none;
+            }
+            
+            .time-selector {
+                flex-wrap: wrap;
+            }
+            
+            .time-option {
+                flex: 0 0 calc(50% - var(--spacing-1));
+            }
+            
+            .route-summary {
+                flex-wrap: wrap;
+                gap: var(--spacing-4);
+            }
+            
+            .summary-item {
+                flex: 0 0 calc(50% - var(--spacing-2));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-train"></i>
+                    </div>
+                    <span>Mumbai Transport</span>
+                </a>
+                
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fas fa-route"></i>
+                            <span>Plan Journey</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <span>Live Map</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-clock"></i>
+                            <span>Schedules</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-info-circle"></i>
+                            <span>About</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Map Container -->
+                <div class="map-container">
+                    <div id="map"></div>
+                    
+                    <!-- Floating Panel -->
+                    <div class="floating-panel">
+                        <div class="panel-header">
+                            <h2 class="panel-title">
+                                <i class="fas fa-route"></i>
+                                <span>Plan Your Journey</span>
+                            </h2>
+                            <button class="panel-toggle">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="panel-content">
+                            <!-- Transport Mode Tabs -->
+                            <div class="transport-modes">
+                                <div class="mode-tab active">
+                                    <i class="fas fa-bus"></i>
+                                    <span>Bus</span>
+                                </div>
+                                <div class="mode-tab">
+                                    <i class="fas fa-train"></i>
+                                    <span>Train</span>
+                                </div>
+                                <div class="mode-tab">
+                                    <i class="fas fa-subway"></i>
+                                    <span>Metro</span>
+                                </div>
+                                <div class="mode-tab">
+                                    <i class="fas fa-walking"></i>
+                                    <span>Walk</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Route Form -->
+                            <form class="route-form">
+                                <div class="location-inputs">
+                                    <div class="location-line"></div>
+                                    <div class="location-dot start"></div>
+                                    <div class="location-dot end"></div>
+                                    
+                                    <input type="text" class="form-input" placeholder="Enter starting point" id="start-location">
+                                    <input type="text" class="form-input" placeholder="Enter destination" id="end-location">
+                                    
+                                    <button type="button" class="swap-locations">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Time Options -->
+                                <div class="time-selector">
+                                    <div class="time-option active">Depart now</div>
+                                    <div class="time-option">Depart at</div>
+                                    <div class="time-option">Arrive by</div>
+                                </div>
+                                
+                                <div class="action-buttons">
+                                    <button type="button" class="btn btn-primary" id="find-route">
+                                        <i class="fas fa-search"></i>
+                                        <span>Find Routes</span>
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-icon">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <!-- Recent Searches -->
+                            <div class="recent-searches">
+                                <div class="recent-searches-title">
+                                    <span>Recent Searches</span>
+                                    <a href="#" class="clear-all">Clear all</a>
+                                </div>
+                                
+                                <div class="recent-search-item">
+                                    <div class="recent-search-icon">
+                                        <i class="fas fa-history"></i>
+                                    </div>
+                                    <div class="recent-search-content">
+                                        <div class="recent-search-route">Andheri to Bandra</div>
+                                        <div class="recent-search-date">Today, 10:05 AM</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="recent-search-item">
+                                    <div class="recent-search-icon">
+                                        <i class="fas fa-history"></i>
+                                    </div>
+                                    <div class="recent-search-content">
+                                        <div class="recent-search-route">CST to Dadar</div>
+                                        <div class="recent-search-date">Yesterday, 6:30 PM</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Map Controls -->
+                    <div class="map-controls">
+                        <button class="map-control-btn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="map-control-btn">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button class="map-control-btn">
+                            <i class="fas fa-location-arrow"></i>
+                        </button>
+                        <button class="map-control-btn">
+                            <i class="fas fa-layer-group"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Results Panel -->
+                    <div class="results-panel" id="results-panel">
+                        <div class="results-handle" id="results-handle"></div>
+                        
+                        <div class="results-title">
+                            <span>Best Route Found</span>
+                            <div>
+                                <button class="btn btn-secondary btn-icon">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="route-summary">
+                            <div class="summary-item">
+                                <div class="summary-value">35 min</div>
+                                <div class="summary-label">Duration</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value">₹25</div>
+                                <div class="summary-label">Fare</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value">2</div>
+                                <div class="summary-label">Transfers</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value">400m</div>
+                                <div class="summary-label">Walking</div>
+                            </div>
+                        </div>
+                        
+                        <div class="route-steps">
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-walking"></i>
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-title">Walk to Andheri Station</div>
+                                    <div class="step-details">200m · 3 min</div>
+                                    <div class="step-time">Depart at 10:05 AM</div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-train"></i>
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-title">Western Line to Bandra</div>
+                                    <div class="step-details">4 stops · 15 min · ₹15</div>
+                                    <div class="step-time">10:08 AM - 10:23 AM</div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-walking"></i>
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-title">Walk to Bandra Bus Stop</div>
+                                    <div class="step-details">100m · 2 min</div>
+                                    <div class="step-time">10:23 AM - 10:25 AM</div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-bus"></i>
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-title">Bus 84 to Bandra Kurla Complex</div>
+                                    <div class="step-details">3 stops · 12 min · ₹10</div>
+                                    <div class="step-time">10:30 AM - 10:42 AM</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Initialize Map
+        function initMap() {
+            // Mumbai coordinates
+            const mumbai = { lat: 19.0760, lng: 72.8777 };
+            
+            // Create map centered on Mumbai
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: mumbai,
+                zoom: 12,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+                zoomControl: false,
+                styles: [
+                    {
+                        "featureType": "water",
+                        "elementType": "geometry",
+                        "stylers": [
+                            { "color": "#e9e9e9" },
+                            { "lightness": 17 }
+                        ]
+                    },
+                    {
+                        "featureType": "landscape",
+                        "elementType": "geometry",
+                        "stylers": [
+                            { "color": "#f5f5f5" },
+                            { "lightness": 20 }
+                        ]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "geometry.fill",
+                        "stylers": [
+                            { "color": "#ffffff" },
+                            { "lightness": 17 }
+                        ]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "geometry.stroke",
+                        "stylers": [
+                            { "color": "#ffffff" },
+                            { "lightness": 29 },
+                            { "weight": 0.2 }
+                        ]
+                    },
+                    {
+                        "featureType": "road.arterial",
+                        "elementType": "geometry",
+                        "stylers": [
+                            { "color": "#ffffff" },
+                            { "lightness": 18 }
+                        ]
+                    },
+                    {
+                        "featureType": "road.local",
+                        "elementType": "geometry",
+                        "stylers": [
+                            { "color": "#ffffff" },
+                            { "lightness": 16 }
+                        ]
+                    },
+                    {
+                        "featureType": "poi",
+                        "elementType": "geometry",
+                        "stylers": [
+                            { "color": "#f5f5f5" },
+                            { "lightness": 21 }
+                        ]
+                    },
+                    {
+                        "featureType": "poi.park",
+                        "elementType": "geometry",
+                        "stylers": [
+                            { "color": "#dedede" },
+                            { "lightness": 21 }
+                        ]
+                    },
+                    {
+                        "elementType": "labels.text.stroke",
+                        "stylers": [
+                            { "visibility": "on" },
+                            { "color": "#ffffff" },
+                            { "lightness": 16 }
+                        ]
+                    },
+                    {
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            { "saturation": 36 },
+                            { "color": "#333333" },
+                            { "lightness": 40 }
+                        ]
+                    },
+                    {
+                        "elementType": "labels.icon",
+                        "stylers": [
+                            { "visibility": "off" }
+                        ]
+                    },
+                    {
+                        "featureType": "transit",
+                        "elementType": "geometry",
+                        "stylers": [
+                            { "color": "#f2f2f2" },
+                            { "lightness": 19 }
+                        ]
+                    },
+                    {
+                        "featureType": "administrative",
+                        "elementType": "geometry.fill",
+                        "stylers": [
+                            { "color": "#fefefe" },
+                            { "lightness": 20 }
+                        ]
+                    },
+                    {
+                        "featureType": "administrative",
+                        "elementType": "geometry.stroke",
+                        "stylers": [
+                            { "color": "#fefefe" },
+                            { "lightness": 17 },
+                            { "weight": 1.2 }
+                        ]
+                    },
+                    {
+                        "featureType": "transit.line",
+                        "elementType": "geometry",
+                        "stylers": [
+                            { "color": "#3a5a78" },
+                            { "weight": 2 }
+                        ]
+                    }
+                ]
+            });
+            
+            // Add autocomplete for location inputs
+            const startInput = document.getElementById("start-location");
+            const endInput = document.getElementById("end-location");
+            
+            const startAutocomplete = new google.maps.places.Autocomplete(startInput, {
+                componentRestrictions: { country: "in" },
+                fields: ["place_id", "geometry", "name"],
+                bounds: {
+                    north: 19.4,
+                    south: 18.8,
+                    east: 73.2,
+                    west: 72.5,
+                },
+                strictBounds: true,
+            });
+            
+            const endAutocomplete = new google.maps.places.Autocomplete(endInput, {
+                componentRestrictions: { country: "in" },
+                fields: ["place_id", "geometry", "name"],
+                bounds: {
+                    north: 19.4,
+                    south: 18.8,
+                    east: 73.2,
+                    west: 72.5,
+                },
+                strictBounds: true,
+            });
+            
+            // Results panel toggle
+            const resultsPanel = document.getElementById("results-panel");
+            const resultsHandle = document.getElementById("results-handle");
+            
+            resultsHandle.addEventListener("click", function() {
+                resultsPanel.classList.toggle("expanded");
+            });
+            
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
+            const navMenu = document.querySelector(".nav-menu");
+            
+            mobileMenuBtn.addEventListener("click", function() {
+                navMenu.classList.toggle("active");
+            });
+            
+            // Swap locations
+            const swapBtn = document.querySelector(".swap-locations");
+            
+            swapBtn.addEventListener("click", function() {
+                const startValue = startInput.value;
+                startInput.value = endInput.value;
+                endInput.value = startValue;
+            });
+            
+            // Transport mode tabs
+            const modeTabs = document.querySelectorAll(".mode-tab");
+            
+            modeTabs.forEach(tab => {
+                tab.addEventListener("click", function() {
+                    modeTabs.forEach(t => t.classList.remove("active"));
+                    this.classList.add("active");
+                });
+            });
+            
+            // Time options
+            const timeOptions = document.querySelectorAll(".time-option");
+            
+            timeOptions.forEach(option => {
+                option.addEventListener("click", function() {
+                    timeOptions.forEach(o => o.classList.remove("active"));
+                    this.classList.add("active");
+                });
+            });
+            
+            // Panel toggle
+            const panelToggle = document.querySelector(".panel-toggle");
+            const floatingPanel = document.querySelector(".floating-panel");
+            
+            panelToggle.addEventListener("click", function() {
+                floatingPanel.classList.toggle("collapsed");
+                this.querySelector("i").classList.toggle("fa-chevron-left");
+                this.querySelector("i").classList.toggle("fa-chevron-right");
+            });
+            
+            // Map control buttons
+            const zoomInBtn = document.querySelector(".map-controls .map-control-btn:nth-child(1)");
+            const zoomOutBtn = document.querySelector(".map-controls .map-control-btn:nth-child(2)");
+            const locateBtn = document.querySelector(".map-controls .map-control-btn:nth-child(3)");
+            
+            zoomInBtn.addEventListener("click", function() {
+                map.setZoom(map.getZoom() + 1);
+            });
+            
+            zoomOutBtn.addEventListener("click", function() {
+                map.setZoom(map.getZoom() - 1);
+            });
+            
+            locateBtn.addEventListener("click", function() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const pos = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                            };
+                            map.setCenter(pos);
+                            map.setZoom(15);
+                            
+                            new google.maps.Marker({
+                                position: pos,
+                                map: map,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 10,
+                                    fillColor: "#3a5a78",
+                                    fillOpacity: 1,
+                                    strokeColor: "white",
+                                    strokeWeight: 2,
+                                },
+                            });
+                        },
+                        () => {
+                            alert("Error: The Geolocation service failed.");
+                        }
+                    );
+                } else {
+                    alert("Error: Your browser doesn't support geolocation.");
+                }
+            });
+            
+            // Find route button
+            const findRouteBtn = document.getElementById("find-route");
+            
+            findRouteBtn.addEventListener("click", function() {
+                // Simulate finding a route
+                resultsPanel.classList.add("expanded");
+                
+                // In a real implementation, you would call your routing API here
+                // and update the map with the route and the results panel with the details
+                
+                // Draw a sample route on the map
+                const directionsService = new google.maps.DirectionsService();
+                const directionsRenderer = new google.maps.DirectionsRenderer({
+                    map: map,
+                    suppressMarkers: true,
+                    polylineOptions: {
+                        strokeColor: "#3a5a78",
+                        strokeWeight: 5,
+                        strokeOpacity: 0.7
+                    }
+                });
+                
+                // Sample route from Andheri to Bandra
+                const request = {
+                    origin: { lat: 19.1136, lng: 72.8697 }, // Andheri
+                    destination: { lat: 19.0596, lng: 72.8295 }, // Bandra
+                    travelMode: google.maps.TravelMode.TRANSIT
+                };
+                
+                directionsService.route(request, function(result, status) {
+                    if (status == google.maps.DirectionsStatus.OK) {
+                        directionsRenderer.setDirections(result);
+                    }
+                });
+            });
+        }
+        
+        // Load map when the page is loaded
+        window.onload = initMap;
+    </script>
+</body>
+</html>
