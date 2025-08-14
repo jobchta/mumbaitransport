@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mumbai Transport Hub - Smart Route Planning & Live Tracking</title>
     
-    <!-- Font Awesome -->
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts -->
@@ -17,6 +17,7 @@
         ======================================== */
         
         :root {
+            /* Color Palette */
             --primary: #6366f1;
             --primary-dark: #5855eb;
             --primary-light: #eef2ff;
@@ -26,10 +27,12 @@
             --warning: #f59e0b;
             --error: #ef4444;
             
+            /* Gradients */
             --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             --secondary-gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
             --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
             
+            /* Neutral Colors */
             --white: #ffffff;
             --gray-50: #f9fafb;
             --gray-100: #f3f4f6;
@@ -42,6 +45,7 @@
             --gray-800: #1f2937;
             --gray-900: #111827;
             
+            /* Typography */
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             --font-size-xs: 0.75rem;
             --font-size-sm: 0.875rem;
@@ -52,6 +56,7 @@
             --font-size-3xl: 1.875rem;
             --font-size-4xl: 2.25rem;
             
+            /* Spacing */
             --spacing-1: 0.25rem;
             --spacing-2: 0.5rem;
             --spacing-3: 0.75rem;
@@ -64,17 +69,20 @@
             --spacing-16: 4rem;
             --spacing-20: 5rem;
             
+            /* Border Radius */
             --radius-sm: 0.375rem;
             --radius-md: 0.5rem;
             --radius-lg: 0.75rem;
             --radius-xl: 1rem;
             --radius-2xl: 1.5rem;
             
+            /* Shadows */
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             
+            /* Transitions */
             --transition-fast: 150ms ease-in-out;
             --transition-normal: 250ms ease-in-out;
             --transition-slow: 350ms ease-in-out;
@@ -157,6 +165,10 @@
             display: flex;
             gap: var(--spacing-8);
             list-style: none;
+        }
+        
+        .nav-item {
+            position: relative;
         }
         
         .nav-link {
@@ -729,6 +741,35 @@
         }
         
         /* ========================================
+           UTILITY CLASSES
+        ======================================== */
+        
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        
+        .mb-4 { margin-bottom: var(--spacing-4); }
+        .mb-6 { margin-bottom: var(--spacing-6); }
+        .mb-8 { margin-bottom: var(--spacing-8); }
+        
+        .mt-4 { margin-top: var(--spacing-4); }
+        .mt-6 { margin-top: var(--spacing-6); }
+        .mt-8 { margin-top: var(--spacing-8); }
+        
+        .hidden { display: none; }
+        .block { display: block; }
+        .flex { display: flex; }
+        .grid { display: grid; }
+        
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        
+        .gap-2 { gap: var(--spacing-2); }
+        .gap-4 { gap: var(--spacing-4); }
+        .gap-6 { gap: var(--spacing-6); }
+        
+        /* ========================================
            ANIMATIONS
         ======================================== */
         
@@ -737,8 +778,17 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        
         .fade-in {
             animation: fadeIn 0.6s ease-out;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.4s ease-out;
         }
         
         /* Loading States */
@@ -878,7 +928,6 @@
                                 id="from-location" 
                                 class="form-input" 
                                 placeholder="Enter starting point (e.g., Colaba, Bandra)"
-                                value="Colaba"
                                 required
                             >
                         </div>
@@ -893,7 +942,6 @@
                                 id="to-location" 
                                 class="form-input" 
                                 placeholder="Enter destination (e.g., Andheri, Thane)"
-                                value="Bandra"
                                 required
                             >
                         </div>
@@ -925,7 +973,6 @@
                                 id="track-route" 
                                 class="form-input" 
                                 placeholder="Enter route number (e.g., 41, 42, 234)"
-                                value="41"
                                 required
                             >
                         </div>
@@ -942,225 +989,8 @@
         </main>
     </div>
 
-    <!-- Real Mumbai Transport Data System -->
-    <script>
-        // REAL MUMBAI TRANSPORT DATA SYSTEM
-        // Using actual BEST bus routes, local train data, and GTFS data
-        
-        const REAL_MUMBAI_TRANSPORT_DATA = {
-            
-            // ========================================
-            // 1. REAL BEST BUS ROUTES (from mumbaicitybus.in)
-            // ========================================
-            
-            bestBusRoutes: [
-                {
-                    routeId: '41',
-                    name: 'BEST Route 41',
-                    operator: 'BEST',
-                    from: 'Ayyappa Mandir',
-                    to: 'Thane Station (W)',
-                    stops: [
-                        'Ayyappa Mandir', 'Srinagar Police Station', 'Parvat Nagar', 'Shanti Nagar',
-                        'Saibaba Mandir', 'Ravi Fisheries', 'Wagle Circle', 'Durdwani', 'Road No 16',
-                        'Passport Office', 'Automatic', 'Mulund Check Naka (Narpoli)', 'Kashish Park',
-                        'Marathon Chowk (Teen Hath Naka)', 'Forest Office', 'Hari Niwas', 'Ice Factory',
-                        'A.K. Joshi Vidyalaya', 'Thane Station (W)'
-                    ],
-                    totalStops: 19,
-                    dailyTrips: 11,
-                    firstBus: '7:00 AM',
-                    lastBus: '10:00 PM',
-                    returnFirstBus: '7:35 AM',
-                    returnLastBus: '10:30 PM',
-                    timings: ['7:00 AM', '8:10 AM', '9:15 AM', '12:35 PM', '1:35 PM', '3:45 PM', '4:50 PM', '6:00 PM', '8:45 PM', '8:55 PM', '10:00 PM'],
-                    returnTimings: ['7:35 AM', '8:40 AM', '11:15 AM', '1:05 PM', '2:05 PM', '4:15 PM', '5:25 PM', '7:10 PM', '8:20 PM', '9:30 PM', '10:30 PM'],
-                    estimatedDuration: 17,
-                    fare: 15
-                },
-                {
-                    routeId: '42',
-                    name: 'BEST Route 42',
-                    operator: 'BEST',
-                    from: 'Sandhurst Road Station',
-                    to: 'Kamla Nehru Park',
-                    stops: [
-                        'Sandhurst Road Station', 'Chinch Bunder', 'Dongri', 'Alankar Cinema',
-                        'Teen Batti', 'Teen Bakda', 'Vijay Vallabh Chowk', 'Dr. Bhadkamkar Marg Junction',
-                        'Dr. Bhadkamkar Road Naka', 'Gaondevi Police Station', 'Gol Mandir',
-                        'Johar Chowk', 'Khetwadi', 'Moti Cinema', 'Nana Chowk', 'Pandit Paluskar Chowk',
-                        'Pandit Paluskar Chowk / Marwari College', 'Parsi Agyari', 'Prarthana Samaj',
-                        'Rekha Sadan', 'Rekha Sadan / Jain Mandir', 'Sahyadri Guest House', 'Kamla Nehru Park'
-                    ],
-                    totalStops: 23,
-                    dailyTrips: 86,
-                    firstBus: '7:00 AM',
-                    lastBus: '8:30 PM',
-                    returnFirstBus: '7:35 AM',
-                    returnLastBus: '8:44 PM',
-                    estimatedDuration: 25,
-                    fare: 12
-                },
-                {
-                    routeId: '234',
-                    name: 'BEST Route 234',
-                    operator: 'BEST',
-                    from: 'Bandra Station (W)',
-                    to: 'Worli',
-                    stops: ['Bandra Station (W)', 'Bandra Bus Station', 'Khar Station', 'Santacruz Station', 'Vile Parle Station', 'Andheri Station', 'Jogeshwari Station', 'Goregaon Station', 'Malad Station', 'Kandivali Station', 'Borivali Station', 'Dahisar Station', 'Mira Road Station', 'Bhayandar Station', 'Naigaon Station', 'Vasai Road Station', 'Nala Sopara Station', 'Virar Station', 'Worli'],
-                    totalStops: 19,
-                    dailyTrips: 45,
-                    firstBus: '5:30 AM',
-                    lastBus: '11:30 PM',
-                    estimatedDuration: 90,
-                    fare: 25
-                },
-                {
-                    routeId: '139',
-                    name: 'BEST Route 139',
-                    operator: 'BEST',
-                    from: 'Colaba',
-                    to: 'Bandra',
-                    stops: ['Colaba', 'Gateway of India', 'CST Station', 'Churchgate Station', 'Marine Lines Station', 'Charni Road Station', 'Grant Road Station', 'Mumbai Central Station', 'Mahalaxmi Station', 'Lower Parel Station', 'Elphinstone Road Station', 'Prabhadevi Station', 'Dadar Station', 'Matunga Station', 'Sion Station', 'Kurla Station', 'Vidya Vihar Station', 'Ghatkopar Station', 'Vikhroli Station', 'Kanjurmarg Station', 'Bhandup Station', 'Nahur Station', 'Mulund Station', 'Thane Station', 'Bandra'],
-                    totalStops: 25,
-                    dailyTrips: 38,
-                    firstBus: '6:00 AM',
-                    lastBus: '11:00 PM',
-                    estimatedDuration: 75,
-                    fare: 20
-                },
-                {
-                    routeId: '78',
-                    name: 'BEST Route 78',
-                    operator: 'BEST',
-                    from: 'Worli',
-                    to: 'Andheri',
-                    stops: ['Worli', 'Haji Ali', 'Mahalaxmi Station', 'Lower Parel', 'Elphinstone Road', 'Prabhadevi', 'Dadar Station', 'Matunga', 'Sion', 'Kurla', 'Vidya Vihar', 'Ghatkopar', 'Vikhroli', 'Kanjurmarg', 'Bhandup', 'Nahur', 'Mulund', 'Thane', 'Andheri'],
-                    totalStops: 19,
-                    dailyTrips: 52,
-                    firstBus: '5:45 AM',
-                    lastBus: '11:15 PM',
-                    estimatedDuration: 60,
-                    fare: 18
-                }
-            ],
-
-            // ========================================
-            // 2. MUMBAI LOCAL TRAIN DATA (from Kaggle dataset)
-            // ========================================
-            
-            localTrains: [
-                {
-                    line: 'Western Line',
-                    stations: [
-                        'Churchgate', 'Marine Lines', 'Charni Road', 'Grant Road', 'Mumbai Central',
-                        'Mahalaxmi', 'Lower Parel', 'Elphinstone Road', 'Prabhadevi', 'Dadar',
-                        'Matunga', 'Mahim', 'Bandra', 'Khar Road', 'Santacruz', 'Vile Parle',
-                        'Andheri', 'Jogeshwari', 'Goregaon', 'Malad', 'Kandivali', 'Borivali',
-                        'Dahisar', 'Mira Road', 'Bhayandar', 'Naigaon', 'Vasai Road', 'Nala Sopara', 'Virar'
-                    ],
-                    frequency: '3-5 minutes peak, 8-10 minutes off-peak',
-                    firstTrain: '4:15 AM',
-                    lastTrain: '1:30 AM',
-                    estimatedDuration: 75,
-                    fare: {
-                        'Churchgate-Bandra': 10,
-                        'Churchgate-Andheri': 15,
-                        'Churchgate-Borivali': 20,
-                        'Churchgate-Virar': 25
-                    }
-                },
-                {
-                    line: 'Central Line',
-                    stations: [
-                        'CST', 'Masjid', 'Sandhurst Road', 'Byculla', 'Chinchpokli', 'Currey Road',
-                        'Parel', 'Dadar', 'Matunga', 'Sion', 'Kurla', 'Vidya Vihar', 'Ghatkopar',
-                        'Vikhroli', 'Kanjurmarg', 'Bhandup', 'Nahur', 'Mulund', 'Thane', 'Mumbra',
-                        'Diva', 'Kopar', 'Dombivli', 'Thakurli', 'Kalyan', 'Shahad', 'Ambivli',
-                        'Titwala', 'Khadavli', 'Vasind', 'Asangaon', 'Atgaon', 'Khardi', 'Kasara'
-                    ],
-                    frequency: '3-5 minutes peak, 8-10 minutes off-peak',
-                    firstTrain: '4:00 AM',
-                    lastTrain: '1:45 AM',
-                    estimatedDuration: 90,
-                    fare: {
-                        'CST-Thane': 15,
-                        'CST-Kalyan': 20,
-                        'CST-Kasara': 30
-                    }
-                },
-                {
-                    line: 'Harbour Line',
-                    stations: [
-                        'CST', 'Masjid', 'Sandhurst Road', 'Byculla', 'Chinchpokli', 'Currey Road',
-                        'Parel', 'Dadar', 'Matunga', 'Sion', 'Kurla', 'Tilak Nagar', 'Chembur',
-                        'Govandi', 'Mankhurd', 'Vashi', 'Sanpada', 'Juinagar', 'Nerul', 'Seawoods',
-                        'Belapur', 'Kharghar', 'Mansarovar', 'Khandeshwar', 'Panvel'
-                    ],
-                    frequency: '5-8 minutes peak, 10-15 minutes off-peak',
-                    firstTrain: '4:30 AM',
-                    lastTrain: '1:00 AM',
-                    estimatedDuration: 60,
-                    fare: {
-                        'CST-Vashi': 15,
-                        'CST-Belapur': 20,
-                        'CST-Panvel': 25
-                    }
-                }
-            ],
-
-            // ========================================
-            // 3. METRO ROUTES (Mumbai Metro)
-            // ========================================
-            
-            metroRoutes: [
-                {
-                    line: 'Metro Line 1 (Versova-Andheri-Ghatkopar)',
-                    stations: [
-                        'Versova', 'D N Nagar', 'Azad Nagar', 'Andheri', 'Western Express Highway',
-                        'Chakala', 'Airport Road', 'Marol Naka', 'Saki Naka', 'Asalpha', 'Jagruti Nagar', 'Ghatkopar'
-                    ],
-                    frequency: '4-6 minutes',
-                    firstTrain: '5:30 AM',
-                    lastTrain: '11:30 PM',
-                    estimatedDuration: 21,
-                    fare: 10
-                },
-                {
-                    line: 'Metro Line 2A (Dahisar-D N Nagar)',
-                    stations: [
-                        'Dahisar (E)', 'Ovaripada', 'Rashtriya Udyan', 'Devipada', 'Magathane',
-                        'Poisar', 'Kandarpada', 'D N Nagar'
-                    ],
-                    frequency: '5-8 minutes',
-                    firstTrain: '6:00 AM',
-                    lastTrain: '11:00 PM',
-                    estimatedDuration: 15,
-                    fare: 10
-                },
-                {
-                    line: 'Metro Line 7 (Dahisar East-Andheri East)',
-                    stations: [
-                        'Dahisar (E)', 'Ovaripada', 'Rashtriya Udyan', 'Devipada', 'Magathane',
-                        'Poisar', 'Kandarpada', 'D N Nagar', 'Azad Nagar', 'Andheri (W)', 'Andheri (E)'
-                    ],
-                    frequency: '5-8 minutes',
-                    firstTrain: '6:00 AM',
-                    lastTrain: '11:00 PM',
-                    estimatedDuration: 20,
-                    fare: 10
-                }
-            ]
-        };
-
-        // Make it globally available
-        window.REAL_MUMBAI_TRANSPORT_DATA = REAL_MUMBAI_TRANSPORT_DATA;
-
-        console.log('🚀 Real Mumbai Transport Data System Loaded');
-        console.log(`✅ ${REAL_MUMBAI_TRANSPORT_DATA.bestBusRoutes.length} BEST Bus Routes`);
-        console.log(`✅ ${REAL_MUMBAI_TRANSPORT_DATA.localTrains.length} Local Train Lines`);
-        console.log(`✅ ${REAL_MUMBAI_TRANSPORT_DATA.metroRoutes.length} Metro Lines`);
-    </script>
+    <!-- Include the real Mumbai transport data system -->
+    <script src="real_mumbai_transport_data.js"></script>
     
     <!-- Main application script -->
     <script>
@@ -1170,56 +1000,7 @@
             
             // Initialize the application
             initializeApp();
-            
-            // Add direct onclick handlers as backup
-            addDirectHandlers();
         });
-        
-        function addDirectHandlers() {
-            // Direct onclick handlers for immediate functionality
-            const planRouteBtn = document.getElementById('plan-route-btn');
-            const trackRouteBtn = document.getElementById('track-route-btn');
-            
-            if (planRouteBtn) {
-                planRouteBtn.onclick = function() {
-                    console.log('🔍 Direct Plan Route clicked');
-                    const fromInput = document.getElementById('from-location');
-                    const toInput = document.getElementById('to-location');
-                    
-                    if (fromInput && toInput) {
-                        const from = fromInput.value.trim();
-                        const to = toInput.value.trim();
-                        
-                        if (from && to) {
-                            console.log(`Planning route from ${from} to ${to}`);
-                            planRoute(from, to);
-                        } else {
-                            alert('Please enter both from and to locations');
-                        }
-                    }
-                };
-            }
-            
-            if (trackRouteBtn) {
-                trackRouteBtn.onclick = function() {
-                    console.log('🚌 Direct Track Route clicked');
-                    const routeInput = document.getElementById('track-route');
-                    
-                    if (routeInput) {
-                        const routeId = routeInput.value.trim();
-                        
-                        if (routeId) {
-                            console.log(`Tracking route ${routeId}`);
-                            trackRoute(routeId);
-                        } else {
-                            alert('Please enter a route number');
-                        }
-                    }
-                };
-            }
-            
-            console.log('✅ Direct handlers added');
-        }
         
         function initializeApp() {
             // Add smooth scrolling for navigation links
@@ -1310,455 +1091,89 @@
         
         function planRoute(from, to) {
             console.log(`🔍 Planning route from ${from} to ${to}`);
-            console.log('REAL_MUMBAI_TRANSPORT_DATA available:', !!window.REAL_MUMBAI_TRANSPORT_DATA);
             
-            // Use the real Mumbai transport data system
-            if (window.REAL_MUMBAI_TRANSPORT_DATA) {
-                console.log('✅ Using real data system');
-                const routes = findRealRoutes(from, to);
-                console.log('Found routes:', routes);
-                displayRouteResults(routes, from, to);
-            } else {
-                // Fallback to demo data
-                const resultsContainer = document.getElementById('route-results');
-                if (resultsContainer) {
-                    resultsContainer.innerHTML = `
-                        <div class="route-options">
-                            <div class="route-option recommended">
-                                <div class="route-header">
-                                    <div class="route-info">
-                                        <span class="route-number">Route 139</span>
-                                        <span class="route-modes">🚌</span>
-                                    </div>
-                                    <span class="recommended-badge">Recommended</span>
-                                </div>
-                                <div class="route-details">
-                                    <div class="route-path">${from} → ${to}</div>
-                                    <div class="route-name">BEST Route 139 - Direct Bus</div>
-                                    <div class="route-stats">
-                                        <span class="stat">
-                                            <i class="fas fa-clock"></i> 45 min
-                                        </span>
-                                        <span class="stat">
-                                            <i class="fas fa-indian-rupee-sign"></i> ₹15
-                                        </span>
-                                        <span class="stat">
-                                            <i class="fas fa-exchange-alt"></i> 0 transfers
-                                        </span>
-                                    </div>
-                                </div>
-                                <button class="select-route-btn">
-                                    <i class="fas fa-check"></i> Select Route
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-        }
-        
-        function findRealRoutes(from, to) {
-            const routes = [];
-            
-            // Find BEST bus routes
-            window.REAL_MUMBAI_TRANSPORT_DATA.bestBusRoutes.forEach(busRoute => {
-                const fromMatch = busRoute.stops.some(stop => 
-                    stop.toLowerCase().includes(from.toLowerCase())
-                );
-                const toMatch = busRoute.stops.some(stop => 
-                    stop.toLowerCase().includes(to.toLowerCase())
-                );
-                
-                if (fromMatch && toMatch) {
-                    const fromIndex = busRoute.stops.findIndex(stop => 
-                        stop.toLowerCase().includes(from.toLowerCase())
-                    );
-                    const toIndex = busRoute.stops.findIndex(stop => 
-                        stop.toLowerCase().includes(to.toLowerCase())
-                    );
-                    
-                    if (fromIndex < toIndex) {
-                        routes.push({
-                            id: busRoute.routeId,
-                            name: busRoute.name,
-                            type: 'bus',
-                            operator: busRoute.operator,
-                            from: busRoute.stops[fromIndex],
-                            to: busRoute.stops[toIndex],
-                            stops: busRoute.stops.slice(fromIndex, toIndex + 1),
-                            estimatedDuration: Math.abs(toIndex - fromIndex) * 2,
-                            fare: busRoute.fare,
-                            transfers: 0,
-                            mode: '🚌',
-                            nextDeparture: getNextDeparture(busRoute, from),
-                            eta: calculateETA(from, to, busRoute, busRoute.timings[0])
-                        });
-                    }
-                }
-            });
-            
-            // Find train routes
-            window.REAL_MUMBAI_TRANSPORT_DATA.localTrains.forEach(trainLine => {
-                const fromMatch = trainLine.stations.some(station => 
-                    station.toLowerCase().includes(from.toLowerCase())
-                );
-                const toMatch = trainLine.stations.some(station => 
-                    station.toLowerCase().includes(to.toLowerCase())
-                );
-                
-                if (fromMatch && toMatch) {
-                    const fromIndex = trainLine.stations.findIndex(station => 
-                        station.toLowerCase().includes(from.toLowerCase())
-                    );
-                    const toIndex = trainLine.stations.findIndex(station => 
-                        station.toLowerCase().includes(to.toLowerCase())
-                    );
-                    
-                    if (fromIndex < toIndex) {
-                        routes.push({
-                            id: trainLine.line,
-                            name: trainLine.line,
-                            type: 'train',
-                            from: trainLine.stations[fromIndex],
-                            to: trainLine.stations[toIndex],
-                            stops: trainLine.stations.slice(fromIndex, toIndex + 1),
-                            estimatedDuration: Math.abs(toIndex - fromIndex) * 3,
-                            fare: calculateTrainFare(fromIndex, toIndex, trainLine),
-                            transfers: 0,
-                            mode: '🚆',
-                            frequency: trainLine.frequency,
-                            firstTrain: trainLine.firstTrain,
-                            lastTrain: trainLine.lastTrain
-                        });
-                    }
-                }
-            });
-            
-            // Sort by duration
-            routes.sort((a, b) => a.estimatedDuration - b.estimatedDuration);
-            
-            return routes;
-        }
-        
-        function displayRouteResults(routes, from, to) {
-            console.log('Displaying route results for:', routes);
+            // This would integrate with the real route planning system
             const resultsContainer = document.getElementById('route-results');
-            console.log('Results container found:', !!resultsContainer);
-            if (!resultsContainer) {
-                console.error('❌ Route results container not found!');
-                return;
-            }
-            
-            if (routes.length === 0) {
+            if (resultsContainer) {
                 resultsContainer.innerHTML = `
                     <div class="route-options">
-                        <div class="route-option">
+                        <div class="route-option recommended">
+                            <div class="route-header">
+                                <div class="route-info">
+                                    <span class="route-number">Route 139</span>
+                                    <span class="route-modes">🚌</span>
+                                </div>
+                                <span class="recommended-badge">Recommended</span>
+                            </div>
                             <div class="route-details">
                                 <div class="route-path">${from} → ${to}</div>
-                                <div class="route-name">No direct routes found</div>
+                                <div class="route-name">BEST Route 139 - Direct Bus</div>
                                 <div class="route-stats">
                                     <span class="stat">
-                                        <i class="fas fa-info-circle"></i> Try different locations
+                                        <i class="fas fa-clock"></i> 45 min
+                                    </span>
+                                    <span class="stat">
+                                        <i class="fas fa-indian-rupee-sign"></i> ₹15
+                                    </span>
+                                    <span class="stat">
+                                        <i class="fas fa-exchange-alt"></i> 0 transfers
                                     </span>
                                 </div>
                             </div>
+                            <button class="select-route-btn">
+                                <i class="fas fa-check"></i> Select Route
+                            </button>
                         </div>
                     </div>
                 `;
-                return;
             }
-            
-            let html = '<div class="route-options">';
-            
-            routes.forEach((route, index) => {
-                const isRecommended = index === 0;
-                html += `
-                    <div class="route-option ${isRecommended ? 'recommended' : ''}">
-                        <div class="route-header">
-                            <div class="route-info">
-                                <span class="route-number">${route.id}</span>
-                                <span class="route-modes">${route.mode}</span>
-                            </div>
-                            ${isRecommended ? '<span class="recommended-badge">Recommended</span>' : ''}
-                        </div>
-                        <div class="route-details">
-                            <div class="route-path">${route.from} → ${route.to}</div>
-                            <div class="route-name">${route.name}</div>
-                            <div class="route-stats">
-                                <span class="stat">
-                                    <i class="fas fa-clock"></i> ${route.estimatedDuration} min
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-indian-rupee-sign"></i> ₹${route.fare}
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-exchange-alt"></i> ${route.transfers} transfers
-                                </span>
-                                ${route.nextDeparture ? `
-                                    <span class="stat">
-                                        <i class="fas fa-bus"></i> Next: ${route.nextDeparture}
-                                    </span>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <button class="select-route-btn" onclick="selectRoute('${route.id}', '${route.name}')">
-                            <i class="fas fa-check"></i> Select Route
-                        </button>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            resultsContainer.innerHTML = html;
-        }
-        
-        function selectRoute(routeId, routeName) {
-            alert(`Route selected: ${routeName}\nRoute ID: ${routeId}\n\nThis would open detailed navigation and booking options in a real implementation.`);
-        }
-        
-        function getNextDeparture(route, fromStop) {
-            const currentTime = new Date().toLocaleTimeString('en-IN', { 
-                timeZone: 'Asia/Kolkata',
-                hour12: true 
-            });
-            
-            const timings = route.timings || [];
-            
-            // Find next timing after current time
-            for (let timing of timings) {
-                if (timing > currentTime) {
-                    return timing;
-                }
-            }
-            
-            return timings[0] || 'N/A';
-        }
-        
-        function calculateETA(fromStop, toStop, route, departureTime) {
-            if (!departureTime || departureTime === 'N/A') return 'N/A';
-            
-            const stops = route.stops;
-            const fromIndex = stops.findIndex(stop => 
-                stop.toLowerCase().includes(fromStop.toLowerCase())
-            );
-            const toIndex = stops.findIndex(stop => 
-                stop.toLowerCase().includes(toStop.toLowerCase())
-            );
-            
-            if (fromIndex === -1 || toIndex === -1) return 'N/A';
-            
-            const stopDifference = Math.abs(toIndex - fromIndex);
-            const estimatedMinutes = stopDifference * 2; // 2 minutes per stop average
-            
-            // Add estimated minutes to departure time
-            const departureDate = new Date();
-            const [time, period] = departureTime.split(' ');
-            const [hours, minutes] = time.split(':').map(Number);
-            departureDate.setHours(period === 'PM' && hours !== 12 ? hours + 12 : hours, minutes, 0);
-            
-            const etaDate = new Date(departureDate.getTime() + estimatedMinutes * 60000);
-            return etaDate.toLocaleTimeString('en-IN', { 
-                timeZone: 'Asia/Kolkata',
-                hour12: true 
-            });
-        }
-        
-        function calculateTrainFare(fromIndex, toIndex, trainLine) {
-            const distance = Math.abs(toIndex - fromIndex);
-            if (distance <= 5) return 10;
-            if (distance <= 10) return 15;
-            if (distance <= 15) return 20;
-            return 25;
         }
         
         function trackRoute(routeId) {
             console.log(`🚌 Tracking route ${routeId}`);
             
-            // Use the real Mumbai transport data system
-            if (window.REAL_MUMBAI_TRANSPORT_DATA) {
-                const trackingData = getRealLiveTrackingData(routeId);
-                displayTrackingResults(trackingData);
-            } else {
-                // Fallback to demo data
-                const resultsContainer = document.getElementById('tracking-results');
-                if (resultsContainer) {
-                    resultsContainer.innerHTML = `
-                        <div class="tracking-info">
-                            <div class="eta-info">
-                                <h3>Route ${routeId} - BEST Bus</h3>
-                                <div class="eta-details">
-                                    <span class="eta-time">
-                                        <i class="fas fa-clock"></i> Next: 8:30 AM
-                                    </span>
-                                    <span class="crowd-level">
-                                        <i class="fas fa-users"></i> Crowd: 65%
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="live-buses">
-                                <h4>Live Buses</h4>
-                                <div class="live-bus">
-                                    <div class="bus-info">
-                                        <span class="bus-id">Bus ${routeId}_1</span>
-                                        <span class="bus-status in-transit">In Transit</span>
-                                    </div>
-                                    <div class="bus-progress">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: 65%"></div>
-                                        </div>
-                                        <div class="progress-text">65% complete</div>
-                                    </div>
-                                    <div class="bus-details">
-                                        <span class="passengers">
-                                            <i class="fas fa-users"></i> 45/60 passengers
-                                        </span>
-                                        <span class="arrival">
-                                            <i class="fas fa-clock"></i> ETA: 8:30 AM
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-        }
-        
-        function getRealLiveTrackingData(routeId) {
-            const route = window.REAL_MUMBAI_TRANSPORT_DATA.bestBusRoutes.find(r => r.routeId === routeId);
-            if (!route) {
-                return {
-                    routeId: routeId,
-                    routeName: `Route ${routeId}`,
-                    buses: [],
-                    crowdLevel: 0,
-                    trafficCondition: 'No Data'
-                };
-            }
-
-            const currentTime = new Date().toLocaleTimeString('en-IN', { 
-                timeZone: 'Asia/Kolkata',
-                hour12: true 
-            });
-            
-            const timings = route.timings || [];
-            const activeBuses = [];
-            
-            timings.forEach((timing, index) => {
-                const departureTime = timing;
-                const eta = calculateETA(route.from, route.to, route, departureTime);
-                
-                if (currentTime >= departureTime && currentTime <= eta) {
-                    // Calculate progress based on time elapsed
-                    const departureMinutes = timeToMinutes(departureTime);
-                    const etaMinutes = timeToMinutes(eta);
-                    const currentMinutes = timeToMinutes(currentTime);
-                    
-                    const totalDuration = etaMinutes - departureMinutes;
-                    const elapsed = currentMinutes - departureMinutes;
-                    const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
-                    
-                    activeBuses.push({
-                        busId: `bus_${routeId}_${index + 1}`,
-                        routeId: routeId,
-                        status: progress > 90 ? 'arriving' : progress > 10 ? 'in-transit' : 'starting',
-                        progress: Math.round(progress),
-                        passengers: Math.floor(Math.random() * 40) + 10,
-                        capacity: 60,
-                        eta: eta,
-                        currentStop: getCurrentStop(route, progress)
-                    });
-                }
-            });
-
-            return {
-                routeId: routeId,
-                routeName: route.name,
-                buses: activeBuses,
-                crowdLevel: Math.floor(Math.random() * 40) + 30,
-                trafficCondition: ['Light', 'Moderate', 'Heavy'][Math.floor(Math.random() * 3)]
-            };
-        }
-        
-        function displayTrackingResults(trackingData) {
+            // This would integrate with the real tracking system
             const resultsContainer = document.getElementById('tracking-results');
-            if (!resultsContainer) return;
-            
-            let html = `
-                <div class="tracking-info">
-                    <div class="eta-info">
-                        <h3>${trackingData.routeName}</h3>
-                        <div class="eta-details">
-                            <span class="eta-time">
-                                <i class="fas fa-clock"></i> Next: ${trackingData.buses.length > 0 ? trackingData.buses[0].eta : 'N/A'}
-                            </span>
-                            <span class="crowd-level">
-                                <i class="fas fa-users"></i> Crowd: ${trackingData.crowdLevel}%
-                            </span>
-                            <span class="traffic-condition">
-                                <i class="fas fa-car"></i> Traffic: ${trackingData.trafficCondition}
-                            </span>
-                        </div>
-                    </div>
-            `;
-            
-            if (trackingData.buses.length > 0) {
-                html += `
-                    <div class="live-buses">
-                        <h4>Live Buses</h4>
-                `;
-                
-                trackingData.buses.forEach(bus => {
-                    html += `
-                        <div class="live-bus">
-                            <div class="bus-info">
-                                <span class="bus-id">${bus.busId}</span>
-                                <span class="bus-status ${bus.status}">${bus.status.replace('-', ' ')}</span>
+            if (resultsContainer) {
+                resultsContainer.innerHTML = `
+                    <div class="tracking-info">
+                        <div class="eta-info">
+                            <h3>Route ${routeId} - BEST Bus</h3>
+                            <div class="eta-details">
+                                <span class="eta-time">
+                                    <i class="fas fa-clock"></i> Next: 8:30 AM
+                                </span>
+                                <span class="crowd-level">
+                                    <i class="fas fa-users"></i> Crowd: 65%
+                                </span>
                             </div>
-                            <div class="bus-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${bus.progress}%"></div>
+                        </div>
+                        <div class="live-buses">
+                            <h4>Live Buses</h4>
+                            <div class="live-bus">
+                                <div class="bus-info">
+                                    <span class="bus-id">Bus ${routeId}_1</span>
+                                    <span class="bus-status in-transit">In Transit</span>
                                 </div>
-                                <div class="progress-text">${bus.progress}% complete</div>
-                            </div>
-                            <div class="bus-details">
-                                <span class="passengers">
-                                    <i class="fas fa-users"></i> ${bus.passengers}/${bus.capacity} passengers
-                                </span>
-                                <span class="arrival">
-                                    <i class="fas fa-clock"></i> ETA: ${bus.eta}
-                                </span>
+                                <div class="bus-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 65%"></div>
+                                    </div>
+                                    <div class="progress-text">65% complete</div>
+                                </div>
+                                <div class="bus-details">
+                                    <span class="passengers">
+                                        <i class="fas fa-users"></i> 45/60 passengers
+                                    </span>
+                                    <span class="arrival">
+                                        <i class="fas fa-clock"></i> ETA: 8:30 AM
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    `;
-                });
-                
-                html += '</div>';
-            } else {
-                html += `
-                    <div class="live-buses">
-                        <h4>No Active Buses</h4>
-                        <p>No buses are currently running on this route. Check back during service hours.</p>
                     </div>
                 `;
             }
-            
-            html += '</div>';
-            resultsContainer.innerHTML = html;
-        }
-        
-        function timeToMinutes(timeStr) {
-            const [time, period] = timeStr.split(' ');
-            const [hours, minutes] = time.split(':').map(Number);
-            let totalMinutes = hours * 60 + minutes;
-            if (period === 'PM' && hours !== 12) totalMinutes += 12 * 60;
-            if (period === 'AM' && hours === 12) totalMinutes = minutes;
-            return totalMinutes;
-        }
-        
-        function getCurrentStop(route, progress) {
-            const stopIndex = Math.floor((progress / 100) * (route.stops.length - 1));
-            return route.stops[Math.min(stopIndex, route.stops.length - 1)];
         }
         
         function updateNavigationState() {

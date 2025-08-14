@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mumbai Transport Hub - Google Maps Integration</title>
+    
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,geometry"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        /* Results Styles */
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .results-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .route-option {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .route-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .route-option.recommended {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+        }
+
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .route-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .route-number {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .route-modes {
+            font-size: 20px;
+        }
+
+        .recommended-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .route-details {
+            margin-bottom: 15px;
+        }
+
+        .route-path {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .route-name {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .route-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .stat i {
+            color: #667eea;
+        }
+
+        /* Map Styles */
+        .map-container {
+            position: relative;
+            height: 100vh;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .control-btn {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border: none;
+            border-radius: 6px;
+            background: #f8f9fa;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .control-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            
+            .sidebar {
+                max-height: 50vh;
+            }
+        }
+
+        /* Custom Info Windows */
+        .info-window {
+            padding: 10px;
+            max-width: 300px;
+        }
+
+        .info-window h3 {
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .info-window p {
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        /* Route Polyline Styles */
+        .route-polyline {
+            stroke: #667eea;
+            stroke-width: 4;
+            stroke-opacity: 0.8;
+        }
+
+        .route-polyline:hover {
+            stroke-width: 6;
+            stroke-opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1><i class="fas fa-bus"></i> Mumbai Transport Hub</h1>
+                <p>Smart Route Planning & Live Tracking</p>
+            </div>
+
+            <!-- Route Planning Section -->
+            <div class="form-group">
+                <label class="form-label" for="from-location">
+                    <i class="fas fa-map-marker-alt"></i> From
+                </label>
+                <input type="text" id="from-location" class="form-input" placeholder="Enter starting location">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="to-location">
+                    <i class="fas fa-map-marker-alt"></i> To
+                </label>
+                <input type="text" id="to-location" class="form-input" placeholder="Enter destination">
+            </div>
+
+            <button class="btn btn-primary" id="plan-route-btn">
+                <i class="fas fa-search"></i> Plan Route
+            </button>
+
+            <button class="btn btn-secondary" id="clear-route-btn">
+                <i class="fas fa-eraser"></i> Clear Route
+            </button>
+
+            <!-- Live Tracking Section -->
+            <div class="form-group" style="margin-top: 30px;">
+                <label class="form-label" for="track-route">
+                    <i class="fas fa-satellite-dish"></i> Track Bus
+                </label>
+                <input type="text" id="track-route" class="form-input" placeholder="Enter route number (e.g., 139)">
+            </div>
+
+            <button class="btn btn-primary" id="track-route-btn">
+                <i class="fas fa-satellite-dish"></i> Track Bus
+            </button>
+
+            <!-- Results Section -->
+            <div class="results-section" id="results-section" style="display: none;">
+                <h3 class="results-title">Route Options</h3>
+                <div id="route-results"></div>
+            </div>
+
+            <!-- Tracking Results -->
+            <div class="results-section" id="tracking-section" style="display: none;">
+                <h3 class="results-title">Live Tracking</h3>
+                <div id="tracking-results"></div>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="map-container">
+            <div id="map"></div>
+            
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <button class="control-btn" id="toggle-traffic">
+                    <i class="fas fa-car"></i> Traffic
+                </button>
+                <button class="control-btn" id="toggle-transit">
+                    <i class="fas fa-subway"></i> Transit
+                </button>
+                <button class="control-btn" id="toggle-bicycling">
+                    <i class="fas fa-bicycle"></i> Bicycling
+                </button>
+                <button class="control-btn" id="my-location">
+                    <i class="fas fa-crosshairs"></i> My Location
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let map;
+        let directionsService;
+        let directionsRenderer;
+        let autocompleteFrom;
+        let autocompleteTo;
+        let currentRoute;
+        let markers = [];
+        let polylines = [];
+        let trafficLayer;
+        let transitLayer;
+        let bicyclingLayer;
+
+        // Mumbai Transport Data
+        const MUMBAI_TRANSPORT_DATA = {
+            bestBusRoutes: [
+                {
+                    routeId: '139',
+                    name: 'BEST Route 139',
+                    operator: 'BEST',
+                    from: 'Colaba',
+                    to: 'Bandra',
+                    stops: [
+                        {name: 'Colaba', lat: 18.9217, lng: 72.8347},
+                        {name: 'Gateway of India', lat: 18.9217, lng: 72.8347},
+                        {name: 'CST Station', lat: 18.9398, lng: 72.8354},
+                        {name: 'Churchgate Station', lat: 18.9346, lng: 72.8264},
+                        {name: 'Marine Lines Station', lat: 18.9439, lng: 72.8234},
+                        {name: 'Charni Road Station', lat: 18.9529, lng: 72.8204},
+                        {name: 'Grant Road Station', lat: 18.9620, lng: 72.8174},
+                        {name: 'Mumbai Central Station', lat: 18.9711, lng: 72.8144},
+                        {name: 'Mahalaxmi Station', lat: 18.9802, lng: 72.8114},
+                        {name: 'Lower Parel Station', lat: 18.9893, lng: 72.8084},
+                        {name: 'Elphinstone Road Station', lat: 18.9984, lng: 72.8054},
+                        {name: 'Prabhadevi Station', lat: 19.0075, lng: 72.8024},
+                        {name: 'Dadar Station', lat: 19.0166, lng: 72.7994},
+                        {name: 'Matunga Station', lat: 19.0257, lng: 72.7964},
+                        {name: 'Sion Station', lat: 19.0348, lng: 72.7934},
+                        {name: 'Kurla Station', lat: 19.0439, lng: 72.7904},
+                        {name: 'Vidya Vihar Station', lat: 19.0530, lng: 72.7874},
+                        {name: 'Ghatkopar Station', lat: 19.0621, lng: 72.7844},
+                        {name: 'Vikhroli Station', lat: 19.0712, lng: 72.7814},
+                        {name: 'Kanjurmarg Station', lat: 19.0803, lng: 72.7784},
+                        {name: 'Bhandup Station', lat: 19.0894, lng: 72.7754},
+                        {name: 'Nahur Station', lat: 19.0985, lng: 72.7724},
+                        {name: 'Mulund Station', lat: 19.1076, lng: 72.7694},
+                        {name: 'Thane Station', lat: 19.1167, lng: 72.7664},
+                        {name: 'Bandra', lat: 19.1258, lng: 72.7634}
+                    ],
+                    fare: 20,
+                    frequency: 'Every 15 minutes'
+                },
+                {
+                    routeId: '41',
+                    name: 'BEST Route 41',
+                    operator: 'BEST',
+                    from: 'Ayyappa Mandir',
+                    to: 'Thane Station (W)',
+                    stops: [
+                        {name: 'Ayyappa Mandir', lat: 19.2189, lng: 72.9780},
+                        {name: 'Thane Station (W)', lat: 19.2189, lng: 72.9780}
+                    ],
+                    fare: 15,
+                    frequency: 'Every 20 minutes'
+                }
+            ]
+        };
+
+        // Initialize the application
+        function initMap() {
+            // Initialize map centered on Mumbai
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 19.0760, lng: 72.8777 },
+                zoom: 12,
+                styles: getCustomMapStyle(),
+                mapTypeControl: false,
+                streetViewControl: false
+            });
+
+            // Initialize services
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: true
+            });
+
+            // Initialize layers
+            trafficLayer = new google.maps.TrafficLayer();
+            transitLayer = new google.maps.TransitLayer();
+            bicyclingLayer = new google.maps.BicyclingLayer();
+
+            // Initialize autocomplete
+            autocompleteFrom = new google.maps.places.Autocomplete(
+                document.getElementById('from-location'),
+                { bounds: new google.maps.LatLngBounds(
+                    new google.maps.LatLng(18.8964, 72.7962),
+                    new google.maps.LatLng(19.2189, 72.9780)
+                )}
+            );
+
+            autocompleteTo = new google.maps.places.Autocomplete(
+                document.getElementById('to-location'),
+                { bounds: new google.maps.LatLngBounds(
+                    new google.maps.LatLng(18.8964, 72.7962),
+                    new google.maps.LatLng(19.2189, 72.9780)
+                )}
+            );
+
+            // Add event listeners
+            setupEventListeners();
+            
+            // Add bus route markers
+            addBusRouteMarkers();
+        }
+
+        // Custom map style
+        function getCustomMapStyle() {
+            return [
+                {
+                    "featureType": "all",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"weight": "2.00"}]
+                },
+                {
+                    "featureType": "all",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#9c9c9c"}]
+                },
+                {
+                    "featureType": "all",
+                    "elementType": "labels.text",
+                    "stylers": [{"visibility": "on"}]
+                },
+                {
+                    "featureType": "landscape",
+                    "elementType": "all",
+                    "stylers": [{"color": "#f2f2f2"}]
+                },
+                {
+                    "featureType": "landscape",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#ffffff"}]
+                },
+                {
+                    "featureType": "landscape.man_made",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#ffffff"}]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "all",
+                    "stylers": [{"visibility": "off"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "all",
+                    "stylers": [{"saturation": -100}, {"lightness": 45}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#eeeeee"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#7b7b7b"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#ffffff"}]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "all",
+                    "stylers": [{"visibility": "simplified"}]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "labels.icon",
+                    "stylers": [{"visibility": "off"}]
+                },
+                {
+                    "featureType": "transit",
+                    "elementType": "all",
+                    "stylers": [{"visibility": "off"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "all",
+                    "stylers": [{"color": "#46bcec"}, {"visibility": "on"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#c8d7d4"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#070707"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#ffffff"}]
+                }
+            ];
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Route planning
+            document.getElementById('plan-route-btn').addEventListener('click', planRoute);
+            document.getElementById('clear-route-btn').addEventListener('click', clearRoute);
+            
+            // Live tracking
+            document.getElementById('track-route-btn').addEventListener('click', trackRoute);
+            
+            // Map controls
+            document.getElementById('toggle-traffic').addEventListener('click', toggleTraffic);
+            document.getElementById('toggle-transit').addEventListener('click', toggleTransit);
+            document.getElementById('toggle-bicycling').addEventListener('click', toggleBicycling);
+            document.getElementById('my-location').addEventListener('click', getMyLocation);
+        }
+
+        // Plan route function
+        function planRoute() {
+            const from = document.getElementById('from-location').value;
+            const to = document.getElementById('to-location').value;
+
+            if (!from || !to) {
+                alert('Please enter both from and to locations');
+                return;
+            }
+
+            // Show loading state
+            const btn = document.getElementById('plan-route-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading"></span> Planning...';
+            btn.disabled = true;
+
+            // Get route using Google Directions API
+            directionsService.route({
+                origin: from,
+                destination: to,
+                travelMode: google.maps.TravelMode.TRANSIT,
+                provideRouteAlternatives: true
+            }, (response, status) => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+
+                if (status === 'OK') {
+                    displayRouteResults(response.routes, from, to);
+                    showRouteOnMap(response.routes[0]);
+                } else {
+                    alert('Could not find route. Please try different locations.');
+                }
+            });
+        }
+
+        // Display route results
+        function displayRouteResults(routes, from, to) {
+            const resultsSection = document.getElementById('results-section');
+            const resultsContainer = document.getElementById('route-results');
+            
+            resultsSection.style.display = 'block';
+            
+            let html = '';
+            
+            routes.forEach((route, index) => {
+                const isRecommended = index === 0;
+                const leg = route.legs[0];
+                
+                html += `
+                    <div class="route-option ${isRecommended ? 'recommended' : ''}" onclick="selectRoute(${index})">
+                        <div class="route-header">
+                            <div class="route-info">
+                                <span class="route-number">Route ${index + 1}</span>
+                                <span class="route-modes">🚌</span>
+                            </div>
+                            ${isRecommended ? '<span class="recommended-badge">Recommended</span>' : ''}
+                        </div>
+                        <div class="route-details">
+                            <div class="route-path">${from} → ${to}</div>
+                            <div class="route-name">${leg.distance.text} • ${leg.duration.text}</div>
+                            <div class="route-stats">
+                                <span class="stat">
+                                    <i class="fas fa-clock"></i> ${leg.duration.text}
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-road"></i> ${leg.distance.text}
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-exchange-alt"></i> ${route.legs[0].steps.filter(step => step.travel_mode === 'TRANSIT').length} transfers
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+        }
+
+        // Show route on map
+        function showRouteOnMap(route) {
+            clearMap();
+            
+            directionsRenderer.setDirections({
+                routes: [route],
+                request: {
+                    origin: route.legs[0].start_address,
+                    destination: route.legs[0].end_address,
+                    travelMode: google.maps.TravelMode.TRANSIT
+                }
+            });
+
+            // Add custom markers for start and end points
+            addMarker(route.legs[0].start_location, 'A', 'Start', '#4CAF50');
+            addMarker(route.legs[0].end_location, 'B', 'End', '#F44336');
+        }
+
+        // Track route function
+        function trackRoute() {
+            const routeId = document.getElementById('track-route').value;
+            
+            if (!routeId) {
+                alert('Please enter a route number');
+                return;
+            }
+
+            const route = MUMBAI_TRANSPORT_DATA.bestBusRoutes.find(r => r.routeId === routeId);
+            
+            if (!route) {
+                alert('Route not found. Available routes: 139, 41');
+                return;
+            }
+
+            // Show tracking results
+            displayTrackingResults(route);
+            showBusRouteOnMap(route);
+        }
+
+        // Display tracking results
+        function displayTrackingResults(route) {
+            const trackingSection = document.getElementById('tracking-section');
+            const trackingContainer = document.getElementById('tracking-results');
+            
+            trackingSection.style.display = 'block';
+            
+            const html = `
+                <div class="route-option recommended">
+                    <div class="route-header">
+                        <div class="route-info">
+                            <span class="route-number">${route.name}</span>
+                            <span class="route-modes">🚌</span>
+                        </div>
+                        <span class="recommended-badge">Live</span>
+                    </div>
+                    <div class="route-details">
+                        <div class="route-path">${route.from} → ${route.to}</div>
+                        <div class="route-name">${route.operator} • ${route.frequency}</div>
+                        <div class="route-stats">
+                            <span class="stat">
+                                <i class="fas fa-indian-rupee-sign"></i> ₹${route.fare}
+                            </span>
+                            <span class="stat">
+                                <i class="fas fa-clock"></i> Next: 8:30 AM
+                            </span>
+                            <span class="stat">
+                                <i class="fas fa-users"></i> Crowd: 65%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            trackingContainer.innerHTML = html;
+        }
+
+        // Show bus route on map
+        function showBusRouteOnMap(route) {
+            clearMap();
+            
+            const path = route.stops.map(stop => ({
+                lat: stop.lat,
+                lng: stop.lng
+            }));
+
+            const polyline = new google.maps.Polyline({
+                path: path,
+                geodesic: true,
+                strokeColor: '#667eea',
+                strokeOpacity: 0.8,
+                strokeWeight: 4
+            });
+
+            polyline.setMap(map);
+            polylines.push(polyline);
+
+            // Add markers for all stops
+            route.stops.forEach((stop, index) => {
+                const marker = new google.maps.Marker({
+                    position: { lat: stop.lat, lng: stop.lng },
+                    map: map,
+                    title: stop.name,
+                    label: {
+                        text: (index + 1).toString(),
+                        color: 'white'
+                    },
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 8,
+                        fillColor: '#667eea',
+                        fillOpacity: 1,
+                        strokeColor: 'white',
+                        strokeWeight: 2
+                    }
+                });
+
+                // Add info window
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `
+                        <div class="info-window">
+                            <h3>${stop.name}</h3>
+                            <p><strong>Route:</strong> ${route.name}</p>
+                            <p><strong>Stop:</strong> ${index + 1} of ${route.stops.length}</p>
+                        </div>
+                    `
+                });
+
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+
+                markers.push(marker);
+            });
+
+            // Fit map to show all stops
+            const bounds = new google.maps.LatLngBounds();
+            route.stops.forEach(stop => {
+                bounds.extend({ lat: stop.lat, lng: stop.lng });
+            });
+            map.fitBounds(bounds);
+        }
+
+        // Add bus route markers
+        function addBusRouteMarkers() {
+            MUMBAI_TRANSPORT_DATA.bestBusRoutes.forEach(route => {
+                route.stops.forEach(stop => {
+                    const marker = new google.maps.Marker({
+                        position: { lat: stop.lat, lng: stop.lng },
+                        map: map,
+                        title: `${stop.name} - ${route.name}`,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 4,
+                            fillColor: '#667eea',
+                            fillOpacity: 0.6,
+                            strokeColor: 'white',
+                            strokeWeight: 1
+                        }
+                    });
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `
+                            <div class="info-window">
+                                <h3>${stop.name}</h3>
+                                <p><strong>Route:</strong> ${route.name}</p>
+                                <p><strong>Operator:</strong> ${route.operator}</p>
+                            </div>
+                        `
+                    });
+
+                    marker.addListener('click', () => {
+                        infoWindow.open(map, marker);
+                    });
+
+                    markers.push(marker);
+                });
+            });
+        }
+
+        // Map control functions
+        function toggleTraffic() {
+            const btn = document.getElementById('toggle-traffic');
+            if (btn.classList.contains('active')) {
+                trafficLayer.setMap(null);
+                btn.classList.remove('active');
+            } else {
+                trafficLayer.setMap(map);
+                btn.classList.add('active');
+            }
+        }
+
+        function toggleTransit() {
+            const btn = document.getElementById('toggle-transit');
+            if (btn.classList.contains('active')) {
+                transitLayer.setMap(null);
+                btn.classList.remove('active');
+            } else {
+                transitLayer.setMap(map);
+                btn.classList.add('active');
+            }
+        }
+
+        function toggleBicycling() {
+            const btn = document.getElementById('toggle-bicycling');
+            if (btn.classList.contains('active')) {
+                bicyclingLayer.setMap(null);
+                btn.classList.remove('active');
+            } else {
+                bicyclingLayer.setMap(map);
+                btn.classList.add('active');
+            }
+        }
+
+        function getMyLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        map.setCenter(pos);
+                        map.setZoom(15);
+                        
+                        addMarker(pos, '📍', 'Your Location', '#FF9800');
+                    },
+                    () => {
+                        alert('Error: The Geolocation service failed.');
+                    }
+                );
+            } else {
+                alert('Error: Your browser doesn\'t support geolocation.');
+            }
+        }
+
+        // Utility functions
+        function addMarker(position, label, title, color) {
+            const marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: title,
+                label: {
+                    text: label,
+                    color: 'white'
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: color,
+                    fillOpacity: 1,
+                    strokeColor: 'white',
+                    strokeWeight: 2
+                }
+            });
+
+            markers.push(marker);
+            return marker;
+        }
+
+        function clearMap() {
+            // Clear markers
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+            
+            // Clear polylines
+            polylines.forEach(polyline => polyline.setMap(null));
+            polylines = [];
+            
+            // Clear directions
+            directionsRenderer.setDirections({ routes: [] });
+        }
+
+        function clearRoute() {
+            clearMap();
+            document.getElementById('results-section').style.display = 'none';
+            document.getElementById('tracking-section').style.display = 'none';
+            addBusRouteMarkers();
+        }
+
+        function selectRoute(routeIndex) {
+            // This would be implemented to show the selected route
+            console.log('Selected route:', routeIndex);
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', initMap);
+    </script>
+</body>
+</html>
