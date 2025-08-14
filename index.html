@@ -11,6 +11,9 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Google Maps API - BEAST MODE WITH REAL API KEY -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry"></script>
+    
     <style>
         /* ========================================
            MODERN DESIGN SYSTEM
@@ -729,6 +732,91 @@
         }
         
         /* ========================================
+           BEAST MODE: INTERACTIVE MAP STYLES
+        ======================================== */
+        
+        .interactive-map-section {
+            margin-top: var(--spacing-8);
+            background: white;
+            border-radius: var(--radius-2xl);
+            padding: var(--spacing-8);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .map-controls {
+            display: flex;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-6);
+            flex-wrap: wrap;
+        }
+        
+        .map-control-btn {
+            background: var(--gray-100);
+            border: 2px solid var(--gray-200);
+            color: var(--gray-700);
+            padding: var(--spacing-3) var(--spacing-4);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+        
+        .map-control-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .map-control-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        .interactive-map {
+            width: 100%;
+            height: 400px;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--spacing-6);
+        }
+        
+        .route-actions {
+            display: flex;
+            gap: var(--spacing-4);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .route-actions .btn {
+            min-width: 140px;
+        }
+        
+        /* Enhanced Route Results with Map Integration */
+        .route-option {
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .route-option:hover::after {
+            content: 'Click to view on map';
+            position: absolute;
+            top: var(--spacing-2);
+            right: var(--spacing-2);
+            background: var(--primary);
+            color: white;
+            padding: var(--spacing-1) var(--spacing-2);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+        }
+        
+        /* ========================================
            ANIMATIONS
         ======================================== */
         
@@ -905,6 +993,46 @@
                     </form>
 
                     <div id="route-results" class="route-results"></div>
+                    
+                    <!-- BEAST MODE: Interactive Map Section -->
+                    <div id="interactive-map-section" class="interactive-map-section" style="display: none;">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-map-marked-alt"></i>
+                                Interactive Route Map
+                            </h2>
+                            <p class="section-subtitle">Visualize your route with real-time traffic and transit options</p>
+                        </div>
+                        
+                        <div class="map-controls">
+                            <button class="map-control-btn" id="toggle-traffic" onclick="toggleTraffic()">
+                                <i class="fas fa-car"></i> Traffic
+                            </button>
+                            <button class="map-control-btn" id="toggle-transit" onclick="toggleTransit()">
+                                <i class="fas fa-subway"></i> Transit
+                            </button>
+                            <button class="map-control-btn" id="toggle-bicycling" onclick="toggleBicycling()">
+                                <i class="fas fa-bicycle"></i> Bicycling
+                            </button>
+                            <button class="map-control-btn" id="my-location" onclick="getMyLocation()">
+                                <i class="fas fa-crosshairs"></i> My Location
+                            </button>
+                        </div>
+                        
+                        <div id="interactive-map" class="interactive-map"></div>
+                        
+                        <div class="route-actions">
+                            <button class="btn btn-secondary" onclick="saveRoute()">
+                                <i class="fas fa-heart"></i> Save Route
+                            </button>
+                            <button class="btn btn-primary" onclick="shareRoute()">
+                                <i class="fas fa-share-alt"></i> Share Route
+                            </button>
+                            <button class="btn btn-secondary" onclick="getDirections()">
+                                <i class="fas fa-directions"></i> Get Directions
+                            </button>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- Live Tracking Section -->
@@ -1166,13 +1294,16 @@
     <script>
         // Modern UI Application Script
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Modern Mumbai Transport Hub UI Loaded');
+            console.log('🚀 BEAST MODE: Modern Mumbai Transport Hub UI Loaded');
             
             // Initialize the application
             initializeApp();
             
             // Add direct onclick handlers as backup
             addDirectHandlers();
+            
+            // Initialize BEAST MODE Google Maps
+            initBeastModeMaps();
         });
         
         function addDirectHandlers() {
@@ -1308,53 +1439,418 @@
             }
         }
         
+        // BEAST MODE: Google Maps Integration Variables
+        let map;
+        let directionsService;
+        let directionsRenderer;
+        let autocompleteFrom;
+        let autocompleteTo;
+        let trafficLayer;
+        let transitLayer;
+        let bicyclingLayer;
+        let currentRoute;
+
+        // Initialize BEAST MODE Google Maps
+        function initBeastModeMaps() {
+            // Initialize map
+            map = new google.maps.Map(document.getElementById('interactive-map'), {
+                center: { lat: 19.0760, lng: 72.8777 }, // Mumbai center
+                zoom: 12,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+                styles: getBeastModeMapStyle()
+            });
+
+            // Initialize services
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: true
+            });
+
+            // Initialize layers
+            trafficLayer = new google.maps.TrafficLayer();
+            transitLayer = new google.maps.TransitLayer();
+            bicyclingLayer = new google.maps.BicyclingLayer();
+
+            // Initialize autocomplete
+            autocompleteFrom = new google.maps.places.Autocomplete(
+                document.getElementById('from-location'),
+                { bounds: new google.maps.LatLngBounds(
+                    new google.maps.LatLng(18.8964, 72.7962),
+                    new google.maps.LatLng(19.2189, 72.9780)
+                )}
+            );
+
+            autocompleteTo = new google.maps.places.Autocomplete(
+                document.getElementById('to-location'),
+                { bounds: new google.maps.LatLngBounds(
+                    new google.maps.LatLng(18.8964, 72.7962),
+                    new google.maps.LatLng(19.2189, 72.9780)
+                )}
+            );
+
+            console.log('🚀 BEAST MODE Google Maps initialized!');
+        }
+
+        // BEAST MODE Map Style
+        function getBeastModeMapStyle() {
+            return [
+                {
+                    "featureType": "all",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"weight": "2.00"}]
+                },
+                {
+                    "featureType": "all",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{"color": "#9c9c9c"}]
+                },
+                {
+                    "featureType": "all",
+                    "elementType": "labels.text",
+                    "stylers": [{"visibility": "on"}]
+                },
+                {
+                    "featureType": "landscape",
+                    "elementType": "all",
+                    "stylers": [{"color": "#f2f2f2"}]
+                },
+                {
+                    "featureType": "landscape",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#ffffff"}]
+                },
+                {
+                    "featureType": "landscape.man_made",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#ffffff"}]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "all",
+                    "stylers": [{"visibility": "off"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "all",
+                    "stylers": [{"saturation": -100}, {"lightness": 45}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#eeeeee"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#7b7b7b"}]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#ffffff"}]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "all",
+                    "stylers": [{"visibility": "simplified"}]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "labels.icon",
+                    "stylers": [{"visibility": "off"}]
+                },
+                {
+                    "featureType": "transit",
+                    "elementType": "all",
+                    "stylers": [{"visibility": "off"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "all",
+                    "stylers": [{"color": "#46bcec"}, {"visibility": "on"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry.fill",
+                    "stylers": [{"color": "#c8d7d4"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.fill",
+                    "stylers": [{"color": "#070707"}]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{"color": "#ffffff"}]
+                }
+            ];
+        }
+
         function planRoute(from, to) {
-            console.log(`🔍 Planning route from ${from} to ${to}`);
+            console.log(`🔍 BEAST MODE: Planning route from ${from} to ${to}`);
             console.log('REAL_MUMBAI_TRANSPORT_DATA available:', !!window.REAL_MUMBAI_TRANSPORT_DATA);
             
-            // Use the real Mumbai transport data system
-            if (window.REAL_MUMBAI_TRANSPORT_DATA) {
-                console.log('✅ Using real data system');
-                const routes = findRealRoutes(from, to);
-                console.log('Found routes:', routes);
-                displayRouteResults(routes, from, to);
+            // Show loading state
+            const btn = document.getElementById('plan-route-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading"></span> Finding Best Route...';
+            btn.disabled = true;
+
+            // Use Google Maps Directions API for BEAST MODE routing
+            if (directionsService) {
+                directionsService.route({
+                    origin: from,
+                    destination: to,
+                    travelMode: google.maps.TravelMode.TRANSIT,
+                    provideRouteAlternatives: true
+                }, (response, status) => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+
+                    if (status === 'OK') {
+                        console.log('🚀 BEAST MODE: Google Maps route found!');
+                        displayBeastModeRouteResults(response.routes, from, to);
+                        showRouteOnBeastModeMap(response.routes[0]);
+                        currentRoute = response.routes[0];
+                    } else {
+                        console.log('❌ BEAST MODE: Google Maps route failed, falling back to local data');
+                        // Fallback to local data
+                        if (window.REAL_MUMBAI_TRANSPORT_DATA) {
+                            const routes = findRealRoutes(from, to);
+                            displayRouteResults(routes, from, to);
+                        }
+                    }
+                });
             } else {
-                // Fallback to demo data
-                const resultsContainer = document.getElementById('route-results');
-                if (resultsContainer) {
-                    resultsContainer.innerHTML = `
-                        <div class="route-options">
-                            <div class="route-option recommended">
-                                <div class="route-header">
-                                    <div class="route-info">
-                                        <span class="route-number">Route 139</span>
-                                        <span class="route-modes">🚌</span>
-                                    </div>
-                                    <span class="recommended-badge">Recommended</span>
-                                </div>
-                                <div class="route-details">
-                                    <div class="route-path">${from} → ${to}</div>
-                                    <div class="route-name">BEST Route 139 - Direct Bus</div>
-                                    <div class="route-stats">
-                                        <span class="stat">
-                                            <i class="fas fa-clock"></i> 45 min
-                                        </span>
-                                        <span class="stat">
-                                            <i class="fas fa-indian-rupee-sign"></i> ₹15
-                                        </span>
-                                        <span class="stat">
-                                            <i class="fas fa-exchange-alt"></i> 0 transfers
-                                        </span>
-                                    </div>
-                                </div>
-                                <button class="select-route-btn">
-                                    <i class="fas fa-check"></i> Select Route
-                                </button>
+                // Fallback to local data
+                if (window.REAL_MUMBAI_TRANSPORT_DATA) {
+                    const routes = findRealRoutes(from, to);
+                    displayRouteResults(routes, from, to);
+                }
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // BEAST MODE Route Display
+        function displayBeastModeRouteResults(routes, from, to) {
+            const resultsContainer = document.getElementById('route-results');
+            if (!resultsContainer) return;
+
+            let html = '<div class="route-options">';
+            
+            routes.forEach((route, index) => {
+                const isRecommended = index === 0;
+                const leg = route.legs[0];
+                
+                html += `
+                    <div class="route-option ${isRecommended ? 'recommended' : ''}" onclick="selectBeastModeRoute(${index}, routes)">
+                        <div class="route-header">
+                            <div class="route-info">
+                                <span class="route-number">Route ${index + 1}</span>
+                                <span class="route-modes">🚌</span>
+                            </div>
+                            ${isRecommended ? '<span class="recommended-badge">BEAST MODE</span>' : ''}
+                        </div>
+                        <div class="route-details">
+                            <div class="route-path">${from} → ${to}</div>
+                            <div class="route-name">${leg.distance.text} • ${leg.duration.text}</div>
+                            <div class="route-stats">
+                                <span class="stat">
+                                    <i class="fas fa-clock"></i> ${leg.duration.text}
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-road"></i> ${leg.distance.text}
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-exchange-alt"></i> ${route.legs[0].steps.filter(step => step.travel_mode === 'TRANSIT').length} transfers
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-map-marked-alt"></i> Click to view on map
+                                </span>
                             </div>
                         </div>
-                    `;
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            resultsContainer.innerHTML = html;
+        }
+
+        // Show route on BEAST MODE map
+        function showRouteOnBeastModeMap(route) {
+            const mapSection = document.getElementById('interactive-map-section');
+            mapSection.style.display = 'block';
+            
+            directionsRenderer.setDirections({
+                routes: [route],
+                request: {
+                    origin: route.legs[0].start_address,
+                    destination: route.legs[0].end_address,
+                    travelMode: google.maps.TravelMode.TRANSIT
                 }
+            });
+
+            // Add custom markers
+            addBeastModeMarker(route.legs[0].start_location, 'A', 'Start', '#10b981');
+            addBeastModeMarker(route.legs[0].end_location, 'B', 'End', '#ef4444');
+
+            // Scroll to map
+            mapSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // BEAST MODE Map Controls
+        function toggleTraffic() {
+            const btn = document.getElementById('toggle-traffic');
+            if (btn.classList.contains('active')) {
+                trafficLayer.setMap(null);
+                btn.classList.remove('active');
+            } else {
+                trafficLayer.setMap(map);
+                btn.classList.add('active');
             }
+        }
+
+        function toggleTransit() {
+            const btn = document.getElementById('toggle-transit');
+            if (btn.classList.contains('active')) {
+                transitLayer.setMap(null);
+                btn.classList.remove('active');
+            } else {
+                transitLayer.setMap(map);
+                btn.classList.add('active');
+            }
+        }
+
+        function toggleBicycling() {
+            const btn = document.getElementById('toggle-bicycling');
+            if (btn.classList.contains('active')) {
+                bicyclingLayer.setMap(null);
+                btn.classList.remove('active');
+            } else {
+                bicyclingLayer.setMap(map);
+                btn.classList.add('active');
+            }
+        }
+
+        function getMyLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        map.setCenter(pos);
+                        map.setZoom(15);
+                        
+                        addBeastModeMarker(pos, '📍', 'Your Location', '#f59e0b');
+                    },
+                    () => {
+                        alert('Error: The Geolocation service failed.');
+                    }
+                );
+            } else {
+                alert('Error: Your browser doesn\'t support geolocation.');
+            }
+        }
+
+        // BEAST MODE Utility Functions
+        function addBeastModeMarker(position, label, title, color) {
+            return new google.maps.Marker({
+                position: position,
+                map: map,
+                title: title,
+                label: {
+                    text: label,
+                    color: 'white'
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: color,
+                    fillOpacity: 1,
+                    strokeColor: 'white',
+                    strokeWeight: 2
+                }
+            });
+        }
+
+        function selectBeastModeRoute(routeIndex, routes) {
+            const selectedRoute = routes[routeIndex];
+            showRouteOnBeastModeMap(selectedRoute);
+            currentRoute = selectedRoute;
+        }
+
+        // BEAST MODE Action Functions
+        function saveRoute() {
+            if (currentRoute) {
+                const savedRoutes = JSON.parse(localStorage.getItem('savedRoutes') || '[]');
+                const routeData = {
+                    from: currentRoute.legs[0].start_address,
+                    to: currentRoute.legs[0].end_address,
+                    duration: currentRoute.legs[0].duration.text,
+                    distance: currentRoute.legs[0].distance.text,
+                    timestamp: new Date().toISOString()
+                };
+                
+                savedRoutes.push(routeData);
+                localStorage.setItem('savedRoutes', JSON.stringify(savedRoutes));
+                
+                showBeastModeToast('Route saved to favorites! 🚀', 'success');
+            }
+        }
+
+        function shareRoute() {
+            if (currentRoute && navigator.share) {
+                navigator.share({
+                    title: 'Mumbai Transport Route',
+                    text: `Route from ${currentRoute.legs[0].start_address} to ${currentRoute.legs[0].end_address}`,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback: copy to clipboard
+                const routeText = `Route: ${currentRoute.legs[0].start_address} → ${currentRoute.legs[0].end_address}`;
+                navigator.clipboard.writeText(routeText);
+                showBeastModeToast('Route copied to clipboard! 📋', 'info');
+            }
+        }
+
+        function getDirections() {
+            if (currentRoute) {
+                const directionsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(currentRoute.legs[0].start_address)}/${encodeURIComponent(currentRoute.legs[0].end_address)}`;
+                window.open(directionsUrl, '_blank');
+            }
+        }
+
+        function showBeastModeToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#6366f1'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 25px;
+                z-index: 10001;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                font-size: 14px;
+                font-weight: 500;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         }
         
         function findRealRoutes(from, to) {
