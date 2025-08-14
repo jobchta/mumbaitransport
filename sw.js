@@ -4,7 +4,7 @@ const urlsToCache = [
   '/mumbai_transport_pwa.html',
   '/manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places'
+  'https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places'
 ];
 
 // Install event - cache resources
