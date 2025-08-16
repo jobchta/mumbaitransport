@@ -9,6 +9,21 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
     }
 
+    // API: Authentication endpoints
+    if (pathname.startsWith('/api/auth/')) {
+      return handleAuthApi(request, env);
+    }
+
+    // API: User data endpoints
+    if (pathname.startsWith('/api/user/')) {
+      return handleUserApi(request, env);
+    }
+
+    // API: Ride-hailing endpoints
+    if (pathname.startsWith('/api/rides/')) {
+      return handleRidesApi(request, env);
+    }
+
     // API: GTFS Realtime proxy/decoder endpoints
     if (pathname.startsWith('/api/gtfs/')) {
       return handleGtfsApi(request, env);
@@ -239,6 +254,459 @@ function json(obj, status, request) {
   if (origin) {
     headers.set('Access-Control-Allow-Origin', origin);
     headers.set('Vary', 'Origin');
+  }
+  
+  // --- Authentication API handlers ---
+  async function handleAuthApi(request, env) {
+    const url = new URL(request.url);
+    const path = url.pathname; // /api/auth/{action}
+    const action = path.split('/').filter(Boolean)[2] || '';
+  
+    switch (action) {
+      case 'google':
+        return handleGoogleAuth(request, env);
+      case 'logout':
+        return handleLogout(request, env);
+      case 'verify':
+        return handleVerifyToken(request, env);
+      default:
+        return json({ error: 'Unknown auth action. Use: google | logout | verify' }, 400, request);
+    }
+  }
+  
+  async function handleGoogleAuth(request, env) {
+    if (request.method !== 'POST') {
+      return json({ error: 'Method not allowed' }, 405, request);
+    }
+  
+    try {
+      const { credential } = await request.json();
+      
+      if (!credential) {
+        return json({ error: 'Missing Google credential' }, 400, request);
+      }
+  
+      // Verify Google JWT token
+      const googleUser = await verifyGoogleToken(credential, env);
+      if (!googleUser) {
+        return json({ error: 'Invalid Google token' }, 401, request);
+      }
+  
+      // Generate our own JWT for the user
+      const userToken = await generateUserToken(googleUser, env);
+      
+      // Store/update user in database
+      await storeUser(googleUser, env);
+  
+      const headers = new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'Set-Cookie': `auth_token=${userToken}; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000; Path=/`
+      });
+  
+      const origin = request.headers.get('Origin');
+      if (origin) {
+        headers.set('Access-Control-Allow-Origin', origin);
+        headers.set('Access-Control-Allow-Credentials', 'true');
+        headers.set('Vary', 'Origin');
+      }
+  
+      return new Response(JSON.stringify({
+        success: true,
+        user: {
+          id: googleUser.sub,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture
+        }
+      }), { status: 200, headers });
+  
+    } catch (error) {
+      console.error('Google auth error:', error);
+      return json({ error: 'Authentication failed' }, 500, request);
+    }
+  }
+  
+  async function handleLogout(request, env) {
+    const headers = new Headers({
+      'Content-Type': 'application/json; charset=utf-8',
+      'Set-Cookie': 'auth_token=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/'
+    });
+  
+    const origin = request.headers.get('Origin');
+    if (origin) {
+      headers.set('Access-Control-Allow-Origin', origin);
+      headers.set('Access-Control-Allow-Credentials', 'true');
+      headers.set('Vary', 'Origin');
+    }
+  
+    return new Response(JSON.stringify({ success: true }), { status: 200, headers });
+  }
+  
+  async function handleVerifyToken(request, env) {
+    try {
+      const authToken = getCookieValue(request, 'auth_token');
+      if (!authToken) {
+        return json({ error: 'No auth token' }, 401, request);
+      }
+  
+      const user = await verifyUserToken(authToken, env);
+      if (!user) {
+        return json({ error: 'Invalid token' }, 401, request);
+      }
+  
+      return json({ success: true, user }, 200, request);
+    } catch (error) {
+      return json({ error: 'Token verification failed' }, 401, request);
+    }
+  }
+  
+  // --- User Data API handlers ---
+  async function handleUserApi(request, env) {
+    const url = new URL(request.url);
+    const path = url.pathname; // /api/user/{action}
+    const action = path.split('/').filter(Boolean)[2] || '';
+  
+    // Verify authentication for all user endpoints
+    const authToken = getCookieValue(request, 'auth_token');
+    if (!authToken) {
+      return json({ error: 'Authentication required' }, 401, request);
+    }
+  
+    const user = await verifyUserToken(authToken, env);
+    if (!user) {
+      return json({ error: 'Invalid authentication' }, 401, request);
+    }
+  
+    switch (action) {
+      case 'profile':
+        return handleUserProfile(request, env, user);
+      case 'preferences':
+        return handleUserPreferences(request, env, user);
+      case 'locations':
+        return handleUserLocations(request, env, user);
+      default:
+        return json({ error: 'Unknown user action. Use: profile | preferences | locations' }, 400, request);
+    }
+  }
+  
+  async function handleUserProfile(request, env, user) {
+    if (request.method === 'GET') {
+      const userData = await getUserData(user.sub, env);
+      return json({ success: true, user: userData }, 200, request);
+    }
+    
+    if (request.method === 'PUT') {
+      const updates = await request.json();
+      const updatedUser = await updateUserData(user.sub, updates, env);
+      return json({ success: true, user: updatedUser }, 200, request);
+    }
+  
+    return json({ error: 'Method not allowed' }, 405, request);
+  }
+  
+  async function handleUserPreferences(request, env, user) {
+    if (request.method === 'GET') {
+      const preferences = await getUserPreferences(user.sub, env);
+      return json({ success: true, preferences }, 200, request);
+    }
+    
+    if (request.method === 'PUT') {
+      const preferences = await request.json();
+      await updateUserPreferences(user.sub, preferences, env);
+      return json({ success: true }, 200, request);
+    }
+  
+    return json({ error: 'Method not allowed' }, 405, request);
+  }
+  
+  async function handleUserLocations(request, env, user) {
+    if (request.method === 'GET') {
+      const locations = await getUserLocations(user.sub, env);
+      return json({ success: true, locations }, 200, request);
+    }
+    
+    if (request.method === 'POST') {
+      const location = await request.json();
+      await addUserLocation(user.sub, location, env);
+      return json({ success: true }, 200, request);
+    }
+  
+    if (request.method === 'DELETE') {
+      const { locationId } = await request.json();
+      await deleteUserLocation(user.sub, locationId, env);
+      return json({ success: true }, 200, request);
+    }
+  
+    return json({ error: 'Method not allowed' }, 405, request);
+  }
+  
+  // --- Ride-hailing API handlers ---
+  async function handleRidesApi(request, env) {
+    const url = new URL(request.url);
+    const path = url.pathname; // /api/rides/{provider}/{action}
+    const parts = path.split('/').filter(Boolean);
+    const provider = parts[2] || '';
+    const action = parts[3] || '';
+  
+    // Verify authentication for ride endpoints
+    const authToken = getCookieValue(request, 'auth_token');
+    if (!authToken) {
+      return json({ error: 'Authentication required' }, 401, request);
+    }
+  
+    const user = await verifyUserToken(authToken, env);
+    if (!user) {
+      return json({ error: 'Invalid authentication' }, 401, request);
+    }
+  
+    switch (provider) {
+      case 'uber':
+        return handleUberApi(request, env, user, action);
+      case 'ola':
+        return handleOlaApi(request, env, user, action);
+      default:
+        return json({ error: 'Unknown provider. Use: uber | ola' }, 400, request);
+    }
+  }
+  
+  async function handleUberApi(request, env, user, action) {
+    switch (action) {
+      case 'connect':
+        return handleUberConnect(request, env, user);
+      case 'estimate':
+        return handleUberEstimate(request, env, user);
+      case 'request':
+        return handleUberRequest(request, env, user);
+      default:
+        return json({ error: 'Unknown Uber action. Use: connect | estimate | request' }, 400, request);
+    }
+  }
+  
+  async function handleOlaApi(request, env, user, action) {
+    switch (action) {
+      case 'connect':
+        return handleOlaConnect(request, env, user);
+      case 'estimate':
+        return handleOlaEstimate(request, env, user);
+      case 'request':
+        return handleOlaRequest(request, env, user);
+      default:
+        return json({ error: 'Unknown Ola action. Use: connect | estimate | request' }, 400, request);
+    }
+  }
+  
+  // --- Authentication Helper Functions ---
+  async function verifyGoogleToken(credential, env) {
+    try {
+      // Verify Google JWT token with Google's public keys
+      const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+      const tokenInfo = await response.json();
+      
+      if (tokenInfo.error) {
+        return null;
+      }
+  
+      // Verify the token is for our app
+      if (tokenInfo.aud !== env.GOOGLE_CLIENT_ID) {
+        return null;
+      }
+  
+      return tokenInfo;
+    } catch (error) {
+      console.error('Google token verification failed:', error);
+      return null;
+    }
+  }
+  
+  async function generateUserToken(googleUser, env) {
+    const payload = {
+      sub: googleUser.sub,
+      email: googleUser.email,
+      name: googleUser.name,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60) // 30 days
+    };
+  
+    // Simple JWT signing (in production, use proper JWT library)
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+    const payloadStr = btoa(JSON.stringify(payload));
+    const signature = await signJWT(`${header}.${payloadStr}`, env.JWT_SECRET);
+    
+    return `${header}.${payloadStr}.${signature}`;
+  }
+  
+  async function verifyUserToken(token, env) {
+    try {
+      const [header, payload, signature] = token.split('.');
+      
+      // Verify signature
+      const expectedSignature = await signJWT(`${header}.${payload}`, env.JWT_SECRET);
+      if (signature !== expectedSignature) {
+        return null;
+      }
+  
+      const user = JSON.parse(atob(payload));
+      
+      // Check expiration
+      if (user.exp < Math.floor(Date.now() / 1000)) {
+        return null;
+      }
+  
+      return user;
+    } catch (error) {
+      return null;
+    }
+  }
+  
+  async function signJWT(data, secret) {
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    
+    const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(data));
+    return btoa(String.fromCharCode(...new Uint8Array(signature)));
+  }
+  
+  // --- Database Helper Functions (using KV for simplicity) ---
+  async function storeUser(googleUser, env) {
+    const userData = {
+      id: googleUser.sub,
+      email: googleUser.email,
+      name: googleUser.name,
+      picture: googleUser.picture,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      preferences: {
+        defaultTransportModes: ['metro', 'bus'],
+        savedLocations: []
+      },
+      connectedAccounts: {
+        uber: { connected: false },
+        ola: { connected: false }
+      }
+    };
+  
+    if (env.USER_DATA_KV) {
+      await env.USER_DATA_KV.put(`user:${googleUser.sub}`, JSON.stringify(userData));
+    }
+    
+    return userData;
+  }
+  
+  async function getUserData(userId, env) {
+    if (!env.USER_DATA_KV) return null;
+    
+    const userData = await env.USER_DATA_KV.get(`user:${userId}`);
+    return userData ? JSON.parse(userData) : null;
+  }
+  
+  async function updateUserData(userId, updates, env) {
+    if (!env.USER_DATA_KV) return null;
+    
+    const existing = await getUserData(userId, env);
+    if (!existing) return null;
+    
+    const updated = { ...existing, ...updates, updatedAt: new Date().toISOString() };
+    await env.USER_DATA_KV.put(`user:${userId}`, JSON.stringify(updated));
+    
+    return updated;
+  }
+  
+  async function getUserPreferences(userId, env) {
+    const userData = await getUserData(userId, env);
+    return userData?.preferences || {};
+  }
+  
+  async function updateUserPreferences(userId, preferences, env) {
+    const userData = await getUserData(userId, env);
+    if (!userData) return;
+    
+    userData.preferences = { ...userData.preferences, ...preferences };
+    userData.updatedAt = new Date().toISOString();
+    
+    await env.USER_DATA_KV.put(`user:${userId}`, JSON.stringify(userData));
+  }
+  
+  async function getUserLocations(userId, env) {
+    const preferences = await getUserPreferences(userId, env);
+    return preferences.savedLocations || [];
+  }
+  
+  async function addUserLocation(userId, location, env) {
+    const userData = await getUserData(userId, env);
+    if (!userData) return;
+    
+    if (!userData.preferences.savedLocations) {
+      userData.preferences.savedLocations = [];
+    }
+    
+    userData.preferences.savedLocations.push({
+      id: crypto.randomUUID(),
+      ...location,
+      createdAt: new Date().toISOString()
+    });
+    
+    userData.updatedAt = new Date().toISOString();
+    await env.USER_DATA_KV.put(`user:${userId}`, JSON.stringify(userData));
+  }
+  
+  async function deleteUserLocation(userId, locationId, env) {
+    const userData = await getUserData(userId, env);
+    if (!userData) return;
+    
+    if (userData.preferences.savedLocations) {
+      userData.preferences.savedLocations = userData.preferences.savedLocations.filter(
+        loc => loc.id !== locationId
+      );
+      userData.updatedAt = new Date().toISOString();
+      await env.USER_DATA_KV.put(`user:${userId}`, JSON.stringify(userData));
+    }
+  }
+  
+  // --- Uber API Functions (Placeholder - will implement with real API) ---
+  async function handleUberConnect(request, env, user) {
+    // TODO: Implement Uber OAuth flow
+    return json({ error: 'Uber connection not yet implemented' }, 501, request);
+  }
+  
+  async function handleUberEstimate(request, env, user) {
+    // TODO: Implement Uber fare estimation
+    return json({ error: 'Uber estimates not yet implemented' }, 501, request);
+  }
+  
+  async function handleUberRequest(request, env, user) {
+    // TODO: Implement Uber ride request
+    return json({ error: 'Uber ride request not yet implemented' }, 501, request);
+  }
+  
+  // --- Ola API Functions (Placeholder - will implement with real API) ---
+  async function handleOlaConnect(request, env, user) {
+    // TODO: Implement Ola OAuth flow
+    return json({ error: 'Ola connection not yet implemented' }, 501, request);
+  }
+  
+  async function handleOlaEstimate(request, env, user) {
+    // TODO: Implement Ola fare estimation
+    return json({ error: 'Ola estimates not yet implemented' }, 501, request);
+  }
+  
+  async function handleOlaRequest(request, env, user) {
+    // TODO: Implement Ola ride request
+    return json({ error: 'Ola ride request not yet implemented' }, 501, request);
+  }
+  
+  // --- Utility Functions ---
+  function getCookieValue(request, name) {
+    const cookies = request.headers.get('Cookie');
+    if (!cookies) return null;
+    
+    const cookie = cookies.split(';').find(c => c.trim().startsWith(`${name}=`));
+    return cookie ? cookie.split('=')[1] : null;
   }
   return new Response(JSON.stringify(obj), { status: status || 200, headers });
 }

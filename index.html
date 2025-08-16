@@ -23,6 +23,9 @@
     <!-- Google Maps API with callback for reliable init -->
     <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&v=weekly&callback=initMap"></script>
     
+    <!-- Google Identity Services for OAuth -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <style>
         /* ========================================
            MUMBAI TRANSPORT APP SHELL
@@ -1193,6 +1196,213 @@
         .dark .ad-space::before {
             background: rgba(0, 0, 0, 0.5);
         }
+        
+        /* ========================================
+           AUTHENTICATION UI
+        ======================================== */
+        
+        .user-auth {
+            position: relative;
+        }
+        
+        .btn-login {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-login:hover {
+            background: var(--surface-tertiary);
+            border-color: var(--primary);
+        }
+        
+        .btn-login i {
+            color: #4285f4;
+            font-size: 1rem;
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-avatar {
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: var(--radius-full);
+            padding: var(--space-1);
+            transition: all 0.2s;
+        }
+        
+        .user-avatar:hover {
+            background: var(--surface-tertiary);
+        }
+        
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + var(--space-2));
+            right: 0;
+            min-width: 240px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: var(--space-3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+        }
+        
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .user-info {
+            margin-bottom: var(--space-3);
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: var(--space-1);
+        }
+        
+        .user-email {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: var(--space-3) 0;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            width: 100%;
+            padding: var(--space-2) var(--space-3);
+            background: none;
+            border: none;
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: var(--space-1);
+        }
+        
+        .dropdown-item:hover {
+            background: var(--surface-tertiary);
+        }
+        
+        .dropdown-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .dropdown-item i {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface-tertiary) 25%, var(--surface-secondary) 50%, var(--surface-tertiary) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+        }
+        
+        .modal-title {
+            font-weight: 600;
+            font-size: var(--text-lg);
+            color: var(--text);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: var(--space-1);
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: var(--surface-tertiary);
+            color: var(--text);
+        }
     </style>
 </head>
 <body>
@@ -1230,6 +1440,50 @@
             </div>
             
             <div class="header-actions">
+                <!-- User Authentication -->
+                <div class="user-auth" id="user-auth">
+                    <!-- Login State -->
+                    <div class="auth-login" id="auth-login">
+                        <button class="btn-login" id="google-login-btn">
+                            <i class="ph ph-google-logo"></i>
+                            Sign In
+                        </button>
+                    </div>
+                    
+                    <!-- Authenticated State -->
+                    <div class="auth-user" id="auth-user" style="display: none;">
+                        <div class="user-menu">
+                            <button class="user-avatar" id="user-avatar">
+                                <img id="user-picture" src="" alt="User" style="width: 32px; height: 32px; border-radius: 50%;">
+                            </button>
+                            <div class="user-dropdown" id="user-dropdown">
+                                <div class="user-info">
+                                    <div class="user-name" id="user-name"></div>
+                                    <div class="user-email" id="user-email"></div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" id="user-preferences">
+                                    <i class="ph ph-gear"></i>
+                                    Preferences
+                                </button>
+                                <button class="dropdown-item" id="saved-locations">
+                                    <i class="ph ph-map-pin"></i>
+                                    Saved Places
+                                </button>
+                                <button class="dropdown-item" id="connect-accounts">
+                                    <i class="ph ph-link"></i>
+                                    Connect Uber/Ola
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" id="logout-btn">
+                                    <i class="ph ph-sign-out"></i>
+                                    Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
                     <i class="ph ph-sun"></i>
                 </button>
@@ -1303,7 +1557,7 @@
                     </div>
                     
                     <button type="submit" class="btn btn-primary btn-full">
-                        <i class="ph ph-magnifying-glass"></i>
+                        <i class="ph ph-route"></i>
                         Find Routes
                     </button>
                 </form>
@@ -1385,7 +1639,7 @@
                         <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
                             <a class="btn btn-secondary" href="https://play.google.com/store/search?q=MetroConnect3" target="_blank" rel="noopener">Android App</a>
                             <a class="btn btn-secondary" href="https://apps.apple.com/in/search?term=MetroConnect3" target="_blank" rel="noopener">iOS App</a>
-                            <a class="btn btn-primary" href="https://mmrcl.com/en/map" target="_blank" rel="noopener">Official Map</a>
+                            <a class="btn btn-primary" href="https://mmrcl.com/en/map" target="_blank" rel="noopener">Book Ticket</a>
                         </div>
                     </div>
 
@@ -1446,22 +1700,10 @@
                 <div class="section-title">Ride Estimates & Compare</div>
                 
                 <div class="card" style="margin-bottom: var(--space-4);">
-                    <h3 style="font-weight: 600; margin-bottom: var(--space-3);">Estimate ranges (Mumbai, non-binding)</h3>
-                    <div style="margin-bottom: var(--space-3);">
-                        <label style="display: block; margin-bottom: var(--space-2); font-size: var(--text-sm); color: var(--text-secondary);">
-                            Choose surge factor:
-                        </label>
-                        <input id="surge-factor" type="range" min="1.0" max="1.5" value="1.0" step="0.1" style="width: 100%; margin-bottom: var(--space-2);">
-                        <div style="display: flex; justify-content: space-between; font-size: var(--text-sm); color: var(--text-muted);">
-                            <span>1.0x</span>
-                            <span id="surge-label">1.0x</span>
-                            <span>1.5x</span>
-                        </div>
-                        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--space-1);">Adjust during peak hours</p>
-                    </div>
+                    <h3 style="font-weight: 600; margin-bottom: var(--space-3);">Live Fare Estimates</h3>
                     <div style="font-size: var(--text-sm); color: var(--text-secondary);">
-                        <strong>Based on distance:</strong>
-                        <span id="trip-distance-label">Your route: —</span>
+                        <strong>Based on your route:</strong>
+                        <span id="trip-distance-label">Select origin and destination to see live fares</span>
                     </div>
                 </div>
 
@@ -2597,21 +2839,7 @@
             localStorage.setItem('bookmark-status', 'dismissed');
         });
 
-        // Surge Factor Slider
-        const surgeSlider = document.getElementById('surge-factor');
-        const surgeLabel = document.getElementById('surge-label');
-        
-        if (surgeSlider && surgeLabel) {
-            surgeSlider.addEventListener('input', (e) => {
-                const value = parseFloat(e.target.value);
-                surgeLabel.textContent = `${value.toFixed(1)}x`;
-                
-                // Update ride estimates if function exists
-                if (typeof updateRideEstimates === 'function') {
-                    updateRideEstimates();
-                }
-            });
-        }
+        // Surge factor slider removed - using base rates for estimates
 
         // Ride-hailing Deep Link Functions
         window.openUberDeepLink = function() {
@@ -2640,11 +2868,9 @@
             }
         };
 
-        // Ride Estimates Calculator
+        // Ride Estimates Calculator (Updated for real-time API integration)
         window.updateRideEstimates = function() {
-            const surgeFactor = parseFloat(document.getElementById('surge-factor')?.value || 1.0);
-            
-            // Mumbai ride-hailing base rates (approximate)
+            // Mumbai ride-hailing base rates (will be replaced with real API calls)
             const rates = {
                 uberGo: { base: 25, perKm: 12 },
                 olaMini: { base: 23, perKm: 11 },
@@ -2658,11 +2884,12 @@
             }
             
             distances.forEach(km => {
+                // Base estimates without surge pricing
                 const estimates = {
-                    uberGo: Math.round((rates.uberGo.base + rates.uberGo.perKm * km) * surgeFactor),
-                    olaMini: Math.round((rates.olaMini.base + rates.olaMini.perKm * km) * surgeFactor),
-                    uberMoto: Math.round((rates.uberMoto.base + rates.uberMoto.perKm * km) * surgeFactor),
-                    olaAuto: Math.round((rates.olaAuto.base + rates.olaAuto.perKm * km) * surgeFactor)
+                    uberGo: Math.round(rates.uberGo.base + rates.uberGo.perKm * km),
+                    olaMini: Math.round(rates.olaMini.base + rates.olaMini.perKm * km),
+                    uberMoto: Math.round(rates.uberMoto.base + rates.uberMoto.perKm * km),
+                    olaAuto: Math.round(rates.olaAuto.base + rates.olaAuto.perKm * km)
                 };
                 
                 let elementId;
@@ -2689,6 +2916,332 @@
                 updateRideEstimates();
             }
         }, 1000);
+
+        // ========================================
+        // AUTHENTICATION SYSTEM
+        // ========================================
+
+        class AuthManager {
+            constructor() {
+                this.user = null;
+                this.isAuthenticated = false;
+                this.init();
+            }
+
+            async init() {
+                // Initialize Google Identity Services
+                if (typeof google !== 'undefined' && google.accounts) {
+                    google.accounts.id.initialize({
+                        client_id: 'YOUR_GOOGLE_CLIENT_ID', // TODO: Replace with actual client ID
+                        callback: this.handleGoogleResponse.bind(this),
+                        auto_select: false,
+                        cancel_on_tap_outside: true
+                    });
+                }
+
+                // Check if user is already authenticated
+                await this.checkAuthStatus();
+                this.setupEventListeners();
+            }
+
+            async checkAuthStatus() {
+                try {
+                    const response = await fetch('/api/auth/verify', {
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            this.setUser(data.user);
+                        }
+                    }
+                } catch (error) {
+                    console.log('No existing authentication found');
+                }
+
+                this.updateUI();
+            }
+
+            setupEventListeners() {
+                // Google Sign In button
+                const loginBtn = document.getElementById('google-login-btn');
+                if (loginBtn) {
+                    loginBtn.addEventListener('click', () => {
+                        if (typeof google !== 'undefined' && google.accounts) {
+                            google.accounts.id.prompt();
+                        } else {
+                            console.error('Google Identity Services not loaded');
+                        }
+                    });
+                }
+
+                // User avatar dropdown
+                const userAvatar = document.getElementById('user-avatar');
+                const userDropdown = document.getElementById('user-dropdown');
+                if (userAvatar && userDropdown) {
+                    userAvatar.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        userDropdown.classList.toggle('show');
+                    });
+
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', () => {
+                        userDropdown.classList.remove('show');
+                    });
+                }
+
+                // Logout button
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', this.logout.bind(this));
+                }
+
+                // User preferences
+                const preferencesBtn = document.getElementById('user-preferences');
+                if (preferencesBtn) {
+                    preferencesBtn.addEventListener('click', this.showPreferences.bind(this));
+                }
+
+                // Saved locations
+                const locationsBtn = document.getElementById('saved-locations');
+                if (locationsBtn) {
+                    locationsBtn.addEventListener('click', this.showSavedLocations.bind(this));
+                }
+
+                // Connect accounts
+                const connectBtn = document.getElementById('connect-accounts');
+                if (connectBtn) {
+                    connectBtn.addEventListener('click', this.showConnectAccounts.bind(this));
+                }
+            }
+
+            async handleGoogleResponse(response) {
+                try {
+                    const result = await fetch('/api/auth/google', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            credential: response.credential
+                        })
+                    });
+
+                    const data = await result.json();
+                    
+                    if (data.success) {
+                        this.setUser(data.user);
+                        this.updateUI();
+                        this.showWelcomeMessage();
+                    } else {
+                        console.error('Authentication failed:', data.error);
+                        alert('Authentication failed. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Authentication error:', error);
+                    alert('Authentication failed. Please try again.');
+                }
+            }
+
+            async logout() {
+                try {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+
+                    this.user = null;
+                    this.isAuthenticated = false;
+                    this.updateUI();
+                    
+                    // Sign out from Google
+                    if (typeof google !== 'undefined' && google.accounts) {
+                        google.accounts.id.disableAutoSelect();
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            }
+
+            setUser(user) {
+                this.user = user;
+                this.isAuthenticated = true;
+            }
+
+            updateUI() {
+                const loginState = document.getElementById('auth-login');
+                const userState = document.getElementById('auth-user');
+                const userName = document.getElementById('user-name');
+                const userEmail = document.getElementById('user-email');
+                const userPicture = document.getElementById('user-picture');
+
+                if (this.isAuthenticated && this.user) {
+                    // Show authenticated state
+                    loginState.style.display = 'none';
+                    userState.style.display = 'block';
+                    
+                    // Update user info
+                    if (userName) userName.textContent = this.user.name;
+                    if (userEmail) userEmail.textContent = this.user.email;
+                    if (userPicture) userPicture.src = this.user.picture || '';
+                } else {
+                    // Show login state
+                    loginState.style.display = 'block';
+                    userState.style.display = 'none';
+                }
+            }
+
+            showWelcomeMessage() {
+                if (this.user) {
+                    const message = `Welcome back, ${this.user.name}! Your preferences and saved locations are now available.`;
+                    this.showNotification(message, 'success');
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: var(--space-2);">
+                        <i class="ph ph-${type === 'success' ? 'check-circle' : 'info'}"></i>
+                        <span>${message}</span>
+                        <button onclick="this.parentElement.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: inherit; cursor: pointer;">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+                `;
+                
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#10b981' : '#0ea5e9'};
+                    color: white;
+                    padding: var(--space-3) var(--space-4);
+                    border-radius: var(--radius-lg);
+                    box-shadow: var(--shadow-lg);
+                    z-index: 1000;
+                    max-width: 400px;
+                    animation: slideIn 0.3s ease;
+                `;
+
+                document.body.appendChild(notification);
+
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
+
+            async showPreferences() {
+                // TODO: Implement preferences modal
+                alert('User preferences coming soon!');
+            }
+
+            async showSavedLocations() {
+                // TODO: Implement saved locations modal
+                alert('Saved locations coming soon!');
+            }
+
+            async showConnectAccounts() {
+                // TODO: Implement account connection modal
+                alert('Connect Uber/Ola accounts coming soon!');
+            }
+
+            // API helper methods
+            async apiCall(endpoint, options = {}) {
+                const defaultOptions = {
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                const response = await fetch(endpoint, { ...defaultOptions, ...options });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'API call failed');
+                }
+
+                return data;
+            }
+
+            async getUserPreferences() {
+                if (!this.isAuthenticated) return null;
+                try {
+                    return await this.apiCall('/api/user/preferences');
+                } catch (error) {
+                    console.error('Failed to get user preferences:', error);
+                    return null;
+                }
+            }
+
+            async updateUserPreferences(preferences) {
+                if (!this.isAuthenticated) return false;
+                try {
+                    await this.apiCall('/api/user/preferences', {
+                        method: 'PUT',
+                        body: JSON.stringify(preferences)
+                    });
+                    return true;
+                } catch (error) {
+                    console.error('Failed to update user preferences:', error);
+                    return false;
+                }
+            }
+
+            async getSavedLocations() {
+                if (!this.isAuthenticated) return [];
+                try {
+                    const result = await this.apiCall('/api/user/locations');
+                    return result.locations || [];
+                } catch (error) {
+                    console.error('Failed to get saved locations:', error);
+                    return [];
+                }
+            }
+
+            async addSavedLocation(location) {
+                if (!this.isAuthenticated) return false;
+                try {
+                    await this.apiCall('/api/user/locations', {
+                        method: 'POST',
+                        body: JSON.stringify(location)
+                    });
+                    return true;
+                } catch (error) {
+                    console.error('Failed to add saved location:', error);
+                    return false;
+                }
+            }
+        }
+
+        // Initialize authentication system
+        const authManager = new AuthManager();
+
+        // Make auth manager globally available
+        window.authManager = authManager;
+
+        // Add CSS animation for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
