@@ -412,6 +412,11 @@
             position: relative;
         }
         
+        /* Hidden Radio Inputs for CSS-Only Tab Control */
+        .tab-radio {
+            display: none;
+        }
+
         .tab-content {
             height: 100%;
             overflow-y: auto;
@@ -420,9 +425,43 @@
             padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-inset-bottom));
             display: none;
         }
-        
-        .tab-content.active {
+
+        /* CSS-Only Tab Content Visibility Control */
+        #plan-radio:checked ~ .app-content #plan-tab {
             display: block;
+        }
+
+        #tickets-radio:checked ~ .app-content #tickets-tab {
+            display: block;
+        }
+
+        #compare-radio:checked ~ .app-content #compare-tab {
+            display: block;
+        }
+
+        /* CSS-Only Tab Button Active State Control */
+        #plan-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="plan-radio"] {
+            color: var(--primary);
+        }
+
+        #plan-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="plan-radio"] i {
+            transform: scale(1.1);
+        }
+
+        #tickets-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="tickets-radio"] {
+            color: var(--primary);
+        }
+
+        #tickets-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="tickets-radio"] i {
+            transform: scale(1.1);
+        }
+
+        #compare-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="compare-radio"] {
+            color: var(--primary);
+        }
+
+        #compare-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="compare-radio"] i {
+            transform: scale(1.1);
         }
         
         /* Bottom Tab Bar */
@@ -465,6 +504,7 @@
             -webkit-tap-highlight-color: rgba(0,0,0,0.1);
             z-index: 1000;
             position: relative;
+            user-select: none;
         }
         
         .tab-button i {
@@ -1111,10 +1151,15 @@
             </div>
         </header>
 
+        <!-- Hidden Radio Inputs for CSS-Only Tab Control -->
+        <input type="radio" name="tabs" id="plan-radio" class="tab-radio" checked>
+        <input type="radio" name="tabs" id="tickets-radio" class="tab-radio">
+        <input type="radio" name="tabs" id="compare-radio" class="tab-radio">
+
         <!-- App Content -->
         <main class="app-content">
             <!-- Plan Tab -->
-            <div class="tab-content active" id="plan-tab">
+            <div class="tab-content" id="plan-tab">
                 <div class="section-title">Plan Your Journey</div>
                 
                 <!-- Transport Modes -->
@@ -1346,20 +1391,20 @@
             </div>
         </main>
 
-        <!-- Bottom Tab Bar -->
+        <!-- Bottom Tab Bar with CSS-Only Navigation -->
         <nav class="bottom-tab-bar">
-            <button class="tab-button active" data-tab="plan" id="plan-btn" onclick="forceTabSwitch('plan', this)">
+            <label for="plan-radio" class="tab-button">
                 <i class="ph ph-route"></i>
                 <span>Plan</span>
-            </button>
-            <button class="tab-button" data-tab="tickets" id="tickets-btn" onclick="forceTabSwitch('tickets', this)">
+            </label>
+            <label for="tickets-radio" class="tab-button">
                 <i class="ph ph-ticket"></i>
                 <span>Tickets</span>
-            </button>
-            <button class="tab-button" data-tab="compare" id="compare-btn" onclick="forceTabSwitch('compare', this)">
+            </label>
+            <label for="compare-radio" class="tab-button">
                 <i class="ph ph-scales"></i>
                 <span>Compare</span>
-            </button>
+            </label>
         </nav>
     </div>
 
