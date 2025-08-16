@@ -1,0 +1,9 @@
+# Cloudflare Worker config for Mumbai Transport portal proxy
+name = "portal-proxy"
+main = "cloudflare-worker-portal-proxy.js"
+compatibility_date = "2025-01-15"
+workers_dev = false
+
+routes = [
+  { pattern = "mumbaitransport.in/portal*", zone_name = "mumbaitransport.in" }
+]

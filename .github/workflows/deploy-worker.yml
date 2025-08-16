@@ -1,0 +1,31 @@
+name: Deploy Cloudflare Worker - Portal Proxy
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - "cloudflare-worker-portal-proxy.js"
+      - "wrangler.toml"
+      - ".github/workflows/deploy-worker.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Deploy with Wrangler
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: deploy
+          workingDirectory: .
+        env:
+          CF_LOG_LEVEL: info
