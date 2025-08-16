@@ -1068,6 +1068,93 @@
                 </div>
             </div>
         </section>
+
+        <!-- Ride-hailing fare comparison -->
+        <section class="features" id="ride-hailing">
+            <h2 class="features-title">🚕 Ola & Uber – Fare Estimates</h2>
+            <div class="features-grid">
+                <div class="feature-card card-3d" style="grid-column: 1 / -1;">
+                    <h3 class="feature-title" style="margin-bottom: 8px;">Estimate ranges (Mumbai, non-binding)</h3>
+                    <div class="feature-description" style="margin-bottom: 10px;">
+                        Choose surge factor:
+                        <input id="surge-factor" type="range" min="1.0" max="1.5" value="1.0" step="0.1" style="width: 200px; vertical-align: middle;">
+                        <span id="surge-label">1.0x</span>
+                        <span style="display:inline-block; margin-left:8px; font-size:0.85em; color:#64748b;">Adjust during peak hours</span>
+                    </div>
+                    <div class="feature-description">
+                        <strong>Based on distance:</strong>
+                        <span id="trip-distance-label">Your route: —</span>
+                    </div>
+                </div>
+
+                <!-- 5 km -->
+                <div class="feature-card card-3d">
+                    <div class="feature-icon"><i class="ph ph-car"></i></div>
+                    <h3 class="feature-title">5 km</h3>
+                    <div class="feature-description" id="fare-5km">
+                        Uber Go: —<br>
+                        Ola Mini: —<br>
+                        Uber Moto: —<br>
+                        Ola Auto: —
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
+                        <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
+                    </div>
+                </div>
+
+                <!-- 10 km -->
+                <div class="feature-card card-3d">
+                    <div class="feature-icon"><i class="ph ph-car-profile"></i></div>
+                    <h3 class="feature-title">10 km</h3>
+                    <div class="feature-description" id="fare-10km">
+                        Uber Go: —<br>
+                        Ola Mini: —<br>
+                        Uber Moto: —<br>
+                        Ola Auto: —
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
+                        <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
+                    </div>
+                </div>
+
+                <!-- 20 km -->
+                <div class="feature-card card-3d">
+                    <div class="feature-icon"><i class="ph ph-steering-wheel"></i></div>
+                    <h3 class="feature-title">20 km</h3>
+                    <div class="feature-description" id="fare-20km">
+                        Uber Go: —<br>
+                        Ola Mini: —<br>
+                        Uber Moto: —<br>
+                        Ola Auto: —
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
+                        <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
+                    </div>
+                </div>
+
+                <!-- Current route distance (if available) -->
+                <div class="feature-card card-3d" id="fare-current-card" style="display:none;">
+                    <div class="feature-icon"><i class="ph ph-route"></i></div>
+                    <h3 class="feature-title">Your route</h3>
+                    <div class="feature-description" id="fare-current">
+                        Uber Go: —<br>
+                        Ola Mini: —<br>
+                        Uber Moto: —<br>
+                        Ola Auto: —
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
+                        <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
+                    </div>
+                </div>
+            </div>
+            <p class="feature-description" style="margin-top:10px;">
+                Estimates are indicative using typical Mumbai rates; actual prices depend on live demand, time, tolls, and provider policies. For live quotes, use the buttons to open the ride app with your pickup/drop set.
+            </p>
+        </section>
         
         <!-- Journey Planner Section -->
         <section class="journey-planner" id="journey-planner">
@@ -1656,6 +1743,25 @@
                                 addTransitMarker(step);
                             }
                         });
+
+                        // Capture distance and coordinates for ride-hailing deep links and estimates
+                        try {
+                            const km = leg.distance && leg.distance.value ? (leg.distance.value / 1000) : null;
+                            window.currentDistanceKm = km;
+                            window.currentFrom = { lat: leg.start_location.lat(), lng: leg.start_location.lng() };
+                            window.currentTo = { lat: leg.end_location.lat(), lng: leg.end_location.lng() };
+
+                            const lbl = document.getElementById('trip-distance-label');
+                            if (lbl && km) lbl.textContent = `Your route: ${km.toFixed(1)} km`;
+                            const card = document.getElementById('fare-current-card');
+                            if (card && km) card.style.display = '';
+
+                            if (typeof updateRideEstimates === 'function') {
+                                updateRideEstimates();
+                            }
+                        } catch (e) {
+                            console.warn('Ride estimate init failed', e);
+                        }
                     } else {
                         console.error('Directions request failed due to ' + status);
                         alert('Could not calculate route. Please try different locations.');
@@ -1830,6 +1936,88 @@
 
             dismissBtn?.addEventListener('click', () => hideBanner('dismissed'));
         })();
+    </script>
+
+    <!-- Ride-hailing estimation and deep links -->
+    <script>
+        // Heuristic city rates (INR). Adjust if RTO changes.
+        const RATE = {
+            UBER_GO:  { base: 45, perKm: 13 },
+            UBER_MOTO:{ base: 20, perKm: 8  },
+            OLA_MINI: { base: 45, perKm: 13 },
+            OLA_AUTO: { base: 30, perKm: 12 } // autos fluctuate; indicative only
+        };
+
+        function estimateFareRange(distanceKm, surge = 1.0, rate) {
+            if (!distanceKm) return '—';
+            const low = (rate.base + rate.perKm * distanceKm) * surge * 0.9;
+            const high = (rate.base + rate.perKm * distanceKm) * surge * 1.15;
+            return `₹${Math.round(low)}–₹${Math.round(high)}`;
+        }
+
+        function setFareRow(elId, km, surge) {
+            const el = document.getElementById(elId);
+            if (!el) return;
+            el.innerHTML = `
+                Uber Go: ${estimateFareRange(km, surge, RATE.UBER_GO)}<br>
+                Ola Mini: ${estimateFareRange(km, surge, RATE.OLA_MINI)}<br>
+                Uber Moto: ${estimateFareRange(km, surge, RATE.UBER_MOTO)}<br>
+                Ola Auto: ${estimateFareRange(km, surge, RATE.OLA_AUTO)}
+            `;
+        }
+
+        function updateRideEstimates() {
+            const surgeInput = document.getElementById('surge-factor');
+            const surgeLabel = document.getElementById('surge-label');
+            const surge = surgeInput ? parseFloat(surgeInput.value) : 1.0;
+            if (surgeLabel) surgeLabel.textContent = `${surge.toFixed(1)}x`;
+
+            setFareRow('fare-5km', 5, surge);
+            setFareRow('fare-10km', 10, surge);
+            setFareRow('fare-20km', 20, surge);
+
+            if (window.currentDistanceKm) {
+                setFareRow('fare-current', window.currentDistanceKm, surge);
+            }
+        }
+
+        // Update on surge change
+        document.getElementById('surge-factor')?.addEventListener('input', updateRideEstimates);
+        // Initial paint
+        updateRideEstimates();
+
+        // Deep links
+        function openUberDeepLink() {
+            const from = window.currentFrom;
+            const to = window.currentTo;
+            if (!from || !to) {
+                alert('Set your From and To, then click "Find Routes" to enable ride links.');
+                return;
+            }
+            const url = new URL('https://m.uber.com/ul/');
+            url.searchParams.set('action', 'setPickup');
+            url.searchParams.set('pickup[latitude]', from.lat);
+            url.searchParams.set('pickup[longitude]', from.lng);
+            url.searchParams.set('dropoff[latitude]', to.lat);
+            url.searchParams.set('dropoff[longitude]', to.lng);
+            window.open(url.toString(), '_blank', 'noopener');
+        }
+
+        function openOlaDeepLink() {
+            const from = window.currentFrom;
+            const to = window.currentTo;
+            if (!from || !to) {
+                alert('Set your From and To, then click "Find Routes" to enable ride links.');
+                return;
+            }
+            // Ola universal link
+            const url = new URL('https://olawebcdn.com/assets/ola-universal-link.html');
+            url.searchParams.set('lat', from.lat);
+            url.searchParams.set('lng', from.lng);
+            url.searchParams.set('drop_lat', to.lat);
+            url.searchParams.set('drop_lng', to.lng);
+            window.open(url.toString(), '_blank', 'noopener');
+        }
     </script>
 </body>
 </html>
