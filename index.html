@@ -460,6 +460,11 @@
             transition: all 0.2s;
             min-width: 60px;
             border-radius: var(--radius);
+            pointer-events: auto !important;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            z-index: 1000;
+            position: relative;
         }
         
         .tab-button i {
@@ -1343,15 +1348,15 @@
 
         <!-- Bottom Tab Bar -->
         <nav class="bottom-tab-bar">
-            <button class="tab-button active" data-tab="plan" onclick="switchTab('plan', this)">
+            <button class="tab-button active" data-tab="plan" id="plan-btn" onclick="forceTabSwitch('plan', this)">
                 <i class="ph ph-route"></i>
                 <span>Plan</span>
             </button>
-            <button class="tab-button" data-tab="tickets" onclick="switchTab('tickets', this)">
+            <button class="tab-button" data-tab="tickets" id="tickets-btn" onclick="forceTabSwitch('tickets', this)">
                 <i class="ph ph-ticket"></i>
                 <span>Tickets</span>
             </button>
-            <button class="tab-button" data-tab="compare" onclick="switchTab('compare', this)">
+            <button class="tab-button" data-tab="compare" id="compare-btn" onclick="forceTabSwitch('compare', this)">
                 <i class="ph ph-scales"></i>
                 <span>Compare</span>
             </button>
@@ -1402,39 +1407,103 @@
         // MUMBAI TRANSPORT APP FUNCTIONALITY
         // ========================================
         
-        // Global Tab Switching Function
-        function switchTab(tabName, buttonElement) {
-            console.log('Switching to tab:', tabName);
+        // FORCE TAB SWITCH - Global function for inline onclick
+        window.forceTabSwitch = function(targetTab, buttonElement) {
+            console.log('🚨 FORCE TAB SWITCH:', targetTab);
             
-            // Remove active class from all tab buttons
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Remove active class from all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Add active class to clicked button
-            buttonElement.classList.add('active');
-            
-            // Add active class to corresponding content
-            const targetTab = document.getElementById(tabName + '-tab');
-            if (targetTab) {
-                targetTab.classList.add('active');
-                console.log('Successfully switched to tab:', tabName);
+            try {
+                // Remove active from all buttons
+                const allButtons = document.querySelectorAll('.tab-button');
+                allButtons.forEach(btn => btn.classList.remove('active'));
                 
-                // Resize map if switching to plan tab
-                if (tabName === 'plan' && typeof google !== 'undefined' && map) {
-                    setTimeout(() => {
-                        google.maps.event.trigger(map, 'resize');
-                    }, 100);
+                // Remove active from all content
+                const allContents = document.querySelectorAll('.tab-content');
+                allContents.forEach(content => content.classList.remove('active'));
+                
+                // Activate clicked button
+                if (buttonElement) {
+                    buttonElement.classList.add('active');
+                    console.log('✅ Button force activated:', targetTab);
                 }
-            } else {
-                console.error('Target tab not found:', tabName + '-tab');
+                
+                // Activate target content
+                const targetContent = document.getElementById(targetTab + '-tab');
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                    console.log('✅ Content force activated:', targetTab);
+                    
+                    // Resize map for plan tab
+                    if (targetTab === 'plan' && typeof google !== 'undefined' && window.map) {
+                        setTimeout(() => {
+                            google.maps.event.trigger(window.map, 'resize');
+                            console.log('🗺️ Map force resized');
+                        }, 100);
+                    }
+                } else {
+                    console.error('❌ Target content not found:', targetTab + '-tab');
+                }
+            } catch (error) {
+                console.error('❌ Force tab switch error:', error);
             }
+        };
+        
+        // Aggressive Tab Navigation System
+        function initializeAggressiveTabNavigation() {
+            console.log('🚀 Initializing AGGRESSIVE tab navigation...');
+            
+            // Multiple initialization attempts
+            const initAttempts = [0, 100, 500, 1000, 2000];
+            
+            initAttempts.forEach(delay => {
+                setTimeout(() => {
+                    console.log(`🔄 Init attempt at ${delay}ms`);
+                    
+                    // Get buttons by multiple methods
+                    const buttons = [
+                        ...document.querySelectorAll('.tab-button'),
+                        document.getElementById('plan-btn'),
+                        document.getElementById('tickets-btn'),
+                        document.getElementById('compare-btn')
+                    ].filter(Boolean);
+                    
+                    console.log(`📱 Found ${buttons.length} buttons to bind`);
+                    
+                    buttons.forEach((button, index) => {
+                        if (!button) return;
+                        
+                        const tabName = button.getAttribute('data-tab') || button.id.replace('-btn', '');
+                        console.log(`🎯 Binding aggressive handler ${index + 1}: ${tabName}`);
+                        
+                        // Remove all existing listeners
+                        const newButton = button.cloneNode(true);
+                        button.parentNode.replaceChild(newButton, button);
+                        
+                        // Add multiple event types
+                        ['click', 'touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(eventType => {
+                            newButton.addEventListener(eventType, function(e) {
+                                if (eventType === 'click' || eventType === 'touchend') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log(`🖱️ ${eventType.toUpperCase()} handler triggered for:`, tabName);
+                                    window.forceTabSwitch(tabName, this);
+                                }
+                            }, { passive: false, capture: true });
+                        });
+                    });
+                }, delay);
+            });
+            
+            console.log('🎯 Aggressive tab navigation setup complete');
         }
+        
+        // Initialize immediately and with multiple fallbacks
+        initializeAggressiveTabNavigation();
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeAggressiveTabNavigation);
+        }
+        
+        window.addEventListener('load', initializeAggressiveTabNavigation);
         
         // Global Variables
         let map;
