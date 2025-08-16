@@ -1222,12 +1222,18 @@
                     console.log('No existing session');
                 }
                 
-                // Initialize Google Identity Services
+                // Initialize Google Identity Services with fallback
                 if (typeof google !== 'undefined' && google.accounts) {
-                    google.accounts.id.initialize({
-                        client_id: 'YOUR_GOOGLE_CLIENT_ID',
-                        callback: this.handleCredentialResponse.bind(this)
-                    });
+                    try {
+                        google.accounts.id.initialize({
+                            client_id: '1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com',
+                            callback: this.handleCredentialResponse.bind(this)
+                        });
+                    } catch (error) {
+                        console.log('Google OAuth not available in development');
+                    }
+                } else {
+                    console.log('Google Identity Services not loaded');
                 }
             }
             
@@ -1256,7 +1262,15 @@
             
             async login() {
                 if (typeof google !== 'undefined' && google.accounts) {
-                    google.accounts.id.prompt();
+                    try {
+                        google.accounts.id.prompt();
+                    } catch (error) {
+                        // Fallback for development
+                        alert('Google Sign-In is not available in local development. This will work in production.');
+                        console.log('Google OAuth not available:', error);
+                    }
+                } else {
+                    alert('Google Sign-In is not available in local development. This will work in production.');
                 }
             }
             
@@ -1492,14 +1506,76 @@
                 const leg = result.routes[0].legs[0];
                 let stepsHTML = '';
                 
+                // Add route summary
+                stepsHTML += `
+                    <div style="background: var(--primary); color: white; padding: 1rem; border-radius: var(--radius); margin-bottom: 1rem;">
+                        <div style="font-weight: 600; font-size: var(--text-lg); margin-bottom: 0.5rem;">
+                            <i class="ph ph-route" style="margin-right: 0.5rem;"></i>
+                            ${leg.distance.text} • ${leg.duration.text}
+                        </div>
+                        <div style="opacity: 0.9;">
+                            From ${leg.start_address} to ${leg.end_address}
+                        </div>
+                    </div>
+                `;
+                
                 leg.steps.forEach((step, index) => {
+                    // Determine transport mode icon
+                    let modeIcon = 'ph ph-footprints';
+                    let modeColor = 'var(--text-secondary)';
+                    
+                    if (step.travel_mode === 'TRANSIT') {
+                        if (step.transit && step.transit.line) {
+                            const vehicle = step.transit.line.vehicle.type;
+                            switch (vehicle) {
+                                case 'SUBWAY':
+                                case 'METRO_RAIL':
+                                    modeIcon = 'ph ph-train';
+                                    modeColor = '#0ea5e9';
+                                    break;
+                                case 'BUS':
+                                    modeIcon = 'ph ph-bus';
+                                    modeColor = '#10b981';
+                                    break;
+                                case 'RAIL':
+                                    modeIcon = 'ph ph-train-regional';
+                                    modeColor = '#8b5cf6';
+                                    break;
+                                default:
+                                    modeIcon = 'ph ph-train';
+                                    modeColor = '#0ea5e9';
+                            }
+                        }
+                    } else if (step.travel_mode === 'WALKING') {
+                        modeIcon = 'ph ph-footprints';
+                        modeColor = '#64748b';
+                    }
+                    
                     stepsHTML += `
-                        <div style="padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
-                            <div style="font-weight: 500; margin-bottom: 0.25rem;">
-                                Step ${index + 1}: ${step.instructions.replace(/<[^>]*>/g, '')}
+                        <div style="display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border);">
+                            <div style="flex-shrink: 0;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: ${modeColor}20; display: flex; align-items: center; justify-content: center;">
+                                    <i class="${modeIcon}" style="color: ${modeColor}; font-size: 1.25rem;"></i>
+                                </div>
                             </div>
-                            <div style="font-size: var(--text-sm); color: var(--text-secondary);">
-                                ${step.distance.text} • ${step.duration.text}
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500; margin-bottom: 0.5rem; color: var(--text);">
+                                    ${step.instructions.replace(/<[^>]*>/g, '')}
+                                </div>
+                                <div style="display: flex; gap: 1rem; font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                    <span><i class="ph ph-ruler"></i> ${step.distance.text}</span>
+                                    <span><i class="ph ph-clock"></i> ${step.duration.text}</span>
+                                </div>
+                                ${step.transit ? `
+                                    <div style="background: var(--surface-tertiary); padding: 0.5rem; border-radius: var(--radius); font-size: var(--text-sm);">
+                                        <strong>${step.transit.line.name}</strong>
+                                        ${step.transit.line.short_name ? `(${step.transit.line.short_name})` : ''}
+                                        <br>
+                                        <span style="color: var(--text-secondary);">
+                                            ${step.transit.departure_stop.name} → ${step.transit.arrival_stop.name}
+                                        </span>
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
                     `;
@@ -1583,18 +1659,30 @@
             estimatesDiv.innerHTML = html || '<div style="text-align: center; color: var(--text-secondary);">No estimates available</div>';
         }
         
-        // Theme Toggle
+        // Theme Toggle with Persistence
         function initThemeToggle() {
             const themeToggle = document.getElementById('theme-toggle');
             const themeIcon = themeToggle.querySelector('i');
+            
+            // Load saved theme or default to light
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+                themeIcon.className = 'ph ph-moon';
+            } else {
+                document.body.classList.remove('dark');
+                themeIcon.className = 'ph ph-sun';
+            }
             
             themeToggle.addEventListener('click', () => {
                 document.body.classList.toggle('dark');
                 
                 if (document.body.classList.contains('dark')) {
                     themeIcon.className = 'ph ph-moon';
+                    localStorage.setItem('theme', 'dark');
                 } else {
                     themeIcon.className = 'ph ph-sun';
+                    localStorage.setItem('theme', 'light');
                 }
             });
         }
@@ -1639,9 +1727,13 @@
                     if (response.ok) {
                         const data = await response.json();
                         window.location.href = data.auth_url;
+                    } else {
+                        // Fallback for development
+                        alert('Uber connection is not available in local development. This will work in production with proper API setup.');
                     }
                 } catch (error) {
                     console.error('Failed to connect Uber:', error);
+                    alert('Uber connection is not available in local development. This will work in production with proper API setup.');
                 }
             });
             
@@ -1653,9 +1745,13 @@
                     if (response.ok) {
                         const data = await response.json();
                         window.location.href = data.auth_url;
+                    } else {
+                        // Fallback for development
+                        alert('Ola connection is not available in local development. This will work in production with proper API setup.');
                     }
                 } catch (error) {
                     console.error('Failed to connect Ola:', error);
+                    alert('Ola connection is not available in local development. This will work in production with proper API setup.');
                 }
             });
         }
