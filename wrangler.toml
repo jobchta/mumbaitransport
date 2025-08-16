@@ -1,5 +1,5 @@
 # Cloudflare Worker config for Mumbai Transport portal proxy
-name = "portal-proxy"
+name = "portalproxy"
 main = "cloudflare-worker-portal-proxy.js"
 compatibility_date = "2025-01-15"
 workers_dev = false
