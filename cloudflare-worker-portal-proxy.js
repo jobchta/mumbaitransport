@@ -172,6 +172,9 @@ async function handleGoogleApi(request, env) {
       // Ensure transit defaults suitable for Mumbai if not provided
       if (!params.has('mode')) params.set('mode', 'transit');
       if (!params.has('region')) params.set('region', 'in');
+      if (!params.has('language')) params.set('language', 'en-IN');
+      if (!params.has('units')) params.set('units', 'metric');
+      if (!params.has('alternatives')) params.set('alternatives', 'true');
       if (!params.has('departure_time')) params.set('departure_time', 'now');
       upstream = `${base}?${params.toString()}`;
       break;
@@ -180,6 +183,8 @@ async function handleGoogleApi(request, env) {
       // Support /api/google/places?endpoint=nearbysearch/json&...
       const endpoint = params.get('endpoint') || 'nearbysearch/json';
       params.delete('endpoint');
+      if (!params.has('region')) params.set('region', 'in');
+      if (!params.has('language')) params.set('language', 'en-IN');
       const base = env.GOOGLE_PLACES_BASE_URL || 'https://maps.googleapis.com/maps/api/place';
       upstream = `${base}/${endpoint}?${params.toString()}`;
       break;
@@ -188,6 +193,8 @@ async function handleGoogleApi(request, env) {
       const base = env.GOOGLE_DISTANCE_MATRIX_BASE_URL || 'https://maps.googleapis.com/maps/api/distancematrix/json';
       if (!params.has('mode')) params.set('mode', 'transit');
       if (!params.has('region')) params.set('region', 'in');
+      if (!params.has('language')) params.set('language', 'en-IN');
+      if (!params.has('units')) params.set('units', 'metric');
       upstream = `${base}?${params.toString()}`;
       break;
     }
