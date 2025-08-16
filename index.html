@@ -1297,6 +1297,182 @@
             gap: var(--space-2);
             width: 100%;
             padding: var(--space-2) var(--space-3);
+/* ========================================
+           REAL-TIME RIDE ESTIMATES STYLING
+        ======================================== */
+        
+        .loading-estimates {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .estimate-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-2) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .estimate-item:last-child {
+            border-bottom: none;
+        }
+
+        .estimate-item.real-time {
+            background: linear-gradient(90deg, rgba(30, 136, 229, 0.05), transparent);
+            padding: var(--space-2);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(30, 136, 229, 0.1);
+            margin-bottom: var(--space-2);
+        }
+
+        .service-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .fare-amount {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .surge-indicator {
+            background: #ff6b35;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: var(--text-xs);
+            font-weight: 600;
+            margin-left: var(--space-2);
+        }
+
+        .provider-section {
+            margin-bottom: var(--space-3);
+        }
+
+        .provider-section h4 {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .connection-item {
+            padding: var(--space-3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--surface);
+        }
+
+        .connected {
+            color: #22c55e;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+
+        .btn-sm {
+            padding: var(--space-1) var(--space-2);
+            font-size: var(--text-sm);
+            min-height: auto;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .no-route-message {
+            text-align: center;
+            padding: var(--space-6) var(--space-4);
+            color: var(--text-secondary);
+        }
+
+        .no-route-message p {
+            margin-top: var(--space-2);
+            font-size: var(--text-sm);
+        }
+
+        .fare-estimates {
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .distance-estimate {
+            padding: var(--space-3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--surface);
+        }
+
+        .real-time-estimates {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        /* Route guidance styling */
+        .route-step {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-3);
+            padding: var(--space-3);
+            border-left: 3px solid var(--primary);
+            margin-left: var(--space-2);
+            position: relative;
+        }
+
+        .route-step::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: var(--space-3);
+            width: 9px;
+            height: 9px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .route-step-icon {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .route-step-content {
+            flex: 1;
+        }
+
+        .route-step-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .route-step-details {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .route-duration {
+            font-weight: 500;
+            color: var(--primary);
+        }
             background: none;
             border: none;
             border-radius: var(--radius);
@@ -1697,13 +1873,45 @@
 
             <!-- Compare Tab -->
             <div class="tab-content" id="compare-tab">
-                <div class="section-title">Ride Estimates & Compare</div>
+                <div class="section-title">Live Ride Comparison</div>
                 
+                <!-- Account Connection Status -->
+                <div class="card" style="margin-bottom: var(--space-4);">
+                    <h3 style="font-weight: 600; margin-bottom: var(--space-3);">
+                        <i class="ph ph-link" style="color: var(--primary);"></i>
+                        Connected Accounts
+                    </h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);">
+                        <div class="connection-item">
+                            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                                <i class="ph ph-car" style="color: #000;"></i>
+                                <span style="font-weight: 500;">Uber</span>
+                            </div>
+                            <div id="uber-connection-status">
+                                <button onclick="connectUberAccount()" class="btn btn-outline btn-sm">Connect Account</button>
+                            </div>
+                        </div>
+                        <div class="connection-item">
+                            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                                <i class="ph ph-car" style="color: #00D100;"></i>
+                                <span style="font-weight: 500;">Ola</span>
+                            </div>
+                            <div id="ola-connection-status">
+                                <button onclick="connectOlaAccount()" class="btn btn-outline btn-sm">Connect Account</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size: var(--text-sm); color: var(--text-secondary); margin-top: var(--space-3);">
+                        <i class="ph ph-info"></i>
+                        Connect your accounts to get real-time pricing and book rides directly
+                    </div>
+                </div>
+
                 <div class="card" style="margin-bottom: var(--space-4);">
                     <h3 style="font-weight: 600; margin-bottom: var(--space-3);">Live Fare Estimates</h3>
                     <div style="font-size: var(--text-sm); color: var(--text-secondary);">
                         <strong>Based on your route:</strong>
-                        <span id="trip-distance-label">Select origin and destination to see live fares</span>
+                        <span id="trip-distance-label">Plan a route to see live fare estimates</span>
                     </div>
                 </div>
 
@@ -2489,6 +2697,192 @@
                 { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
                 { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
                 { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+// Enhanced Route Display with Step-by-Step Guidance
+        function displayRouteGuidance(route) {
+            const routeResults = document.getElementById('route-results');
+            if (!routeResults) return;
+
+            // Store route data globally for fare estimation
+            window.currentRoute = {
+                start: { lat: route.legs[0].start_location.lat(), lng: route.legs[0].start_location.lng() },
+                end: { lat: route.legs[0].end_location.lat(), lng: route.legs[0].end_location.lng() },
+                distance: route.legs[0].distance.value / 1000, // Convert to km
+                duration: route.legs[0].duration.value / 60 // Convert to minutes
+            };
+
+            window.currentDistanceKm = window.currentRoute.distance;
+
+            let guidanceHTML = '<div class="route-guidance">';
+            guidanceHTML += '<h3 style="margin-bottom: var(--space-3);">Step-by-Step Directions</h3>';
+
+            route.legs[0].steps.forEach((step, index) => {
+                const instruction = step.instructions.replace(/<[^>]*>/g, ''); // Remove HTML tags
+                const distance = step.distance.text;
+                const duration = step.duration.text;
+                const travelMode = step.travel_mode.toLowerCase();
+
+                let icon = 'ph-footprints';
+                if (travelMode === 'transit') icon = 'ph-train';
+                else if (travelMode === 'driving') icon = 'ph-car';
+                else if (travelMode === 'bicycling') icon = 'ph-bicycle';
+
+                guidanceHTML += `
+                    <div class="route-step">
+                        <i class="ph ${icon} route-step-icon"></i>
+                        <div class="route-step-content">
+                            <div class="route-step-title">Step ${index + 1}</div>
+                            <div class="route-step-details">
+                                ${instruction}<br>
+                                <span class="route-duration">${distance} • ${duration}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            guidanceHTML += '</div>';
+
+            // Update route results with guidance
+            routeResults.innerHTML = `
+                <div class="section-title">Your Route</div>
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    Live traffic updates
+                </div>
+                <div class="route-option active card">
+                    <div class="route-header">
+                        <div class="route-time">${Math.round(window.currentRoute.duration)} min</div>
+                        <div class="route-price">${window.currentRoute.distance.toFixed(1)} km</div>
+                    </div>
+                    <div class="route-meta">
+                        <div class="route-meta-item">
+                            <i class="ph ph-clock"></i>
+                            <span>Total Duration</span>
+                        </div>
+                        <div class="route-meta-item">
+                            <i class="ph ph-map-pin-line"></i>
+                            <span>Distance</span>
+                        </div>
+                    </div>
+                </div>
+                ${guidanceHTML}
+            `;
+
+            routeResults.style.display = 'block';
+
+            // Update fare estimates with real route data
+            updateRideEstimates();
+
+            // Show current route card in Compare tab
+            const currentRouteCard = document.getElementById('fare-current-card');
+            if (currentRouteCard) {
+                currentRouteCard.style.display = 'block';
+            }
+
+            // Update trip distance label
+            const tripLabel = document.getElementById('trip-distance-label');
+            if (tripLabel) {
+                tripLabel.textContent = `${window.currentRoute.distance.toFixed(1)} km route planned - showing live estimates`;
+            }
+        }
+
+        // Booking Functions
+        window.bookUberRide = async function() {
+            if (!window.currentRoute) {
+                alert('Please plan a route first using the Plan tab');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/rides/uber/request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        start_latitude: window.currentRoute.start.lat,
+                        start_longitude: window.currentRoute.start.lng,
+                        end_latitude: window.currentRoute.end.lat,
+                        end_longitude: window.currentRoute.end.lng,
+                        product_id: 'uberX' // Default product
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        alert(`Uber ride requested! Request ID: ${data.request_id}`);
+                    } else {
+                        alert('Failed to book Uber ride. Please try again.');
+                    }
+                } else if (response.status === 401) {
+                    alert('Please connect your Uber account first');
+                } else {
+                    alert('Error booking Uber ride. Please try again.');
+                }
+            } catch (error) {
+                console.error('Uber booking error:', error);
+                // Fallback to deep link
+                openUberDeepLink();
+            }
+        };
+
+        window.bookOlaRide = async function() {
+            if (!window.currentRoute) {
+                alert('Please plan a route first using the Plan tab');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/rides/ola/request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        pickup_lat: window.currentRoute.start.lat,
+                        pickup_lng: window.currentRoute.start.lng,
+                        drop_lat: window.currentRoute.end.lat,
+                        drop_lng: window.currentRoute.end.lng,
+                        category: 'mini' // Default category
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        alert(`Ola ride requested! Booking ID: ${data.booking_id}${data.otp ? ` | OTP: ${data.otp}` : ''}`);
+                    } else {
+                        alert('Failed to book Ola ride. Please try again.');
+                    }
+                } else if (response.status === 401) {
+                    alert('Please connect your Ola account first');
+                } else {
+                    alert('Error booking Ola ride. Please try again.');
+                }
+            } catch (error) {
+                console.error('Ola booking error:', error);
+                // Fallback to deep link
+                openOlaDeepLink();
+            }
+        };
+
+        // Enhanced initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated and update connection status
+            if (typeof authManager !== 'undefined') {
+                authManager.checkAuthStatus().then(isAuthenticated => {
+                    if (isAuthenticated) {
+                        checkAccountConnections();
+                    }
+                });
+            }
+
+            // Initialize static estimates
+            updateRideEstimates();
+        });
                 { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#181818' }] },
                 { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
                 { featureType: 'poi.park', elementType: 'labels.text.stroke', stylers: [{ color: '#1b1b1b' }] },
@@ -2868,9 +3262,52 @@
             }
         };
 
-        // Ride Estimates Calculator (Updated for real-time API integration)
-        window.updateRideEstimates = function() {
-            // Mumbai ride-hailing base rates (will be replaced with real API calls)
+        // Real-time Ride Estimates with API Integration
+        window.updateRideEstimates = async function() {
+            // Check if we have route coordinates
+            if (!window.currentRoute || !window.currentRoute.start || !window.currentRoute.end) {
+                // Show static estimates for common distances
+                updateStaticEstimates();
+                return;
+            }
+
+            const { start, end } = window.currentRoute;
+            
+            try {
+                // Show loading state
+                showEstimateLoading();
+                
+                // Call real-time fare comparison API
+                const response = await fetch('/api/rides/compare', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        start_latitude: start.lat,
+                        start_longitude: start.lng,
+                        end_latitude: end.lat,
+                        end_longitude: end.lng
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayRealTimeEstimates(data);
+                } else {
+                    // Fallback to static estimates if API fails
+                    console.warn('Real-time estimates unavailable, using static rates');
+                    updateStaticEstimates();
+                }
+            } catch (error) {
+                console.error('Error fetching real-time estimates:', error);
+                updateStaticEstimates();
+            }
+        };
+
+        function updateStaticEstimates() {
+            // Mumbai ride-hailing base rates (fallback)
             const rates = {
                 uberGo: { base: 25, perKm: 12 },
                 olaMini: { base: 23, perKm: 11 },
@@ -2884,7 +3321,6 @@
             }
             
             distances.forEach(km => {
-                // Base estimates without surge pricing
                 const estimates = {
                     uberGo: Math.round(rates.uberGo.base + rates.uberGo.perKm * km),
                     olaMini: Math.round(rates.olaMini.base + rates.olaMini.perKm * km),
@@ -2901,14 +3337,190 @@
                 const element = document.getElementById(elementId);
                 if (element) {
                     element.innerHTML = `
-                        Uber Go: ₹${estimates.uberGo}<br>
-                        Ola Mini: ₹${estimates.olaMini}<br>
-                        Uber Moto: ₹${estimates.uberMoto}<br>
-                        Ola Auto: ₹${estimates.olaAuto}
+                        <div class="estimate-item">
+                            <span class="service-name">Uber Go</span>
+                            <span class="fare-amount">₹${estimates.uberGo}</span>
+                        </div>
+                        <div class="estimate-item">
+                            <span class="service-name">Ola Mini</span>
+                            <span class="fare-amount">₹${estimates.olaMini}</span>
+                        </div>
+                        <div class="estimate-item">
+                            <span class="service-name">Uber Moto</span>
+                            <span class="fare-amount">₹${estimates.uberMoto}</span>
+                        </div>
+                        <div class="estimate-item">
+                            <span class="service-name">Ola Auto</span>
+                            <span class="fare-amount">₹${estimates.olaAuto}</span>
+                        </div>
                     `;
                 }
             });
+        }
+
+        function showEstimateLoading() {
+            const elements = ['fare-5km', 'fare-10km', 'fare-20km', 'fare-current'];
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = `
+                        <div class="loading-estimates">
+                            <i class="ph ph-spinner ph-spin"></i>
+                            Getting live prices...
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function displayRealTimeEstimates(data) {
+            if (!data.success) {
+                updateStaticEstimates();
+                return;
+            }
+
+            // Update current route estimates
+            const currentElement = document.getElementById('fare-current');
+            if (currentElement && (data.providers.uber || data.providers.ola)) {
+                let html = '<div class="real-time-estimates">';
+                
+                if (data.providers.uber && data.providers.uber.estimates) {
+                    html += '<div class="provider-section"><h4>Uber</h4>';
+                    data.providers.uber.estimates.forEach(estimate => {
+                        html += `
+                            <div class="estimate-item real-time">
+                                <span class="service-name">${estimate.service}</span>
+                                <span class="fare-amount">${estimate.estimate}</span>
+                                ${estimate.surge_multiplier > 1 ? `<span class="surge-indicator">${estimate.surge_multiplier}x</span>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                if (data.providers.ola && data.providers.ola.estimates) {
+                    html += '<div class="provider-section"><h4>Ola</h4>';
+                    data.providers.ola.estimates.forEach(estimate => {
+                        html += `
+                            <div class="estimate-item real-time">
+                                <span class="service-name">${estimate.service}</span>
+                                <span class="fare-amount">${estimate.estimate}</span>
+                                ${estimate.surge_multiplier > 1 ? `<span class="surge-indicator">${estimate.surge_multiplier}x</span>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                html += '</div>';
+                currentElement.innerHTML = html;
+            }
+
+            // Update static distance estimates with fallback
+            updateStaticEstimates();
+        }
+
+        // Account Connection Functions
+        window.connectUberAccount = async function() {
+            try {
+                const response = await fetch('/api/rides/uber/connect', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.authUrl) {
+                        // Open OAuth flow in popup
+                        const popup = window.open(data.authUrl, 'uber-auth', 'width=500,height=600');
+                        
+                        // Listen for popup completion
+                        const checkClosed = setInterval(() => {
+                            if (popup.closed) {
+                                clearInterval(checkClosed);
+                                // Refresh account status
+                                checkAccountConnections();
+                            }
+                        }, 1000);
+                    }
+                } else {
+                    alert('Failed to initiate Uber connection');
+                }
+            } catch (error) {
+                console.error('Uber connection error:', error);
+                alert('Error connecting to Uber');
+            }
         };
+
+        window.connectOlaAccount = async function() {
+            try {
+                const response = await fetch('/api/rides/ola/connect', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.authUrl) {
+                        // Open OAuth flow in popup
+                        const popup = window.open(data.authUrl, 'ola-auth', 'width=500,height=600');
+                        
+                        // Listen for popup completion
+                        const checkClosed = setInterval(() => {
+                            if (popup.closed) {
+                                clearInterval(checkClosed);
+                                // Refresh account status
+                                checkAccountConnections();
+                            }
+                        }, 1000);
+                    }
+                } else {
+                    alert('Failed to initiate Ola connection');
+                }
+            } catch (error) {
+                console.error('Ola connection error:', error);
+                alert('Error connecting to Ola');
+            }
+        };
+
+        async function checkAccountConnections() {
+            try {
+                const response = await fetch('/api/user/profile', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.user) {
+                        updateConnectionStatus(data.user.connectedAccounts);
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking account connections:', error);
+            }
+        }
+
+        function updateConnectionStatus(connectedAccounts) {
+            // Update UI to show connection status
+            const uberStatus = document.getElementById('uber-connection-status');
+            const olaStatus = document.getElementById('ola-connection-status');
+
+            if (uberStatus) {
+                if (connectedAccounts?.uber?.connected) {
+                    uberStatus.innerHTML = '<span class="connected">✓ Connected</span>';
+                } else {
+                    uberStatus.innerHTML = '<button onclick="connectUberAccount()" class="btn btn-outline">Connect Uber</button>';
+                }
+            }
+
+            if (olaStatus) {
+                if (connectedAccounts?.ola?.connected) {
+                    olaStatus.innerHTML = '<span class="connected">✓ Connected</span>';
+                } else {
+                    olaStatus.innerHTML = '<button onclick="connectOlaAccount()" class="btn btn-outline">Connect Ola</button>';
+                }
+            }
+        }
 
         // Initialize ride estimates on page load
         setTimeout(() => {

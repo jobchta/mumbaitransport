@@ -21,6 +21,10 @@ export default {
 
     // API: Ride-hailing endpoints
     if (pathname.startsWith('/api/rides/')) {
+      // Special handling for compare endpoint (doesn't need user auth in routing)
+      if (pathname === '/api/rides/compare') {
+        return handleFareComparison(request, env);
+      }
       return handleRidesApi(request, env);
     }
 
@@ -473,12 +477,14 @@ function json(obj, status, request) {
     switch (action) {
       case 'connect':
         return handleUberConnect(request, env, user);
+      case 'callback':
+        return handleUberCallback(request, env);
       case 'estimate':
         return handleUberEstimate(request, env, user);
       case 'request':
         return handleUberRequest(request, env, user);
       default:
-        return json({ error: 'Unknown Uber action. Use: connect | estimate | request' }, 400, request);
+        return json({ error: 'Unknown Uber action. Use: connect | callback | estimate | request' }, 400, request);
     }
   }
   
@@ -486,12 +492,14 @@ function json(obj, status, request) {
     switch (action) {
       case 'connect':
         return handleOlaConnect(request, env, user);
+      case 'callback':
+        return handleOlaCallback(request, env);
       case 'estimate':
         return handleOlaEstimate(request, env, user);
       case 'request':
         return handleOlaRequest(request, env, user);
       default:
-        return json({ error: 'Unknown Ola action. Use: connect | estimate | request' }, 400, request);
+        return json({ error: 'Unknown Ola action. Use: connect | callback | estimate | request' }, 400, request);
     }
   }
   
@@ -668,36 +676,541 @@ function json(obj, status, request) {
     }
   }
   
-  // --- Uber API Functions (Placeholder - will implement with real API) ---
+  // --- Uber API Functions (Real Implementation) ---
   async function handleUberConnect(request, env, user) {
-    // TODO: Implement Uber OAuth flow
-    return json({ error: 'Uber connection not yet implemented' }, 501, request);
+    try {
+      const UBER_CLIENT_ID = env.UBER_CLIENT_ID;
+      const UBER_REDIRECT_URI = env.UBER_REDIRECT_URI || `${new URL(request.url).origin}/api/rides/uber/callback`;
+      
+      if (!UBER_CLIENT_ID) {
+        return json({ error: 'Uber API not configured' }, 500, request);
+      }
+
+      // Generate OAuth URL for Uber
+      const scopes = ['profile', 'request', 'request_receipt'];
+      const state = crypto.randomUUID();
+      
+      // Store state for verification
+      if (env.USER_DATA_KV) {
+        await env.USER_DATA_KV.put(`uber_state:${user.sub}`, state, { expirationTtl: 600 });
+      }
+
+      const authUrl = new URL('https://login.uber.com/oauth/v2/authorize');
+      authUrl.searchParams.set('client_id', UBER_CLIENT_ID);
+      authUrl.searchParams.set('response_type', 'code');
+      authUrl.searchParams.set('redirect_uri', UBER_REDIRECT_URI);
+      authUrl.searchParams.set('scope', scopes.join(' '));
+      authUrl.searchParams.set('state', state);
+
+      return json({
+        success: true,
+        authUrl: authUrl.toString(),
+        message: 'Redirect user to this URL to connect Uber account'
+      }, 200, request);
+
+    } catch (error) {
+      console.error('Uber connect error:', error);
+      return json({ error: 'Failed to initiate Uber connection' }, 500, request);
+    }
   }
   
   async function handleUberEstimate(request, env, user) {
-    // TODO: Implement Uber fare estimation
-    return json({ error: 'Uber estimates not yet implemented' }, 501, request);
+    try {
+      const { start_latitude, start_longitude, end_latitude, end_longitude } = await request.json();
+      
+      if (!start_latitude || !start_longitude || !end_latitude || !end_longitude) {
+        return json({ error: 'Missing required coordinates' }, 400, request);
+      }
+
+      // Get user's Uber access token
+      const userData = await getUserData(user.sub, env);
+      const uberToken = userData?.connectedAccounts?.uber?.accessToken;
+      
+      if (!uberToken) {
+        return json({ error: 'Uber account not connected' }, 401, request);
+      }
+
+      // Call Uber Price Estimates API
+      const estimateUrl = new URL('https://api.uber.com/v1.2/estimates/price');
+      estimateUrl.searchParams.set('start_latitude', start_latitude);
+      estimateUrl.searchParams.set('start_longitude', start_longitude);
+      estimateUrl.searchParams.set('end_latitude', end_latitude);
+      estimateUrl.searchParams.set('end_longitude', end_longitude);
+
+      const response = await fetch(estimateUrl.toString(), {
+        headers: {
+          'Authorization': `Bearer ${uberToken}`,
+          'Accept-Language': 'en_IN',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Uber API error: ${response.status}`);
+      }
+
+      const estimates = await response.json();
+      
+      // Transform to our format
+      const transformedEstimates = estimates.prices?.map(price => ({
+        service: price.display_name,
+        estimate: price.estimate,
+        low_estimate: price.low_estimate,
+        high_estimate: price.high_estimate,
+        currency_code: price.currency_code,
+        duration: price.duration,
+        distance: price.distance,
+        surge_multiplier: price.surge_multiplier || 1.0
+      })) || [];
+
+      return json({
+        success: true,
+        provider: 'uber',
+        estimates: transformedEstimates,
+        timestamp: new Date().toISOString()
+      }, 200, request);
+
+    } catch (error) {
+      console.error('Uber estimate error:', error);
+      return json({ error: 'Failed to get Uber estimates' }, 500, request);
+    }
   }
   
   async function handleUberRequest(request, env, user) {
-    // TODO: Implement Uber ride request
-    return json({ error: 'Uber ride request not yet implemented' }, 501, request);
+    try {
+      const { start_latitude, start_longitude, end_latitude, end_longitude, product_id } = await request.json();
+      
+      if (!start_latitude || !start_longitude || !end_latitude || !end_longitude || !product_id) {
+        return json({ error: 'Missing required parameters' }, 400, request);
+      }
+
+      // Get user's Uber access token
+      const userData = await getUserData(user.sub, env);
+      const uberToken = userData?.connectedAccounts?.uber?.accessToken;
+      
+      if (!uberToken) {
+        return json({ error: 'Uber account not connected' }, 401, request);
+      }
+
+      // Request ride via Uber API
+      const response = await fetch('https://api.uber.com/v1.2/requests', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${uberToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          start_latitude,
+          start_longitude,
+          end_latitude,
+          end_longitude,
+          product_id
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Uber request error: ${response.status}`);
+      }
+
+      const rideRequest = await response.json();
+
+      return json({
+        success: true,
+        provider: 'uber',
+        request_id: rideRequest.request_id,
+        status: rideRequest.status,
+        eta: rideRequest.eta,
+        driver: rideRequest.driver,
+        vehicle: rideRequest.vehicle,
+        location: rideRequest.location
+      }, 200, request);
+
+    } catch (error) {
+      console.error('Uber request error:', error);
+      return json({ error: 'Failed to request Uber ride' }, 500, request);
+    }
   }
   
-  // --- Ola API Functions (Placeholder - will implement with real API) ---
+  // --- Ola API Functions (Real Implementation) ---
   async function handleOlaConnect(request, env, user) {
-    // TODO: Implement Ola OAuth flow
-    return json({ error: 'Ola connection not yet implemented' }, 501, request);
+    try {
+      const OLA_CLIENT_ID = env.OLA_CLIENT_ID;
+      const OLA_REDIRECT_URI = env.OLA_REDIRECT_URI || `${new URL(request.url).origin}/api/rides/ola/callback`;
+      
+      if (!OLA_CLIENT_ID) {
+        return json({ error: 'Ola API not configured' }, 500, request);
+      }
+
+      // Generate OAuth URL for Ola
+      const scopes = ['profile', 'booking'];
+      const state = crypto.randomUUID();
+      
+      // Store state for verification
+      if (env.USER_DATA_KV) {
+        await env.USER_DATA_KV.put(`ola_state:${user.sub}`, state, { expirationTtl: 600 });
+      }
+
+      const authUrl = new URL('https://accounts.olacabs.com/oauth2/authorize');
+      authUrl.searchParams.set('client_id', OLA_CLIENT_ID);
+      authUrl.searchParams.set('response_type', 'code');
+      authUrl.searchParams.set('redirect_uri', OLA_REDIRECT_URI);
+      authUrl.searchParams.set('scope', scopes.join(' '));
+      authUrl.searchParams.set('state', state);
+
+      return json({
+        success: true,
+        authUrl: authUrl.toString(),
+        message: 'Redirect user to this URL to connect Ola account'
+      }, 200, request);
+
+    } catch (error) {
+      console.error('Ola connect error:', error);
+      return json({ error: 'Failed to initiate Ola connection' }, 500, request);
+    }
   }
   
   async function handleOlaEstimate(request, env, user) {
-    // TODO: Implement Ola fare estimation
-    return json({ error: 'Ola estimates not yet implemented' }, 501, request);
+    try {
+      const { pickup_lat, pickup_lng, drop_lat, drop_lng } = await request.json();
+      
+      if (!pickup_lat || !pickup_lng || !drop_lat || !drop_lng) {
+        return json({ error: 'Missing required coordinates' }, 400, request);
+      }
+
+      // Get user's Ola access token
+      const userData = await getUserData(user.sub, env);
+      const olaToken = userData?.connectedAccounts?.ola?.accessToken;
+      
+      if (!olaToken) {
+        return json({ error: 'Ola account not connected' }, 401, request);
+      }
+
+      // Call Ola Fare Estimate API
+      const response = await fetch('https://devapi.olacabs.com/v1/products', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${olaToken}`,
+          'Content-Type': 'application/json',
+          'X-APP-TOKEN': env.OLA_APP_TOKEN
+        },
+        body: JSON.stringify({
+          pickup_lat,
+          pickup_lng,
+          drop_lat,
+          drop_lng
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ola API error: ${response.status}`);
+      }
+
+      const products = await response.json();
+      
+      // Transform to our format
+      const transformedEstimates = products.categories?.map(category => ({
+        service: category.display_name,
+        estimate: `₹${category.fare_breakup?.total_fare || 'N/A'}`,
+        low_estimate: category.fare_breakup?.minimum_fare,
+        high_estimate: category.fare_breakup?.maximum_fare,
+        currency_code: 'INR',
+        duration: category.eta,
+        distance: category.distance,
+        surge_multiplier: category.surge_multiplier || 1.0
+      })) || [];
+
+      return json({
+        success: true,
+        provider: 'ola',
+        estimates: transformedEstimates,
+        timestamp: new Date().toISOString()
+      }, 200, request);
+
+    } catch (error) {
+      console.error('Ola estimate error:', error);
+      return json({ error: 'Failed to get Ola estimates' }, 500, request);
+    }
   }
   
   async function handleOlaRequest(request, env, user) {
-    // TODO: Implement Ola ride request
-    return json({ error: 'Ola ride request not yet implemented' }, 501, request);
+    try {
+      const { pickup_lat, pickup_lng, drop_lat, drop_lng, category } = await request.json();
+      
+      if (!pickup_lat || !pickup_lng || !drop_lat || !drop_lng || !category) {
+        return json({ error: 'Missing required parameters' }, 400, request);
+      }
+
+      // Get user's Ola access token
+      const userData = await getUserData(user.sub, env);
+      const olaToken = userData?.connectedAccounts?.ola?.accessToken;
+      
+      if (!olaToken) {
+        return json({ error: 'Ola account not connected' }, 401, request);
+      }
+
+      // Request ride via Ola API
+      const response = await fetch('https://devapi.olacabs.com/v1/bookings', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${olaToken}`,
+          'Content-Type': 'application/json',
+          'X-APP-TOKEN': env.OLA_APP_TOKEN
+        },
+        body: JSON.stringify({
+          pickup_lat,
+          pickup_lng,
+          drop_lat,
+          drop_lng,
+          category
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ola request error: ${response.status}`);
+      }
+
+      const booking = await response.json();
+
+      return json({
+        success: true,
+        provider: 'ola',
+        booking_id: booking.booking_id,
+        status: booking.status,
+        eta: booking.eta,
+        driver: booking.driver_details,
+        vehicle: booking.vehicle_details,
+        otp: booking.otp
+      }, 200, request);
+
+    } catch (error) {
+      console.error('Ola request error:', error);
+      return json({ error: 'Failed to request Ola ride' }, 500, request);
+    }
+  }
+
+  // --- OAuth Callback Handlers ---
+  async function handleUberCallback(request, env) {
+    try {
+      const url = new URL(request.url);
+      const code = url.searchParams.get('code');
+      const state = url.searchParams.get('state');
+      
+      if (!code || !state) {
+        return json({ error: 'Missing authorization code or state' }, 400, request);
+      }
+
+      // Verify state and get user
+      const authToken = getCookieValue(request, 'auth_token');
+      if (!authToken) {
+        return json({ error: 'Authentication required' }, 401, request);
+      }
+
+      const user = await verifyUserToken(authToken, env);
+      if (!user) {
+        return json({ error: 'Invalid authentication' }, 401, request);
+      }
+
+      // Verify state matches
+      const storedState = await env.USER_DATA_KV?.get(`uber_state:${user.sub}`);
+      if (storedState !== state) {
+        return json({ error: 'Invalid state parameter' }, 400, request);
+      }
+
+      // Exchange code for access token
+      const tokenResponse = await fetch('https://login.uber.com/oauth/v2/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          client_id: env.UBER_CLIENT_ID,
+          client_secret: env.UBER_CLIENT_SECRET,
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: env.UBER_REDIRECT_URI || `${new URL(request.url).origin}/api/rides/uber/callback`
+        })
+      });
+
+      if (!tokenResponse.ok) {
+        throw new Error(`Token exchange failed: ${tokenResponse.status}`);
+      }
+
+      const tokens = await tokenResponse.json();
+
+      // Update user data with Uber connection
+      const userData = await getUserData(user.sub, env);
+      if (userData) {
+        userData.connectedAccounts.uber = {
+          connected: true,
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
+          expiresAt: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+          connectedAt: new Date().toISOString()
+        };
+        await env.USER_DATA_KV.put(`user:${user.sub}`, JSON.stringify(userData));
+      }
+
+      // Clean up state
+      await env.USER_DATA_KV?.delete(`uber_state:${user.sub}`);
+
+      return json({
+        success: true,
+        message: 'Uber account connected successfully'
+      }, 200, request);
+
+    } catch (error) {
+      console.error('Uber callback error:', error);
+      return json({ error: 'Failed to connect Uber account' }, 500, request);
+    }
+  }
+
+  async function handleOlaCallback(request, env) {
+    try {
+      const url = new URL(request.url);
+      const code = url.searchParams.get('code');
+      const state = url.searchParams.get('state');
+      
+      if (!code || !state) {
+        return json({ error: 'Missing authorization code or state' }, 400, request);
+      }
+
+      // Verify state and get user
+      const authToken = getCookieValue(request, 'auth_token');
+      if (!authToken) {
+        return json({ error: 'Authentication required' }, 401, request);
+      }
+
+      const user = await verifyUserToken(authToken, env);
+      if (!user) {
+        return json({ error: 'Invalid authentication' }, 401, request);
+      }
+
+      // Verify state matches
+      const storedState = await env.USER_DATA_KV?.get(`ola_state:${user.sub}`);
+      if (storedState !== state) {
+        return json({ error: 'Invalid state parameter' }, 400, request);
+      }
+
+      // Exchange code for access token
+      const tokenResponse = await fetch('https://accounts.olacabs.com/oauth2/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          client_id: env.OLA_CLIENT_ID,
+          client_secret: env.OLA_CLIENT_SECRET,
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: env.OLA_REDIRECT_URI || `${new URL(request.url).origin}/api/rides/ola/callback`
+        })
+      });
+
+      if (!tokenResponse.ok) {
+        throw new Error(`Token exchange failed: ${tokenResponse.status}`);
+      }
+
+      const tokens = await tokenResponse.json();
+
+      // Update user data with Ola connection
+      const userData = await getUserData(user.sub, env);
+      if (userData) {
+        userData.connectedAccounts.ola = {
+          connected: true,
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
+          expiresAt: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+          connectedAt: new Date().toISOString()
+        };
+        await env.USER_DATA_KV.put(`user:${user.sub}`, JSON.stringify(userData));
+      }
+
+      // Clean up state
+      await env.USER_DATA_KV?.delete(`ola_state:${user.sub}`);
+
+      return json({
+        success: true,
+        message: 'Ola account connected successfully'
+      }, 200, request);
+
+    } catch (error) {
+      console.error('Ola callback error:', error);
+      return json({ error: 'Failed to connect Ola account' }, 500, request);
+    }
+  }
+
+  // --- Combined Fare Comparison ---
+  async function handleFareComparison(request, env) {
+    try {
+      const authToken = getCookieValue(request, 'auth_token');
+      if (!authToken) {
+        return json({ error: 'Authentication required' }, 401, request);
+      }
+
+      const user = await verifyUserToken(authToken, env);
+      if (!user) {
+        return json({ error: 'Invalid authentication' }, 401, request);
+      }
+
+      const { start_latitude, start_longitude, end_latitude, end_longitude } = await request.json();
+      
+      if (!start_latitude || !start_longitude || !end_latitude || !end_longitude) {
+        return json({ error: 'Missing required coordinates' }, 400, request);
+      }
+
+      const results = {
+        success: true,
+        timestamp: new Date().toISOString(),
+        providers: {}
+      };
+
+      // Get Uber estimates
+      try {
+        const uberEstimate = await handleUberEstimate(
+          new Request(request.url, {
+            method: 'POST',
+            body: JSON.stringify({ start_latitude, start_longitude, end_latitude, end_longitude })
+          }),
+          env,
+          user
+        );
+        const uberData = await uberEstimate.json();
+        if (uberData.success) {
+          results.providers.uber = uberData;
+        }
+      } catch (error) {
+        results.providers.uber = { error: 'Uber estimates unavailable' };
+      }
+
+      // Get Ola estimates
+      try {
+        const olaEstimate = await handleOlaEstimate(
+          new Request(request.url, {
+            method: 'POST',
+            body: JSON.stringify({
+              pickup_lat: start_latitude,
+              pickup_lng: start_longitude,
+              drop_lat: end_latitude,
+              drop_lng: end_longitude
+            })
+          }),
+          env,
+          user
+        );
+        const olaData = await olaEstimate.json();
+        if (olaData.success) {
+          results.providers.ola = olaData;
+        }
+      } catch (error) {
+        results.providers.ola = { error: 'Ola estimates unavailable' };
+      }
+
+      return json(results, 200, request);
+
+    } catch (error) {
+      console.error('Fare comparison error:', error);
+      return json({ error: 'Failed to compare fares' }, 500, request);
+    }
   }
   
   // --- Utility Functions ---
