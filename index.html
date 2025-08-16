@@ -995,6 +995,56 @@
         .install-banner {
             bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
         }
+
+        /* Organized primary navigation (tabs) */
+        .primary-nav {
+            display: flex;
+            gap: var(--space-xs);
+            justify-content: center;
+            padding: var(--space-xs) var(--space-sm);
+            background: var(--surface-light);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            z-index: 99;
+        }
+        .dark .primary-nav {
+            background: var(--surface-dark);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .primary-nav .nav-btn {
+            flex: 1;
+            max-width: 160px;
+            padding: 10px 12px;
+            border-radius: var(--radius-full);
+            border: 1px solid transparent;
+            background: rgba(0,0,0,0.04);
+            color: inherit;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .dark .primary-nav .nav-btn {
+            background: rgba(255,255,255,0.06);
+        }
+        .primary-nav .nav-btn.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Section switching */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Ensure planner grid fills viewport (iOS Safari safe) */
+        .journey-planner > .app-container {
+            min-height: 100dvh;
+            grid-template-rows: auto 1fr;
+        }
+        @supports (height: 100svh) {
+            .journey-planner > .app-container { min-height: 100svh; }
+        }
+
+        /* Media elements should never overflow on small screens */
+        img, iframe, canvas, video { max-width: 100%; height: auto; }
     </style>
 </head>
 <body>
@@ -1017,6 +1067,13 @@
                 </button>
             </div>
         </header>
+
+        <nav class="primary-nav" id="primary-nav">
+            <button class="nav-btn active" data-target="journey-planner">Plan</button>
+            <button class="nav-btn" data-target="metro-tickets">Tickets</button>
+            <button class="nav-btn" data-target="fares">Fares</button>
+            <button class="nav-btn" data-target="ride-hailing">Compare</button>
+        </nav>
         
         <!-- Hero Section -->
         <section class="hero">
@@ -1062,7 +1119,7 @@
         </section>
 
         <!-- Metro Ticketing -->
-        <section class="features" id="metro-tickets">
+        <section class="features section" id="metro-tickets">
             <h2 class="features-title">🚇 Mumbai Metro Ticketing – Unified</h2>
             <div class="features-grid">
                 <div class="feature-card card-3d">
@@ -1100,7 +1157,7 @@
         </section>
 
         <!-- Fares (Aug 2025) -->
-        <section class="features" id="fares">
+        <section class="features section" id="fares">
             <h2 class="features-title">🚖 Mumbai Fares – Aug 2025</h2>
             <div class="features-grid">
                 <div class="feature-card card-3d">
@@ -1130,7 +1187,7 @@
         </section>
 
         <!-- Ride-hailing fare comparison -->
-        <section class="features" id="ride-hailing">
+        <section class="features section" id="ride-hailing">
             <h2 class="features-title">🚕 Ola & Uber – Fare Estimates</h2>
             <div class="features-grid">
                 <div class="feature-card card-3d" style="grid-column: 1 / -1;">
@@ -1217,7 +1274,7 @@
         </section>
         
         <!-- Journey Planner Section -->
-        <section class="journey-planner" id="journey-planner">
+        <section class="journey-planner section active" id="journey-planner">
             <div class="app-container">
                 <!-- Sidebar -->
                 <aside class="sidebar" id="sidebar">
@@ -2005,6 +2062,29 @@
         })();
     </script>
 
+    <!-- Primary nav: organize sections (Plan, Tickets, Fares, Compare) -->
+    <script>
+        (function () {
+            const nav = document.getElementById('primary-nav');
+            if (!nav) return;
+            const buttons = Array.from(nav.querySelectorAll('.nav-btn'));
+            function setActiveSection(id) {
+                document.querySelectorAll('.section').forEach(sec => {
+                    sec.classList.toggle('active', sec.id === id);
+                });
+                buttons.forEach(b => b.classList.toggle('active', b.dataset.target === id));
+                if (id === 'journey-planner' && typeof google !== 'undefined' && window.map) {
+                    setTimeout(() => { google.maps.event.trigger(window.map, 'resize'); }, 200);
+                }
+                nav.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            }
+            buttons.forEach(b => b.addEventListener('click', () => setActiveSection(b.dataset.target)));
+            const hash = location.hash && location.hash.replace('#', '');
+            if (hash && document.getElementById(hash)) setActiveSection(hash);
+            else setActiveSection('journey-planner');
+        })();
+    </script>
+    
     <!-- Ride-hailing estimation and deep links -->
     <script>
         // Heuristic city rates (INR). Adjust if RTO changes.
