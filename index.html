@@ -1343,15 +1343,15 @@
 
         <!-- Bottom Tab Bar -->
         <nav class="bottom-tab-bar">
-            <button class="tab-button active" data-tab="plan">
+            <button class="tab-button active" data-tab="plan" onclick="switchTab('plan', this)">
                 <i class="ph ph-route"></i>
                 <span>Plan</span>
             </button>
-            <button class="tab-button" data-tab="tickets">
+            <button class="tab-button" data-tab="tickets" onclick="switchTab('tickets', this)">
                 <i class="ph ph-ticket"></i>
                 <span>Tickets</span>
             </button>
-            <button class="tab-button" data-tab="compare">
+            <button class="tab-button" data-tab="compare" onclick="switchTab('compare', this)">
                 <i class="ph ph-scales"></i>
                 <span>Compare</span>
             </button>
@@ -1401,6 +1401,40 @@
         // ========================================
         // MUMBAI TRANSPORT APP FUNCTIONALITY
         // ========================================
+        
+        // Global Tab Switching Function
+        function switchTab(tabName, buttonElement) {
+            console.log('Switching to tab:', tabName);
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Remove active class from all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            buttonElement.classList.add('active');
+            
+            // Add active class to corresponding content
+            const targetTab = document.getElementById(tabName + '-tab');
+            if (targetTab) {
+                targetTab.classList.add('active');
+                console.log('Successfully switched to tab:', tabName);
+                
+                // Resize map if switching to plan tab
+                if (tabName === 'plan' && typeof google !== 'undefined' && map) {
+                    setTimeout(() => {
+                        google.maps.event.trigger(map, 'resize');
+                    }, 100);
+                }
+            } else {
+                console.error('Target tab not found:', tabName + '-tab');
+            }
+        }
         
         // Global Variables
         let map;
@@ -1618,40 +1652,45 @@
             });
         }
         
-        // Tab Navigation
+        // Simplified Tab Navigation - Direct Implementation
         function initTabNavigation() {
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
+            console.log('Initializing simplified tab navigation...');
             
-            console.log('Initializing tab navigation:', tabButtons.length, 'buttons found');
-            
-            tabButtons.forEach((button, index) => {
-                console.log(`Tab button ${index}:`, button.dataset.tab);
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const tabName = button.dataset.tab;
-                    console.log('Tab clicked:', tabName);
-                    
-                    if (!tabName) {
-                        console.error('No tab name found for button:', button);
-                        return;
-                    }
-                    
-                    // Update active states
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabContents.forEach(content => content.classList.remove('active'));
-                    
-                    button.classList.add('active');
-                    const targetTab = document.getElementById(`${tabName}-tab`);
-                    
-                    if (targetTab) {
-                        targetTab.classList.add('active');
-                        console.log('Switched to tab:', tabName);
-                    } else {
-                        console.error('Target tab not found:', `${tabName}-tab`);
-                    }
+            // Direct event binding to ensure it works
+            document.addEventListener('click', function(e) {
+                // Check if clicked element is a tab button
+                const tabButton = e.target.closest('.tab-button');
+                if (!tabButton) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const tabName = tabButton.getAttribute('data-tab');
+                console.log('Tab clicked:', tabName);
+                
+                if (!tabName) {
+                    console.error('No tab name found');
+                    return;
+                }
+                
+                // Remove active class from all tab buttons
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Remove active class from all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                tabButton.classList.add('active');
+                
+                // Add active class to corresponding content
+                const targetTab = document.getElementById(tabName + '-tab');
+                if (targetTab) {
+                    targetTab.classList.add('active');
+                    console.log('Successfully switched to tab:', tabName);
                     
                     // Resize map if switching to plan tab
                     if (tabName === 'plan' && typeof google !== 'undefined' && map) {
@@ -1659,8 +1698,12 @@
                             google.maps.event.trigger(map, 'resize');
                         }, 100);
                     }
-                });
+                } else {
+                    console.error('Target tab not found:', tabName + '-tab');
+                }
             });
+            
+            console.log('Tab navigation initialized with event delegation');
         }
         
         // Transport Mode Selection
