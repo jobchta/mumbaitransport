@@ -2,8 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="Plan your journey with real-time BEST bus routes, local trains, and metro connections in Mumbai. Get live tracking and accurate ETAs.">
+    <meta name="theme-color" content="#3b82f6">
     <title>Mumbai Transport Hub - Smart Route Planning & Live Tracking</title>
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mumbai Transport">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     
     <!-- Modern Font System with Variable Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
@@ -12,7 +21,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
     
     <!-- Google Maps API with Advanced Visualization -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,geometry,visualization"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization"></script>
     
     <style>
         /* ========================================
@@ -227,6 +236,7 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             text-fill-color: transparent;
+            filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
         }
         
         .header-actions {
@@ -421,6 +431,11 @@
             font-weight: 500;
             font-size: var(--text-sm);
             color: var(--text-medium);
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+        }
+        
+        .dark .form-label {
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
         }
         
         .input-wrapper {
@@ -446,6 +461,11 @@
             font-size: var(--text-base);
             transition: all var(--transition-fast);
             box-shadow: var(--neo-shadow-inset);
+            color: #1a202c;
+        }
+        
+        .dark .form-input {
+            color: #e2e8f0;
         }
         
         .form-input:focus {
@@ -515,6 +535,7 @@
             color: white;
             text-align: center;
             overflow: hidden;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
         
         .hero-content {
@@ -583,6 +604,7 @@
             background: var(--surface-light);
             box-shadow: var(--neo-shadow-light);
             transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+            color: #1a202c;
         }
         
         .feature-card:hover {
@@ -613,6 +635,11 @@
             font-weight: 600;
             font-size: var(--text-xl);
             margin-bottom: var(--space-sm);
+            color: #1a202c;
+        }
+        
+        .dark .feature-title {
+            color: #e2e8f0;
         }
         
         .feature-description {
@@ -892,10 +919,182 @@
         .dark .theme-toggle:hover {
             background: rgba(255, 255, 255, 0.1);
         }
+        
+        /* Fix for text contrast in route options */
+        .route-option {
+            color: #1a202c;
+        }
+        
+        .dark .route-option {
+            color: #e2e8f0;
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 100;
+                transform: translateX(-100%);
+                transition: transform var(--transition-medium);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-nav-toggle {
+                display: flex;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-title {
+                font-size: var(--text-3xl);
+            }
+            
+            .hero-subtitle {
+                font-size: var(--text-lg);
+            }
+            
+            .form-input, .btn, .mode-tab {
+                font-size: 16px; /* Prevent iOS zoom on focus */
+            }
+            
+            .app-header {
+                padding: var(--space-xs);
+            }
+            
+            .map-container {
+                height: 50vh;
+            }
+        }
+        
+        /* Add to Home Screen and Bookmark Prompts */
+        .pwa-install-prompt,
+        .bookmark-prompt {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface-light);
+            padding: var(--space-sm);
+            box-shadow: var(--neo-shadow-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform var(--transition-medium);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .dark .pwa-install-prompt,
+        .dark .bookmark-prompt {
+            background: var(--surface-dark);
+            box-shadow: var(--neo-shadow-dark);
+        }
+        
+        .pwa-install-prompt.show,
+        .bookmark-prompt.show {
+            transform: translateY(0);
+        }
+        
+        .bookmark-prompt {
+            z-index: 999; /* Lower than PWA prompt */
+        }
+        
+        /* Non-intrusive Ad Space */
+        .ad-space {
+            background: rgba(var(--primary-hue), 10%, 95%, 0.1);
+            border-radius: var(--radius-md);
+            padding: var(--space-sm);
+            margin-bottom: var(--space-md);
+            text-align: center;
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            border: 1px dashed var(--border-color);
+        }
+        
+        .dark .ad-space {
+            background: rgba(var(--primary-hue), 10%, 15%, 0.2);
+        }
+        
+        .dark .pwa-install-prompt {
+            background: var(--surface-dark);
+            box-shadow: var(--neo-shadow-dark);
+        }
+        
+        /* Non-intrusive Ad Space */
+        .ad-space {
+            padding: var(--space-sm);
+            margin: var(--space-md) 0;
+            background: var(--surface-light);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--neo-shadow-light);
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .ad-space::before {
+            content: "Ad";
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 0.1rem 0.3rem;
+            border-radius: var(--radius-sm);
+        }
+        
+        .dark .ad-space {
+            background: var(--surface-dark);
+            box-shadow: var(--neo-shadow-dark);
+        }
+        
+        .dark .ad-space::before {
+            background: rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
+        <!-- PWA Install Prompt -->
+        <div class="pwa-install-prompt" id="pwa-install-prompt">
+            <div>
+                <strong>Add to Home Screen</strong>
+                <p>Install this app on your device for quick access.</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" id="pwa-install-btn">Install</button>
+                <button class="btn btn-secondary" id="pwa-dismiss-btn">Not Now</button>
+            </div>
+        </div>
+        
+        <!-- Bookmark Prompt -->
+        <div class="bookmark-prompt" id="bookmark-prompt">
+            <div>
+                <strong>Bookmark This Page</strong>
+                <p>Save Mumbai Transport for easy access later.</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" id="bookmark-how-btn">How to Bookmark</button>
+                <button class="btn btn-secondary" id="bookmark-dismiss-btn">Dismiss</button>
+            </div>
+        </div>
         <!-- Header -->
         <header class="app-header">
             <div class="logo">
@@ -931,6 +1130,12 @@
         <!-- Features Section -->
         <section class="features" id="features">
             <h2 class="features-title">Discover Mumbai Transport Hub</h2>
+            
+            <!-- Non-intrusive Ad Space -->
+            <div class="ad-space">
+                <p>Sponsored content - Support Mumbai Transport</p>
+            </div>
+            
             <div class="features-grid">
                 <div class="feature-card card-3d">
                     <div class="feature-icon">
@@ -1259,7 +1464,18 @@
             if (window.map) {
                 updateMapStyle();
             }
+            
+            // Update any other elements that need theme-specific styling
+            updateThemeSpecificElements();
         });
+        
+        // Update theme-specific elements
+        function updateThemeSpecificElements() {
+            // Update any elements that need specific theme handling
+            // For example, charts, illustrations, or other components
+            console.log('Theme updated to:', body.classList.contains('dark') ? 'dark' : 'light');
+        }
+        
         
         // Mobile Navigation Toggle
         const mobileNavToggle = document.getElementById('mobile-nav-toggle');
@@ -1270,11 +1486,60 @@
             
             if (sidebar.classList.contains('active')) {
                 mobileNavToggle.innerHTML = '<i class="ph ph-x"></i>';
+                // Add overlay to close sidebar when clicking outside
+                addSidebarOverlay();
             } else {
                 mobileNavToggle.innerHTML = '<i class="ph ph-list"></i>';
+                // Remove overlay
+                removeSidebarOverlay();
             }
         });
         
+        // Add overlay to close sidebar when clicking outside
+        function addSidebarOverlay() {
+            // Check if overlay already exists
+            if (document.getElementById('sidebar-overlay')) return;
+            
+            const overlay = document.createElement('div');
+            overlay.id = 'sidebar-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 99;
+                display: none;
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            // Show overlay
+            setTimeout(() => {
+                overlay.style.display = 'block';
+            }, 10);
+            
+            // Close sidebar when clicking overlay
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                mobileNavToggle.innerHTML = '<i class="ph ph-list"></i>';
+                removeSidebarOverlay();
+            });
+        }
+        
+        // Remove sidebar overlay
+        function removeSidebarOverlay() {
+            const overlay = document.getElementById('sidebar-overlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+                setTimeout(() => {
+                    if (overlay.parentNode) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
+                }, 300);
+            }
+        }
         // Transport Mode Tabs
         const modeTabs = document.querySelectorAll('.mode-tab');
         
@@ -1287,9 +1552,28 @@
                 // Filter routes based on mode
                 console.log(`Selected mode: ${mode}`);
                 
-                // Here you would filter routes and update the map
+                // Filter routes and update the map
+                filterRoutesByMode(mode);
             });
         });
+        
+        // Filter routes by transport mode
+        function filterRoutesByMode(mode) {
+            // This function would filter routes based on the selected mode
+            // For now, we'll just log the mode selection
+            console.log(`Filtering routes by mode: ${mode}`);
+            
+            // In a real implementation, you would:
+            // 1. Get current route data
+            // 2. Filter based on the selected mode
+            // 3. Update the route display
+            // 4. Update the map with filtered routes
+            
+            // For now, we'll just show an alert to indicate the feature works
+            if (mode !== 'all') {
+                alert(`Showing ${mode} routes only. In a full implementation, this would filter the displayed routes.`);
+            }
+        }
         
         // Location Swap Functionality
         const swapLocationsBtn = document.getElementById('swap-locations');
@@ -1298,14 +1582,30 @@
         
         swapLocationsBtn.addEventListener('click', () => {
             const fromValue = fromInput.value;
-            fromInput.value = toInput.value;
+            const toValue = toInput.value;
+            
+            // Swap values
+            fromInput.value = toValue;
             toInput.value = fromValue;
             
             // Animate the swap button
-            swapLocationsBtn.style.transform = 'translateY(-50%) rotate(180deg)';
+            swapLocationsBtn.style.transition = 'transform 0.5s ease';
+            swapLocationsBtn.style.transform = 'rotate(180deg)';
+            
+            // Reset animation after completion
             setTimeout(() => {
-                swapLocationsBtn.style.transform = 'translateY(-50%)';
+                swapLocationsBtn.style.transition = '';
+                swapLocationsBtn.style.transform = '';
             }, 500);
+            
+            // If we have autocomplete instances, update their bounds
+            if (autocompleteFrom && autocompleteTo) {
+                // Trigger a bounds update for both autocomplete instances
+                if (map) {
+                    autocompleteFrom.bindTo('bounds', map);
+                    autocompleteTo.bindTo('bounds', map);
+                }
+            }
         });
         
         // Departure Time Selector
@@ -1349,31 +1649,190 @@
         journeyForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
+            // Get form values
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            
+            // Validate inputs
+            if (!from || !to) {
+                alert('Please enter both start and end locations');
+                return;
+            }
+            
             // Show loading state
             const submitBtn = journeyForm.querySelector('button[type="submit"]');
             submitBtn.innerHTML = '<i class="ph ph-circle-notch ph-spin"></i> Finding Routes...';
             submitBtn.disabled = true;
             
-            // Simulate API call delay
-            setTimeout(() => {
-                // Show results
-                routeResults.style.display = 'block';
-                
-                // Reset button
-                submitBtn.innerHTML = '<i class="ph ph-magnifying-glass"></i> Find Routes';
-                submitBtn.disabled = false;
-                
-                // Draw route on map
-                if (window.map) {
-                    drawRoute();
-                }
-                
-                // Scroll to results on mobile
-                if (window.innerWidth < 1024) {
-                    routeResults.scrollIntoView({ behavior: 'smooth' });
-                }
-            }, 1500);
+            // Calculate route using Google Maps Directions API
+            calculateAndDisplayRoute(from, to);
         });
+        
+        // Calculate and display route
+        function calculateAndDisplayRoute(origin, destination) {
+            // Request directions
+            directionsService.route(
+                {
+                    origin: origin,
+                    destination: destination,
+                    travelMode: google.maps.TravelMode.TRANSIT,
+                    transitOptions: {
+                        modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.RAIL],
+                        routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
+                    },
+                    provideRouteAlternatives: true
+                },
+                (response, status) => {
+                    const submitBtn = journeyForm.querySelector('button[type="submit"]');
+                    
+                    if (status === 'OK') {
+                        // Display routes
+                        displayRoutes(response.routes);
+                        
+                        // Draw first route on map
+                        directionsRenderer.setDirections(response);
+                        
+                        // Show results
+                        routeResults.style.display = 'block';
+                        
+                        // Scroll to results on mobile
+                        if (window.innerWidth < 1024) {
+                            routeResults.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else {
+                        console.error('Directions request failed due to ' + status);
+                        alert('Could not calculate route: ' + status);
+                    }
+                    
+                    // Reset button
+                    submitBtn.innerHTML = '<i class="ph ph-magnifying-glass"></i> Find Routes';
+                    submitBtn.disabled = false;
+                }
+            );
+        }
+        
+        // Display routes in the results panel
+        function displayRoutes(routes) {
+            let html = '';
+            
+            routes.forEach((route, index) => {
+                const leg = route.legs[0];
+                const isRecommended = index === 0;
+                
+                // Calculate total transit time and walking distance
+                let walkingDistance = 0;
+                let transitCount = 0;
+                
+                leg.steps.forEach(step => {
+                    if (step.travel_mode === 'WALKING') {
+                        walkingDistance += step.distance.value;
+                    } else if (step.travel_mode === 'TRANSIT') {
+                        transitCount++;
+                    }
+                });
+                
+                // Convert walking distance to km
+                const walkingKm = (walkingDistance / 1000).toFixed(1);
+                
+                html += `
+                    <div class="route-option card-3d ${isRecommended ? 'active' : ''}" data-route-index="${index}">
+                        <div class="route-header">
+                            <div class="route-time">${leg.duration.text}</div>
+                            <div class="route-price">₹${(20 + transitCount * 10)}</div>
+                        </div>
+                        
+                        <div class="route-meta">
+                            <div class="route-meta-item">
+                                <i class="ph ph-clock"></i>
+                                <span>Depart ${leg.departure_time.text}</span>
+                            </div>
+                            <div class="route-meta-item">
+                                <i class="ph ph-footprints"></i>
+                                <span>${walkingKm}km walk</span>
+                            </div>
+                        </div>
+                        
+                        <div class="route-segments">
+                            ${generateRouteSegments(leg.steps)}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('route-results').innerHTML = `
+                <div class="section-title">Best Routes</div>
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    Live traffic updates
+                </div>
+                ${html}
+            `;
+            
+            // Add event listeners to route options
+            document.querySelectorAll('.route-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    document.querySelectorAll('.route-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // Get route index and display on map
+                    const routeIndex = this.getAttribute('data-route-index');
+                    const route = routes[routeIndex];
+                    directionsRenderer.setDirections({
+                        routes: [route]
+                    });
+                });
+            });
+        }
+        
+        // Generate route segments HTML
+        function generateRouteSegments(steps) {
+            let html = '';
+            let segmentCount = 0;
+            
+            steps.forEach(step => {
+                if (segmentCount > 0) {
+                    html += '<div class="segment-connector"></div>';
+                }
+                
+                if (step.travel_mode === 'WALKING') {
+                    html += `
+                        <div class="segment">
+                            <div class="segment-icon walk">W</div>
+                        </div>
+                    `;
+                } else if (step.travel_mode === 'TRANSIT') {
+                    let icon = 'T';
+                    let mode = 'Transit';
+                    
+                    if (step.transit.line.vehicle.type === 'BUS') {
+                        icon = 'B';
+                        mode = 'Bus';
+                    } else if (step.transit.line.vehicle.type === 'RAIL' || step.transit.line.vehicle.type === 'METRO_RAIL') {
+                        icon = 'M';
+                        mode = 'Metro';
+                    } else if (step.transit.line.vehicle.type === 'TRAIN') {
+                        icon = 'T';
+                        mode = 'Train';
+                    }
+                    
+                    html += `
+                        <div class="segment">
+                            <div class="segment-icon ${mode.toLowerCase()}">${icon}</div>
+                            <span>${step.transit.line.short_name || step.transit.line.name}</span>
+                        </div>
+                    `;
+                }
+                
+                segmentCount++;
+            });
+            
+            return html;
+        }
         
         // Route Option Selection
         const routeOptions = document.querySelectorAll('.route-option');
@@ -1628,6 +2087,190 @@
         
         // Initialize map when page loads
         window.addEventListener('load', initMap);
+    </script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Register Service Worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Use relative path so it works under /portal/
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                        
+                        // Check for updates
+                        registration.update();
+                        
+                        // Listen for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New update available
+                                    console.log('New content is available; please refresh.');
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+            
+            // Listen for controlling service worker changes
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    window.location.reload();
+                    refreshing = true;
+                }
+            });
+        }
+        
+        // Show update notification
+        function showUpdateNotification() {
+            const notification = document.createElement('div');
+            notification.innerHTML = `
+                <div style="position: fixed; bottom: 20px; right: 20px; background: #4CAF50; color: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>New version available!</span>
+                        <button id="refresh-btn" style="background: white; color: #4CAF50; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">Refresh</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            document.getElementById('refresh-btn').addEventListener('click', () => {
+                window.location.reload();
+            });
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 10000);
+        }
+        
+        // PWA Install Prompt Logic
+        let deferredPrompt;
+        const pwaPrompt = document.getElementById('pwa-install-prompt');
+        const pwaInstallBtn = document.getElementById('pwa-install-btn');
+        const pwaDismissBtn = document.getElementById('pwa-dismiss-btn');
+        
+        // Check if user has already dismissed or installed
+        const pwaStatus = localStorage.getItem('pwa-status');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 76+ from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            
+            // Only show if not previously dismissed or installed
+            if (pwaStatus !== 'dismissed' && pwaStatus !== 'installed') {
+                // Show the prompt after a delay for better UX
+                setTimeout(() => {
+                    pwaPrompt.classList.add('show');
+                }, 3000);
+            }
+        });
+        
+        // Install button click handler
+        pwaInstallBtn.addEventListener('click', () => {
+            // Hide the prompt
+            pwaPrompt.classList.remove('show');
+            
+            // Show the native install prompt
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                        localStorage.setItem('pwa-status', 'installed');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                        localStorage.setItem('pwa-status', 'dismissed');
+                    }
+                    
+                    deferredPrompt = null;
+                });
+            }
+        });
+        
+        // Dismiss button click handler
+        pwaDismissBtn.addEventListener('click', () => {
+            pwaPrompt.classList.remove('show');
+            localStorage.setItem('pwa-status', 'dismissed');
+        });
+        
+        // Check if the app was launched from installed PWA
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            localStorage.setItem('pwa-status', 'installed');
+        }
+        
+        // Bookmark Prompt Logic
+        const bookmarkPrompt = document.getElementById('bookmark-prompt');
+        const bookmarkHowBtn = document.getElementById('bookmark-how-btn');
+        const bookmarkDismissBtn = document.getElementById('bookmark-dismiss-btn');
+        
+        // Check if user has already dismissed bookmark prompt
+        const bookmarkStatus = localStorage.getItem('bookmark-status');
+        
+        // Show bookmark prompt after a delay if not previously dismissed
+        if (bookmarkStatus !== 'dismissed') {
+            // Only show if PWA is not installed and on mobile
+            if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+                window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone === true) {
+                // Don't show on desktop or if already installed as PWA
+                // Do nothing
+            } else {
+                // Show on mobile browsers after delay
+                setTimeout(() => {
+                    // Only show if PWA prompt is not showing
+                    if (!pwaPrompt.classList.contains('show')) {
+                        bookmarkPrompt.classList.add('show');
+                    }
+                }, 5000);
+            }
+        }
+        
+        // How to bookmark button click handler
+        bookmarkHowBtn.addEventListener('click', () => {
+            // Show different instructions based on browser
+            let message = '';
+            
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                // iOS instructions
+                message = 'To bookmark this page on iOS: tap the share icon (rectangle with arrow) at the bottom of the screen, then select "Add to Home Screen".';
+            } else if (/Android/i.test(navigator.userAgent)) {
+                // Android instructions (varies by browser)
+                if (/chrome/i.test(navigator.userAgent)) {
+                    message = 'To bookmark in Chrome: tap the menu icon (three dots) in the top right, then tap the star icon.';
+                } else if (/firefox/i.test(navigator.userAgent)) {
+                    message = 'To bookmark in Firefox: tap the menu icon (three dots) in the top right, then tap the star icon.';
+                } else if (/opera/i.test(navigator.userAgent)) {
+                    message = 'To bookmark in Opera: tap the menu icon at the bottom, then tap the heart icon.';
+                } else {
+                    message = 'To bookmark this page: tap your browser menu button and look for the bookmark or star option.';
+                }
+            } else {
+                // Desktop instructions
+                message = 'To bookmark this page: press Ctrl+D (Windows/Linux) or Cmd+D (Mac).';
+            }
+            
+            alert(message);
+        });
+        
+        // Dismiss button click handler
+        bookmarkDismissBtn.addEventListener('click', () => {
+            bookmarkPrompt.classList.remove('show');
+            localStorage.setItem('bookmark-status', 'dismissed');
+        });
     </script>
 </body>
 </html>

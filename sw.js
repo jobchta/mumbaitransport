@@ -1,19 +1,28 @@
-const CACHE_NAME = 'mumbai-transport-v1';
+// top-level cache config
+const CACHE_NAME = 'mumbai-transport-v3';
 const urlsToCache = [
-  '/',
-  '/mumbai_transport_pwa.html',
-  '/manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places'
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './mumbai_transport_pwa.html'
 ];
 
 // Install event - cache resources
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => {
+      .then(async cache => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        await Promise.all(
+          urlsToCache.map(async (url) => {
+            try {
+              await cache.add(new Request(url, { mode: 'no-cors' }));
+            } catch (e) {
+              console.warn('Skipping cache for', url, e);
+            }
+          })
+        );
       })
   );
 });
@@ -23,29 +32,27 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Return cached version or fetch from network
         if (response) {
           return response;
         }
         return fetch(event.request);
-      }
-    )
+      })
   );
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
+    caches.keys().then(cacheNames =>
+      Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
             console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
-      );
-    })
+      )
+    )
   );
 });
 
@@ -57,14 +64,16 @@ self.addEventListener('sync', event => {
 });
 
 function doBackgroundSync() {
-  // Sync saved routes when back online
-  return fetch('/api/sync-routes')
-    .then(response => response.json())
-    .then(data => {
-      console.log('Background sync completed:', data);
+  // Use relative path for API sync so it works under /portal/ (no-op on static hosting)
+  return fetch('./api/sync-routes')
+    .then(response => {
+      if (!response.ok) return Promise.resolve();
+      return response.json().then(data => {
+        console.log('Background sync completed:', data);
+      });
     })
     .catch(error => {
-      console.log('Background sync failed:', error);
+      console.log('Background sync skipped/failed:', error);
     });
 }
 
@@ -98,13 +107,13 @@ self.addEventListener('push', event => {
   );
 });
 
-// Notification click handling
+// Notification click handling (use relative path)
 self.addEventListener('notificationclick', event => {
   event.notification.close();
 
   if (event.action === 'explore') {
     event.waitUntil(
-      clients.openWindow('/mumbai_transport_pwa.html')
+      clients.openWindow('./mumbai_transport_pwa.html')
     );
   }
 });
