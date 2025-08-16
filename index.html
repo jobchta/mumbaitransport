@@ -853,6 +853,16 @@
             gap: var(--space-1);
         }
         
+        /* Loading Animation */
+        .ph-spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
         /* Mobile Optimizations */
         @media (max-width: 768px) {
             .form-input, .btn, .mode-tab {
@@ -1023,6 +1033,14 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Step-by-step Route Guidance -->
+                <div class="provider-section" id="route-guidance" style="display: none;">
+                    <div class="section-title">Route Guidance</div>
+                    <div class="card">
+                        <div id="route-steps"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Tickets Tab -->
@@ -1158,13 +1176,6 @@
                     </div>
                 </div>
                 
-                <!-- Step-by-step Route Guidance -->
-                <div class="provider-section" id="route-guidance" style="display: none;">
-                    <h4>Route Guidance</h4>
-                    <div class="card">
-                        <div id="route-steps"></div>
-                    </div>
-                </div>
             </div>
         </main>
 
@@ -1261,16 +1272,40 @@
             }
             
             async login() {
+                // Show immediate visual feedback
+                const loginBtn = document.getElementById('google-login-btn');
+                const originalText = loginBtn.innerHTML;
+                loginBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Signing in...';
+                loginBtn.disabled = true;
+                
                 if (typeof google !== 'undefined' && google.accounts) {
                     try {
                         google.accounts.id.prompt();
+                        // Reset button after 3 seconds if no response
+                        setTimeout(() => {
+                            loginBtn.innerHTML = originalText;
+                            loginBtn.disabled = false;
+                        }, 3000);
                     } catch (error) {
-                        // Fallback for development
-                        alert('Google Sign-In is not available in local development. This will work in production.');
+                        // Show visible error feedback
+                        loginBtn.innerHTML = '<i class="ph ph-warning"></i> Sign In Unavailable';
+                        loginBtn.style.background = '#ef4444';
+                        setTimeout(() => {
+                            loginBtn.innerHTML = originalText;
+                            loginBtn.disabled = false;
+                            loginBtn.style.background = '';
+                        }, 2000);
                         console.log('Google OAuth not available:', error);
                     }
                 } else {
-                    alert('Google Sign-In is not available in local development. This will work in production.');
+                    // Show visible error feedback
+                    loginBtn.innerHTML = '<i class="ph ph-warning"></i> Sign In Unavailable';
+                    loginBtn.style.background = '#ef4444';
+                    setTimeout(() => {
+                        loginBtn.innerHTML = originalText;
+                        loginBtn.disabled = false;
+                        loginBtn.style.background = '';
+                    }, 2000);
                 }
             }
             
