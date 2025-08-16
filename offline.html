@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Offline | Mumbai Transport</title>
+  <meta name="theme-color" content="#0ea5e9">
+  <style>
+    :root{
+      --bg:#0b1324;--fg:#e2e8f0;--muted:#94a3b8;--primary:#0ea5e9;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      display:flex; align-items:center; justify-content:center;
+      padding:16px; 
+    }
+    .card{
+      width:min(520px, 92vw);
+      background:#0f172a; border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; padding:24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    h1{margin:0 0 8px 0; font-size:1.25rem}
+    p{margin:4px 0; color:var(--muted); line-height:1.55}
+    .row{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap}
+    button, a.btn{
+      appearance:none; border:none; border-radius:12px;
+      padding:12px 14px; font-weight:600; cursor:pointer;
+      background:var(--primary); color:#001018; text-decoration:none;
+    }
+    button.secondary, a.secondary{
+      background:transparent; color:var(--fg); border:1px solid rgba(255,255,255,.12);
+    }
+    .small{font-size:.875rem}
+    .tips{margin-top:14px; border-top:1px dashed rgba(255,255,255,.12); padding-top:12px}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>You're offline</h1>
+    <p>The app is installed and available, but the network is currently unavailable.</p>
+    <div class="row">
+      <button onclick="location.reload()">Retry</button>
+      <a class="btn secondary" href="/portal/#journey-planner">Open app shell</a>
+    </div>
+    <div class="tips small">
+      <p>- You can still open the app shell and access cached content.</p>
+      <p>- When you're back online, features like route planning and live fares will refresh automatically.</p>
+    </div>
+  </main>
+</body>
+</html>

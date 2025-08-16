@@ -10,6 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MT Hub">
     
     <!-- Modern Font System with Variable Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
@@ -954,6 +955,218 @@
             height: auto;
         }
 
+        /* App-shell: hide marketing/extra UI for app-like feel */
+        .hero, #features, .footer, .cta, .ai-assistant-btn, .primary-nav { display: none !important; }
+
+        /* Bottom tab bar and app padding */
+        .app-container { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+
+        .tabbar {
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            z-index: 999;
+            display: flex;
+            justify-content: space-around;
+            gap: 8px;
+            padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)) 12px;
+            background: var(--surface-light);
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+        .dark .tabbar {
+            background: var(--surface-dark);
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .tab-btn {
+            flex: 1;
+            max-width: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 8px 6px;
+            border-radius: 16px;
+            border: none;
+            background: transparent;
+            color: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .tab-btn i { font-size: 1.25rem; line-height: 1; }
+        .tab-btn span { font-size: 0.75rem; }
+        .tab-btn.active { background: rgba(0,0,0,0.06); }
+        .dark .tab-btn.active { background: rgba(255,255,255,0.08); }
+
+        /* Sections behave like app screens */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Standalone mode (installed PWA): remove header chrome */
+        @media all and (display-mode: standalone) {
+            .app-header { display: none; }
+            .tabbar { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+            body { background-attachment: fixed; }
+        }
+
+        /* App-shell: hide marketing/extra UI for app-like feel */
+        .hero, #features, .footer, .cta, .ai-assistant-btn { display: none !important; }
+
+        /* Bottom tab bar and app padding */
+        .app-container { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+
+        .tabbar {
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            z-index: 999;
+            display: flex;
+            justify-content: space-around;
+            gap: 8px;
+            padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)) 12px;
+            background: var(--surface-light);
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+        .dark .tabbar {
+            background: var(--surface-dark);
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .tab-btn {
+            flex: 1;
+            max-width: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 8px 6px;
+            border-radius: 16px;
+            border: none;
+            background: transparent;
+            color: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .tab-btn i { font-size: 1.25rem; line-height: 1; }
+        .tab-btn span { font-size: 0.75rem; }
+        .tab-btn.active { background: rgba(0,0,0,0.06); }
+        .dark .tab-btn.active { background: rgba(255,255,255,0.08); }
+
+        /* Sections behave like app screens */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Standalone mode (installed PWA): remove header chrome */
+        @media all and (display-mode: standalone) {
+            .app-header { display: none; }
+            .tabbar { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+            body { background-attachment: fixed; }
+        }
+
+        /* App-shell: hide marketing/extra UI for app-like feel */
+        .hero, #features, .footer, .cta, .ai-assistant-btn { display: none !important; }
+
+        /* Bottom tab bar and app padding */
+        .app-container { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+
+        .tabbar {
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            z-index: 999;
+            display: flex;
+            justify-content: space-around;
+            gap: 8px;
+            padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)) 12px;
+            background: var(--surface-light);
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+        .dark .tabbar {
+            background: var(--surface-dark);
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .tab-btn {
+            flex: 1;
+            max-width: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 8px 6px;
+            border-radius: 16px;
+            border: none;
+            background: transparent;
+            color: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .tab-btn i { font-size: 1.25rem; line-height: 1; }
+        .tab-btn span { font-size: 0.75rem; }
+        .tab-btn.active { background: rgba(0,0,0,0.06); }
+        .dark .tab-btn.active { background: rgba(255,255,255,0.08); }
+
+        /* Sections behave like app screens */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Standalone mode (installed PWA): remove header chrome */
+        @media all and (display-mode: standalone) {
+            .app-header { display: none; }
+            .tabbar { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+            body { background-attachment: fixed; }
+        }
+
+        /* App-shell: hide marketing/extra UI for app-like feel */
+        .hero, #features, .footer, .cta, .ai-assistant-btn, .primary-nav { display: none !important; }
+
+        /* Bottom tab bar and app padding */
+        .app-container { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+
+        .tabbar {
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            z-index: 999;
+            display: flex;
+            justify-content: space-around;
+            gap: 8px;
+            padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)) 12px;
+            background: var(--surface-light);
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+        .dark .tabbar {
+            background: var(--surface-dark);
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .tab-btn {
+            flex: 1;
+            max-width: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 8px 6px;
+            border-radius: 16px;
+            border: none;
+            background: transparent;
+            color: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .tab-btn i { font-size: 1.25rem; line-height: 1; }
+        .tab-btn span { font-size: 0.75rem; }
+        .tab-btn.active { background: rgba(0,0,0,0.06); }
+        .dark .tab-btn.active { background: rgba(255,255,255,0.08); }
+
+        /* Sections behave like app screens */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Standalone mode (installed PWA): remove header chrome */
+        @media all and (display-mode: standalone) {
+            .app-header { display: none; }
+            .tabbar { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+            body { background-attachment: fixed; }
+        }
+
         /* Subtle first-visit install/bookmark banner */
         .install-banner {
             position: fixed;
@@ -1086,6 +1299,16 @@
                     <a href="#features" class="btn btn-cta btn-cta-secondary">Explore Features</a>
                 </div>
             </div>
+
+            <!-- Compact local fares (Aug 2025) -->
+            <div class="feature-card card-3d">
+                <div class="feature-icon"><i class="ph ph-currency-inr"></i></div>
+                <h3 class="feature-title">Local Fares (Aug 2025)</h3>
+                <p class="feature-description">
+                    Auto Rickshaw: Min ₹26 (first 1.5 km), ₹15.33/km after; Night (00:00–05:00): +25%<br>
+                    Kaali‑Peeli Taxi: Min ₹33 (first 1.5 km), ₹21.33/km after; Night: +25%
+                </p>
+            </div>
         </section>
         
         <!-- Features Section -->
@@ -1163,7 +1386,7 @@
                 <div class="feature-card card-3d">
                     <h3 class="feature-title">Auto Rickshaw</h3>
                     <p class="feature-description">
-                        Minimum fare (first 1.5 km): ₹23<br>
+                        Minimum fare (first 1.5 km): ₹26<br>
                         After 1.5 km: ₹15.33 per km<br>
                         Night charges (00:00–05:00): +25%
                     </p>
@@ -2062,12 +2285,16 @@
         })();
     </script>
 
-    <!-- Primary nav: organize sections (Plan, Tickets, Fares, Compare) -->
+    <!-- App router: bottom tab bar (Plan, Tickets, Compare) -->
     <script>
         (function () {
-            const nav = document.getElementById('primary-nav');
-            if (!nav) return;
-            const buttons = Array.from(nav.querySelectorAll('.nav-btn'));
+            const nav = document.getElementById('tabbar');
+            const fallback = document.getElementById('primary-nav');
+            const scope = nav || fallback;
+            if (!scope) return;
+
+            const buttons = Array.from(scope.querySelectorAll('.tab-btn, .nav-btn'));
+
             function setActiveSection(id) {
                 document.querySelectorAll('.section').forEach(sec => {
                     sec.classList.toggle('active', sec.id === id);
@@ -2076,10 +2303,13 @@
                 if (id === 'journey-planner' && typeof google !== 'undefined' && window.map) {
                     setTimeout(() => { google.maps.event.trigger(window.map, 'resize'); }, 200);
                 }
-                nav.scrollIntoView({ block: 'start', behavior: 'smooth' });
+                if (location.hash !== '#' + id) {
+                    history.replaceState(null, '', '#' + id);
+                }
             }
+
             buttons.forEach(b => b.addEventListener('click', () => setActiveSection(b.dataset.target)));
-            const hash = location.hash && location.hash.replace('#', '');
+            const hash = (location.hash || '').replace('#', '');
             if (hash && document.getElementById(hash)) setActiveSection(hash);
             else setActiveSection('journey-planner');
         })();
@@ -2166,5 +2396,42 @@
             window.open(url.toString(), '_blank', 'noopener');
         }
     </script>
+    
+    <!-- Bottom tab bar -->
+    <nav class="tabbar" id="tabbar">
+        <button class="tab-btn nav-btn active" data-target="journey-planner">
+            <i class="ph ph-compass"></i><span>Plan</span>
+        </button>
+        <button class="tab-btn nav-btn" data-target="metro-tickets">
+            <i class="ph ph-ticket"></i><span>Tickets</span>
+        </button>
+        <button class="tab-btn nav-btn" data-target="ride-hailing">
+            <i class="ph ph-taxi"></i><span>Compare</span>
+        </button>
+    </nav>
+    <!-- Bottom tab bar -->
+    <nav class="tabbar" id="tabbar">
+        <button class="tab-btn nav-btn active" data-target="journey-planner">
+            <i class="ph ph-compass"></i><span>Plan</span>
+        </button>
+        <button class="tab-btn nav-btn" data-target="metro-tickets">
+            <i class="ph ph-ticket"></i><span>Tickets</span>
+        </button>
+        <button class="tab-btn nav-btn" data-target="ride-hailing">
+            <i class="ph ph-taxi"></i><span>Compare</span>
+        </button>
+    </nav>
+    <!-- Bottom tab bar -->
+<nav class="tabbar" id="tabbar">
+    <button class="tab-btn nav-btn active" data-target="journey-planner">
+        <i class="ph ph-compass"></i><span>Plan</span>
+    </button>
+    <button class="tab-btn nav-btn" data-target="metro-tickets">
+        <i class="ph ph-ticket"></i><span>Tickets</span>
+    </button>
+    <button class="tab-btn nav-btn" data-target="ride-hailing">
+        <i class="ph ph-taxi"></i><span>Compare</span>
+    </button>
+</nav>
 </body>
 </html>

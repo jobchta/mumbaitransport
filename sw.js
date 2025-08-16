@@ -6,6 +6,7 @@ const CACHE_NAME = `mt-cache-${CACHE_VERSION}`;
 const PRECACHE_ASSETS = [
   './',
   './index.html',
+  './offline.html',
 ];
 
 // Install: pre-cache minimal shell
@@ -43,19 +44,24 @@ self.addEventListener('fetch', (event) => {
     return; // Let non-GET requests pass through
   }
 
-  // Network-first for HTML documents to keep content fresh
-  if (isHTML(request)) {
-    event.respondWith(
-      fetch(request)
-        .then((resp) => {
-          const copy = resp.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => {});
-          return resp;
-        })
-        .catch(() => caches.match(request).then((match) => match || caches.match('./index.html')))
-    );
-    return;
-  }
+ // Network-first for HTML documents to keep content fresh
+ if (isHTML(request)) {
+   event.respondWith(
+     fetch(request)
+       .then((resp) => {
+         const copy = resp.clone();
+         caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => {});
+         return resp;
+       })
+       .catch(async () => {
+         const cached = await caches.match(request);
+         if (cached) return cached;
+         // Fallback to offline shell
+         return caches.match('./offline.html');
+       })
+   );
+   return;
+ }
 
   // Cache-first for static same-origin assets
   if (isStatic(request)) {
