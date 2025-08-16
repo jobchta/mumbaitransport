@@ -426,41 +426,41 @@
             display: none;
         }
 
-        /* CSS-Only Tab Content Visibility Control */
-        #plan-radio:checked ~ .app-content #plan-tab {
+        /* CSS-Only Tab Content Visibility Control - FIXED SELECTORS */
+        #plan-radio:checked ~ .app-shell .app-content #plan-tab {
             display: block;
         }
 
-        #tickets-radio:checked ~ .app-content #tickets-tab {
+        #tickets-radio:checked ~ .app-shell .app-content #tickets-tab {
             display: block;
         }
 
-        #compare-radio:checked ~ .app-content #compare-tab {
+        #compare-radio:checked ~ .app-shell .app-content #compare-tab {
             display: block;
         }
 
-        /* CSS-Only Tab Button Active State Control */
-        #plan-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="plan-radio"] {
+        /* CSS-Only Tab Button Active State Control - FIXED SELECTORS */
+        #plan-radio:checked ~ .app-shell .bottom-tab-bar label[for="plan-radio"] {
             color: var(--primary);
         }
 
-        #plan-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="plan-radio"] i {
+        #plan-radio:checked ~ .app-shell .bottom-tab-bar label[for="plan-radio"] i {
             transform: scale(1.1);
         }
 
-        #tickets-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="tickets-radio"] {
+        #tickets-radio:checked ~ .app-shell .bottom-tab-bar label[for="tickets-radio"] {
             color: var(--primary);
         }
 
-        #tickets-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="tickets-radio"] i {
+        #tickets-radio:checked ~ .app-shell .bottom-tab-bar label[for="tickets-radio"] i {
             transform: scale(1.1);
         }
 
-        #compare-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="compare-radio"] {
+        #compare-radio:checked ~ .app-shell .bottom-tab-bar label[for="compare-radio"] {
             color: var(--primary);
         }
 
-        #compare-radio:checked ~ .app-content ~ .bottom-tab-bar label[for="compare-radio"] i {
+        #compare-radio:checked ~ .app-shell .bottom-tab-bar label[for="compare-radio"] i {
             transform: scale(1.1);
         }
         
@@ -1150,11 +1150,6 @@
                 </button>
             </div>
         </header>
-
-        <!-- Hidden Radio Inputs for CSS-Only Tab Control -->
-        <input type="radio" name="tabs" id="plan-radio" class="tab-radio" checked>
-        <input type="radio" name="tabs" id="tickets-radio" class="tab-radio">
-        <input type="radio" name="tabs" id="compare-radio" class="tab-radio">
 
         <!-- App Content -->
         <main class="app-content">
