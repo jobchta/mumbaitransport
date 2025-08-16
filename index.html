@@ -459,185 +459,75 @@
             color: white;
         }
         
-        /* Preferences */
-        .preferences {
-            display: flex;
-            gap: var(--space-2);
-            margin-bottom: var(--space-4);
-            flex-wrap: wrap;
-        }
-        
-        .preference-chip {
-            display: flex;
-            align-items: center;
-            gap: var(--space-1);
-            padding: var(--space-2) var(--space-3);
-            border-radius: var(--radius-full);
-            background: var(--surface-tertiary);
-            color: var(--text-secondary);
-            font-size: var(--text-sm);
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-        
-        .preference-chip.active {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .preference-chip:hover:not(.active) {
-            background: var(--surface-secondary);
-            color: var(--text);
-        }
-        
-        /* Route Results */
-        .route-results {
-            margin-top: var(--space-6);
-        }
-        
-        .route-option {
-            margin-bottom: var(--space-4);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .route-option.active {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
-        }
-        
-        .route-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--space-3);
-        }
-        
-        .route-time {
-            font-weight: 600;
-            font-size: var(--text-lg);
-            color: var(--text);
-        }
-        
-        .route-price {
-            font-weight: 600;
-            color: var(--primary);
-        }
-        
-        .route-meta {
-            display: flex;
-            gap: var(--space-4);
-            margin-bottom: var(--space-3);
-            flex-wrap: wrap;
-        }
-        
-        .route-meta-item {
-            display: flex;
-            align-items: center;
-            gap: var(--space-1);
-            font-size: var(--text-sm);
-            color: var(--text-secondary);
-        }
-        
-        .route-segments {
-            display: flex;
-            align-items: center;
-            gap: var(--space-2);
-            flex-wrap: wrap;
-        }
-        
-        .segment {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--space-1);
-        }
-        
-        .segment-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius-full);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: var(--text-sm);
-            color: white;
-        }
-        
-        .segment-icon.walk {
-            background: var(--text-muted);
-        }
-        
-        .segment-icon.metro {
-            background: var(--primary);
-        }
-        
-        .segment-icon.bus {
-            background: var(--success);
-        }
-        
-        .segment-connector {
-            width: 20px;
-            height: 2px;
-            background: var(--border);
-        }
-        
-        .segment span {
-            font-size: var(--text-xs);
-            color: var(--text-secondary);
-        }
-        
         /* Advanced Button */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: var(--space-xs) var(--space-sm);
-            border-radius: var(--radius-md);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius);
             font-weight: 500;
             font-size: var(--text-base);
-            transition: all var(--transition-medium);
+            transition: all 0.2s;
             cursor: pointer;
-            gap: var(--space-2xs);
+            gap: var(--space-2);
             border: none;
+            min-height: 44px;
         }
         
         .btn-primary {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.3);
+            box-shadow: var(--shadow);
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.4);
+            box-shadow: var(--shadow-lg);
         }
         
         .btn-primary:active {
             transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.2);
+            box-shadow: var(--shadow);
         }
         
         .btn-secondary {
-            background: rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.1);
+            background: var(--surface-tertiary);
             color: var(--primary);
+            border: 1px solid var(--border);
         }
         
         .btn-secondary:hover {
-            background: rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.15);
-        }
-        
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            border-radius: var(--radius-full);
+            background: var(--surface-secondary);
+            border-color: var(--primary);
         }
         
         .btn-full {
             width: 100%;
+        }
+        
+        .btn-large {
+            padding: var(--space-5) var(--space-6);
+            font-size: var(--text-lg);
+            font-weight: 600;
+            min-height: 64px;
+        }
+        
+        .btn-sm {
+            padding: var(--space-1) var(--space-2);
+            font-size: var(--text-sm);
+            min-height: auto;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
         }
         
         /* Map Container */
@@ -655,552 +545,7 @@
             }
         }
         
-        /* Hero Section */
-        .hero {
-            position: relative;
-            padding: var(--space-xl) var(--space-md);
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: white;
-            text-align: center;
-            overflow: hidden;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-        
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .hero-title {
-            font-family: var(--font-display);
-            font-weight: 700;
-            font-size: var(--text-4xl);
-            line-height: 1.2;
-            margin-bottom: var(--space-md);
-        }
-        
-        .hero-subtitle {
-            font-size: var(--text-xl);
-            margin-bottom: var(--space-lg);
-            opacity: 0.9;
-        }
-        
-        .hero-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.1;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgzMCkiPjxwYXRoIGQ9Ik0gMCAxMCBMIDIwIDEwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
-        }
-        
-        /* Feature Cards */
-        .features {
-            padding: var(--space-xl) var(--space-md);
-            background-color: var(--gray-50);
-        }
-        
-        .dark .features {
-            background-color: #1a202c;
-        }
-        
-        .features-title {
-            text-align: center;
-            font-family: var(--font-display);
-            font-weight: 700;
-            font-size: var(--text-3xl);
-            margin-bottom: var(--space-lg);
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: var(--space-md);
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .feature-card {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            padding: var(--space-lg);
-            border-radius: var(--radius-lg);
-            background: var(--surface-light);
-            box-shadow: var(--neo-shadow-light);
-            transition: transform var(--transition-medium), box-shadow var(--transition-medium);
-            color: #1a202c;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
-        }
-        
-        .dark .feature-card {
-            background: var(--surface-dark);
-            box-shadow: var(--neo-shadow-dark);
-        }
-        
-        .feature-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: var(--radius-lg);
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: var(--space-md);
-            color: white;
-            font-size: 2rem;
-        }
-        
-        .feature-title {
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: var(--text-xl);
-            margin-bottom: var(--space-sm);
-            color: #1a202c;
-        }
-        
-        .dark .feature-title {
-            color: #e2e8f0;
-        }
-        
-        .feature-description {
-            color: var(--gray-600);
-            font-size: var(--text-base);
-        }
-        
-        .dark .feature-description {
-            color: var(--gray-400);
-        }
-        
-        /* Call to Action */
-        .cta {
-            padding: var(--space-xl) var(--space-md);
-            text-align: center;
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-            color: white;
-        }
-        
-        .cta-title {
-            font-family: var(--font-display);
-            font-weight: 700;
-            font-size: var(--text-3xl);
-            margin-bottom: var(--space-md);
-        }
-        
-        .cta-description {
-            font-size: var(--text-lg);
-            max-width: 600px;
-            margin: 0 auto var(--space-lg);
-            opacity: 0.9;
-        }
-        
-        .cta-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--space-md);
-            justify-content: center;
-        }
-        
-        .btn-cta {
-            padding: var(--space-sm) var(--space-lg);
-            font-size: var(--text-lg);
-            border-radius: var(--radius-lg);
-            background: white;
-            color: var(--primary);
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn-cta:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        }
-        
-        .btn-cta-secondary {
-            background: transparent;
-            border: 2px solid white;
-            color: white;
-        }
-        
-        .btn-cta-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Footer */
-        .footer {
-            padding: var(--space-lg) var(--space-md);
-            background-color: var(--gray-900);
-            color: var(--gray-300);
-        }
-        
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: var(--space-lg);
-        }
-        
-        .footer-logo {
-            display: flex;
-            align-items: center;
-            gap: var(--space-xs);
-            margin-bottom: var(--space-md);
-        }
-        
-        .footer-logo-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius-sm);
-            background: var(--primary-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.25rem;
-        }
-        
-        .footer-logo-text {
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: var(--text-lg);
-            color: white;
-        }
-        
-        .footer-description {
-            margin-bottom: var(--space-md);
-            max-width: 300px;
-        }
-        
-        .footer-social {
-            display: flex;
-            gap: var(--space-sm);
-        }
-        
-        .footer-social-link {
-            width: 36px;
-            height: 36px;
-            border-radius: var(--radius-full);
-            background: var(--gray-800);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gray-300);
-            transition: all var(--transition-fast);
-        }
-        
-        .footer-social-link:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-4px);
-        }
-        
-        .footer-title {
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: var(--text-lg);
-            color: white;
-            margin-bottom: var(--space-md);
-        }
-        
-        .footer-links {
-            list-style: none;
-        }
-        
-        .footer-link {
-            margin-bottom: var(--space-xs);
-        }
-        
-        .footer-link a {
-            color: var(--gray-400);
-            text-decoration: none;
-            transition: color var(--transition-fast);
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-2xs);
-        }
-        
-        .footer-link a:hover {
-            color: var(--primary-light);
-        }
-        
-        .footer-link a i {
-            font-size: 0.75rem;
-        }
-        
-        .footer-bottom {
-            margin-top: var(--space-lg);
-            padding-top: var(--space-md);
-            border-top: 1px solid var(--gray-800);
-            text-align: center;
-            font-size: var(--text-sm);
-            color: var(--gray-500);
-        }
-        
-        /* 3D Card Effect */
-        .card-3d {
-            transform-style: preserve-3d;
-            perspective: var(--transform-perspective);
-            transition: transform var(--transition-medium);
-        }
-        
-        .card-3d:hover {
-            --transform-rotate-y: 5deg;
-            --transform-rotate-x: -5deg;
-            transform: 
-                perspective(var(--transform-perspective))
-                rotateX(var(--transform-rotate-x))
-                rotateY(var(--transform-rotate-y))
-                scale(var(--transform-scale));
-        }
-        
-        /* Live Indicators */
-        .live-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-2xs);
-            font-size: var(--text-xs);
-            font-weight: 500;
-            color: var(--energy);
-        }
-        
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: var(--radius-full);
-            background: var(--energy);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(var(--energy-hue), 80%, 45%, 0.7);
-            }
-            70% {
-                transform: scale(1);
-                box-shadow: 0 0 0 6px rgba(var(--energy-hue), 80%, 45%, 0);
-            }
-            100% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(var(--energy-hue), 80%, 45%, 0);
-            }
-        }
-        
-        /* AI Assistant Button */
-        .ai-assistant-btn {
-            position: fixed;
-            bottom: var(--space-md);
-            right: var(--space-md);
-            width: 56px;
-            height: 56px;
-            border-radius: var(--radius-full);
-            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            border: none;
-            cursor: pointer;
-            z-index: 100;
-            transition: all var(--transition-bounce);
-        }
-        
-        .ai-assistant-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* Theme Toggle */
-        .theme-toggle {
-            background: transparent;
-            border: none;
-            color: var(--text-dark);
-            font-size: 1.25rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-full);
-            transition: all var(--transition-medium);
-        }
-        
-        .theme-toggle:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-        
-        .dark .theme-toggle {
-            color: var(--text-light);
-        }
-        
-        .dark .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Fix for text contrast in route options */
-        .route-option {
-            color: #1a202c;
-        }
-        
-        .dark .route-option {
-            color: #e2e8f0;
-        }
-        
-        /* Mobile Optimizations */
-        @media (max-width: 768px) {
-            .app-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 100;
-                transform: translateX(-100%);
-                transition: transform var(--transition-medium);
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .mobile-nav-toggle {
-                display: flex;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .hero-title {
-                font-size: var(--text-3xl);
-            }
-            
-            .hero-subtitle {
-                font-size: var(--text-lg);
-            }
-            
-            .form-input, .btn, .mode-tab {
-                font-size: 16px; /* Prevent iOS zoom on focus */
-            }
-            
-            .app-header {
-                padding: var(--space-xs);
-            }
-            
-            .map-container {
-                height: 50vh;
-            }
-        }
-        
-        /* Add to Home Screen and Bookmark Prompts */
-        .pwa-install-prompt,
-        .bookmark-prompt {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--surface-light);
-            padding: var(--space-sm);
-            box-shadow: var(--neo-shadow-light);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            z-index: 1000;
-            transform: translateY(100%);
-            transition: transform var(--transition-medium);
-            border-top: 1px solid var(--border-color);
-        }
-        
-        .dark .pwa-install-prompt,
-        .dark .bookmark-prompt {
-            background: var(--surface-dark);
-            box-shadow: var(--neo-shadow-dark);
-        }
-        
-        .pwa-install-prompt.show,
-        .bookmark-prompt.show {
-            transform: translateY(0);
-        }
-        
-        .bookmark-prompt {
-            z-index: 999; /* Lower than PWA prompt */
-        }
-        
-        /* Non-intrusive Ad Space */
-        .ad-space {
-            background: rgba(var(--primary-hue), 10%, 95%, 0.1);
-            border-radius: var(--radius-md);
-            padding: var(--space-sm);
-            margin-bottom: var(--space-md);
-            text-align: center;
-            font-size: var(--text-sm);
-            color: var(--text-muted);
-            border: 1px dashed var(--border-color);
-        }
-        
-        .dark .ad-space {
-            background: rgba(var(--primary-hue), 10%, 15%, 0.2);
-        }
-        
-        .dark .pwa-install-prompt {
-            background: var(--surface-dark);
-            box-shadow: var(--neo-shadow-dark);
-        }
-        
-        /* Non-intrusive Ad Space */
-        .ad-space {
-            padding: var(--space-sm);
-            margin: var(--space-md) 0;
-            background: var(--surface-light);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--neo-shadow-light);
-            text-align: center;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .ad-space::before {
-            content: "Ad";
-            position: absolute;
-            top: 0.25rem;
-            right: 0.25rem;
-            font-size: var(--text-xs);
-            color: var(--text-muted);
-            background: rgba(255, 255, 255, 0.8);
-            padding: 0.1rem 0.3rem;
-            border-radius: var(--radius-sm);
-        }
-        
-        .dark .ad-space {
-            background: var(--surface-dark);
-            box-shadow: var(--neo-shadow-dark);
-        }
-        
-        .dark .ad-space::before {
-            background: rgba(0, 0, 0, 0.5);
-        }
-        
-        /* ========================================
-           AUTHENTICATION UI
-        ======================================== */
-        
+        /* Authentication UI */
         .user-auth {
             position: relative;
         }
@@ -1297,10 +642,141 @@
             gap: var(--space-2);
             width: 100%;
             padding: var(--space-2) var(--space-3);
-/* ========================================
-           REAL-TIME RIDE ESTIMATES STYLING
-        ======================================== */
+            background: none;
+            border: none;
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: var(--space-1);
+        }
         
+        .dropdown-item:hover {
+            background: var(--surface-tertiary);
+        }
+        
+        .dropdown-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .dropdown-item i {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        /* Ticket Cards */
+        .ticket-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+        
+        .ticket-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: var(--radius-xl);
+            padding: var(--space-5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ticket-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+        
+        .ticket-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+        
+        .ticket-icon {
+            font-size: 2rem;
+            opacity: 0.9;
+        }
+        
+        .ticket-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            margin-bottom: var(--space-1);
+        }
+        
+        .ticket-subtitle {
+            font-size: var(--text-sm);
+            opacity: 0.8;
+        }
+        
+        .ticket-actions {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+        
+        .ticket-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .ticket-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
+        }
+        
+        /* Fare Table */
+        .fare-table {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        .fare-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .fare-row:last-child {
+            border-bottom: none;
+        }
+        
+        .fare-row:nth-child(even) {
+            background: var(--surface-secondary);
+        }
+        
+        .fare-label {
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .fare-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Real-time Ride Estimates Styling */
         .loading-estimates {
             display: flex;
             align-items: center;
@@ -1314,7 +790,7 @@
             justify-content: space-between;
             align-items: center;
             padding: var(--space-2) 0;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border);
         }
 
         .estimate-item:last-child {
@@ -1324,14 +800,14 @@
         .estimate-item.real-time {
             background: linear-gradient(90deg, rgba(30, 136, 229, 0.05), transparent);
             padding: var(--space-2);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius);
             border: 1px solid rgba(30, 136, 229, 0.1);
             margin-bottom: var(--space-2);
         }
 
         .service-name {
             font-weight: 500;
-            color: var(--text-primary);
+            color: var(--text);
         }
 
         .fare-amount {
@@ -1364,8 +840,8 @@
 
         .connection-item {
             padding: var(--space-3);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             background: var(--surface);
         }
 
@@ -1376,236 +852,28 @@
             align-items: center;
             gap: var(--space-1);
         }
-
-        .btn-sm {
-            padding: var(--space-1) var(--space-2);
-            font-size: var(--text-sm);
-            min-height: auto;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .no-route-message {
-            text-align: center;
-            padding: var(--space-6) var(--space-4);
-            color: var(--text-secondary);
-        }
-
-        .no-route-message p {
-            margin-top: var(--space-2);
-            font-size: var(--text-sm);
-        }
-
-        .fare-estimates {
-            min-height: 60px;
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-2);
-        }
-
-        .distance-estimate {
-            padding: var(--space-3);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            background: var(--surface);
-        }
-
-        .real-time-estimates {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-3);
-        }
-
-        /* Route guidance styling */
-        .route-step {
-            display: flex;
-            align-items: flex-start;
-            gap: var(--space-3);
-            padding: var(--space-3);
-            border-left: 3px solid var(--primary);
-            margin-left: var(--space-2);
-            position: relative;
-        }
-
-        .route-step::before {
-            content: '';
-            position: absolute;
-            left: -6px;
-            top: var(--space-3);
-            width: 9px;
-            height: 9px;
-            background: var(--primary);
-            border-radius: 50%;
-        }
-
-        .route-step-icon {
-            font-size: 1.2rem;
-            color: var(--primary);
-            margin-top: 2px;
-        }
-
-        .route-step-content {
-            flex: 1;
-        }
-
-        .route-step-title {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: var(--space-1);
-        }
-
-        .route-step-details {
-            font-size: var(--text-sm);
-            color: var(--text-secondary);
-            line-height: 1.4;
-        }
-
-        .route-duration {
-            font-weight: 500;
-            color: var(--primary);
-        }
-            background: none;
-            border: none;
-            border-radius: var(--radius);
-            color: var(--text);
-            font-size: var(--text-sm);
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: var(--space-1);
-        }
         
-        .dropdown-item:hover {
-            background: var(--surface-tertiary);
-        }
-        
-        .dropdown-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .dropdown-item i {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-        
-        /* Loading States */
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-        
-        .skeleton {
-            background: linear-gradient(90deg, var(--surface-tertiary) 25%, var(--surface-secondary) 50%, var(--surface-tertiary) 75%);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s infinite;
-        }
-        
-        @keyframes skeleton-loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal {
-            background: var(--surface);
-            border-radius: var(--radius-xl);
-            padding: var(--space-6);
-            max-width: 400px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            transform: scale(0.9);
-            transition: all 0.3s;
-        }
-        
-        .modal-overlay.show .modal {
-            transform: scale(1);
-        }
-        
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--space-4);
-        }
-        
-        .modal-title {
-            font-weight: 600;
-            font-size: var(--text-lg);
-            color: var(--text);
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: var(--space-1);
-            border-radius: var(--radius);
-            transition: all 0.2s;
-        }
-        
-        .modal-close:hover {
-            background: var(--surface-tertiary);
-            color: var(--text);
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .form-input, .btn, .mode-tab {
+                font-size: 16px; /* Prevent iOS zoom on focus */
+            }
+            
+            .app-header {
+                padding: var(--space-2);
+            }
+            
+            .map-container {
+                height: 50vh;
+            }
+            
+            .ticket-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- PWA Install Prompt -->
-    <div class="pwa-install-prompt" id="pwa-install-prompt">
-        <div>
-            <strong>Add to Home Screen</strong>
-            <p>Install this app on your device for quick access.</p>
-        </div>
-        <div>
-            <button class="btn btn-primary" id="pwa-install-btn">Install</button>
-            <button class="btn btn-secondary" id="pwa-dismiss-btn">Not Now</button>
-        </div>
-    </div>
-    
-    <!-- Bookmark Prompt -->
-    <div class="bookmark-prompt" id="bookmark-prompt">
-        <div>
-            <strong>Bookmark This Page</strong>
-            <p>Save Mumbai Transport for easy access later.</p>
-        </div>
-        <div>
-            <button class="btn btn-primary" id="bookmark-how-btn">How to Bookmark</button>
-            <button class="btn btn-secondary" id="bookmark-dismiss-btn">Dismiss</button>
-        </div>
-    </div>
-
     <!-- App Shell -->
     <div class="app-shell">
         <!-- Minimal Header -->
@@ -1732,39 +1000,26 @@
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary btn-full">
-                        <i class="ph ph-route"></i>
+                    <button type="submit" class="btn btn-primary btn-full btn-large">
+                        <i class="ph ph-route" style="font-size: 1.5rem;"></i>
                         Find Routes
                     </button>
                 </form>
                 
                 <!-- Map Container -->
-                <div id="map" class="map-container" style="height: 300px; margin-top: 1rem; border-radius: var(--radius-lg);"></div>
+                <div id="map" class="map-container" style="height: 300px; margin-top: 1rem;"></div>
                 
                 <!-- Route Results -->
                 <div class="route-results" id="route-results" style="display: none;">
                     <div class="section-title">Best Routes</div>
-                    
-                    <div class="live-indicator">
-                        <span class="live-dot"></span>
-                        Live traffic updates
-                    </div>
-                    
-                    <div class="route-option active card">
-                        <div class="route-header">
-                            <div class="route-time">38 min</div>
-                            <div class="route-price">₹30</div>
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div style="font-weight: 600; font-size: 1.125rem;">38 min</div>
+                            <div style="font-weight: 600; color: var(--primary);">₹30</div>
                         </div>
-                        
-                        <div class="route-meta">
-                            <div class="route-meta-item">
-                                <i class="ph ph-clock"></i>
-                                <span>Depart 5:45 PM</span>
-                            </div>
-                            <div class="route-meta-item">
-                                <i class="ph ph-footprints"></i>
-                                <span>400m walk</span>
-                            </div>
+                        <div style="display: flex; gap: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span><i class="ph ph-clock"></i> Depart 5:45 PM</span>
+                            <span><i class="ph ph-footprints"></i> 400m walk</span>
                         </div>
                     </div>
                 </div>
@@ -1774,1510 +1029,493 @@
             <div class="tab-content" id="tickets-tab">
                 <div class="section-title">Metro Tickets & Fares</div>
                 
-                <!-- Metro Ticketing -->
-                <div style="display: grid; gap: var(--space-4); margin-bottom: var(--space-6);">
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
-                            <i class="ph ph-qr-code" style="font-size: 1.5rem; color: var(--primary);"></i>
+                <!-- Metro Ticket Cards -->
+                <div class="ticket-grid">
+                    <!-- Line 1 -->
+                    <div class="ticket-card">
+                        <div class="ticket-header">
+                            <i class="ph ph-train ticket-icon"></i>
                             <div>
-                                <h3 style="font-weight: 600; margin-bottom: var(--space-1);">Line 1 – WhatsApp Ticket</h3>
-                                <p style="color: var(--text-secondary); font-size: var(--text-sm);">Versova–Andheri–Ghatkopar (Reliance Metro)</p>
+                                <div class="ticket-title">Line 1 (Blue)</div>
+                                <div class="ticket-subtitle">Versova ↔ Ghatkopar</div>
                             </div>
                         </div>
-                        <a class="btn btn-primary" href="https://wa.me/919670008889?text=Hi" target="_blank" rel="noopener">
-                            <i class="ph ph-whatsapp-logo"></i>
-                            Open WhatsApp
-                        </a>
-                    </div>
-
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
-                            <i class="ph ph-qr-code" style="font-size: 1.5rem; color: var(--primary);"></i>
-                            <div>
-                                <h3 style="font-weight: 600; margin-bottom: var(--space-1);">Lines 2A & 7 – WhatsApp Ticket</h3>
-                                <p style="color: var(--text-secondary); font-size: var(--text-sm);">Dahisar–DN Nagar & Dahisar–Gundavali (MMMOCL)</p>
-                            </div>
-                        </div>
-                        <a class="btn btn-primary" href="https://wa.me/918652635500?text=Hi" target="_blank" rel="noopener">
-                            <i class="ph ph-whatsapp-logo"></i>
-                            Open WhatsApp
-                        </a>
-                    </div>
-
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
-                            <i class="ph ph-train" style="font-size: 1.5rem; color: var(--primary);"></i>
-                            <div>
-                                <h3 style="font-weight: 600; margin-bottom: var(--space-1);">Aqua Line (Line 3)</h3>
-                                <p style="color: var(--text-secondary); font-size: var(--text-sm);">No WhatsApp yet. Use MetroConnect3 app or see official map.</p>
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
-                            <a class="btn btn-secondary" href="https://play.google.com/store/search?q=MetroConnect3" target="_blank" rel="noopener">Android App</a>
-                            <a class="btn btn-secondary" href="https://apps.apple.com/in/search?term=MetroConnect3" target="_blank" rel="noopener">iOS App</a>
-                            <a class="btn btn-primary" href="https://mmrcl.com/en/map" target="_blank" rel="noopener">Book Ticket</a>
+                        <div class="ticket-actions">
+                            <a href="https://wa.me/919819999199?text=Hi%2C%20I%20want%20to%20buy%20Metro%20Line%201%20tickets" class="ticket-btn" target="_blank">
+                                <i class="ph ph-whatsapp-logo"></i>
+                                Buy Tickets
+                            </a>
                         </div>
                     </div>
-
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
-                            <i class="ph ph-credit-card" style="font-size: 1.5rem; color: var(--primary);"></i>
+                    
+                    <!-- Lines 2A & 7 -->
+                    <div class="ticket-card">
+                        <div class="ticket-header">
+                            <i class="ph ph-train ticket-icon"></i>
                             <div>
-                                <h3 style="font-weight: 600; margin-bottom: var(--space-1);">NCMC / Mumbai 1 Card</h3>
-                                <p style="color: var(--text-secondary); font-size: var(--text-sm);">Tap & go on Lines 1, 2A, 7 (Line 3 soon). No app required.</p>
+                                <div class="ticket-title">Lines 2A & 7</div>
+                                <div class="ticket-subtitle">DN Nagar ↔ Dahisar East</div>
                             </div>
                         </div>
-                        <a class="btn btn-secondary" href="https://www.npci.org.in/what-we-do/ncmc" target="_blank" rel="noopener">About NCMC</a>
+                        <div class="ticket-actions">
+                            <a href="https://wa.me/919819999199?text=Hi%2C%20I%20want%20to%20buy%20Metro%20Line%202A%20%26%207%20tickets" class="ticket-btn" target="_blank">
+                                <i class="ph ph-whatsapp-logo"></i>
+                                Buy Tickets
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Line 3 -->
+                    <div class="ticket-card">
+                        <div class="ticket-header">
+                            <i class="ph ph-train ticket-icon"></i>
+                            <div>
+                                <div class="ticket-title">Line 3 (Aqua)</div>
+                                <div class="ticket-subtitle">Colaba ↔ SEEPZ</div>
+                            </div>
+                        </div>
+                        <div class="ticket-actions">
+                            <a href="https://metroconnect3.com/" class="ticket-btn" target="_blank">
+                                <i class="ph ph-globe"></i>
+                                MetroConnect3
+                            </a>
+                            <a href="https://www.mmrcl.com/sites/default/files/2024-01/Aqua%20Line%20Route%20Map.pdf" class="ticket-btn" target="_blank">
+                                <i class="ph ph-map"></i>
+                                Route Map
+                            </a>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Local Fares (Aug 2025) -->
-                <div class="section-title">Local Fares (Aug 2025)</div>
-                <div style="display: grid; gap: var(--space-4);">
-                    <div class="card card-compact">
-                        <h3 style="font-weight: 600; margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
-                            <i class="ph ph-car" style="color: var(--primary);"></i>
-                            Auto Rickshaw
-                        </h3>
-                        <p style="color: var(--text-secondary); font-size: var(--text-sm);">
-                            Minimum fare (first 1.5 km): <strong>₹26</strong><br>
-                            After 1.5 km: ₹15.33 per km<br>
-                            Night charges (00:00–05:00): +25%
-                        </p>
+                
+                <!-- Fares Section -->
+                <div class="section-title">Current Fares</div>
+                <div class="fare-table">
+                    <div class="fare-row">
+                        <div class="fare-label">Auto Rickshaw (Minimum)</div>
+                        <div class="fare-value">₹26</div>
                     </div>
-                    
-                    <div class="card card-compact">
-                        <h3 style="font-weight: 600; margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
-                            <i class="ph ph-taxi" style="color: var(--primary);"></i>
-                            Kaali‑Peeli Taxi
-                        </h3>
-                        <p style="color: var(--text-secondary); font-size: var(--text-sm);">
-                            Minimum fare (first 1.5 km): ₹33<br>
-                            After 1.5 km: ₹21.33 per km<br>
-                            Night charges (00:00–05:00): +25%
-                        </p>
+                    <div class="fare-row">
+                        <div class="fare-label">Auto Rickshaw (Per km)</div>
+                        <div class="fare-value">₹17.97</div>
                     </div>
-                    
-                    <div class="card card-compact">
-                        <h3 style="font-weight: 600; margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
-                            <i class="ph ph-info" style="color: var(--primary);"></i>
-                            Notes
-                        </h3>
-                        <p style="color: var(--text-secondary); font-size: var(--text-sm);">
-                            Fares regulated by Mumbai RTO; waiting charges ≈ ₹1.5–₹2/min when stationary.
-                            NCMC/Mumbai 1 not valid for autos or kaali‑peelis (only metro/BEST/some cabs).
-                        </p>
+                    <div class="fare-row">
+                        <div class="fare-label">Auto Rickshaw (Night 25% extra)</div>
+                        <div class="fare-value">₹32.50</div>
                     </div>
+                    <div class="fare-row">
+                        <div class="fare-label">Kaali-Peeli Taxi (First 1.5km)</div>
+                        <div class="fare-value">₹28</div>
+                    </div>
+                    <div class="fare-row">
+                        <div class="fare-label">Kaali-Peeli Taxi (Per km)</div>
+                        <div class="fare-value">₹20.67</div>
+                    </div>
+                    <div class="fare-row">
+                        <div class="fare-label">Kaali-Peeli Taxi (Night 25% extra)</div>
+                        <div class="fare-value">₹35</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: var(--surface-tertiary); border-radius: var(--radius); font-size: var(--text-sm); color: var(--text-secondary);">
+                    <strong>Note:</strong> Fares updated as of August 2025. Night charges apply from 12 AM to 5 AM.
                 </div>
             </div>
 
             <!-- Compare Tab -->
             <div class="tab-content" id="compare-tab">
-                <div class="section-title">Live Ride Comparison</div>
+                <div class="section-title">Compare Rides</div>
                 
                 <!-- Account Connection Status -->
-                <div class="card" style="margin-bottom: var(--space-4);">
-                    <h3 style="font-weight: 600; margin-bottom: var(--space-3);">
-                        <i class="ph ph-link" style="color: var(--primary);"></i>
-                        Connected Accounts
-                    </h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);">
-                        <div class="connection-item">
-                            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
-                                <i class="ph ph-car" style="color: #000;"></i>
-                                <span style="font-weight: 500;">Uber</span>
+                <div class="provider-section">
+                    <h4>Account Connections</h4>
+                    <div class="connection-item" style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>Uber</strong>
+                                <div style="font-size: var(--text-sm); color: var(--text-secondary);">Connect for real-time fares</div>
                             </div>
-                            <div id="uber-connection-status">
-                                <button onclick="connectUberAccount()" class="btn btn-outline btn-sm">Connect Account</button>
+                            <button class="btn btn-outline btn-sm" id="connect-uber">Connect</button>
+                        </div>
+                    </div>
+                    <div class="connection-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>Ola</strong>
+                                <div style="font-size: var(--text-sm); color: var(--text-secondary);">Connect for real-time fares</div>
                             </div>
-                        </div>
-                        <div class="connection-item">
-                            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
-                                <i class="ph ph-car" style="color: #00D100;"></i>
-                                <span style="font-weight: 500;">Ola</span>
-                            </div>
-                            <div id="ola-connection-status">
-                                <button onclick="connectOlaAccount()" class="btn btn-outline btn-sm">Connect Account</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="font-size: var(--text-sm); color: var(--text-secondary); margin-top: var(--space-3);">
-                        <i class="ph ph-info"></i>
-                        Connect your accounts to get real-time pricing and book rides directly
-                    </div>
-                </div>
-
-                <div class="card" style="margin-bottom: var(--space-4);">
-                    <h3 style="font-weight: 600; margin-bottom: var(--space-3);">Live Fare Estimates</h3>
-                    <div style="font-size: var(--text-sm); color: var(--text-secondary);">
-                        <strong>Based on your route:</strong>
-                        <span id="trip-distance-label">Plan a route to see live fare estimates</span>
-                    </div>
-                </div>
-
-                <div style="display: grid; gap: var(--space-4);">
-                    <!-- 5 km -->
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
-                            <i class="ph ph-car" style="font-size: 1.5rem; color: var(--primary);"></i>
-                            <h3 style="font-weight: 600;">5 km</h3>
-                        </div>
-                        <div id="fare-5km" style="margin-bottom: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary);">
-                            Uber Go: —<br>
-                            Ola Mini: —<br>
-                            Uber Moto: —<br>
-                            Ola Auto: —
-                        </div>
-                        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
-                            <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
-                        </div>
-                    </div>
-
-                    <!-- 10 km -->
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
-                            <i class="ph ph-car-profile" style="font-size: 1.5rem; color: var(--primary);"></i>
-                            <h3 style="font-weight: 600;">10 km</h3>
-                        </div>
-                        <div id="fare-10km" style="margin-bottom: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary);">
-                            Uber Go: —<br>
-                            Ola Mini: —<br>
-                            Uber Moto: —<br>
-                            Ola Auto: —
-                        </div>
-                        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
-                            <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
-                        </div>
-                    </div>
-
-                    <!-- 20 km -->
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
-                            <i class="ph ph-steering-wheel" style="font-size: 1.5rem; color: var(--primary);"></i>
-                            <h3 style="font-weight: 600;">20 km</h3>
-                        </div>
-                        <div id="fare-20km" style="margin-bottom: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary);">
-                            Uber Go: —<br>
-                            Ola Mini: —<br>
-                            Uber Moto: —<br>
-                            Ola Auto: —
-                        </div>
-                        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
-                            <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
-                        </div>
-                    </div>
-
-                    <!-- Current route distance (if available) -->
-                    <div class="card" id="fare-current-card" style="display:none;">
-                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
-                            <i class="ph ph-route" style="font-size: 1.5rem; color: var(--primary);"></i>
-                            <h3 style="font-weight: 600;">Your route</h3>
-                        </div>
-                        <div id="fare-current" style="margin-bottom: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary);">
-                            Uber Go: —<br>
-                            Ola Mini: —<br>
-                            Uber Moto: —<br>
-                            Ola Auto: —
-                        </div>
-                        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
-                            <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
+                            <button class="btn btn-outline btn-sm" id="connect-ola">Connect</button>
                         </div>
                     </div>
                 </div>
                 
-                <p style="margin-top: var(--space-4); font-size: var(--text-xs); color: var(--text-muted);">
-                    Estimates are indicative using typical Mumbai rates; actual prices depend on live demand, time, tolls, and provider policies. For live quotes, use the buttons to open the ride app with your pickup/drop set.
-                </p>
+                <!-- Route-based Estimates -->
+                <div class="provider-section">
+                    <h4>Ride Estimates</h4>
+                    <div class="card" id="ride-estimates">
+                        <div style="text-align: center; color: var(--text-secondary); font-style: italic;">
+                            Plan a route first to see ride estimates
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step-by-step Route Guidance -->
+                <div class="provider-section" id="route-guidance" style="display: none;">
+                    <h4>Route Guidance</h4>
+                    <div class="card">
+                        <div id="route-steps"></div>
+                    </div>
+                </div>
             </div>
         </main>
 
         <!-- Bottom Tab Bar -->
         <nav class="bottom-tab-bar">
-            <button class="tab-button active" data-tab="plan-tab">
-                <i class="ph ph-map-trifold"></i>
+            <button class="tab-button active" data-tab="plan">
+                <i class="ph ph-route"></i>
                 <span>Plan</span>
             </button>
-            <button class="tab-button" data-tab="tickets-tab">
+            <button class="tab-button" data-tab="tickets">
                 <i class="ph ph-ticket"></i>
                 <span>Tickets</span>
             </button>
-            <button class="tab-button" data-tab="compare-tab">
+            <button class="tab-button" data-tab="compare">
                 <i class="ph ph-scales"></i>
                 <span>Compare</span>
             </button>
         </nav>
     </div>
-    
+
     <script>
-        // Theme Toggle Functionality
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
+        // ========================================
+        // MUMBAI TRANSPORT APP FUNCTIONALITY
+        // ========================================
         
-        // Check for saved theme preference or respect OS preference
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-            body.classList.add('dark');
-            themeToggle.innerHTML = '<i class="ph ph-moon"></i>';
-        } else {
-            themeToggle.innerHTML = '<i class="ph ph-sun"></i>';
-        }
-        
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            
-            if (body.classList.contains('dark')) {
-                localStorage.setItem('theme', 'dark');
-                themeToggle.innerHTML = '<i class="ph ph-moon"></i>';
-            } else {
-                localStorage.setItem('theme', 'light');
-                themeToggle.innerHTML = '<i class="ph ph-sun"></i>';
-            }
-            
-            // Update map style if map is initialized
-            if (window.map) {
-                updateMapStyle();
-            }
-            
-            // Update any other elements that need theme-specific styling
-            updateThemeSpecificElements();
-        });
-        
-        // Update theme-specific elements
-        function updateThemeSpecificElements() {
-            // Update any elements that need specific theme handling
-            // For example, charts, illustrations, or other components
-            console.log('Theme updated to:', body.classList.contains('dark') ? 'dark' : 'light');
-        }
-        
-        
-        // Bottom Tab Bar Navigation
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
-        
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const targetTab = button.dataset.tab;
-                
-                // Remove active class from all buttons and contents
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-                
-                // Add active class to clicked button and corresponding content
-                button.classList.add('active');
-                const targetContent = document.getElementById(targetTab);
-                if (targetContent) {
-                    targetContent.classList.add('active');
-                }
-                
-                // Trigger map resize when switching to Plan tab (if map exists)
-                if (targetTab === 'plan-tab' && typeof google !== 'undefined' && window.map) {
-                    setTimeout(() => {
-                        google.maps.event.trigger(window.map, 'resize');
-                    }, 100);
-                }
-            });
-        });
-
-        // Mobile Navigation Toggle (if exists)
-        const mobileNavToggle = document.getElementById('mobile-nav-toggle');
-        const sidebar = document.getElementById('sidebar');
-        
-        if (mobileNavToggle && sidebar) {
-            mobileNavToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-                
-                if (sidebar.classList.contains('active')) {
-                    mobileNavToggle.innerHTML = '<i class="ph ph-x"></i>';
-                    // Add overlay to close sidebar when clicking outside
-                    addSidebarOverlay();
-                } else {
-                    mobileNavToggle.innerHTML = '<i class="ph ph-list"></i>';
-                    // Remove overlay
-                    removeSidebarOverlay();
-                }
-
-                // On iOS/Safari, when the drawer opens/closes, force map to resize to avoid cut layouts
-                if (typeof google !== 'undefined' && window.map) {
-                    setTimeout(() => {
-                        google.maps.event.trigger(window.map, 'resize');
-                    }, 250);
-                }
-            });
-        }
-        
-        // Add overlay to close sidebar when clicking outside
-        function addSidebarOverlay() {
-            // Check if overlay already exists
-            if (document.getElementById('sidebar-overlay')) return;
-            
-            const overlay = document.createElement('div');
-            overlay.id = 'sidebar-overlay';
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 99;
-                display: none;
-            `;
-            
-            document.body.appendChild(overlay);
-            
-            // Show overlay
-            setTimeout(() => {
-                overlay.style.display = 'block';
-            }, 10);
-            
-            // Close sidebar when clicking overlay
-            overlay.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-                mobileNavToggle.innerHTML = '<i class="ph ph-list"></i>';
-                removeSidebarOverlay();
-            });
-        }
-        
-        // Remove sidebar overlay
-        function removeSidebarOverlay() {
-            const overlay = document.getElementById('sidebar-overlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-                setTimeout(() => {
-                    if (overlay.parentNode) {
-                        overlay.parentNode.removeChild(overlay);
-                    }
-                }, 300);
-            }
-        }
-        // Transport Mode Tabs
-        const modeTabs = document.querySelectorAll('.mode-tab');
-        
-        modeTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                modeTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                const mode = tab.dataset.mode;
-                // Filter routes based on mode
-                console.log(`Selected mode: ${mode}`);
-                
-                // Filter routes and update the map
-                filterRoutesByMode(mode);
-            });
-        });
-        
-        // Filter routes by transport mode
-        function filterRoutesByMode(mode) {
-            // This function would filter routes based on the selected mode
-            // For now, we'll just log the mode selection
-            console.log(`Filtering routes by mode: ${mode}`);
-            
-            // In a real implementation, you would:
-            // 1. Get current route data
-            // 2. Filter based on the selected mode
-            // 3. Update the route display
-            // 4. Update the map with filtered routes
-            
-            // For now, we'll just show an alert to indicate the feature works
-            if (mode !== 'all') {
-                alert(`Showing ${mode} routes only. In a full implementation, this would filter the displayed routes.`);
-            }
-        }
-        
-        // Location Swap Functionality
-        const swapLocationsBtn = document.getElementById('swap-locations');
-        const fromInput = document.getElementById('from');
-        const toInput = document.getElementById('to');
-        
-        swapLocationsBtn.addEventListener('click', () => {
-            const fromValue = fromInput.value;
-            const toValue = toInput.value;
-            
-            // Swap values
-            fromInput.value = toValue;
-            toInput.value = fromValue;
-            
-            // Animate the swap button
-            swapLocationsBtn.style.transition = 'transform 0.5s ease';
-            swapLocationsBtn.style.transform = 'rotate(180deg)';
-            
-            // Reset animation after completion
-            setTimeout(() => {
-                swapLocationsBtn.style.transition = '';
-                swapLocationsBtn.style.transform = '';
-            }, 500);
-            
-            // If we have autocomplete instances, update their bounds
-            if (autocompleteFrom && autocompleteTo) {
-                // Trigger a bounds update for both autocomplete instances
-                if (map) {
-                    autocompleteFrom.bindTo('bounds', map);
-                    autocompleteTo.bindTo('bounds', map);
-                }
-            }
-        });
-        
-        // Departure Time Selector
-        const departureTimeSelect = document.getElementById('departure-time');
-        const timeSelector = document.getElementById('time-selector');
-        
-        departureTimeSelect.addEventListener('change', () => {
-            if (departureTimeSelect.value === 'now') {
-                timeSelector.style.display = 'none';
-            } else {
-                timeSelector.style.display = 'block';
-                
-                // Set default time to current time + 30 minutes
-                const now = new Date();
-                now.setMinutes(now.getMinutes() + 30);
-                
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                
-                document.getElementById('custom-time').value = `${year}-${month}-${day}T${hours}:${minutes}`;
-            }
-        });
-        
-        // Preference Chips
-        const preferenceChips = document.querySelectorAll('.preference-chip');
-        
-        preferenceChips.forEach(chip => {
-            chip.addEventListener('click', () => {
-                preferenceChips.forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
-            });
-        });
-        
-        // Journey Form Submission
-        const journeyForm = document.getElementById('journey-form');
-        const routeResults = document.getElementById('route-results');
-        
-        journeyForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            // Get form values
-            const from = document.getElementById('from').value;
-            const to = document.getElementById('to').value;
-            
-            // Validate inputs
-            if (!from || !to) {
-                alert('Please enter both start and end locations');
-                return;
-            }
-            
-            // Show loading state
-            const submitBtn = journeyForm.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="ph ph-circle-notch ph-spin"></i> Finding Routes...';
-            submitBtn.disabled = true;
-            
-            // Calculate route using Google Maps Directions API
-            calculateAndDisplayRoute(from, to);
-        });
-        
-        // Calculate and display route (Worker REST first, JS fallback)
-        function calculateAndDisplayRoute(origin, destination) {
-            const submitBtn = journeyForm.querySelector('button[type="submit"]');
-
-            // Prefer place_id when available from Autocomplete
-            const fromPlace = (typeof autocompleteFrom?.getPlace === 'function') ? autocompleteFrom.getPlace() : null;
-            const toPlace = (typeof autocompleteTo?.getPlace === 'function') ? autocompleteTo.getPlace() : null;
-            const originParam = (fromPlace && fromPlace.place_id) ? `place_id:${fromPlace.place_id}` : origin;
-            const destinationParam = (toPlace && toPlace.place_id) ? `place_id:${toPlace.place_id}` : destination;
-
-            // Derive mode from active chip (defaults to transit)
-            const activeMode = (document.querySelector('.mode-tab.active')?.dataset.mode || 'all').toLowerCase();
-
-            const params = new URLSearchParams();
-            params.set('origin', originParam);
-            params.set('destination', destinationParam);
-            if (activeMode === 'taxi' || activeMode === 'auto') {
-                params.set('mode', 'driving');
-            } else {
-                params.set('mode', 'transit');
-                // Use Mumbai-appropriate modes by default
-                params.set('transit_mode', 'bus,subway,train');
-                params.set('transit_routing_preference', 'fewer_transfers');
-            }
-            params.set('region', 'in');
-            params.set('language', 'en-IN');
-            params.set('alternatives', 'true');
-            params.set('departure_time', 'now');
-
-            const url = `/api/google/directions?${params.toString()}`;
-
-            fetch(url)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.status !== 'OK' || !data.routes || !data.routes.length) {
-                        throw new Error(`Worker directions status: ${data.status}`);
-                    }
-
-                    const route = data.routes[0];
-                    const leg = route.legs && route.legs[0];
-
-                    // Clear previous overlays
-                    if (window.routePolyline) { window.routePolyline.setMap(null); window.routePolyline = null; }
-                    if (!Array.isArray(window.routeMarkers)) window.routeMarkers = [];
-                    window.routeMarkers.forEach(m => m && m.setMap && m.setMap(null));
-                    window.routeMarkers = [];
-
-                    // Draw overview polyline
-                    const encoded = route.overview_polyline && route.overview_polyline.points;
-                    if (encoded && google.maps?.geometry?.encoding?.decodePath) {
-                        const path = google.maps.geometry.encoding.decodePath(encoded);
-                        window.routePolyline = new google.maps.Polyline({
-                            map,
-                            path,
-                            strokeColor: (getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#0ea5e9').trim(),
-                            strokeOpacity: 0.8,
-                            strokeWeight: 5
-                        });
-                        const bounds = new google.maps.LatLngBounds();
-                        path.forEach(p => bounds.extend(p));
-                        map.fitBounds(bounds);
-                    }
-
-                    // Start/End markers
-                    if (leg) {
-                        const startPos = leg.start_location;
-                        const endPos = leg.end_location;
-                        const startMarker = addCustomMarker(
-                            (startPos && typeof startPos.lat === 'function') ? { lat: startPos.lat(), lng: startPos.lng() } : startPos,
-                            'start'
-                        );
-                        const endMarker = addCustomMarker(
-                            (endPos && typeof endPos.lat === 'function') ? { lat: endPos.lat(), lng: endPos.lng() } : endPos,
-                            'end'
-                        );
-                        if (startMarker) window.routeMarkers.push(startMarker);
-                        if (endMarker) window.routeMarkers.push(endMarker);
-                    }
-
-                    // Adapt REST routes to the UI renderer shape
-                    let adaptedRoutes = [];
-                    try {
-                        adaptedRoutes = data.routes.map(r => {
-                            const l = r.legs && r.legs[0];
-                            return {
-                                legs: [{
-                                    duration: l?.duration || { text: '' },
-                                    departure_time: l?.departure_time || { text: '' },
-                                    steps: (l?.steps || []).map(s => {
-                                        const tm = (s.travel_mode || '').toUpperCase();
-                                        if (tm === 'TRANSIT') {
-                                            // Normalize to the UI's expectations
-                                            const td = s.transit_details || {};
-                                            return {
-                                                travel_mode: 'TRANSIT',
-                                                distance: s.distance,
-                                                transit: {
-                                                    line: {
-                                                        short_name: td.line?.short_name || td.line?.name,
-                                                        name: td.line?.name,
-                                                        vehicle: { type: (td.line?.vehicle?.type || '').toUpperCase() }
-                                                    }
-                                                }
-                                            };
-                                        } else if (tm === 'WALKING') {
-                                            return { travel_mode: 'WALKING', distance: s.distance };
-                                        }
-                                        return { travel_mode: s.travel_mode || 'WALKING', distance: s.distance };
-                                    })
-                                }]
-                            };
-                        });
-                    } catch (e) {
-                        console.warn('displayRoutes adaptation failed', e);
-                    }
-
-                    if (adaptedRoutes.length) {
-                        displayRoutes(adaptedRoutes);
-                        routeResults.style.display = 'block';
-                        if (window.innerWidth < 1024) {
-                            routeResults.scrollIntoView({ behavior: 'smooth' });
-                        }
-                    }
-
-                    submitBtn.innerHTML = '<i class="ph ph-magnifying-glass"></i> Find Routes';
-                    submitBtn.disabled = false;
-                })
-                .catch(err => {
-                    console.warn('Worker directions failed, falling back to JS DirectionsService', err);
-
-                    // JS fallback
-                    const dsRequest = {
-                        origin,
-                        destination,
-                        travelMode: (activeMode === 'taxi' || activeMode === 'auto')
-                            ? google.maps.TravelMode.DRIVING
-                            : google.maps.TravelMode.TRANSIT,
-                        provideRouteAlternatives: true
-                    };
-                    if (dsRequest.travelMode === google.maps.TravelMode.TRANSIT) {
-                        dsRequest.transitOptions = {
-                            modes: [
-                                google.maps.TransitMode.BUS,
-                                google.maps.TransitMode.SUBWAY,
-                                google.maps.TransitMode.TRAIN
-                            ],
-                            routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
-                        };
-                    }
-
-                    directionsService.route(
-                        dsRequest,
-                        (response, status) => {
-                            if (status === 'OK') {
-                                displayRoutes(response.routes);
-                                directionsRenderer.setDirections(response);
-                                routeResults.style.display = 'block';
-                                if (window.innerWidth < 1024) {
-                                    routeResults.scrollIntoView({ behavior: 'smooth' });
-                                }
-                            } else {
-                                console.error('Directions request failed due to ' + status);
-                                alert('Could not calculate route: ' + status);
-                            }
-                            submitBtn.innerHTML = '<i class="ph ph-magnifying-glass"></i> Find Routes';
-                            submitBtn.disabled = false;
-                        }
-                    );
-                });
-        }
-        
-        // Display routes in the results panel
-        function displayRoutes(routes) {
-            let html = '';
-            
-            routes.forEach((route, index) => {
-                const leg = route.legs[0];
-                const isRecommended = index === 0;
-                
-                // Calculate total transit time and walking distance
-                let walkingDistance = 0;
-                let transitCount = 0;
-                
-                leg.steps.forEach(step => {
-                    if (step.travel_mode === 'WALKING') {
-                        walkingDistance += step.distance.value;
-                    } else if (step.travel_mode === 'TRANSIT') {
-                        transitCount++;
-                    }
-                });
-                
-                // Convert walking distance to km
-                const walkingKm = (walkingDistance / 1000).toFixed(1);
-                
-                html += `
-                    <div class="route-option card-3d ${isRecommended ? 'active' : ''}" data-route-index="${index}">
-                        <div class="route-header">
-                            <div class="route-time">${leg.duration.text}</div>
-                            <div class="route-price">₹${(20 + transitCount * 10)}</div>
-                        </div>
-                        
-                        <div class="route-meta">
-                            <div class="route-meta-item">
-                                <i class="ph ph-clock"></i>
-                                <span>Depart ${leg.departure_time.text}</span>
-                            </div>
-                            <div class="route-meta-item">
-                                <i class="ph ph-footprints"></i>
-                                <span>${walkingKm}km walk</span>
-                            </div>
-                        </div>
-                        
-                        <div class="route-segments">
-                            ${generateRouteSegments(leg.steps)}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            document.getElementById('route-results').innerHTML = `
-                <div class="section-title">Best Routes</div>
-                <div class="live-indicator">
-                    <span class="live-dot"></span>
-                    Live traffic updates
-                </div>
-                ${html}
-            `;
-            
-            // Add event listeners to route options
-            document.querySelectorAll('.route-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove active class from all options
-                    document.querySelectorAll('.route-option').forEach(opt => {
-                        opt.classList.remove('active');
-                    });
-                    
-                    // Add active class to clicked option
-                    this.classList.add('active');
-                    
-                    // Get route index and display on map
-                    const routeIndex = this.getAttribute('data-route-index');
-                    const route = routes[routeIndex];
-                    directionsRenderer.setDirections({
-                        routes: [route]
-                    });
-                });
-            });
-        }
-        
-        // Generate route segments HTML
-        function generateRouteSegments(steps) {
-            let html = '';
-            let segmentCount = 0;
-            
-            steps.forEach(step => {
-                if (segmentCount > 0) {
-                    html += '<div class="segment-connector"></div>';
-                }
-                
-                if (step.travel_mode === 'WALKING') {
-                    html += `
-                        <div class="segment">
-                            <div class="segment-icon walk">W</div>
-                        </div>
-                    `;
-                } else if (step.travel_mode === 'TRANSIT') {
-                    let icon = 'T';
-                    let mode = 'Transit';
-                    
-                    if (step.transit.line.vehicle.type === 'BUS') {
-                        icon = 'B';
-                        mode = 'Bus';
-                    } else if (step.transit.line.vehicle.type === 'RAIL' || step.transit.line.vehicle.type === 'METRO_RAIL') {
-                        icon = 'M';
-                        mode = 'Metro';
-                    } else if (step.transit.line.vehicle.type === 'TRAIN') {
-                        icon = 'T';
-                        mode = 'Train';
-                    }
-                    
-                    html += `
-                        <div class="segment">
-                            <div class="segment-icon ${mode.toLowerCase()}">${icon}</div>
-                            <span>${step.transit.line.short_name || step.transit.line.name}</span>
-                        </div>
-                    `;
-                }
-                
-                segmentCount++;
-            });
-            
-            return html;
-        }
-        
-        // Route Option Selection
-        const routeOptions = document.querySelectorAll('.route-option');
-        
-        routeOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                routeOptions.forEach(o => o.classList.remove('active'));
-                option.classList.add('active');
-                
-                // Update route on map
-                if (window.map) {
-                    // Here you would update the route display
-                    console.log('Selected new route');
-                }
-            });
-        });
-        
-        // AI Assistant (if exists)
-        const aiAssistant = document.getElementById('ai-assistant');
-        
-        if (aiAssistant) {
-            aiAssistant.addEventListener('click', () => {
-                // Show AI assistant modal or chat interface
-                alert('AI Travel Assistant: How can I help you plan your journey today?');
-            });
-        }
-        
-        // Initialize Google Maps
+        // Global Variables
         let map;
         let directionsService;
         let directionsRenderer;
-        let autocompleteFrom;
-        let autocompleteTo;
+        let placesService;
+        let fromAutocomplete;
+        let toAutocomplete;
+        let authManager;
         
+        // Authentication Manager
+        class AuthManager {
+            constructor() {
+                this.user = null;
+                this.token = null;
+                this.init();
+            }
+            
+            async init() {
+                // Check for existing session
+                try {
+                    const response = await fetch('/api/auth/verify', {
+                        credentials: 'include'
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.user = data.user;
+                        this.updateUI();
+                    }
+                } catch (error) {
+                    console.log('No existing session');
+                }
+                
+                // Initialize Google Identity Services
+                if (typeof google !== 'undefined' && google.accounts) {
+                    google.accounts.id.initialize({
+                        client_id: 'YOUR_GOOGLE_CLIENT_ID',
+                        callback: this.handleCredentialResponse.bind(this)
+                    });
+                }
+            }
+            
+            async handleCredentialResponse(response) {
+                try {
+                    const authResponse = await fetch('/api/auth/google', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            credential: response.credential
+                        })
+                    });
+                    
+                    if (authResponse.ok) {
+                        const data = await authResponse.json();
+                        this.user = data.user;
+                        this.updateUI();
+                    }
+                } catch (error) {
+                    console.error('Authentication failed:', error);
+                }
+            }
+            
+            async login() {
+                if (typeof google !== 'undefined' && google.accounts) {
+                    google.accounts.id.prompt();
+                }
+            }
+            
+            async logout() {
+                try {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                    this.user = null;
+                    this.updateUI();
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                }
+            }
+            
+            updateUI() {
+                const loginDiv = document.getElementById('auth-login');
+                const userDiv = document.getElementById('auth-user');
+                
+                if (this.user) {
+                    loginDiv.style.display = 'none';
+                    userDiv.style.display = 'block';
+                    
+                    document.getElementById('user-name').textContent = this.user.name;
+                    document.getElementById('user-email').textContent = this.user.email;
+                    document.getElementById('user-picture').src = this.user.picture;
+                } else {
+                    loginDiv.style.display = 'block';
+                    userDiv.style.display = 'none';
+                }
+            }
+        }
+        
+        // Initialize Google Maps
         function initMap() {
-            // Mumbai coordinates
-            const mumbai = { lat: 19.0760, lng: 72.8777 };
-            
-            // Map options
-            const mapOptions = {
-                center: mumbai,
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 19.0760, lng: 72.8777 },
                 zoom: 12,
-                disableDefaultUI: true,
-                zoomControl: true,
-                mapTypeControl: false,
-                scaleControl: true,
-                streetViewControl: false,
-                rotateControl: false,
-                fullscreenControl: true
-            };
+                styles: [
+                    {
+                        featureType: 'poi',
+                        elementType: 'labels',
+                        stylers: [{ visibility: 'off' }]
+                    }
+                ]
+            });
             
-            // Create the map
-            map = new google.maps.Map(document.getElementById('map'), mapOptions);
-            
-            // Initialize directions service and renderer
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer({
-                map: map,
-                suppressMarkers: true,
+                suppressMarkers: false,
                 polylineOptions: {
-                    strokeColor: getComputedStyle(document.documentElement).getPropertyValue('--primary'),
-                    strokeWeight: 5,
-                    strokeOpacity: 0.7
+                    strokeColor: '#0ea5e9',
+                    strokeWeight: 4
                 }
             });
+            directionsRenderer.setMap(map);
             
-            // Apply custom map style based on theme
-            updateMapStyle();
+            placesService = new google.maps.places.PlacesService(map);
             
-            // Initialize autocomplete for location inputs
-            autocompleteFrom = new google.maps.places.Autocomplete(
-                document.getElementById('from'),
-                { componentRestrictions: { country: 'in' } }
-            );
+            // Initialize autocomplete
+            initAutocomplete();
             
-            autocompleteTo = new google.maps.places.Autocomplete(
-                document.getElementById('to'),
-                { componentRestrictions: { country: 'in' } }
-            );
-            
-            // Bias autocomplete results to current map bounds
-            autocompleteFrom.bindTo('bounds', map);
-            autocompleteTo.bindTo('bounds', map);
+            // Initialize auth manager
+            authManager = new AuthManager();
         }
         
-        // Update map style based on theme
-        function updateMapStyle() {
-            const isDark = document.body.classList.contains('dark');
+        function initAutocomplete() {
+            const fromInput = document.getElementById('from');
+            const toInput = document.getElementById('to');
             
-            const lightStyle = [
-                { elementType: 'geometry', stylers: [{ color: '#f5f5f5' }] },
-                { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-                { elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-                { elementType: 'labels.text.stroke', stylers: [{ color: '#f5f5f5' }] },
-                { featureType: 'administrative.land_parcel', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
-                { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#eeeeee' }] },
-                { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-                { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#e5e5e5' }] },
-                { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
-                { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
-                { featureType: 'road.arterial', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-                { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#dadada' }] },
-                { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-                { featureType: 'road.local', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
-                { featureType: 'transit.line', elementType: 'geometry', stylers: [{ color: '#e5e5e5' }] },
-                { featureType: 'transit.station', elementType: 'geometry', stylers: [{ color: '#eeeeee' }] },
-                { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c9c9c9' }] },
-                { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] }
-            ];
-            
-            const darkStyle = [
-                { elementType: 'geometry', stylers: [{ color: '#212121' }] },
-                { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-                { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-                { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },
-                { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
-                { featureType: 'administrative.country', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
-                { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
-                { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
-                { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-// Enhanced Route Display with Step-by-Step Guidance
-        function displayRouteGuidance(route) {
-            const routeResults = document.getElementById('route-results');
-            if (!routeResults) return;
-
-            // Store route data globally for fare estimation
-            window.currentRoute = {
-                start: { lat: route.legs[0].start_location.lat(), lng: route.legs[0].start_location.lng() },
-                end: { lat: route.legs[0].end_location.lat(), lng: route.legs[0].end_location.lng() },
-                distance: route.legs[0].distance.value / 1000, // Convert to km
-                duration: route.legs[0].duration.value / 60 // Convert to minutes
-            };
-
-            window.currentDistanceKm = window.currentRoute.distance;
-
-            let guidanceHTML = '<div class="route-guidance">';
-            guidanceHTML += '<h3 style="margin-bottom: var(--space-3);">Step-by-Step Directions</h3>';
-
-            route.legs[0].steps.forEach((step, index) => {
-                const instruction = step.instructions.replace(/<[^>]*>/g, ''); // Remove HTML tags
-                const distance = step.distance.text;
-                const duration = step.duration.text;
-                const travelMode = step.travel_mode.toLowerCase();
-
-                let icon = 'ph-footprints';
-                if (travelMode === 'transit') icon = 'ph-train';
-                else if (travelMode === 'driving') icon = 'ph-car';
-                else if (travelMode === 'bicycling') icon = 'ph-bicycle';
-
-                guidanceHTML += `
-                    <div class="route-step">
-                        <i class="ph ${icon} route-step-icon"></i>
-                        <div class="route-step-content">
-                            <div class="route-step-title">Step ${index + 1}</div>
-                            <div class="route-step-details">
-                                ${instruction}<br>
-                                <span class="route-duration">${distance} • ${duration}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            fromAutocomplete = new google.maps.places.Autocomplete(fromInput, {
+                componentRestrictions: { country: 'IN' },
+                bounds: new google.maps.LatLngBounds(
+                    new google.maps.LatLng(18.8, 72.6),
+                    new google.maps.LatLng(19.3, 73.0)
+                )
             });
-
-            guidanceHTML += '</div>';
-
-            // Update route results with guidance
-            routeResults.innerHTML = `
-                <div class="section-title">Your Route</div>
-                <div class="live-indicator">
-                    <span class="live-dot"></span>
-                    Live traffic updates
-                </div>
-                <div class="route-option active card">
-                    <div class="route-header">
-                        <div class="route-time">${Math.round(window.currentRoute.duration)} min</div>
-                        <div class="route-price">${window.currentRoute.distance.toFixed(1)} km</div>
-                    </div>
-                    <div class="route-meta">
-                        <div class="route-meta-item">
-                            <i class="ph ph-clock"></i>
-                            <span>Total Duration</span>
-                        </div>
-                        <div class="route-meta-item">
-                            <i class="ph ph-map-pin-line"></i>
-                            <span>Distance</span>
-                        </div>
-                    </div>
-                </div>
-                ${guidanceHTML}
-            `;
-
-            routeResults.style.display = 'block';
-
-            // Update fare estimates with real route data
-            updateRideEstimates();
-
-            // Show current route card in Compare tab
-            const currentRouteCard = document.getElementById('fare-current-card');
-            if (currentRouteCard) {
-                currentRouteCard.style.display = 'block';
-            }
-
-            // Update trip distance label
-            const tripLabel = document.getElementById('trip-distance-label');
-            if (tripLabel) {
-                tripLabel.textContent = `${window.currentRoute.distance.toFixed(1)} km route planned - showing live estimates`;
-            }
-        }
-
-        // Booking Functions
-        window.bookUberRide = async function() {
-            if (!window.currentRoute) {
-                alert('Please plan a route first using the Plan tab');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/rides/uber/request', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        start_latitude: window.currentRoute.start.lat,
-                        start_longitude: window.currentRoute.start.lng,
-                        end_latitude: window.currentRoute.end.lat,
-                        end_longitude: window.currentRoute.end.lng,
-                        product_id: 'uberX' // Default product
-                    })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        alert(`Uber ride requested! Request ID: ${data.request_id}`);
-                    } else {
-                        alert('Failed to book Uber ride. Please try again.');
-                    }
-                } else if (response.status === 401) {
-                    alert('Please connect your Uber account first');
-                } else {
-                    alert('Error booking Uber ride. Please try again.');
-                }
-            } catch (error) {
-                console.error('Uber booking error:', error);
-                // Fallback to deep link
-                openUberDeepLink();
-            }
-        };
-
-        window.bookOlaRide = async function() {
-            if (!window.currentRoute) {
-                alert('Please plan a route first using the Plan tab');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/rides/ola/request', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        pickup_lat: window.currentRoute.start.lat,
-                        pickup_lng: window.currentRoute.start.lng,
-                        drop_lat: window.currentRoute.end.lat,
-                        drop_lng: window.currentRoute.end.lng,
-                        category: 'mini' // Default category
-                    })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        alert(`Ola ride requested! Booking ID: ${data.booking_id}${data.otp ? ` | OTP: ${data.otp}` : ''}`);
-                    } else {
-                        alert('Failed to book Ola ride. Please try again.');
-                    }
-                } else if (response.status === 401) {
-                    alert('Please connect your Ola account first');
-                } else {
-                    alert('Error booking Ola ride. Please try again.');
-                }
-            } catch (error) {
-                console.error('Ola booking error:', error);
-                // Fallback to deep link
-                openOlaDeepLink();
-            }
-        };
-
-        // Enhanced initialization
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is authenticated and update connection status
-            if (typeof authManager !== 'undefined') {
-                authManager.checkAuthStatus().then(isAuthenticated => {
-                    if (isAuthenticated) {
-                        checkAccountConnections();
-                    }
-                });
-            }
-
-            // Initialize static estimates
-            updateRideEstimates();
-        });
-                { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#181818' }] },
-                { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-                { featureType: 'poi.park', elementType: 'labels.text.stroke', stylers: [{ color: '#1b1b1b' }] },
-                { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#2c2c2c' }] },
-                { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#8a8a8a' }] },
-                { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#373737' }] },
-                { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#3c3c3c' }] },
-                { featureType: 'road.highway.controlled_access', elementType: 'geometry', stylers: [{ color: '#4e4e4e' }] },
-                { featureType: 'road.local', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-                { featureType: 'transit', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-                { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
-                { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
-            ];
             
-            map.setOptions({ styles: isDark ? darkStyle : lightStyle });
+            toAutocomplete = new google.maps.places.Autocomplete(toInput, {
+                componentRestrictions: { country: 'IN' },
+                bounds: new google.maps.LatLngBounds(
+                    new google.maps.LatLng(18.8, 72.6),
+                    new google.maps.LatLng(19.3, 73.0)
+                )
+            });
         }
         
-        // Draw route on map
-        function drawRoute() {
-            // Get route points from form
+        // Tab Navigation
+        function initTabNavigation() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabName = button.dataset.tab;
+                    
+                    // Update active states
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    button.classList.add('active');
+                    document.getElementById(`${tabName}-tab`).classList.add('active');
+                    
+                    // Resize map if switching to plan tab
+                    if (tabName === 'plan' && map) {
+                        setTimeout(() => {
+                            google.maps.event.trigger(map, 'resize');
+                        }, 100);
+                    }
+                });
+            });
+        }
+        
+        // Transport Mode Selection
+        function initTransportModes() {
+            const modeTabs = document.querySelectorAll('.mode-tab');
+            
+            modeTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    modeTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                });
+            });
+        }
+        
+        // Journey Planning
+        function initJourneyPlanner() {
+            const form = document.getElementById('journey-form');
+            const swapButton = document.getElementById('swap-locations');
+            const departureSelect = document.getElementById('departure-time');
+            const timeSelector = document.getElementById('time-selector');
+            
+            form.addEventListener('submit', handleRouteSearch);
+            swapButton.addEventListener('click', swapLocations);
+            
+            departureSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'now') {
+                    timeSelector.style.display = 'none';
+                } else {
+                    timeSelector.style.display = 'block';
+                }
+            });
+        }
+        
+        function swapLocations() {
+            const fromInput = document.getElementById('from');
+            const toInput = document.getElementById('to');
+            
+            const temp = fromInput.value;
+            fromInput.value = toInput.value;
+            toInput.value = temp;
+        }
+        
+        async function handleRouteSearch(e) {
+            e.preventDefault();
+            
             const from = document.getElementById('from').value;
             const to = document.getElementById('to').value;
             
-            if (!from || !to) return;
-            
-            // Request directions
-            directionsService.route(
-                {
-                    origin: from,
-                    destination: to,
-                    travelMode: google.maps.TravelMode.TRANSIT,
-                    transitOptions: {
-                        modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.RAIL],
-                        routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
-                    },
-                    provideRouteAlternatives: true
-                },
-                (response, status) => {
-                    if (status === 'OK') {
-                        directionsRenderer.setDirections(response);
-                        
-                        // Add custom markers for start and end
-                        const leg = response.routes[0].legs[0];
-                        addCustomMarker(leg.start_location, 'start');
-                        addCustomMarker(leg.end_location, 'end');
-                        
-                        // Add transit markers for each step
-                        leg.steps.forEach(step => {
-                            if (step.travel_mode === 'TRANSIT') {
-                                addTransitMarker(step);
-                            }
-                        });
-
-                        // Capture distance and coordinates for ride-hailing deep links and estimates
-                        try {
-                            const km = leg.distance && leg.distance.value ? (leg.distance.value / 1000) : null;
-                            window.currentDistanceKm = km;
-                            window.currentFrom = { lat: leg.start_location.lat(), lng: leg.start_location.lng() };
-                            window.currentTo = { lat: leg.end_location.lat(), lng: leg.end_location.lng() };
-
-                            const lbl = document.getElementById('trip-distance-label');
-                            if (lbl && km) lbl.textContent = `Your route: ${km.toFixed(1)} km`;
-                            const card = document.getElementById('fare-current-card');
-                            if (card && km) card.style.display = '';
-
-                            if (typeof updateRideEstimates === 'function') {
-                                updateRideEstimates();
-                            }
-                        } catch (e) {
-                            console.warn('Ride estimate init failed', e);
-                        }
-                    } else {
-                        console.error('Directions request failed due to ' + status);
-                        alert('Could not calculate route. Please try different locations.');
-                    }
-                }
-            );
-        }
-        
-        // Add custom marker to map
-        function addCustomMarker(position, type) {
-            const iconUrl = type === 'start' 
-                ? 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOWMwIDUuMjUgNyAxMyA3IDEzczctNy43NSA3LTEzYzAtMy44Ny0zLjEzLTctNy03em0wIDkuNWMtMS4zOCAwLTIuNS0xLjEyLTIuNS0yLjVzMS4xMi0yLjUgMi41LTIuNSAyLjUgMS4xMiAyLjUgMi41LTEuMTIgMi41LTIuNSAyLjV6IiBmaWxsPSIjNDI4NWY0Ii8+PC9zdmc+'
-                : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOWMwIDUuMjUgNyAxMyA3IDEzczctNy43NSA3LTEzYzAtMy44Ny0zLjEzLTctNy03em0wIDkuNWMtMS4zOCAwLTIuNS0xLjEyLTIuNS0yLjVzMS4xMi0yLjUgMi41LTIuNSAyLjUgMS4xMiAyLjUgMi41LTEuMTIgMi41LTIuNSAyLjV6IiBmaWxsPSIjZWE0MzM1Ii8+PC9zdmc+';
-            
-            const marker = new google.maps.Marker({
-                position: position,
-                map: map,
-                icon: {
-                    url: iconUrl,
-                    scaledSize: new google.maps.Size(36, 36)
-                },
-                animation: google.maps.Animation.DROP,
-                zIndex: type === 'start' ? 2 : 3
-            });
-            
-            return marker;
-        }
-        
-        // Add transit marker
-        function addTransitMarker(step) {
-            const transitDetails = step.transit;
-            const departureStop = transitDetails.departure_stop;
-            
-            // Create icon based on transit type
-            let iconColor;
-            switch(transitDetails.line.vehicle.type) {
-                case 'BUS':
-                    iconColor = '#4CAF50'; // Green
-                    break;
-                case 'SUBWAY':
-                case 'METRO_RAIL':
-                    iconColor = '#2196F3'; // Blue
-                    break;
-                case 'TRAIN':
-                    iconColor = '#FF9800'; // Orange
-                    break;
-                default:
-                    iconColor = '#9C27B0'; // Purple
-            }
-            
-            const iconSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="' + iconColor + '"/><circle cx="12" cy="12" r="6" fill="white"/></svg>';
-            
-            const encodedSvg = btoa(iconSvg);
-            
-            const marker = new google.maps.Marker({
-                position: departureStop.location,
-                map: map,
-                icon: {
-                    url: 'data:image/svg+xml;base64,' + encodedSvg,
-                    scaledSize: new google.maps.Size(24, 24)
-                },
-                zIndex: 1
-            });
-            
-            // Add info window with transit details
-             const infoWindow = new google.maps.InfoWindow({
-                 content: '<div style="padding: 8px;">' +
-                     '<div style="font-weight: bold; margin-bottom: 4px;">' + (transitDetails.line.name || transitDetails.line.short_name) + '</div>' +
-                     '<div>Departure: ' + transitDetails.departure_time.text + '</div>' +
-                     '<div>Arrival: ' + transitDetails.arrival_time.text + '</div>' +
-                     '<div>Stops: ' + transitDetails.num_stops + '</div>' +
-                     '</div>'
-             });
-            
-            marker.addListener('click', () => {
-                infoWindow.open(map, marker);
-            });
-            
-            return marker;
-        }
-        
-        // Initialize via Maps callback; see script tag (callback=initMap)
-    </script>
-    
-    <!-- PWA Service Worker Registration -->
-    <script>
-        // Register Service Worker for PWA functionality
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // Explicitly scope SW under /portal/
-                navigator.serviceWorker.register('sw.js', { scope: '/' })
-                    .then(registration => {
-                        console.log('Service Worker registered with scope:', registration.scope);
-                        // Ensure only /portal/ scoped SW is active (remove any root-scoped registrations)
-                        try {
-                            navigator.serviceWorker.getRegistrations().then(regs => {
-                                regs.forEach(r => {
-                                    try {
-                                        if (!r.scope.endsWith('/portal/')) {
-                                            r.unregister().catch(() => {});
-                                        }
-                                    } catch {}
-                                });
-                            });
-                        } catch {}
-                        
-                        // Check for updates
-                        registration.update();
-                        
-                        // Listen for updates
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // New update available
-                                    console.log('New content is available; please refresh.');
-                                    showUpdateNotification();
-                                }
-                            });
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Service Worker registration failed:', error);
-                    });
-            });
-            
-            // Listen for controlling service worker changes
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
-                    window.location.reload();
-                    refreshing = true;
-                }
-            });
-        }
-        
-        // Show update notification
-        function showUpdateNotification() {
-            const notification = document.createElement('div');
-            notification.innerHTML = `
-                <div style="position: fixed; bottom: 20px; right: 20px; background: #4CAF50; color: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span>New version available!</span>
-                        <button id="refresh-btn" style="background: white; color: #4CAF50; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">Refresh</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(notification);
-            
-            document.getElementById('refresh-btn').addEventListener('click', () => {
-                window.location.reload();
-            });
-            
-            // Auto-hide after 10 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 10000);
-        }
-        
-        // PWA Install Prompt Logic
-        let deferredPrompt;
-        const pwaPrompt = document.getElementById('pwa-install-prompt');
-        const pwaInstallBtn = document.getElementById('pwa-install-btn');
-        const pwaDismissBtn = document.getElementById('pwa-dismiss-btn');
-        
-        // Check if user has already dismissed or installed
-        const pwaStatus = localStorage.getItem('pwa-status');
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent Chrome 76+ from automatically showing the prompt
-            e.preventDefault();
-            // Stash the event so it can be triggered later
-            deferredPrompt = e;
-            
-            // Only show if not previously dismissed or installed
-            if (pwaStatus !== 'dismissed' && pwaStatus !== 'installed') {
-                // Show the prompt after a delay for better UX
-                setTimeout(() => {
-                    pwaPrompt.classList.add('show');
-                }, 3000);
-            }
-        });
-        
-        // Install button click handler
-        pwaInstallBtn.addEventListener('click', () => {
-            // Hide the prompt
-            pwaPrompt.classList.remove('show');
-            
-            // Show the native install prompt
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                        localStorage.setItem('pwa-status', 'installed');
-                    } else {
-                        console.log('User dismissed the install prompt');
-                        localStorage.setItem('pwa-status', 'dismissed');
-                    }
-                    
-                    deferredPrompt = null;
-                });
-            }
-        });
-        
-        // Dismiss button click handler
-        pwaDismissBtn.addEventListener('click', () => {
-            pwaPrompt.classList.remove('show');
-            localStorage.setItem('pwa-status', 'dismissed');
-        });
-        
-        // Check if the app was launched from installed PWA
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            localStorage.setItem('pwa-status', 'installed');
-        }
-        
-        // Bookmark Prompt Logic
-        const bookmarkPrompt = document.getElementById('bookmark-prompt');
-        const bookmarkHowBtn = document.getElementById('bookmark-how-btn');
-        const bookmarkDismissBtn = document.getElementById('bookmark-dismiss-btn');
-        
-        // Check if user has already dismissed bookmark prompt
-        const bookmarkStatus = localStorage.getItem('bookmark-status');
-        
-        // Show bookmark prompt after a delay if not previously dismissed
-        if (bookmarkStatus !== 'dismissed') {
-            // Only show if PWA is not installed and on mobile
-            if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
-                window.matchMedia('(display-mode: standalone)').matches || 
-                window.navigator.standalone === true) {
-                // Don't show on desktop or if already installed as PWA
-                // Do nothing
-            } else {
-                // Show on mobile browsers after delay
-                setTimeout(() => {
-                    // Only show if PWA prompt is not showing
-                    if (!pwaPrompt.classList.contains('show')) {
-                        bookmarkPrompt.classList.add('show');
-                    }
-                }, 5000);
-            }
-        }
-        
-        // How to bookmark button click handler
-        bookmarkHowBtn.addEventListener('click', () => {
-            // Show different instructions based on browser
-            let message = '';
-            
-            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                // iOS instructions
-                message = 'To bookmark this page on iOS: tap the share icon (rectangle with arrow) at the bottom of the screen, then select "Add to Home Screen".';
-            } else if (/Android/i.test(navigator.userAgent)) {
-                // Android instructions (varies by browser)
-                if (/chrome/i.test(navigator.userAgent)) {
-                    message = 'To bookmark in Chrome: tap the menu icon (three dots) in the top right, then tap the star icon.';
-                } else if (/firefox/i.test(navigator.userAgent)) {
-                    message = 'To bookmark in Firefox: tap the menu icon (three dots) in the top right, then tap the star icon.';
-                } else if (/opera/i.test(navigator.userAgent)) {
-                    message = 'To bookmark in Opera: tap the menu icon at the bottom, then tap the heart icon.';
-                } else {
-                    message = 'To bookmark this page: tap your browser menu button and look for the bookmark or star option.';
-                }
-            } else {
-                // Desktop instructions
-                message = 'To bookmark this page: press Ctrl+D (Windows/Linux) or Cmd+D (Mac).';
-            }
-            
-            alert(message);
-        });
-        
-        // Dismiss button click handler
-        bookmarkDismissBtn.addEventListener('click', () => {
-            bookmarkPrompt.classList.remove('show');
-            localStorage.setItem('bookmark-status', 'dismissed');
-        });
-
-        // Surge factor slider removed - using base rates for estimates
-
-        // Ride-hailing Deep Link Functions
-        window.openUberDeepLink = function() {
-            const from = window.currentFrom;
-            const to = window.currentTo;
-            
-            if (from && to) {
-                const uberUrl = `https://m.uber.com/ul/?action=setPickup&pickup[latitude]=${from.lat}&pickup[longitude]=${from.lng}&dropoff[latitude]=${to.lat}&dropoff[longitude]=${to.lng}`;
-                window.open(uberUrl, '_blank');
-            } else {
-                // Fallback to general Uber app
-                window.open('https://m.uber.com/', '_blank');
-            }
-        };
-
-        window.openOlaDeepLink = function() {
-            const from = window.currentFrom;
-            const to = window.currentTo;
-            
-            if (from && to) {
-                const olaUrl = `https://book.olacabs.com/?serviceType=p2p&lat=${from.lat}&lng=${from.lng}&drop_lat=${to.lat}&drop_lng=${to.lng}`;
-                window.open(olaUrl, '_blank');
-            } else {
-                // Fallback to general Ola app
-                window.open('https://book.olacabs.com/', '_blank');
-            }
-        };
-
-        // Real-time Ride Estimates with API Integration
-        window.updateRideEstimates = async function() {
-            // Check if we have route coordinates
-            if (!window.currentRoute || !window.currentRoute.start || !window.currentRoute.end) {
-                // Show static estimates for common distances
-                updateStaticEstimates();
+            if (!from || !to) {
+                alert('Please enter both origin and destination');
                 return;
             }
-
-            const { start, end } = window.currentRoute;
             
             try {
-                // Show loading state
-                showEstimateLoading();
+                // Use secure proxy for directions
+                const response = await fetch('/api/google/directions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        origin: from,
+                        destination: to,
+                        travelMode: 'TRANSIT',
+                        transitOptions: {
+                            modes: ['BUS', 'RAIL', 'SUBWAY']
+                        }
+                    })
+                });
                 
-                // Call real-time fare comparison API
+                if (response.ok) {
+                    const data = await response.json();
+                    displayRouteResults(data);
+                    updateRideEstimates(from, to);
+                } else {
+                    // Fallback to client-side directions
+                    const request = {
+                        origin: from,
+                        destination: to,
+                        travelMode: google.maps.TravelMode.TRANSIT,
+                        transitOptions: {
+                            modes: [
+                                google.maps.TransitMode.BUS,
+                                google.maps.TransitMode.RAIL,
+                                google.maps.TransitMode.SUBWAY
+                            ]
+                        }
+                    };
+                    
+                    directionsService.route(request, (result, status) => {
+                        if (status === 'OK') {
+                            displayRouteResults(result);
+                            updateRideEstimates(from, to);
+                        } else {
+                            console.error('Directions request failed:', status);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Route search failed:', error);
+            }
+        }
+        
+        function displayRouteResults(result) {
+            const resultsDiv = document.getElementById('route-results');
+            resultsDiv.style.display = 'block';
+            
+            if (directionsRenderer) {
+                directionsRenderer.setDirections(result);
+            }
+            
+            // Update route guidance
+            updateRouteGuidance(result);
+        }
+        
+        function updateRouteGuidance(result) {
+            const guidanceDiv = document.getElementById('route-guidance');
+            const stepsDiv = document.getElementById('route-steps');
+            
+            if (result.routes && result.routes[0] && result.routes[0].legs) {
+                const leg = result.routes[0].legs[0];
+                let stepsHTML = '';
+                
+                leg.steps.forEach((step, index) => {
+                    stepsHTML += `
+                        <div style="padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                            <div style="font-weight: 500; margin-bottom: 0.25rem;">
+                                Step ${index + 1}: ${step.instructions.replace(/<[^>]*>/g, '')}
+                            </div>
+                            <div style="font-size: var(--text-sm); color: var(--text-secondary);">
+                                ${step.distance.text} • ${step.duration.text}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                stepsDiv.innerHTML = stepsHTML;
+                guidanceDiv.style.display = 'block';
+            }
+        }
+        
+        async function updateRideEstimates(from, to) {
+            const estimatesDiv = document.getElementById('ride-estimates');
+            
+            estimatesDiv.innerHTML = '<div class="loading-estimates"><i class="ph ph-spinner"></i> Getting real-time estimates...</div>';
+            
+            try {
                 const response = await fetch('/api/rides/compare', {
                     method: 'POST',
                     headers: {
@@ -3285,575 +1523,164 @@
                     },
                     credentials: 'include',
                     body: JSON.stringify({
-                        start_latitude: start.lat,
-                        start_longitude: start.lng,
-                        end_latitude: end.lat,
-                        end_longitude: end.lng
+                        pickup: from,
+                        destination: to
                     })
                 });
-
+                
                 if (response.ok) {
                     const data = await response.json();
-                    displayRealTimeEstimates(data);
+                    displayRideEstimates(data);
                 } else {
-                    // Fallback to static estimates if API fails
-                    console.warn('Real-time estimates unavailable, using static rates');
-                    updateStaticEstimates();
+                    estimatesDiv.innerHTML = '<div style="text-align: center; color: var(--text-secondary);">Connect your accounts for real-time estimates</div>';
                 }
             } catch (error) {
-                console.error('Error fetching real-time estimates:', error);
-                updateStaticEstimates();
+                console.error('Failed to get ride estimates:', error);
+                estimatesDiv.innerHTML = '<div style="text-align: center; color: var(--text-secondary);">Unable to get estimates at this time</div>';
             }
-        };
-
-        function updateStaticEstimates() {
-            // Mumbai ride-hailing base rates (fallback)
-            const rates = {
-                uberGo: { base: 25, perKm: 12 },
-                olaMini: { base: 23, perKm: 11 },
-                uberMoto: { base: 15, perKm: 8 },
-                olaAuto: { base: 20, perKm: 10 }
-            };
+        }
+        
+        function displayRideEstimates(data) {
+            const estimatesDiv = document.getElementById('ride-estimates');
+            let html = '';
             
-            const distances = [5, 10, 20];
-            if (window.currentDistanceKm) {
-                distances.push(window.currentDistanceKm);
-            }
-            
-            distances.forEach(km => {
-                const estimates = {
-                    uberGo: Math.round(rates.uberGo.base + rates.uberGo.perKm * km),
-                    olaMini: Math.round(rates.olaMini.base + rates.olaMini.perKm * km),
-                    uberMoto: Math.round(rates.uberMoto.base + rates.uberMoto.perKm * km),
-                    olaAuto: Math.round(rates.olaAuto.base + rates.olaAuto.perKm * km)
-                };
-                
-                let elementId;
-                if (km === 5) elementId = 'fare-5km';
-                else if (km === 10) elementId = 'fare-10km';
-                else if (km === 20) elementId = 'fare-20km';
-                else if (km === window.currentDistanceKm) elementId = 'fare-current';
-                
-                const element = document.getElementById(elementId);
-                if (element) {
-                    element.innerHTML = `
-                        <div class="estimate-item">
-                            <span class="service-name">Uber Go</span>
-                            <span class="fare-amount">₹${estimates.uberGo}</span>
-                        </div>
-                        <div class="estimate-item">
-                            <span class="service-name">Ola Mini</span>
-                            <span class="fare-amount">₹${estimates.olaMini}</span>
-                        </div>
-                        <div class="estimate-item">
-                            <span class="service-name">Uber Moto</span>
-                            <span class="fare-amount">₹${estimates.uberMoto}</span>
-                        </div>
-                        <div class="estimate-item">
-                            <span class="service-name">Ola Auto</span>
-                            <span class="fare-amount">₹${estimates.olaAuto}</span>
+            if (data.uber && data.uber.length > 0) {
+                html += '<h5 style="margin-bottom: 0.5rem; color: var(--text-secondary);">UBER</h5>';
+                data.uber.forEach(estimate => {
+                    html += `
+                        <div class="estimate-item real-time">
+                            <span class="service-name">${estimate.display_name}</span>
+                            <span class="fare-amount">₹${estimate.fare_estimate}</span>
                         </div>
                     `;
+                });
+            }
+            
+            if (data.ola && data.ola.length > 0) {
+                html += '<h5 style="margin: 1rem 0 0.5rem 0; color: var(--text-secondary);">OLA</h5>';
+                data.ola.forEach(estimate => {
+                    html += `
+                        <div class="estimate-item real-time">
+                            <span class="service-name">${estimate.category}</span>
+                            <span class="fare-amount">₹${estimate.fare_estimate}</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            if (data.local) {
+                html += '<h5 style="margin: 1rem 0 0.5rem 0; color: var(--text-secondary);">LOCAL TRANSPORT</h5>';
+                Object.entries(data.local).forEach(([key, value]) => {
+                    html += `
+                        <div class="estimate-item">
+                            <span class="service-name">${key}</span>
+                            <span class="fare-amount">₹${value}</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            estimatesDiv.innerHTML = html || '<div style="text-align: center; color: var(--text-secondary);">No estimates available</div>';
+        }
+        
+        // Theme Toggle
+        function initThemeToggle() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+            
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark');
+                
+                if (document.body.classList.contains('dark')) {
+                    themeIcon.className = 'ph ph-moon';
+                } else {
+                    themeIcon.className = 'ph ph-sun';
                 }
             });
         }
-
-        function showEstimateLoading() {
-            const elements = ['fare-5km', 'fare-10km', 'fare-20km', 'fare-current'];
-            elements.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.innerHTML = `
-                        <div class="loading-estimates">
-                            <i class="ph ph-spinner ph-spin"></i>
-                            Getting live prices...
-                        </div>
-                    `;
+        
+        // User Authentication
+        function initAuthentication() {
+            const loginBtn = document.getElementById('google-login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const userAvatar = document.getElementById('user-avatar');
+            const userDropdown = document.getElementById('user-dropdown');
+            const connectUber = document.getElementById('connect-uber');
+            const connectOla = document.getElementById('connect-ola');
+            
+            loginBtn.addEventListener('click', () => {
+                if (authManager) {
+                    authManager.login();
                 }
             });
-        }
-
-        function displayRealTimeEstimates(data) {
-            if (!data.success) {
-                updateStaticEstimates();
-                return;
-            }
-
-            // Update current route estimates
-            const currentElement = document.getElementById('fare-current');
-            if (currentElement && (data.providers.uber || data.providers.ola)) {
-                let html = '<div class="real-time-estimates">';
-                
-                if (data.providers.uber && data.providers.uber.estimates) {
-                    html += '<div class="provider-section"><h4>Uber</h4>';
-                    data.providers.uber.estimates.forEach(estimate => {
-                        html += `
-                            <div class="estimate-item real-time">
-                                <span class="service-name">${estimate.service}</span>
-                                <span class="fare-amount">${estimate.estimate}</span>
-                                ${estimate.surge_multiplier > 1 ? `<span class="surge-indicator">${estimate.surge_multiplier}x</span>` : ''}
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
+            
+            logoutBtn.addEventListener('click', () => {
+                if (authManager) {
+                    authManager.logout();
                 }
-
-                if (data.providers.ola && data.providers.ola.estimates) {
-                    html += '<div class="provider-section"><h4>Ola</h4>';
-                    data.providers.ola.estimates.forEach(estimate => {
-                        html += `
-                            <div class="estimate-item real-time">
-                                <span class="service-name">${estimate.service}</span>
-                                <span class="fare-amount">${estimate.estimate}</span>
-                                ${estimate.surge_multiplier > 1 ? `<span class="surge-indicator">${estimate.surge_multiplier}x</span>` : ''}
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
+            });
+            
+            userAvatar.addEventListener('click', () => {
+                userDropdown.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!userAvatar.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userDropdown.classList.remove('show');
                 }
-
-                html += '</div>';
-                currentElement.innerHTML = html;
-            }
-
-            // Update static distance estimates with fallback
-            updateStaticEstimates();
-        }
-
-        // Account Connection Functions
-        window.connectUberAccount = async function() {
-            try {
-                const response = await fetch('/api/rides/uber/connect', {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.authUrl) {
-                        // Open OAuth flow in popup
-                        const popup = window.open(data.authUrl, 'uber-auth', 'width=500,height=600');
-                        
-                        // Listen for popup completion
-                        const checkClosed = setInterval(() => {
-                            if (popup.closed) {
-                                clearInterval(checkClosed);
-                                // Refresh account status
-                                checkAccountConnections();
-                            }
-                        }, 1000);
-                    }
-                } else {
-                    alert('Failed to initiate Uber connection');
-                }
-            } catch (error) {
-                console.error('Uber connection error:', error);
-                alert('Error connecting to Uber');
-            }
-        };
-
-        window.connectOlaAccount = async function() {
-            try {
-                const response = await fetch('/api/rides/ola/connect', {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.authUrl) {
-                        // Open OAuth flow in popup
-                        const popup = window.open(data.authUrl, 'ola-auth', 'width=500,height=600');
-                        
-                        // Listen for popup completion
-                        const checkClosed = setInterval(() => {
-                            if (popup.closed) {
-                                clearInterval(checkClosed);
-                                // Refresh account status
-                                checkAccountConnections();
-                            }
-                        }, 1000);
-                    }
-                } else {
-                    alert('Failed to initiate Ola connection');
-                }
-            } catch (error) {
-                console.error('Ola connection error:', error);
-                alert('Error connecting to Ola');
-            }
-        };
-
-        async function checkAccountConnections() {
-            try {
-                const response = await fetch('/api/user/profile', {
-                    credentials: 'include'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.user) {
-                        updateConnectionStatus(data.user.connectedAccounts);
-                    }
-                }
-            } catch (error) {
-                console.error('Error checking account connections:', error);
-            }
-        }
-
-        function updateConnectionStatus(connectedAccounts) {
-            // Update UI to show connection status
-            const uberStatus = document.getElementById('uber-connection-status');
-            const olaStatus = document.getElementById('ola-connection-status');
-
-            if (uberStatus) {
-                if (connectedAccounts?.uber?.connected) {
-                    uberStatus.innerHTML = '<span class="connected">✓ Connected</span>';
-                } else {
-                    uberStatus.innerHTML = '<button onclick="connectUberAccount()" class="btn btn-outline">Connect Uber</button>';
-                }
-            }
-
-            if (olaStatus) {
-                if (connectedAccounts?.ola?.connected) {
-                    olaStatus.innerHTML = '<span class="connected">✓ Connected</span>';
-                } else {
-                    olaStatus.innerHTML = '<button onclick="connectOlaAccount()" class="btn btn-outline">Connect Ola</button>';
-                }
-            }
-        }
-
-        // Initialize ride estimates on page load
-        setTimeout(() => {
-            if (typeof updateRideEstimates === 'function') {
-                updateRideEstimates();
-            }
-        }, 1000);
-
-        // ========================================
-        // AUTHENTICATION SYSTEM
-        // ========================================
-
-        class AuthManager {
-            constructor() {
-                this.user = null;
-                this.isAuthenticated = false;
-                this.init();
-            }
-
-            async init() {
-                // Initialize Google Identity Services
-                if (typeof google !== 'undefined' && google.accounts) {
-                    google.accounts.id.initialize({
-                        client_id: 'YOUR_GOOGLE_CLIENT_ID', // TODO: Replace with actual client ID
-                        callback: this.handleGoogleResponse.bind(this),
-                        auto_select: false,
-                        cancel_on_tap_outside: true
-                    });
-                }
-
-                // Check if user is already authenticated
-                await this.checkAuthStatus();
-                this.setupEventListeners();
-            }
-
-            async checkAuthStatus() {
+            });
+            
+            connectUber.addEventListener('click', async () => {
                 try {
-                    const response = await fetch('/api/auth/verify', {
+                    const response = await fetch('/api/rides/uber/connect', {
                         credentials: 'include'
                     });
-
                     if (response.ok) {
                         const data = await response.json();
-                        if (data.success) {
-                            this.setUser(data.user);
-                        }
+                        window.location.href = data.auth_url;
                     }
                 } catch (error) {
-                    console.log('No existing authentication found');
+                    console.error('Failed to connect Uber:', error);
                 }
-
-                this.updateUI();
-            }
-
-            setupEventListeners() {
-                // Google Sign In button
-                const loginBtn = document.getElementById('google-login-btn');
-                if (loginBtn) {
-                    loginBtn.addEventListener('click', () => {
-                        if (typeof google !== 'undefined' && google.accounts) {
-                            google.accounts.id.prompt();
-                        } else {
-                            console.error('Google Identity Services not loaded');
-                        }
-                    });
-                }
-
-                // User avatar dropdown
-                const userAvatar = document.getElementById('user-avatar');
-                const userDropdown = document.getElementById('user-dropdown');
-                if (userAvatar && userDropdown) {
-                    userAvatar.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        userDropdown.classList.toggle('show');
-                    });
-
-                    // Close dropdown when clicking outside
-                    document.addEventListener('click', () => {
-                        userDropdown.classList.remove('show');
-                    });
-                }
-
-                // Logout button
-                const logoutBtn = document.getElementById('logout-btn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', this.logout.bind(this));
-                }
-
-                // User preferences
-                const preferencesBtn = document.getElementById('user-preferences');
-                if (preferencesBtn) {
-                    preferencesBtn.addEventListener('click', this.showPreferences.bind(this));
-                }
-
-                // Saved locations
-                const locationsBtn = document.getElementById('saved-locations');
-                if (locationsBtn) {
-                    locationsBtn.addEventListener('click', this.showSavedLocations.bind(this));
-                }
-
-                // Connect accounts
-                const connectBtn = document.getElementById('connect-accounts');
-                if (connectBtn) {
-                    connectBtn.addEventListener('click', this.showConnectAccounts.bind(this));
-                }
-            }
-
-            async handleGoogleResponse(response) {
+            });
+            
+            connectOla.addEventListener('click', async () => {
                 try {
-                    const result = await fetch('/api/auth/google', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({
-                            credential: response.credential
-                        })
-                    });
-
-                    const data = await result.json();
-                    
-                    if (data.success) {
-                        this.setUser(data.user);
-                        this.updateUI();
-                        this.showWelcomeMessage();
-                    } else {
-                        console.error('Authentication failed:', data.error);
-                        alert('Authentication failed. Please try again.');
-                    }
-                } catch (error) {
-                    console.error('Authentication error:', error);
-                    alert('Authentication failed. Please try again.');
-                }
-            }
-
-            async logout() {
-                try {
-                    await fetch('/api/auth/logout', {
-                        method: 'POST',
+                    const response = await fetch('/api/rides/ola/connect', {
                         credentials: 'include'
                     });
-
-                    this.user = null;
-                    this.isAuthenticated = false;
-                    this.updateUI();
-                    
-                    // Sign out from Google
-                    if (typeof google !== 'undefined' && google.accounts) {
-                        google.accounts.id.disableAutoSelect();
+                    if (response.ok) {
+                        const data = await response.json();
+                        window.location.href = data.auth_url;
                     }
                 } catch (error) {
-                    console.error('Logout error:', error);
+                    console.error('Failed to connect Ola:', error);
                 }
-            }
-
-            setUser(user) {
-                this.user = user;
-                this.isAuthenticated = true;
-            }
-
-            updateUI() {
-                const loginState = document.getElementById('auth-login');
-                const userState = document.getElementById('auth-user');
-                const userName = document.getElementById('user-name');
-                const userEmail = document.getElementById('user-email');
-                const userPicture = document.getElementById('user-picture');
-
-                if (this.isAuthenticated && this.user) {
-                    // Show authenticated state
-                    loginState.style.display = 'none';
-                    userState.style.display = 'block';
-                    
-                    // Update user info
-                    if (userName) userName.textContent = this.user.name;
-                    if (userEmail) userEmail.textContent = this.user.email;
-                    if (userPicture) userPicture.src = this.user.picture || '';
-                } else {
-                    // Show login state
-                    loginState.style.display = 'block';
-                    userState.style.display = 'none';
-                }
-            }
-
-            showWelcomeMessage() {
-                if (this.user) {
-                    const message = `Welcome back, ${this.user.name}! Your preferences and saved locations are now available.`;
-                    this.showNotification(message, 'success');
-                }
-            }
-
-            showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = `notification notification-${type}`;
-                notification.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: var(--space-2);">
-                        <i class="ph ph-${type === 'success' ? 'check-circle' : 'info'}"></i>
-                        <span>${message}</span>
-                        <button onclick="this.parentElement.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: inherit; cursor: pointer;">
-                            <i class="ph ph-x"></i>
-                        </button>
-                    </div>
-                `;
-                
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: ${type === 'success' ? '#10b981' : '#0ea5e9'};
-                    color: white;
-                    padding: var(--space-3) var(--space-4);
-                    border-radius: var(--radius-lg);
-                    box-shadow: var(--shadow-lg);
-                    z-index: 1000;
-                    max-width: 400px;
-                    animation: slideIn 0.3s ease;
-                `;
-
-                document.body.appendChild(notification);
-
-                // Auto-remove after 5 seconds
-                setTimeout(() => {
-                    if (notification.parentElement) {
-                        notification.remove();
-                    }
-                }, 5000);
-            }
-
-            async showPreferences() {
-                // TODO: Implement preferences modal
-                alert('User preferences coming soon!');
-            }
-
-            async showSavedLocations() {
-                // TODO: Implement saved locations modal
-                alert('Saved locations coming soon!');
-            }
-
-            async showConnectAccounts() {
-                // TODO: Implement account connection modal
-                alert('Connect Uber/Ola accounts coming soon!');
-            }
-
-            // API helper methods
-            async apiCall(endpoint, options = {}) {
-                const defaultOptions = {
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                };
-
-                const response = await fetch(endpoint, { ...defaultOptions, ...options });
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'API call failed');
-                }
-
-                return data;
-            }
-
-            async getUserPreferences() {
-                if (!this.isAuthenticated) return null;
-                try {
-                    return await this.apiCall('/api/user/preferences');
-                } catch (error) {
-                    console.error('Failed to get user preferences:', error);
-                    return null;
-                }
-            }
-
-            async updateUserPreferences(preferences) {
-                if (!this.isAuthenticated) return false;
-                try {
-                    await this.apiCall('/api/user/preferences', {
-                        method: 'PUT',
-                        body: JSON.stringify(preferences)
-                    });
-                    return true;
-                } catch (error) {
-                    console.error('Failed to update user preferences:', error);
-                    return false;
-                }
-            }
-
-            async getSavedLocations() {
-                if (!this.isAuthenticated) return [];
-                try {
-                    const result = await this.apiCall('/api/user/locations');
-                    return result.locations || [];
-                } catch (error) {
-                    console.error('Failed to get saved locations:', error);
-                    return [];
-                }
-            }
-
-            async addSavedLocation(location) {
-                if (!this.isAuthenticated) return false;
-                try {
-                    await this.apiCall('/api/user/locations', {
-                        method: 'POST',
-                        body: JSON.stringify(location)
-                    });
-                    return true;
-                } catch (error) {
-                    console.error('Failed to add saved location:', error);
-                    return false;
-                }
-            }
+            });
         }
-
-        // Initialize authentication system
-        const authManager = new AuthManager();
-
-        // Make auth manager globally available
-        window.authManager = authManager;
-
-        // Add CSS animation for notifications
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+        
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            initTabNavigation();
+            initTransportModes();
+            initJourneyPlanner();
+            initThemeToggle();
+            initAuthentication();
+        });
+        
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
