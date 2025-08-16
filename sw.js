@@ -1,119 +1,88 @@
-// top-level cache config
-const CACHE_NAME = 'mumbai-transport-v3';
-const urlsToCache = [
+// Lightweight, scope-safe Service Worker for /portal/ (installed via ./sw.js)
+const CACHE_VERSION = 'mt-portal-v1';
+const CACHE_NAME = `mt-cache-${CACHE_VERSION}`;
+
+// App shell (relative to scope). Keep small; HTML is runtime-updated.
+const PRECACHE_ASSETS = [
   './',
   './index.html',
-  './style.css',
-  './app.js',
-  './mumbai_transport_pwa.html'
+  './offline.html',
 ];
 
-// Install event - cache resources
-self.addEventListener('install', event => {
+// Install: pre-cache minimal shell
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(async cache => {
-        console.log('Opened cache');
-        await Promise.all(
-          urlsToCache.map(async (url) => {
-            try {
-              await cache.add(new Request(url, { mode: 'no-cors' }));
-            } catch (e) {
-              console.warn('Skipping cache for', url, e);
-            }
-          })
-        );
-      })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS)).then(() => self.skipWaiting())
   );
 });
 
-// Fetch event - serve from cache when offline
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
-  );
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', event => {
+// Activate: clean old caches and take control immediately
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(cacheNames =>
-      Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      )
-    )
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k.startsWith('mt-cache-') && k !== CACHE_NAME).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim())
   );
 });
 
-// Background sync for offline route planning
-self.addEventListener('sync', event => {
-  if (event.tag === 'background-sync') {
-    event.waitUntil(doBackgroundSync());
-  }
-});
-
-function doBackgroundSync() {
-  // Use relative path for API sync so it works under /portal/ (no-op on static hosting)
-  return fetch('./api/sync-routes')
-    .then(response => {
-      if (!response.ok) return Promise.resolve();
-      return response.json().then(data => {
-        console.log('Background sync completed:', data);
-      });
-    })
-    .catch(error => {
-      console.log('Background sync skipped/failed:', error);
-    });
+// Helper: classify request
+function isHTML(req) {
+  return req.destination === 'document' || (req.headers.get('accept') || '').includes('text/html');
+}
+function isStatic(req) {
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return false;
+  const path = url.pathname.toLowerCase();
+  return /\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|json|txt|xml|woff2?|map)$/.test(path);
 }
 
-// Push notification handling
-self.addEventListener('push', event => {
-  const options = {
-    body: event.data ? event.data.text() : 'New route update available!',
-    icon: 'icons/icon-192x192.png',
-    badge: 'icons/icon-72x72.png',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
-    },
-    actions: [
-      {
-        action: 'explore',
-        title: 'View Route',
-        icon: 'icons/icon-96x96.png'
-      },
-      {
-        action: 'close',
-        title: 'Close',
-        icon: 'icons/icon-96x96.png'
-      }
-    ]
-  };
+// Strategy: network-first for HTML, cache-first for static assets, passthrough for others
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
 
-  event.waitUntil(
-    self.registration.showNotification('Mumbai Transport', options)
-  );
-});
-
-// Notification click handling (use relative path)
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-
-  if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('./mumbai_transport_pwa.html')
-    );
+  if (request.method !== 'GET') {
+    return; // Let non-GET requests pass through
   }
+
+ // Network-first for HTML documents to keep content fresh
+ if (isHTML(request)) {
+   event.respondWith(
+     fetch(request)
+       .then((resp) => {
+         const copy = resp.clone();
+         caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => {});
+         return resp;
+       })
+       .catch(async () => {
+         const cached = await caches.match(request);
+         if (cached) return cached;
+         // Fallback to offline shell
+         return caches.match('./offline.html');
+       })
+   );
+   return;
+ }
+
+  // Cache-first for static same-origin assets
+  if (isStatic(request)) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request)
+          .then((resp) => {
+            // Only cache successful, same-origin responses
+            if (resp.ok && new URL(request.url).origin === self.location.origin) {
+              const copy = resp.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => {});
+            }
+            return resp;
+          })
+          .catch(() => cached);
+      })
+    );
+    return;
+  }
+
+  // Default: network
+  // Avoid caching third-party APIs like Google Maps to keep API keys safe and fresh
 });

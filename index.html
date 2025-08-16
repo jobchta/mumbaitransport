@@ -1668,47 +1668,175 @@
             calculateAndDisplayRoute(from, to);
         });
         
-        // Calculate and display route
+        // Calculate and display route (Worker REST first, JS fallback)
         function calculateAndDisplayRoute(origin, destination) {
-            // Request directions
-            directionsService.route(
-                {
-                    origin: origin,
-                    destination: destination,
-                    travelMode: google.maps.TravelMode.TRANSIT,
-                    transitOptions: {
-                        modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.RAIL],
-                        routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
-                    },
-                    provideRouteAlternatives: true
-                },
-                (response, status) => {
-                    const submitBtn = journeyForm.querySelector('button[type="submit"]');
-                    
-                    if (status === 'OK') {
-                        // Display routes
-                        displayRoutes(response.routes);
-                        
-                        // Draw first route on map
-                        directionsRenderer.setDirections(response);
-                        
-                        // Show results
+            const submitBtn = journeyForm.querySelector('button[type="submit"]');
+
+            // Prefer place_id when available from Autocomplete
+            const fromPlace = (typeof autocompleteFrom?.getPlace === 'function') ? autocompleteFrom.getPlace() : null;
+            const toPlace = (typeof autocompleteTo?.getPlace === 'function') ? autocompleteTo.getPlace() : null;
+            const originParam = (fromPlace && fromPlace.place_id) ? `place_id:${fromPlace.place_id}` : origin;
+            const destinationParam = (toPlace && toPlace.place_id) ? `place_id:${toPlace.place_id}` : destination;
+
+            // Derive mode from active chip (defaults to transit)
+            const activeMode = (document.querySelector('.mode-tab.active')?.dataset.mode || 'all').toLowerCase();
+
+            const params = new URLSearchParams();
+            params.set('origin', originParam);
+            params.set('destination', destinationParam);
+            if (activeMode === 'taxi' || activeMode === 'auto') {
+                params.set('mode', 'driving');
+            } else {
+                params.set('mode', 'transit');
+                // Use Mumbai-appropriate modes by default
+                params.set('transit_mode', 'bus,subway,train');
+                params.set('transit_routing_preference', 'fewer_transfers');
+            }
+            params.set('region', 'in');
+            params.set('language', 'en-IN');
+            params.set('alternatives', 'true');
+            params.set('departure_time', 'now');
+
+            const url = `/api/google/directions?${params.toString()}`;
+
+            fetch(url)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status !== 'OK' || !data.routes || !data.routes.length) {
+                        throw new Error(`Worker directions status: ${data.status}`);
+                    }
+
+                    const route = data.routes[0];
+                    const leg = route.legs && route.legs[0];
+
+                    // Clear previous overlays
+                    if (window.routePolyline) { window.routePolyline.setMap(null); window.routePolyline = null; }
+                    if (!Array.isArray(window.routeMarkers)) window.routeMarkers = [];
+                    window.routeMarkers.forEach(m => m && m.setMap && m.setMap(null));
+                    window.routeMarkers = [];
+
+                    // Draw overview polyline
+                    const encoded = route.overview_polyline && route.overview_polyline.points;
+                    if (encoded && google.maps?.geometry?.encoding?.decodePath) {
+                        const path = google.maps.geometry.encoding.decodePath(encoded);
+                        window.routePolyline = new google.maps.Polyline({
+                            map,
+                            path,
+                            strokeColor: (getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#0ea5e9').trim(),
+                            strokeOpacity: 0.8,
+                            strokeWeight: 5
+                        });
+                        const bounds = new google.maps.LatLngBounds();
+                        path.forEach(p => bounds.extend(p));
+                        map.fitBounds(bounds);
+                    }
+
+                    // Start/End markers
+                    if (leg) {
+                        const startPos = leg.start_location;
+                        const endPos = leg.end_location;
+                        const startMarker = addCustomMarker(
+                            (startPos && typeof startPos.lat === 'function') ? { lat: startPos.lat(), lng: startPos.lng() } : startPos,
+                            'start'
+                        );
+                        const endMarker = addCustomMarker(
+                            (endPos && typeof endPos.lat === 'function') ? { lat: endPos.lat(), lng: endPos.lng() } : endPos,
+                            'end'
+                        );
+                        if (startMarker) window.routeMarkers.push(startMarker);
+                        if (endMarker) window.routeMarkers.push(endMarker);
+                    }
+
+                    // Adapt REST routes to the UI renderer shape
+                    let adaptedRoutes = [];
+                    try {
+                        adaptedRoutes = data.routes.map(r => {
+                            const l = r.legs && r.legs[0];
+                            return {
+                                legs: [{
+                                    duration: l?.duration || { text: '' },
+                                    departure_time: l?.departure_time || { text: '' },
+                                    steps: (l?.steps || []).map(s => {
+                                        const tm = (s.travel_mode || '').toUpperCase();
+                                        if (tm === 'TRANSIT') {
+                                            // Normalize to the UI's expectations
+                                            const td = s.transit_details || {};
+                                            return {
+                                                travel_mode: 'TRANSIT',
+                                                distance: s.distance,
+                                                transit: {
+                                                    line: {
+                                                        short_name: td.line?.short_name || td.line?.name,
+                                                        name: td.line?.name,
+                                                        vehicle: { type: (td.line?.vehicle?.type || '').toUpperCase() }
+                                                    }
+                                                }
+                                            };
+                                        } else if (tm === 'WALKING') {
+                                            return { travel_mode: 'WALKING', distance: s.distance };
+                                        }
+                                        return { travel_mode: s.travel_mode || 'WALKING', distance: s.distance };
+                                    })
+                                }]
+                            };
+                        });
+                    } catch (e) {
+                        console.warn('displayRoutes adaptation failed', e);
+                    }
+
+                    if (adaptedRoutes.length) {
+                        displayRoutes(adaptedRoutes);
                         routeResults.style.display = 'block';
-                        
-                        // Scroll to results on mobile
                         if (window.innerWidth < 1024) {
                             routeResults.scrollIntoView({ behavior: 'smooth' });
                         }
-                    } else {
-                        console.error('Directions request failed due to ' + status);
-                        alert('Could not calculate route: ' + status);
                     }
-                    
-                    // Reset button
+
                     submitBtn.innerHTML = '<i class="ph ph-magnifying-glass"></i> Find Routes';
                     submitBtn.disabled = false;
-                }
-            );
+                })
+                .catch(err => {
+                    console.warn('Worker directions failed, falling back to JS DirectionsService', err);
+
+                    // JS fallback
+                    const dsRequest = {
+                        origin,
+                        destination,
+                        travelMode: (activeMode === 'taxi' || activeMode === 'auto')
+                            ? google.maps.TravelMode.DRIVING
+                            : google.maps.TravelMode.TRANSIT,
+                        provideRouteAlternatives: true
+                    };
+                    if (dsRequest.travelMode === google.maps.TravelMode.TRANSIT) {
+                        dsRequest.transitOptions = {
+                            modes: [
+                                google.maps.TransitMode.BUS,
+                                google.maps.TransitMode.SUBWAY,
+                                google.maps.TransitMode.TRAIN
+                            ],
+                            routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
+                        };
+                    }
+
+                    directionsService.route(
+                        dsRequest,
+                        (response, status) => {
+                            if (status === 'OK') {
+                                displayRoutes(response.routes);
+                                directionsRenderer.setDirections(response);
+                                routeResults.style.display = 'block';
+                                if (window.innerWidth < 1024) {
+                                    routeResults.scrollIntoView({ behavior: 'smooth' });
+                                }
+                            } else {
+                                console.error('Directions request failed due to ' + status);
+                                alert('Could not calculate route: ' + status);
+                            }
+                            submitBtn.innerHTML = '<i class="ph ph-magnifying-glass"></i> Find Routes';
+                            submitBtn.disabled = false;
+                        }
+                    );
+                });
         }
         
         // Display routes in the results panel
