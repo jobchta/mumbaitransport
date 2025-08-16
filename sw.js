@@ -1,110 +1,82 @@
-const CACHE_NAME = 'mumbai-transport-v1';
-const urlsToCache = [
-  '/',
-  '/mumbai_transport_pwa.html',
-  '/manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places'
+// Lightweight, scope-safe Service Worker for /portal/ (installed via ./sw.js)
+const CACHE_VERSION = 'mt-portal-v1';
+const CACHE_NAME = `mt-cache-${CACHE_VERSION}`;
+
+// App shell (relative to scope). Keep small; HTML is runtime-updated.
+const PRECACHE_ASSETS = [
+  './',
+  './index.html',
 ];
 
-// Install event - cache resources
-self.addEventListener('install', event => {
+// Install: pre-cache minimal shell
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS)).then(() => self.skipWaiting())
   );
 });
 
-// Fetch event - serve from cache when offline
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
-  );
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', event => {
+// Activate: clean old caches and take control immediately
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k.startsWith('mt-cache-') && k !== CACHE_NAME).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim())
   );
 });
 
-// Background sync for offline route planning
-self.addEventListener('sync', event => {
-  if (event.tag === 'background-sync') {
-    event.waitUntil(doBackgroundSync());
-  }
-});
-
-function doBackgroundSync() {
-  // Sync saved routes when back online
-  return fetch('/api/sync-routes')
-    .then(response => response.json())
-    .then(data => {
-      console.log('Background sync completed:', data);
-    })
-    .catch(error => {
-      console.log('Background sync failed:', error);
-    });
+// Helper: classify request
+function isHTML(req) {
+  return req.destination === 'document' || (req.headers.get('accept') || '').includes('text/html');
+}
+function isStatic(req) {
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return false;
+  const path = url.pathname.toLowerCase();
+  return /\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|json|txt|xml|woff2?|map)$/.test(path);
 }
 
-// Push notification handling
-self.addEventListener('push', event => {
-  const options = {
-    body: event.data ? event.data.text() : 'New route update available!',
-    icon: 'icons/icon-192x192.png',
-    badge: 'icons/icon-72x72.png',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
-    },
-    actions: [
-      {
-        action: 'explore',
-        title: 'View Route',
-        icon: 'icons/icon-96x96.png'
-      },
-      {
-        action: 'close',
-        title: 'Close',
-        icon: 'icons/icon-96x96.png'
-      }
-    ]
-  };
+// Strategy: network-first for HTML, cache-first for static assets, passthrough for others
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
 
-  event.waitUntil(
-    self.registration.showNotification('Mumbai Transport', options)
-  );
-});
-
-// Notification click handling
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-
-  if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('/mumbai_transport_pwa.html')
-    );
+  if (request.method !== 'GET') {
+    return; // Let non-GET requests pass through
   }
+
+  // Network-first for HTML documents to keep content fresh
+  if (isHTML(request)) {
+    event.respondWith(
+      fetch(request)
+        .then((resp) => {
+          const copy = resp.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => {});
+          return resp;
+        })
+        .catch(() => caches.match(request).then((match) => match || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Cache-first for static same-origin assets
+  if (isStatic(request)) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request)
+          .then((resp) => {
+            // Only cache successful, same-origin responses
+            if (resp.ok && new URL(request.url).origin === self.location.origin) {
+              const copy = resp.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => {});
+            }
+            return resp;
+          })
+          .catch(() => cached);
+      })
+    );
+    return;
+  }
+
+  // Default: network
+  // Avoid caching third-party APIs like Google Maps to keep API keys safe and fresh
 });

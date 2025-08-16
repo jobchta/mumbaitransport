@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mumbai Transport Hub - Smart Route Planning & Live Tracking</title>
+
+    <!-- PWA + Mobile meta -->
+    <meta name="theme-color" content="#0ea5e9">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <!-- Modern Font System with Variable Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
@@ -891,6 +897,44 @@
         .dark .theme-toggle:hover {
             background: rgba(255, 255, 255, 0.1);
         }
+
+        /* Subtle first-visit install/bookmark banner */
+        .install-banner {
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%) translateY(120%);
+            background: var(--surface-light);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform var(--transition-medium), opacity var(--transition-medium);
+            opacity: 0.98;
+            max-width: min(92vw, 680px);
+        }
+        .dark .install-banner {
+            background: rgba(18, 24, 38, 0.92);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .install-banner .msg {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: var(--text-sm);
+        }
+        .install-banner .actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        .install-banner.show {
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -953,6 +997,74 @@
                     </div>
                     <h3 class="feature-title">Real-Time Updates</h3>
                     <p class="feature-description">Get real-time information using actual Mumbai transport schedules. Accurate ETAs based on real departure timings and route data.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Metro Ticketing -->
+        <section class="features" id="metro-tickets">
+            <h2 class="features-title">🚇 Mumbai Metro Ticketing – Unified</h2>
+            <div class="features-grid">
+                <div class="feature-card card-3d">
+                    <div class="feature-icon"><i class="ph ph-qr-code"></i></div>
+                    <h3 class="feature-title">Line 1 – WhatsApp Ticket</h3>
+                    <p class="feature-description">Versova–Andheri–Ghatkopar (Reliance Metro)</p>
+                    <a class="btn btn-primary" href="https://wa.me/919670008889?text=Hi" target="_blank" rel="noopener">Open WhatsApp</a>
+                </div>
+
+                <div class="feature-card card-3d">
+                    <div class="feature-icon"><i class="ph ph-qr-code"></i></div>
+                    <h3 class="feature-title">Lines 2A & 7 – WhatsApp Ticket</h3>
+                    <p class="feature-description">Dahisar–DN Nagar & Dahisar–Gundavali (MMMOCL)</p>
+                    <a class="btn btn-primary" href="https://wa.me/918652635500?text=Hi" target="_blank" rel="noopener">Open WhatsApp</a>
+                </div>
+
+                <div class="feature-card card-3d">
+                    <div class="feature-icon"><i class="ph ph-train"></i></div>
+                    <h3 class="feature-title">Aqua Line (Line 3)</h3>
+                    <p class="feature-description">No WhatsApp yet. Use MetroConnect3 app or see official map.</p>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <a class="btn btn-secondary" href="https://play.google.com/store/search?q=MetroConnect3" target="_blank" rel="noopener">Android App</a>
+                        <a class="btn btn-secondary" href="https://apps.apple.com/in/search?term=MetroConnect3" target="_blank" rel="noopener">iOS App</a>
+                        <a class="btn btn-primary" href="https://mmrcl.com/en/map" target="_blank" rel="noopener">Official Map</a>
+                    </div>
+                </div>
+
+                <div class="feature-card card-3d">
+                    <div class="feature-icon"><i class="ph ph-credit-card"></i></div>
+                    <h3 class="feature-title">NCMC / Mumbai 1 Card</h3>
+                    <p class="feature-description">Tap & go on Lines 1, 2A, 7 (Line 3 soon). No app required.</p>
+                    <a class="btn btn-secondary" href="https://www.npci.org.in/what-we-do/ncmc" target="_blank" rel="noopener">About NCMC</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fares (Aug 2025) -->
+        <section class="features" id="fares">
+            <h2 class="features-title">🚖 Mumbai Fares – Aug 2025</h2>
+            <div class="features-grid">
+                <div class="feature-card card-3d">
+                    <h3 class="feature-title">Auto Rickshaw</h3>
+                    <p class="feature-description">
+                        Minimum fare (first 1.5 km): ₹23<br>
+                        After 1.5 km: ₹15.33 per km<br>
+                        Night charges (00:00–05:00): +25%
+                    </p>
+                </div>
+                <div class="feature-card card-3d">
+                    <h3 class="feature-title">Kaali‑Peeli Taxi</h3>
+                    <p class="feature-description">
+                        Minimum fare (first 1.5 km): ₹33<br>
+                        After 1.5 km: ₹21.33 per km<br>
+                        Night charges (00:00–05:00): +25%
+                    </p>
+                </div>
+                <div class="feature-card card-3d">
+                    <h3 class="feature-title">Notes</h3>
+                    <p class="feature-description">
+                        Fares regulated by Mumbai RTO; waiting charges ≈ ₹1.5–₹2/min when stationary.
+                        NCMC/Mumbai 1 not valid for autos or kaali‑peelis (only metro/BEST/some cabs).
+                    </p>
                 </div>
             </div>
         </section>
@@ -1627,6 +1739,97 @@
         
         // Initialize map when page loads
         window.addEventListener('load', initMap);
+    </script>
+
+    <!-- Lightweight onboarding: A2HS + Bookmark + SW registration -->
+    <div class="install-banner" id="install-banner" aria-live="polite" style="display:none;">
+        <div class="msg">
+            <i class="ph ph-download-simple"></i>
+            <span>Install or bookmark Mumbai Transport for quick access.</span>
+        </div>
+        <div class="actions">
+            <button class="btn btn-primary" id="install-btn">Install</button>
+            <button class="btn btn-secondary" id="dismiss-install">Dismiss</button>
+        </div>
+    </div>
+
+    <script>
+        // Service Worker registration (scoped under /portal/ via relative path)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(console.error);
+            });
+        }
+
+        // First-visit onboarding: install or bookmark (subtle, non-intrusive)
+        (function () {
+            const banner = document.getElementById('install-banner');
+            const installBtn = document.getElementById('install-btn');
+            const dismissBtn = document.getElementById('dismiss-install');
+            let deferredPrompt = null;
+
+            // Respect prior choice
+            const STATUS_KEY = 'mt_onboard_status'; // 'done' | 'dismissed'
+            function shouldShow() {
+                return localStorage.getItem(STATUS_KEY) !== 'done' && localStorage.getItem(STATUS_KEY) !== 'dismissed';
+            }
+            function showBanner() {
+                if (!shouldShow()) return;
+                banner.style.display = 'flex';
+                // Animate in
+                requestAnimationFrame(() => banner.classList.add('show'));
+            }
+            function hideBanner(status) {
+                banner.classList.remove('show');
+                setTimeout(() => { banner.style.display = 'none'; }, 300);
+                if (status) localStorage.setItem(STATUS_KEY, status);
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Android/Chromium A2HS
+                e.preventDefault();
+                deferredPrompt = e;
+                showBanner();
+            });
+
+            // Fallback: if no A2HS event fired within 3s, show bookmark helper (iOS/Safari/etc.)
+            setTimeout(() => {
+                if (!deferredPrompt) showBanner();
+            }, 3000);
+
+            installBtn?.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    try {
+                        const choice = await deferredPrompt.userChoice;
+                        if (choice.outcome === 'accepted') {
+                            hideBanner('done');
+                        } else {
+                            hideBanner('dismissed');
+                        }
+                    } catch {
+                        hideBanner('dismissed');
+                    } finally {
+                        deferredPrompt = null;
+                    }
+                } else {
+                    // Bookmark guidance
+                    const ua = navigator.userAgent || '';
+                    let message = 'To add to Home Screen:\n';
+                    if (/iPhone|iPad|iPod/i.test(ua)) {
+                        message += 'Tap Share, then "Add to Home Screen".';
+                    } else if (/Android/i.test(ua)) {
+                        message += 'Open browser menu (⋮) and tap "Add to Home screen".';
+                    } else {
+                        message += 'Press Ctrl+D (Windows/Linux) or Cmd+D (Mac) to bookmark.';
+                    }
+                    alert(message);
+                    hideBanner('done');
+                }
+            });
+
+            dismissBtn?.addEventListener('click', () => hideBanner('dismissed'));
+        })();
     </script>
 </body>
 </html>

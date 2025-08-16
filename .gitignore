@@ -84,6 +84,7 @@ simple.html
 live-gh-pages.html
 live-portal.html
 *.json
+!manifest.json
 scripts/
 backup/
 
