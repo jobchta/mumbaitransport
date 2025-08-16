@@ -23,8 +23,176 @@
     <!-- Google Maps API with callback for reliable init -->
     <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&v=weekly&callback=initMap"></script>
     
-    <!-- Google Identity Services for OAuth -->
+    <!-- Google Identity Services for OAuth with mobile optimization -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- PWA Install Prompt Styles -->
+    <style id="pwa-install-styles">
+        .pwa-install-banner {
+            position: fixed;
+            bottom: calc(var(--tab-bar-height) + var(--safe-area-inset-bottom) + 1rem);
+            left: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+        }
+        
+        .pwa-install-banner.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .pwa-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .pwa-banner-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .pwa-banner-text h3 {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .pwa-banner-text p {
+            font-size: var(--text-sm);
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .pwa-banner-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .pwa-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pwa-btn-primary {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary);
+        }
+        
+        .pwa-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .pwa-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        /* iOS Safari specific styles */
+        @supports (-webkit-touch-callout: none) {
+            .ios-install-hint {
+                position: fixed;
+                bottom: calc(var(--tab-bar-height) + var(--safe-area-inset-bottom) + 1rem);
+                left: 1rem;
+                right: 1rem;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-lg);
+                padding: 1rem;
+                box-shadow: var(--shadow-lg);
+                z-index: 2000;
+                transform: translateY(100px);
+                opacity: 0;
+                transition: all 0.3s ease;
+            }
+            
+            .ios-install-hint.show {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            .ios-hint-content {
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .ios-hint-icon {
+                width: 40px;
+                height: 40px;
+                background: var(--primary);
+                color: white;
+                border-radius: var(--radius);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+            
+            .ios-hint-text {
+                flex: 1;
+            }
+            
+            .ios-hint-text h4 {
+                font-size: var(--text-base);
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+            }
+            
+            .ios-hint-text p {
+                font-size: var(--text-sm);
+                color: var(--text-secondary);
+                margin: 0 0 0.5rem 0;
+                line-height: 1.4;
+            }
+            
+            .ios-hint-steps {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: var(--text-sm);
+                color: var(--primary);
+                font-weight: 500;
+            }
+            
+            .ios-hint-close {
+                background: none;
+                border: none;
+                color: var(--text-muted);
+                cursor: pointer;
+                padding: 0.25rem;
+                border-radius: var(--radius-sm);
+                transition: all 0.2s;
+            }
+            
+            .ios-hint-close:hover {
+                background: var(--surface-tertiary);
+                color: var(--text);
+            }
+        }
+    </style>
     
     <style>
         /* ========================================
@@ -1196,6 +1364,45 @@
         </nav>
     </div>
 
+    <!-- PWA Install Banner -->
+    <div class="pwa-install-banner" id="pwa-install-banner">
+        <div class="pwa-banner-content">
+            <div class="pwa-banner-icon">
+                <i class="ph ph-download-simple"></i>
+            </div>
+            <div class="pwa-banner-text">
+                <h3>Install Mumbai Transport</h3>
+                <p>Add to your home screen for quick access</p>
+            </div>
+        </div>
+        <div class="pwa-banner-actions">
+            <button class="pwa-btn pwa-btn-primary" id="pwa-install-btn">Install</button>
+            <button class="pwa-btn pwa-btn-secondary" id="pwa-dismiss-btn">Not Now</button>
+        </div>
+    </div>
+
+    <!-- iOS Install Hint -->
+    <div class="ios-install-hint" id="ios-install-hint">
+        <div class="ios-hint-content">
+            <div class="ios-hint-icon">
+                <i class="ph ph-device-mobile"></i>
+            </div>
+            <div class="ios-hint-text">
+                <h4>Add to Home Screen</h4>
+                <p>Install this app on your iPhone: tap the share button and then "Add to Home Screen".</p>
+                <div class="ios-hint-steps">
+                    <i class="ph ph-share"></i>
+                    <span>Share</span>
+                    <i class="ph ph-arrow-right"></i>
+                    <span>Add to Home Screen</span>
+                </div>
+            </div>
+            <button class="ios-hint-close" id="ios-hint-close">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+    </div>
+
     <script>
         // ========================================
         // MUMBAI TRANSPORT APP FUNCTIONALITY
@@ -1791,6 +1998,270 @@
             });
         }
         
+        // PWA Install Manager
+        class PWAInstallManager {
+            constructor() {
+                this.deferredPrompt = null;
+                this.isInstalled = false;
+                this.init();
+            }
+            
+            init() {
+                // Check if already installed
+                this.isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
+                                  window.navigator.standalone === true;
+                
+                if (this.isInstalled) {
+                    console.log('App is already installed');
+                    return;
+                }
+                
+                // Listen for beforeinstallprompt event
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this.deferredPrompt = e;
+                    this.showInstallBanner();
+                });
+                
+                // Check if iOS Safari and show iOS hint
+                if (this.isIOSSafari() && !this.isInstalled) {
+                    // Show iOS install hint after 3 seconds if not dismissed
+                    setTimeout(() => {
+                        if (!localStorage.getItem('ios-install-dismissed')) {
+                            this.showIOSInstallHint();
+                        }
+                    }, 3000);
+                }
+                
+                // Initialize install button handlers
+                this.initInstallHandlers();
+            }
+            
+            isIOSSafari() {
+                const userAgent = window.navigator.userAgent.toLowerCase();
+                const isIOS = /iphone|ipad|ipod/.test(userAgent);
+                const isSafari = /safari/.test(userAgent) && !/chrome|crios|fxios/.test(userAgent);
+                return isIOS && isSafari;
+            }
+            
+            showInstallBanner() {
+                const banner = document.getElementById('pwa-install-banner');
+                if (banner && !localStorage.getItem('pwa-install-dismissed')) {
+                    banner.classList.add('show');
+                }
+            }
+            
+            showIOSInstallHint() {
+                const hint = document.getElementById('ios-install-hint');
+                if (hint) {
+                    hint.classList.add('show');
+                }
+            }
+            
+            hideInstallBanner() {
+                const banner = document.getElementById('pwa-install-banner');
+                if (banner) {
+                    banner.classList.remove('show');
+                }
+            }
+            
+            hideIOSInstallHint() {
+                const hint = document.getElementById('ios-install-hint');
+                if (hint) {
+                    hint.classList.remove('show');
+                }
+            }
+            
+            initInstallHandlers() {
+                // PWA Install button
+                const installBtn = document.getElementById('pwa-install-btn');
+                const dismissBtn = document.getElementById('pwa-dismiss-btn');
+                const iosCloseBtn = document.getElementById('ios-hint-close');
+                
+                if (installBtn) {
+                    installBtn.addEventListener('click', async () => {
+                        if (this.deferredPrompt) {
+                            this.deferredPrompt.prompt();
+                            const { outcome } = await this.deferredPrompt.userChoice;
+                            
+                            if (outcome === 'accepted') {
+                                console.log('User accepted the install prompt');
+                                this.hideInstallBanner();
+                            } else {
+                                console.log('User dismissed the install prompt');
+                            }
+                            
+                            this.deferredPrompt = null;
+                        }
+                    });
+                }
+                
+                if (dismissBtn) {
+                    dismissBtn.addEventListener('click', () => {
+                        this.hideInstallBanner();
+                        localStorage.setItem('pwa-install-dismissed', 'true');
+                    });
+                }
+                
+                if (iosCloseBtn) {
+                    iosCloseBtn.addEventListener('click', () => {
+                        this.hideIOSInstallHint();
+                        localStorage.setItem('ios-install-dismissed', 'true');
+                    });
+                }
+            }
+        }
+        
+        // Enhanced Mobile Authentication Manager
+        class MobileAuthManager extends AuthManager {
+            constructor() {
+                super();
+                this.isMobile = this.detectMobile();
+            }
+            
+            detectMobile() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            }
+            
+            async init() {
+                // Check for existing session first
+                try {
+                    const response = await fetch('/api/auth/verify', {
+                        credentials: 'include'
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.user = data.user;
+                        this.updateUI();
+                        return;
+                    }
+                } catch (error) {
+                    console.log('No existing session');
+                }
+                
+                // Enhanced mobile Google OAuth initialization
+                if (typeof google !== 'undefined' && google.accounts) {
+                    try {
+                        google.accounts.id.initialize({
+                            client_id: '1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com',
+                            callback: this.handleCredentialResponse.bind(this),
+                            // Mobile-optimized settings
+                            ux_mode: this.isMobile ? 'popup' : 'popup',
+                            auto_select: false,
+                            cancel_on_tap_outside: true
+                        });
+                        
+                        // Pre-render the button for faster mobile response
+                        if (this.isMobile) {
+                            google.accounts.id.renderButton(
+                                document.getElementById('google-login-btn'),
+                                {
+                                    theme: 'outline',
+                                    size: 'large',
+                                    width: '100%',
+                                    text: 'signin_with'
+                                }
+                            );
+                        }
+                    } catch (error) {
+                        console.log('Google OAuth initialization failed:', error);
+                        this.setupFallbackAuth();
+                    }
+                } else {
+                    console.log('Google Identity Services not available');
+                    this.setupFallbackAuth();
+                }
+            }
+            
+            setupFallbackAuth() {
+                // Enhanced fallback for mobile devices
+                const loginBtn = document.getElementById('google-login-btn');
+                if (loginBtn) {
+                    loginBtn.innerHTML = '<i class="ph ph-google-logo"></i> Sign In (Mobile)';
+                    loginBtn.style.background = 'linear-gradient(135deg, #4285f4, #34a853)';
+                    loginBtn.style.color = 'white';
+                }
+            }
+            
+            async login() {
+                const loginBtn = document.getElementById('google-login-btn');
+                const originalText = loginBtn.innerHTML;
+                
+                // Enhanced mobile feedback
+                loginBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Connecting...';
+                loginBtn.disabled = true;
+                loginBtn.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+                
+                if (typeof google !== 'undefined' && google.accounts) {
+                    try {
+                        // Mobile-optimized prompt
+                        if (this.isMobile) {
+                            google.accounts.id.prompt((notification) => {
+                                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                                    // Show mobile-friendly error
+                                    this.showMobileAuthError(loginBtn, originalText);
+                                }
+                            });
+                        } else {
+                            google.accounts.id.prompt();
+                        }
+                        
+                        // Reset button after timeout
+                        setTimeout(() => {
+                            if (loginBtn.disabled) {
+                                loginBtn.innerHTML = originalText;
+                                loginBtn.disabled = false;
+                                loginBtn.style.background = '';
+                            }
+                        }, 5000);
+                    } catch (error) {
+                        this.showMobileAuthError(loginBtn, originalText);
+                    }
+                } else {
+                    this.showMobileAuthError(loginBtn, originalText);
+                }
+            }
+            
+            showMobileAuthError(loginBtn, originalText) {
+                loginBtn.innerHTML = '<i class="ph ph-warning"></i> Try Again';
+                loginBtn.style.background = '#f59e0b';
+                loginBtn.style.color = 'white';
+                
+                // Add helpful message for mobile users
+                const helpText = document.createElement('div');
+                helpText.style.cssText = `
+                    font-size: 0.75rem;
+                    color: var(--text-secondary);
+                    text-align: center;
+                    margin-top: 0.5rem;
+                    padding: 0.5rem;
+                    background: var(--surface-tertiary);
+                    border-radius: var(--radius);
+                `;
+                helpText.textContent = 'Having trouble? Try refreshing the page or using a different browser.';
+                
+                const authDiv = document.getElementById('auth-login');
+                if (authDiv && !authDiv.querySelector('.mobile-help')) {
+                    helpText.className = 'mobile-help';
+                    authDiv.appendChild(helpText);
+                    
+                    // Remove help text after 5 seconds
+                    setTimeout(() => {
+                        if (helpText.parentNode) {
+                            helpText.parentNode.removeChild(helpText);
+                        }
+                    }, 5000);
+                }
+                
+                setTimeout(() => {
+                    loginBtn.innerHTML = originalText;
+                    loginBtn.disabled = false;
+                    loginBtn.style.background = '';
+                    loginBtn.style.color = '';
+                }, 3000);
+            }
+        }
+        
         // Initialize App
         document.addEventListener('DOMContentLoaded', () => {
             initTabNavigation();
@@ -1798,20 +2269,103 @@
             initJourneyPlanner();
             initThemeToggle();
             initAuthentication();
+            
+            // Initialize PWA install manager
+            new PWAInstallManager();
+            
+            // Replace auth manager with mobile-optimized version
+            if (window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                authManager = new MobileAuthManager();
+            }
         });
         
-        // Service Worker Registration
+        // Enhanced Service Worker Registration with Update Handling
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
                     .then(registration => {
                         console.log('SW registered: ', registration);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Show update available notification
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
                     })
                     .catch(registrationError => {
                         console.log('SW registration failed: ', registrationError);
                     });
             });
         }
+        
+        // Update Notification
+        function showUpdateNotification() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                right: 1rem;
+                background: var(--primary);
+                color: white;
+                padding: 1rem;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-lg);
+                z-index: 3000;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                animation: slideDown 0.3s ease;
+            `;
+            
+            notification.innerHTML = `
+                <div>
+                    <strong>Update Available</strong>
+                    <div style="font-size: 0.875rem; opacity: 0.9;">Refresh to get the latest features</div>
+                </div>
+                <button onclick="window.location.reload()" style="
+                    background: rgba(255,255,255,0.2);
+                    border: 1px solid rgba(255,255,255,0.3);
+                    color: white;
+                    padding: 0.5rem 1rem;
+                    border-radius: var(--radius);
+                    cursor: pointer;
+                ">Refresh</button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideUp 0.3s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 10000);
+        }
+        
+        // Add slide animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { transform: translateY(-100%); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateY(0); opacity: 1; }
+                to { transform: translateY(-100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
