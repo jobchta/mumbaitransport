@@ -2,121 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta name="description" content="Plan your journey with real-time BEST bus routes, local trains, and metro connections in Mumbai. Get live tracking and accurate ETAs.">
-    <meta name="theme-color" content="#3b82f6">
-    <title>Mumbai Transport Hub - Smart Route Planning & Live Tracking</title>
-
-    <!-- PWA + Mobile meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Mumbai Transport - Plan journeys, buy tickets, compare rides">
     <meta name="theme-color" content="#0ea5e9">
+    <title>Mumbai Transport</title>
+
+    <!-- PWA + iOS Support -->
+    <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MT Hub">
-    
-    <!-- PWA Support -->
-    <link rel="manifest" href="/portal/manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Mumbai Transport">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     
-    <!-- Modern Font System with Variable Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <!-- Essential Fonts Only -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Phosphor Icons - 2025 Icon System -->
+    <!-- Phosphor Icons -->
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
     
-    <!-- Google Maps API with Advanced Visualization -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&loading=async"></script>
+    <!-- Google Maps API with callback for reliable init -->
+    <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&v=weekly&callback=initMap"></script>
     
     <style>
         /* ========================================
-           FUTURE TRANSPORT 2025 DESIGN SYSTEM
+           MUMBAI TRANSPORT APP SHELL
         ======================================== */
         
         :root {
-            /* Futuristic Color System with HSL for Dynamic Manipulation */
-            --primary-hue: 220;
-            --primary-saturation: 100%;
-            --primary: hsl(var(--primary-hue), var(--primary-saturation), 50%);
-            --primary-light: hsl(var(--primary-hue), var(--primary-saturation), 65%);
-            --primary-dark: hsl(var(--primary-hue), var(--primary-saturation), 35%);
+            /* App Color System */
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #38bdf8;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
             
-            --accent-hue: 280;
-            --accent: hsl(var(--accent-hue), 80%, 60%);
+            /* Surface Colors */
+            --surface: #ffffff;
+            --surface-secondary: #f8fafc;
+            --surface-tertiary: #f1f5f9;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
             
-            --energy-hue: 160;
-            --energy: hsl(var(--energy-hue), 80%, 45%);
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
             
-            --alert-hue: 350;
-            --alert: hsl(var(--alert-hue), 80%, 55%);
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
             
-            /* Adaptive Surface System */
-            --surface-light: hsla(0, 0%, 100%, 0.95);
-            --surface-medium: hsla(0, 0%, 100%, 0.85);
-            --surface-dark: hsla(220, 15%, 16%, 0.95);
-            
-            /* Glass Morphism Effects */
-            --glass-blur: 12px;
-            --glass-opacity: 0.7;
-            --glass-border: 1px solid rgba(255, 255, 255, 0.2);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            
-            /* Neomorphic Effects */
-            --neo-shadow-light: 8px 8px 16px rgba(200, 200, 220, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8);
-            --neo-shadow-dark: 8px 8px 16px rgba(0, 0, 0, 0.3), -8px -8px 16px rgba(40, 40, 60, 0.2);
-            --neo-shadow-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.15), inset -2px -2px 5px rgba(255, 255, 255, 0.15);
-            
-            /* Advanced Typography System */
-            --font-display: 'Space Grotesk', system-ui, sans-serif;
-            --font-body: 'Inter', system-ui, sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            
-            /* Fluid Typography */
-            --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-            --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
-            --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
-            --text-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
-            --text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
-            --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 1.875rem);
-            --text-3xl: clamp(1.875rem, 1.6rem + 1.375vw, 2.25rem);
-            --text-4xl: clamp(2.25rem, 1.9rem + 1.75vw, 3rem);
-            --text-5xl: clamp(3rem, 2.5rem + 2.5vw, 4rem);
-            
-            /* Fluid Spacing System */
-            --space-3xs: clamp(0.25rem, 0.2rem + 0.25vw, 0.375rem);
-            --space-2xs: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
-            --space-xs: clamp(0.75rem, 0.6rem + 0.75vw, 1rem);
-            --space-sm: clamp(1rem, 0.8rem + 1vw, 1.5rem);
-            --space-md: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
-            --space-lg: clamp(2rem, 1.6rem + 2vw, 3rem);
-            --space-xl: clamp(3rem, 2.4rem + 3vw, 4rem);
-            
-            /* Advanced Border Radius */
-            --radius-sm: 0.25rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 1rem;
-            --radius-xl: 1.5rem;
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
             --radius-full: 9999px;
             
-            /* Animation System */
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-medium: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             
-            /* 3D Transform Properties */
-            --transform-perspective: 1000px;
-            --transform-rotate-x: 0deg;
-            --transform-rotate-y: 0deg;
-            --transform-rotate-z: 0deg;
-            --transform-scale: 1;
-            --transform-skew-x: 0deg;
-            --transform-skew-y: 0deg;
+            /* iOS Safe Areas */
+            --safe-area-inset-top: env(safe-area-inset-top);
+            --safe-area-inset-right: env(safe-area-inset-right);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom);
+            --safe-area-inset-left: env(safe-area-inset-left);
+            
+            /* App Layout */
+            --header-height: 60px;
+            --tab-bar-height: 80px;
         }
         
-        /* Base Reset & Accessibility */
+        /* Base Reset */
         * {
             margin: 0;
             padding: 0;
@@ -126,28 +97,28 @@
         html {
             scroll-behavior: smooth;
             color-scheme: light;
+            height: 100%;
+            height: -webkit-fill-available;
         }
         
         body {
-            font-family: var(--font-body);
+            font-family: var(--font-family);
             font-size: var(--text-base);
-            line-height: 1.6;
-            background-color: #f0f4f8;
-            color: #1a202c;
+            line-height: 1.5;
+            background-color: var(--surface-secondary);
+            color: var(--text);
             overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            height: 100%;
+            height: -webkit-fill-available;
             position: relative;
         }
         
-        /* Accessibility Improvements */
+        /* Accessibility */
         :focus-visible {
             outline: 2px solid var(--primary);
             outline-offset: 2px;
         }
         
-        /* Reduced Motion Preference */
         @media (prefers-reduced-motion: reduce) {
             *, ::before, ::after {
                 animation-duration: 0.01ms !important;
@@ -157,236 +128,228 @@
             }
         }
         
-        /* Dark Mode Support */
+        /* Dark Mode */
         @media (prefers-color-scheme: dark) {
             :root {
-                --primary-light: hsl(var(--primary-hue), var(--primary-saturation), 70%);
-                --primary: hsl(var(--primary-hue), var(--primary-saturation), 60%);
-                --primary-dark: hsl(var(--primary-hue), var(--primary-saturation), 45%);
+                --surface: #1e293b;
+                --surface-secondary: #0f172a;
+                --surface-tertiary: #334155;
+                --border: #475569;
+                --text: #f1f5f9;
+                --text-secondary: #cbd5e1;
+                --text-muted: #94a3b8;
             }
             
             html {
                 color-scheme: dark;
             }
-            
-            body {
-                background-color: #121826;
-                color: #e2e8f0;
-            }
+        }
+        
+        .dark {
+            --surface: #1e293b;
+            --surface-secondary: #0f172a;
+            --surface-tertiary: #334155;
+            --border: #475569;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
         }
         
         /* ========================================
-           LAYOUT COMPONENTS
+           APP SHELL LAYOUT
         ======================================== */
         
-        .app-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            grid-template-rows: auto 1fr auto;
-            min-height: 100dvh;
-            width: 100%;
+        .app-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: -webkit-fill-available;
             position: relative;
-            overflow-x: hidden;
-        }
-
-        /* iOS Safari viewport quirks: ensure full-height layouts */
-        html, body {
-            height: 100%;
-            min-height: 100%;
-            min-height: -webkit-fill-available;
-        }
-        @supports (height: 100svh) {
-            .app-container { min-height: 100svh; }
+            overflow: hidden;
         }
         
-        @media (min-width: 1024px) {
-            .app-container {
-                grid-template-columns: 420px 1fr;
-                grid-template-rows: auto 1fr;
+        @supports (height: 100svh) {
+            .app-shell {
+                height: 100svh;
             }
         }
         
-        /* Glass Header */
+        /* iOS Standalone Mode - Hide header when installed */
+        @media (display-mode: standalone) {
+            .app-header {
+                display: none;
+            }
+            
+            .app-content {
+                padding-top: var(--safe-area-inset-top);
+            }
+        }
+        
+        /* Minimal Header */
         .app-header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: var(--space-sm);
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border-bottom: var(--glass-border);
+            flex-shrink: 0;
+            height: var(--header-height);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            grid-column: 1 / -1;
+            padding: 0 var(--space-4);
+            padding-top: var(--safe-area-inset-top);
+            z-index: 100;
         }
         
-        .dark .app-header {
-            background: rgba(18, 24, 38, 0.8);
-        }
-        
-        .logo {
+        .app-logo {
             display: flex;
             align-items: center;
-            gap: var(--space-xs);
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-md);
-            background: var(--primary-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-        }
-        
-        .logo-text {
-            font-family: var(--font-display);
+            gap: var(--space-3);
             font-weight: 600;
-            font-size: var(--text-xl);
-            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
-            filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
+            font-size: var(--text-lg);
+            color: var(--text);
+        }
+        
+        .app-logo i {
+            color: var(--primary);
+            font-size: 1.5rem;
         }
         
         .header-actions {
             display: flex;
-            gap: var(--space-xs);
+            gap: var(--space-2);
             align-items: center;
         }
         
-        /* Main Content Areas */
-        .sidebar {
-            grid-column: 1;
-            grid-row: 2;
-            background: var(--surface-light);
-            border-right: 1px solid rgba(0, 0, 0, 0.1);
-            padding: var(--space-md);
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: var(--space-2);
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--surface-tertiary);
+            color: var(--text);
+        }
+        
+        /* App Content */
+        .app-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .tab-content {
+            height: 100%;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: var(--space-4);
+            padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-inset-bottom));
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Bottom Tab Bar */
+        .bottom-tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: calc(var(--tab-bar-height) + var(--safe-area-inset-bottom));
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-around;
+            padding-top: var(--space-2);
+            padding-bottom: calc(var(--space-2) + var(--safe-area-inset-bottom));
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .tab-button {
             display: flex;
             flex-direction: column;
-            gap: var(--space-md);
-            z-index: 10;
-        }
-        
-        .dark .sidebar {
-            background: var(--surface-dark);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .map-container {
-            grid-column: 1 / -1;
-            grid-row: 2;
-            height: 100%;
-            width: 100%;
-            z-index: 1;
-        }
-        
-        @media (min-width: 1024px) {
-            .map-container {
-                grid-column: 2;
-            }
-        }
-        
-        /* Mobile Navigation */
-        .mobile-nav-toggle {
-            display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-md);
-            background: transparent;
+            gap: var(--space-1);
+            padding: var(--space-2);
             border: none;
+            background: none;
+            color: var(--text-muted);
+            font-size: var(--text-xs);
+            font-weight: 500;
             cursor: pointer;
-            color: var(--text-dark);
+            transition: all 0.2s;
+            min-width: 60px;
+            border-radius: var(--radius);
+        }
+        
+        .tab-button i {
             font-size: 1.5rem;
+            transition: all 0.2s;
         }
         
-        .dark .mobile-nav-toggle {
-            color: var(--text-light);
+        .tab-button.active {
+            color: var(--primary);
         }
         
-        @media (min-width: 1024px) {
-            .mobile-nav-toggle {
-                display: none;
-            }
+        .tab-button.active i {
+            transform: scale(1.1);
+        }
+        
+        .tab-button:hover:not(.active) {
+            color: var(--text-secondary);
+            background: var(--surface-tertiary);
         }
         
         /* ========================================
            COMPONENTS
         ======================================== */
         
-        /* Neomorphic Card */
-        .neo-card {
-            background: var(--surface-light);
+        /* Cards */
+        .card {
+            background: var(--surface);
             border-radius: var(--radius-lg);
-            padding: var(--space-md);
-            box-shadow: var(--neo-shadow-light);
-            transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+            padding: var(--space-4);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
         }
         
-        .neo-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
         }
         
-        .dark .neo-card {
-            background: var(--surface-dark);
-            box-shadow: var(--neo-shadow-dark);
-        }
-        
-        /* Glass Card */
-        .glass-card {
-            background: rgba(255, 255, 255, var(--glass-opacity));
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border-radius: var(--radius-lg);
-            border: var(--glass-border);
-            padding: var(--space-md);
-            box-shadow: var(--glass-shadow);
-        }
-        
-        .dark .glass-card {
-            background: rgba(18, 24, 38, var(--glass-opacity));
+        .card-compact {
+            padding: var(--space-3);
         }
         
         /* Section Title */
         .section-title {
-            font-family: var(--font-display);
             font-weight: 600;
             font-size: var(--text-xl);
-            margin-bottom: var(--space-xs);
-            position: relative;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 40px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-            border-radius: var(--radius-full);
+            margin-bottom: var(--space-4);
+            color: var(--text);
         }
         
         /* Transport Mode Tabs */
         .transport-modes {
             display: flex;
-            gap: var(--space-xs);
-            margin-bottom: var(--space-md);
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
             overflow-x: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            padding-bottom: var(--space-xs);
+            padding-bottom: var(--space-2);
         }
         
         .transport-modes::-webkit-scrollbar {
@@ -398,32 +361,32 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-width: 80px;
-            height: 80px;
+            min-width: 70px;
+            height: 70px;
             border-radius: var(--radius-lg);
-            background: var(--surface-light);
-            border: none;
+            background: var(--surface);
+            border: 1px solid var(--border);
             cursor: pointer;
-            transition: all var(--transition-medium);
-            box-shadow: var(--neo-shadow-light);
-            gap: var(--space-2xs);
-            padding: var(--space-xs);
-            color: var(--text-medium);
+            transition: all 0.2s;
+            gap: var(--space-1);
+            padding: var(--space-2);
+            color: var(--text-secondary);
         }
         
         .mode-tab.active {
             background: var(--primary);
             color: white;
-            box-shadow: 0 8px 16px rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.3);
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
         }
         
         .mode-tab:hover:not(.active) {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            background: var(--surface-tertiary);
+            color: var(--text);
         }
         
         .mode-tab i {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
         }
         
         .mode-tab span {
@@ -431,28 +394,17 @@
             font-weight: 500;
         }
         
-        .dark .mode-tab {
-            background: var(--surface-dark);
-            box-shadow: var(--neo-shadow-dark);
-            color: var(--text-light);
-        }
-        
         /* Advanced Form Controls */
         .form-group {
-            margin-bottom: var(--space-sm);
+            margin-bottom: var(--space-4);
         }
         
         .form-label {
             display: block;
-            margin-bottom: var(--space-2xs);
+            margin-bottom: var(--space-2);
             font-weight: 500;
             font-size: var(--text-sm);
-            color: var(--text-medium);
-            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-        }
-        
-        .dark .form-label {
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+            color: var(--text);
         }
         
         .input-wrapper {
@@ -463,38 +415,175 @@
         
         .input-icon {
             position: absolute;
-            left: var(--space-xs);
+            left: var(--space-3);
             color: var(--text-muted);
             pointer-events: none;
+            z-index: 1;
         }
         
         .form-input {
             width: 100%;
-            padding: var(--space-xs) var(--space-xs) var(--space-xs) calc(var(--space-xs) * 2 + 1rem);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            background: var(--surface-light);
-            font-family: var(--font-body);
+            padding: var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) * 2 + 1rem);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            font-family: var(--font-family);
             font-size: var(--text-base);
-            transition: all var(--transition-fast);
-            box-shadow: var(--neo-shadow-inset);
-            color: #1a202c;
-        }
-        
-        .dark .form-input {
-            color: #e2e8f0;
+            transition: all 0.2s;
+            color: var(--text);
         }
         
         .form-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(var(--primary-hue), var(--primary-saturation), 50%, 0.2);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
             outline: none;
         }
         
-        .dark .form-input {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: var(--text-light);
+        .location-swap {
+            position: absolute;
+            right: var(--space-2);
+            background: var(--surface-tertiary);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: var(--space-2);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .location-swap:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Preferences */
+        .preferences {
+            display: flex;
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+            flex-wrap: wrap;
+        }
+        
+        .preference-chip {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-full);
+            background: var(--surface-tertiary);
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        
+        .preference-chip.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .preference-chip:hover:not(.active) {
+            background: var(--surface-secondary);
+            color: var(--text);
+        }
+        
+        /* Route Results */
+        .route-results {
+            margin-top: var(--space-6);
+        }
+        
+        .route-option {
+            margin-bottom: var(--space-4);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .route-option.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
+        }
+        
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-3);
+        }
+        
+        .route-time {
+            font-weight: 600;
+            font-size: var(--text-lg);
+            color: var(--text);
+        }
+        
+        .route-price {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .route-meta {
+            display: flex;
+            gap: var(--space-4);
+            margin-bottom: var(--space-3);
+            flex-wrap: wrap;
+        }
+        
+        .route-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+        
+        .route-segments {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+        
+        .segment {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-1);
+        }
+        
+        .segment-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: var(--text-sm);
+            color: white;
+        }
+        
+        .segment-icon.walk {
+            background: var(--text-muted);
+        }
+        
+        .segment-icon.metro {
+            background: var(--primary);
+        }
+        
+        .segment-icon.bus {
+            background: var(--success);
+        }
+        
+        .segment-connector {
+            width: 20px;
+            height: 2px;
+            background: var(--border);
+        }
+        
+        .segment span {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
         }
         
         /* Advanced Button */
@@ -542,6 +631,25 @@
             height: 40px;
             padding: 0;
             border-radius: var(--radius-full);
+        }
+        
+        .btn-full {
+            width: 100%;
+        }
+        
+        /* Map Container */
+        .map-container {
+            width: 100%;
+            height: 400px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        @media (max-width: 768px) {
+            .map-container {
+                height: 300px;
+            }
         }
         
         /* Hero Section */
@@ -1088,538 +1196,370 @@
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- PWA Install Prompt -->
-        <div class="pwa-install-prompt" id="pwa-install-prompt">
-            <div>
-                <strong>Add to Home Screen</strong>
-                <p>Install this app on your device for quick access.</p>
-            </div>
-            <div>
-                <button class="btn btn-primary" id="pwa-install-btn">Install</button>
-                <button class="btn btn-secondary" id="pwa-dismiss-btn">Not Now</button>
-            </div>
+    <!-- PWA Install Prompt -->
+    <div class="pwa-install-prompt" id="pwa-install-prompt">
+        <div>
+            <strong>Add to Home Screen</strong>
+            <p>Install this app on your device for quick access.</p>
         </div>
-        
-        <!-- Bookmark Prompt -->
-        <div class="bookmark-prompt" id="bookmark-prompt">
-            <div>
-                <strong>Bookmark This Page</strong>
-                <p>Save Mumbai Transport for easy access later.</p>
-            </div>
-            <div>
-                <button class="btn btn-primary" id="bookmark-how-btn">How to Bookmark</button>
-                <button class="btn btn-secondary" id="bookmark-dismiss-btn">Dismiss</button>
-            </div>
+        <div>
+            <button class="btn btn-primary" id="pwa-install-btn">Install</button>
+            <button class="btn btn-secondary" id="pwa-dismiss-btn">Not Now</button>
         </div>
-        <!-- Header -->
+    </div>
+    
+    <!-- Bookmark Prompt -->
+    <div class="bookmark-prompt" id="bookmark-prompt">
+        <div>
+            <strong>Bookmark This Page</strong>
+            <p>Save Mumbai Transport for easy access later.</p>
+        </div>
+        <div>
+            <button class="btn btn-primary" id="bookmark-how-btn">How to Bookmark</button>
+            <button class="btn btn-secondary" id="bookmark-dismiss-btn">Dismiss</button>
+        </div>
+    </div>
+
+    <!-- App Shell -->
+    <div class="app-shell">
+        <!-- Minimal Header -->
         <header class="app-header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="ph ph-train"></i>
-                </div>
-                <div class="logo-text">Mumbai Transport</div>
+            <div class="app-logo">
+                <i class="ph ph-train"></i>
+                Mumbai Transport
             </div>
             
             <div class="header-actions">
                 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
                     <i class="ph ph-sun"></i>
                 </button>
-                <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle navigation">
-                    <i class="ph ph-list"></i>
-                </button>
             </div>
         </header>
 
-        <nav class="primary-nav" id="primary-nav">
-            <button class="nav-btn active" data-target="journey-planner">Plan</button>
-            <button class="nav-btn" data-target="metro-tickets">Tickets</button>
-            <button class="nav-btn" data-target="fares">Fares</button>
-            <button class="nav-btn" data-target="ride-hailing">Compare</button>
-        </nav>
-        
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-bg"></div>
-            <div class="hero-content">
-                <h1 class="hero-title">Smart Route Planning & Live Tracking</h1>
-                <p class="hero-subtitle">Plan your journey with real-time BEST bus routes, local trains, and metro connections. Get live tracking and accurate ETAs for seamless travel across Mumbai.</p>
-                <div class="cta-buttons">
-                    <a href="#journey-planner" class="btn btn-cta">Plan Your Journey</a>
-                    <a href="#features" class="btn btn-cta btn-cta-secondary">Explore Features</a>
-                </div>
-            </div>
-
-            <!-- Compact local fares (Aug 2025) -->
-            <div class="feature-card card-3d">
-                <div class="feature-icon"><i class="ph ph-currency-inr"></i></div>
-                <h3 class="feature-title">Local Fares (Aug 2025)</h3>
-                <p class="feature-description">
-                    Auto Rickshaw: Min ₹26 (first 1.5 km), ₹15.33/km after; Night (00:00–05:00): +25%<br>
-                    Kaali‑Peeli Taxi: Min ₹33 (first 1.5 km), ₹21.33/km after; Night: +25%
-                </p>
-            </div>
-        </section>
-        
-        <!-- Features Section -->
-        <section class="features" id="features">
-            <h2 class="features-title">Discover Mumbai Transport Hub</h2>
-            
-            <!-- Non-intrusive Ad Space -->
-            <div class="ad-space">
-                <p>Sponsored content - Support Mumbai Transport</p>
-            </div>
-            
-            <div class="features-grid">
-                <div class="feature-card card-3d">
-                    <div class="feature-icon">
-                        <i class="ph ph-map-trifold"></i>
-                    </div>
-                    <h3 class="feature-title">Smart Route Planning</h3>
-                    <p class="feature-description">Find the best routes using real BEST bus data, local trains, and metro connections. Get multi-modal options with accurate timings and fares.</p>
-                </div>
+        <!-- App Content -->
+        <main class="app-content">
+            <!-- Plan Tab -->
+            <div class="tab-content active" id="plan-tab">
+                <div class="section-title">Plan Your Journey</div>
                 
-                <div class="feature-card card-3d">
-                    <div class="feature-icon">
+                <!-- Transport Modes -->
+                <div class="transport-modes">
+                    <button class="mode-tab active" data-mode="all">
+                        <i class="ph ph-shuffle"></i>
+                        <span>All</span>
+                    </button>
+                    <button class="mode-tab" data-mode="metro">
+                        <i class="ph ph-train"></i>
+                        <span>Metro</span>
+                    </button>
+                    <button class="mode-tab" data-mode="bus">
                         <i class="ph ph-bus"></i>
-                    </div>
-                    <h3 class="feature-title">Live Bus Tracking</h3>
-                    <p class="feature-description">Track buses in real-time with accurate ETAs, current locations, and passenger counts. Never miss your bus again with live updates.</p>
+                        <span>Bus</span>
+                    </button>
+                    <button class="mode-tab" data-mode="train">
+                        <i class="ph ph-train-regional"></i>
+                        <span>Train</span>
+                    </button>
                 </div>
                 
-                <div class="feature-card card-3d">
-                    <div class="feature-icon">
-                        <i class="ph ph-clock-clockwise"></i>
+                <!-- Journey Form -->
+                <form id="journey-form">
+                    <div class="form-group">
+                        <label class="form-label" for="from">From</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-map-pin input-icon"></i>
+                            <input type="text" id="from" class="form-input" placeholder="Current location or address">
+                        </div>
                     </div>
-                    <h3 class="feature-title">Real-Time Updates</h3>
-                    <p class="feature-description">Get real-time information using actual Mumbai transport schedules. Accurate ETAs based on real departure timings and route data.</p>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="to">To</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-map-pin-line input-icon"></i>
+                            <input type="text" id="to" class="form-input" placeholder="Destination">
+                            <button type="button" class="location-swap" id="swap-locations">
+                                <i class="ph ph-arrows-down-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">When</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-clock input-icon"></i>
+                            <select class="form-input" id="departure-time">
+                                <option value="now">Leave now</option>
+                                <option value="depart">Depart at</option>
+                                <option value="arrive">Arrive by</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="time-selector" style="display: none;">
+                        <div class="input-wrapper">
+                            <i class="ph ph-calendar input-icon"></i>
+                            <input type="datetime-local" class="form-input" id="custom-time">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="ph ph-magnifying-glass"></i>
+                        Find Routes
+                    </button>
+                </form>
+                
+                <!-- Map Container -->
+                <div id="map" class="map-container" style="height: 300px; margin-top: 1rem; border-radius: var(--radius-lg);"></div>
+                
+                <!-- Route Results -->
+                <div class="route-results" id="route-results" style="display: none;">
+                    <div class="section-title">Best Routes</div>
+                    
+                    <div class="live-indicator">
+                        <span class="live-dot"></span>
+                        Live traffic updates
+                    </div>
+                    
+                    <div class="route-option active card">
+                        <div class="route-header">
+                            <div class="route-time">38 min</div>
+                            <div class="route-price">₹30</div>
+                        </div>
+                        
+                        <div class="route-meta">
+                            <div class="route-meta-item">
+                                <i class="ph ph-clock"></i>
+                                <span>Depart 5:45 PM</span>
+                            </div>
+                            <div class="route-meta-item">
+                                <i class="ph ph-footprints"></i>
+                                <span>400m walk</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Metro Ticketing -->
-        <section class="features section" id="metro-tickets">
-            <h2 class="features-title">🚇 Mumbai Metro Ticketing – Unified</h2>
-            <div class="features-grid">
-                <div class="feature-card card-3d">
-                    <div class="feature-icon"><i class="ph ph-qr-code"></i></div>
-                    <h3 class="feature-title">Line 1 – WhatsApp Ticket</h3>
-                    <p class="feature-description">Versova–Andheri–Ghatkopar (Reliance Metro)</p>
-                    <a class="btn btn-primary" href="https://wa.me/919670008889?text=Hi" target="_blank" rel="noopener">Open WhatsApp</a>
-                </div>
+            <!-- Tickets Tab -->
+            <div class="tab-content" id="tickets-tab">
+                <div class="section-title">Metro Tickets & Fares</div>
+                
+                <!-- Metro Ticketing -->
+                <div style="display: grid; gap: var(--space-4); margin-bottom: var(--space-6);">
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
+                            <i class="ph ph-qr-code" style="font-size: 1.5rem; color: var(--primary);"></i>
+                            <div>
+                                <h3 style="font-weight: 600; margin-bottom: var(--space-1);">Line 1 – WhatsApp Ticket</h3>
+                                <p style="color: var(--text-secondary); font-size: var(--text-sm);">Versova–Andheri–Ghatkopar (Reliance Metro)</p>
+                            </div>
+                        </div>
+                        <a class="btn btn-primary" href="https://wa.me/919670008889?text=Hi" target="_blank" rel="noopener">
+                            <i class="ph ph-whatsapp-logo"></i>
+                            Open WhatsApp
+                        </a>
+                    </div>
 
-                <div class="feature-card card-3d">
-                    <div class="feature-icon"><i class="ph ph-qr-code"></i></div>
-                    <h3 class="feature-title">Lines 2A & 7 – WhatsApp Ticket</h3>
-                    <p class="feature-description">Dahisar–DN Nagar & Dahisar–Gundavali (MMMOCL)</p>
-                    <a class="btn btn-primary" href="https://wa.me/918652635500?text=Hi" target="_blank" rel="noopener">Open WhatsApp</a>
-                </div>
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
+                            <i class="ph ph-qr-code" style="font-size: 1.5rem; color: var(--primary);"></i>
+                            <div>
+                                <h3 style="font-weight: 600; margin-bottom: var(--space-1);">Lines 2A & 7 – WhatsApp Ticket</h3>
+                                <p style="color: var(--text-secondary); font-size: var(--text-sm);">Dahisar–DN Nagar & Dahisar–Gundavali (MMMOCL)</p>
+                            </div>
+                        </div>
+                        <a class="btn btn-primary" href="https://wa.me/918652635500?text=Hi" target="_blank" rel="noopener">
+                            <i class="ph ph-whatsapp-logo"></i>
+                            Open WhatsApp
+                        </a>
+                    </div>
 
-                <div class="feature-card card-3d">
-                    <div class="feature-icon"><i class="ph ph-train"></i></div>
-                    <h3 class="feature-title">Aqua Line (Line 3)</h3>
-                    <p class="feature-description">No WhatsApp yet. Use MetroConnect3 app or see official map.</p>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <a class="btn btn-secondary" href="https://play.google.com/store/search?q=MetroConnect3" target="_blank" rel="noopener">Android App</a>
-                        <a class="btn btn-secondary" href="https://apps.apple.com/in/search?term=MetroConnect3" target="_blank" rel="noopener">iOS App</a>
-                        <a class="btn btn-primary" href="https://mmrcl.com/en/map" target="_blank" rel="noopener">Official Map</a>
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
+                            <i class="ph ph-train" style="font-size: 1.5rem; color: var(--primary);"></i>
+                            <div>
+                                <h3 style="font-weight: 600; margin-bottom: var(--space-1);">Aqua Line (Line 3)</h3>
+                                <p style="color: var(--text-secondary); font-size: var(--text-sm);">No WhatsApp yet. Use MetroConnect3 app or see official map.</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                            <a class="btn btn-secondary" href="https://play.google.com/store/search?q=MetroConnect3" target="_blank" rel="noopener">Android App</a>
+                            <a class="btn btn-secondary" href="https://apps.apple.com/in/search?term=MetroConnect3" target="_blank" rel="noopener">iOS App</a>
+                            <a class="btn btn-primary" href="https://mmrcl.com/en/map" target="_blank" rel="noopener">Official Map</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
+                            <i class="ph ph-credit-card" style="font-size: 1.5rem; color: var(--primary);"></i>
+                            <div>
+                                <h3 style="font-weight: 600; margin-bottom: var(--space-1);">NCMC / Mumbai 1 Card</h3>
+                                <p style="color: var(--text-secondary); font-size: var(--text-sm);">Tap & go on Lines 1, 2A, 7 (Line 3 soon). No app required.</p>
+                            </div>
+                        </div>
+                        <a class="btn btn-secondary" href="https://www.npci.org.in/what-we-do/ncmc" target="_blank" rel="noopener">About NCMC</a>
                     </div>
                 </div>
 
-                <div class="feature-card card-3d">
-                    <div class="feature-icon"><i class="ph ph-credit-card"></i></div>
-                    <h3 class="feature-title">NCMC / Mumbai 1 Card</h3>
-                    <p class="feature-description">Tap & go on Lines 1, 2A, 7 (Line 3 soon). No app required.</p>
-                    <a class="btn btn-secondary" href="https://www.npci.org.in/what-we-do/ncmc" target="_blank" rel="noopener">About NCMC</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Fares (Aug 2025) -->
-        <section class="features section" id="fares">
-            <h2 class="features-title">🚖 Mumbai Fares – Aug 2025</h2>
-            <div class="features-grid">
-                <div class="feature-card card-3d">
-                    <h3 class="feature-title">Auto Rickshaw</h3>
-                    <p class="feature-description">
-                        Minimum fare (first 1.5 km): ₹26<br>
-                        After 1.5 km: ₹15.33 per km<br>
-                        Night charges (00:00–05:00): +25%
-                    </p>
-                </div>
-                <div class="feature-card card-3d">
-                    <h3 class="feature-title">Kaali‑Peeli Taxi</h3>
-                    <p class="feature-description">
-                        Minimum fare (first 1.5 km): ₹33<br>
-                        After 1.5 km: ₹21.33 per km<br>
-                        Night charges (00:00–05:00): +25%
-                    </p>
-                </div>
-                <div class="feature-card card-3d">
-                    <h3 class="feature-title">Notes</h3>
-                    <p class="feature-description">
-                        Fares regulated by Mumbai RTO; waiting charges ≈ ₹1.5–₹2/min when stationary.
-                        NCMC/Mumbai 1 not valid for autos or kaali‑peelis (only metro/BEST/some cabs).
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Ride-hailing fare comparison -->
-        <section class="features section" id="ride-hailing">
-            <h2 class="features-title">🚕 Ola & Uber – Fare Estimates</h2>
-            <div class="features-grid">
-                <div class="feature-card card-3d" style="grid-column: 1 / -1;">
-                    <h3 class="feature-title" style="margin-bottom: 8px;">Estimate ranges (Mumbai, non-binding)</h3>
-                    <div class="feature-description" style="margin-bottom: 10px;">
-                        Choose surge factor:
-                        <input id="surge-factor" type="range" min="1.0" max="1.5" value="1.0" step="0.1" style="width: 200px; vertical-align: middle;">
-                        <span id="surge-label">1.0x</span>
-                        <span style="display:inline-block; margin-left:8px; font-size:0.85em; color:#64748b;">Adjust during peak hours</span>
+                <!-- Local Fares (Aug 2025) -->
+                <div class="section-title">Local Fares (Aug 2025)</div>
+                <div style="display: grid; gap: var(--space-4);">
+                    <div class="card card-compact">
+                        <h3 style="font-weight: 600; margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+                            <i class="ph ph-car" style="color: var(--primary);"></i>
+                            Auto Rickshaw
+                        </h3>
+                        <p style="color: var(--text-secondary); font-size: var(--text-sm);">
+                            Minimum fare (first 1.5 km): <strong>₹26</strong><br>
+                            After 1.5 km: ₹15.33 per km<br>
+                            Night charges (00:00–05:00): +25%
+                        </p>
                     </div>
-                    <div class="feature-description">
+                    
+                    <div class="card card-compact">
+                        <h3 style="font-weight: 600; margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+                            <i class="ph ph-taxi" style="color: var(--primary);"></i>
+                            Kaali‑Peeli Taxi
+                        </h3>
+                        <p style="color: var(--text-secondary); font-size: var(--text-sm);">
+                            Minimum fare (first 1.5 km): ₹33<br>
+                            After 1.5 km: ₹21.33 per km<br>
+                            Night charges (00:00–05:00): +25%
+                        </p>
+                    </div>
+                    
+                    <div class="card card-compact">
+                        <h3 style="font-weight: 600; margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+                            <i class="ph ph-info" style="color: var(--primary);"></i>
+                            Notes
+                        </h3>
+                        <p style="color: var(--text-secondary); font-size: var(--text-sm);">
+                            Fares regulated by Mumbai RTO; waiting charges ≈ ₹1.5–₹2/min when stationary.
+                            NCMC/Mumbai 1 not valid for autos or kaali‑peelis (only metro/BEST/some cabs).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compare Tab -->
+            <div class="tab-content" id="compare-tab">
+                <div class="section-title">Ride Estimates & Compare</div>
+                
+                <div class="card" style="margin-bottom: var(--space-4);">
+                    <h3 style="font-weight: 600; margin-bottom: var(--space-3);">Estimate ranges (Mumbai, non-binding)</h3>
+                    <div style="margin-bottom: var(--space-3);">
+                        <label style="display: block; margin-bottom: var(--space-2); font-size: var(--text-sm); color: var(--text-secondary);">
+                            Choose surge factor:
+                        </label>
+                        <input id="surge-factor" type="range" min="1.0" max="1.5" value="1.0" step="0.1" style="width: 100%; margin-bottom: var(--space-2);">
+                        <div style="display: flex; justify-content: space-between; font-size: var(--text-sm); color: var(--text-muted);">
+                            <span>1.0x</span>
+                            <span id="surge-label">1.0x</span>
+                            <span>1.5x</span>
+                        </div>
+                        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--space-1);">Adjust during peak hours</p>
+                    </div>
+                    <div style="font-size: var(--text-sm); color: var(--text-secondary);">
                         <strong>Based on distance:</strong>
                         <span id="trip-distance-label">Your route: —</span>
                     </div>
                 </div>
 
-                <!-- 5 km -->
-                <div class="feature-card card-3d">
-                    <div class="feature-icon"><i class="ph ph-car"></i></div>
-                    <h3 class="feature-title">5 km</h3>
-                    <div class="feature-description" id="fare-5km">
-                        Uber Go: —<br>
-                        Ola Mini: —<br>
-                        Uber Moto: —<br>
-                        Ola Auto: —
+                <div style="display: grid; gap: var(--space-4);">
+                    <!-- 5 km -->
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
+                            <i class="ph ph-car" style="font-size: 1.5rem; color: var(--primary);"></i>
+                            <h3 style="font-weight: 600;">5 km</h3>
+                        </div>
+                        <div id="fare-5km" style="margin-bottom: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary);">
+                            Uber Go: —<br>
+                            Ola Mini: —<br>
+                            Uber Moto: —<br>
+                            Ola Auto: —
+                        </div>
+                        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
+                            <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
+                        </div>
                     </div>
-                    <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-                        <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
-                        <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
-                    </div>
-                </div>
 
-                <!-- 10 km -->
-                <div class="feature-card card-3d">
-                    <div class="feature-icon"><i class="ph ph-car-profile"></i></div>
-                    <h3 class="feature-title">10 km</h3>
-                    <div class="feature-description" id="fare-10km">
-                        Uber Go: —<br>
-                        Ola Mini: —<br>
-                        Uber Moto: —<br>
-                        Ola Auto: —
+                    <!-- 10 km -->
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
+                            <i class="ph ph-car-profile" style="font-size: 1.5rem; color: var(--primary);"></i>
+                            <h3 style="font-weight: 600;">10 km</h3>
+                        </div>
+                        <div id="fare-10km" style="margin-bottom: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary);">
+                            Uber Go: —<br>
+                            Ola Mini: —<br>
+                            Uber Moto: —<br>
+                            Ola Auto: —
+                        </div>
+                        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
+                            <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
+                        </div>
                     </div>
-                    <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-                        <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
-                        <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
-                    </div>
-                </div>
 
-                <!-- 20 km -->
-                <div class="feature-card card-3d">
-                    <div class="feature-icon"><i class="ph ph-steering-wheel"></i></div>
-                    <h3 class="feature-title">20 km</h3>
-                    <div class="feature-description" id="fare-20km">
-                        Uber Go: —<br>
-                        Ola Mini: —<br>
-                        Uber Moto: —<br>
-                        Ola Auto: —
+                    <!-- 20 km -->
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
+                            <i class="ph ph-steering-wheel" style="font-size: 1.5rem; color: var(--primary);"></i>
+                            <h3 style="font-weight: 600;">20 km</h3>
+                        </div>
+                        <div id="fare-20km" style="margin-bottom: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary);">
+                            Uber Go: —<br>
+                            Ola Mini: —<br>
+                            Uber Moto: —<br>
+                            Ola Auto: —
+                        </div>
+                        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
+                            <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
+                        </div>
                     </div>
-                    <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-                        <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
-                        <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
-                    </div>
-                </div>
 
-                <!-- Current route distance (if available) -->
-                <div class="feature-card card-3d" id="fare-current-card" style="display:none;">
-                    <div class="feature-icon"><i class="ph ph-route"></i></div>
-                    <h3 class="feature-title">Your route</h3>
-                    <div class="feature-description" id="fare-current">
-                        Uber Go: —<br>
-                        Ola Mini: —<br>
-                        Uber Moto: —<br>
-                        Ola Auto: —
-                    </div>
-                    <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-                        <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
-                        <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
-                    </div>
-                </div>
-            </div>
-            <p class="feature-description" style="margin-top:10px;">
-                Estimates are indicative using typical Mumbai rates; actual prices depend on live demand, time, tolls, and provider policies. For live quotes, use the buttons to open the ride app with your pickup/drop set.
-            </p>
-        </section>
-        
-        <!-- Journey Planner Section -->
-        <section class="journey-planner section active" id="journey-planner">
-            <div class="app-container">
-                <!-- Sidebar -->
-                <aside class="sidebar" id="sidebar">
-                    <div class="section-title">Plan Your Journey</div>
-                    
-                    <!-- Transport Modes -->
-                    <div class="transport-modes">
-                        <button class="mode-tab active" data-mode="all">
-                            <i class="ph ph-shuffle"></i>
-                            <span>All</span>
-                        </button>
-                        <button class="mode-tab" data-mode="metro">
-                            <i class="ph ph-train"></i>
-                            <span>Metro</span>
-                        </button>
-                        <button class="mode-tab" data-mode="bus">
-                            <i class="ph ph-bus"></i>
-                            <span>Bus</span>
-                        </button>
-                        <button class="mode-tab" data-mode="train">
-                            <i class="ph ph-train-regional"></i>
-                            <span>Train</span>
-                        </button>
-                        <button class="mode-tab" data-mode="taxi">
-                            <i class="ph ph-taxi"></i>
-                            <span>Taxi</span>
-                        </button>
-                        <button class="mode-tab" data-mode="auto">
-                            <i class="ph ph-car"></i>
-                            <span>Auto</span>
-                        </button>
-                    </div>
-                    
-                    <!-- Journey Form -->
-                    <form id="journey-form">
-                        <div class="form-group">
-                            <label class="form-label" for="from">From</label>
-                            <div class="input-wrapper">
-                                <i class="ph ph-map-pin input-icon"></i>
-                                <input type="text" id="from" class="form-input" placeholder="Current location or address">
-                            </div>
+                    <!-- Current route distance (if available) -->
+                    <div class="card" id="fare-current-card" style="display:none;">
+                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
+                            <i class="ph ph-route" style="font-size: 1.5rem; color: var(--primary);"></i>
+                            <h3 style="font-weight: 600;">Your route</h3>
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="to">To</label>
-                            <div class="input-wrapper">
-                                <i class="ph ph-map-pin-line input-icon"></i>
-                                <input type="text" id="to" class="form-input" placeholder="Destination">
-                                <button type="button" class="location-swap" id="swap-locations">
-                                    <i class="ph ph-arrows-down-up"></i>
-                                </button>
-                            </div>
+                        <div id="fare-current" style="margin-bottom: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary);">
+                            Uber Go: —<br>
+                            Ola Mini: —<br>
+                            Uber Moto: —<br>
+                            Ola Auto: —
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">When</label>
-                            <div class="input-wrapper">
-                                <i class="ph ph-clock input-icon"></i>
-                                <select class="form-input" id="departure-time">
-                                    <option value="now">Leave now</option>
-                                    <option value="depart">Depart at</option>
-                                    <option value="arrive">Arrive by</option>
-                                </select>
-                            </div>
+                        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="openUberDeepLink()">Open Uber</button>
+                            <button class="btn btn-secondary" onclick="openOlaDeepLink()">Open Ola</button>
                         </div>
-                        
-                        <div class="form-group" id="time-selector" style="display: none;">
-                            <div class="input-wrapper">
-                                <i class="ph ph-calendar input-icon"></i>
-                                <input type="datetime-local" class="form-input" id="custom-time">
-                            </div>
-                        </div>
-                        
-                        <div class="preferences">
-                            <div class="preference-chip active">
-                                <i class="ph ph-lightning"></i>
-                                <span>Fastest</span>
-                            </div>
-                            <div class="preference-chip">
-                                <i class="ph ph-wallet"></i>
-                                <span>Cheapest</span>
-                            </div>
-                            <div class="preference-chip">
-                                <i class="ph ph-footprints"></i>
-                                <span>Less walking</span>
-                            </div>
-                            <div class="preference-chip">
-                                <i class="ph ph-wheelchair"></i>
-                                <span>Accessible</span>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">
-                            <i class="ph ph-magnifying-glass"></i>
-                            Find Routes
-                        </button>
-                    </form>
-                    
-                    <!-- Route Results -->
-                    <div class="route-results" id="route-results" style="display: none;">
-                        <div class="section-title">Best Routes</div>
-                        
-                        <div class="live-indicator">
-                            <span class="live-dot"></span>
-                            Live traffic updates
-                        </div>
-                        
-                        <div class="route-option active card-3d">
-                            <div class="route-header">
-                                <div class="route-time">38 min</div>
-                                <div class="route-price">₹30</div>
-                            </div>
-                            
-                            <div class="route-meta">
-                                <div class="route-meta-item">
-                                    <i class="ph ph-clock"></i>
-                                    <span>Depart 5:45 PM</span>
-                                </div>
-                                <div class="route-meta-item">
-                                    <i class="ph ph-footprints"></i>
-                                    <span>400m walk</span>
-                                </div>
-                            </div>
-                            
-                            <div class="route-segments">
-                                <div class="segment">
-                                    <div class="segment-icon walk">W</div>
-                                </div>
-                                <div class="segment-connector"></div>
-                                <div class="segment">
-                                    <div class="segment-icon metro">M</div>
-                                    <span>Line 1</span>
-                                </div>
-                                <div class="segment-connector"></div>
-                                <div class="segment">
-                                    <div class="segment-icon walk">W</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="route-option card-3d">
-                            <div class="route-header">
-                                <div class="route-time">42 min</div>
-                                <div class="route-price">₹25</div>
-                            </div>
-                            
-                            <div class="route-meta">
-                                <div class="route-meta-item">
-                                    <i class="ph ph-clock"></i>
-                                    <span>Depart 5:50 PM</span>
-                                </div>
-                                <div class="route-meta-item">
-                                    <i class="ph ph-footprints"></i>
-                                    <span>200m walk</span>
-                                </div>
-                            </div>
-                            
-                            <div class="route-segments">
-                                <div class="segment">
-                                    <div class="segment-icon walk">W</div>
-                                </div>
-                                <div class="segment-connector"></div>
-                                <div class="segment">
-                                    <div class="segment-icon bus">B</div>
-                                    <span>Route 21</span>
-                                </div>
-                                <div class="segment-connector"></div>
-                                <div class="segment">
-                                    <div class="segment-icon walk">W</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
-                
-                <!-- Map Container -->
-                <div id="map" class="map-container"></div>
-            </div>
-        </section>
-        
-        <!-- Call to Action -->
-        <section class="cta">
-            <h2 class="cta-title">Ready to Transform Your Mumbai Commute?</h2>
-            <p class="cta-description">Download our mobile app for an even better experience with offline maps, journey alerts, and personalized recommendations.</p>
-            <div class="cta-buttons">
-                <a href="#" class="btn btn-cta">
-                    <i class="ph ph-device-mobile"></i>
-                    Download App
-                </a>
-                <a href="#" class="btn btn-cta btn-cta-secondary">
-                    <i class="ph ph-info"></i>
-                    Learn More
-                </a>
-            </div>
-        </section>
-        
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-info">
-                    <div class="footer-logo">
-                        <div class="footer-logo-icon">
-                            <i class="ph ph-train"></i>
-                        </div>
-                        <div class="footer-logo-text">Mumbai Transport</div>
-                    </div>
-                    <p class="footer-description">Providing real-time transport information and journey planning for Mumbai's public transportation network.</p>
-                    <div class="footer-social">
-                        <a href="#" class="footer-social-link">
-                            <i class="ph ph-twitter-logo"></i>
-                        </a>
-                        <a href="#" class="footer-social-link">
-                            <i class="ph ph-facebook-logo"></i>
-                        </a>
-                        <a href="#" class="footer-social-link">
-                            <i class="ph ph-instagram-logo"></i>
-                        </a>
-                        <a href="#" class="footer-social-link">
-                            <i class="ph ph-youtube-logo"></i>
-                        </a>
                     </div>
                 </div>
                 
-                <div class="footer-links-container">
-                    <h3 class="footer-title">Quick Links</h3>
-                    <ul class="footer-links">
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Home</a></li>
-                        <li class="footer-link"><a href="#features"><i class="ph ph-caret-right"></i> Features</a></li>
-                        <li class="footer-link"><a href="#journey-planner"><i class="ph ph-caret-right"></i> Journey Planner</a></li>
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Live Map</a></li>
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Schedules</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links-container">
-                    <h3 class="footer-title">Transport Modes</h3>
-                    <ul class="footer-links">
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> BEST Bus</a></li>
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Local Trains</a></li>
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Metro</a></li>
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Monorail</a></li>
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Ferry Services</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links-container">
-                    <h3 class="footer-title">Support</h3>
-                    <ul class="footer-links">
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Help Center</a></li>
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> FAQs</a></li>
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Contact Us</a></li>
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Privacy Policy</a></li>
-                        <li class="footer-link"><a href="#"><i class="ph ph-caret-right"></i> Terms of Service</a></li>
-                    </ul>
-                </div>
+                <p style="margin-top: var(--space-4); font-size: var(--text-xs); color: var(--text-muted);">
+                    Estimates are indicative using typical Mumbai rates; actual prices depend on live demand, time, tolls, and provider policies. For live quotes, use the buttons to open the ride app with your pickup/drop set.
+                </p>
             </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2025 Mumbai Transport Hub. All rights reserved.</p>
-            </div>
-        </footer>
-        
-        <!-- AI Assistant Button -->
-        <button class="ai-assistant-btn" id="ai-assistant">
-            <i class="ph ph-robot"></i>
-        </button>
+        </main>
+
+        <!-- Bottom Tab Bar -->
+        <nav class="bottom-tab-bar">
+            <button class="tab-button active" data-tab="plan-tab">
+                <i class="ph ph-map-trifold"></i>
+                <span>Plan</span>
+            </button>
+            <button class="tab-button" data-tab="tickets-tab">
+                <i class="ph ph-ticket"></i>
+                <span>Tickets</span>
+            </button>
+            <button class="tab-button" data-tab="compare-tab">
+                <i class="ph ph-scales"></i>
+                <span>Compare</span>
+            </button>
+        </nav>
     </div>
     
     <script>
@@ -1666,30 +1606,60 @@
         }
         
         
-        // Mobile Navigation Toggle
+        // Bottom Tab Bar Navigation
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.dataset.tab;
+                
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                button.classList.add('active');
+                const targetContent = document.getElementById(targetTab);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+                
+                // Trigger map resize when switching to Plan tab (if map exists)
+                if (targetTab === 'plan-tab' && typeof google !== 'undefined' && window.map) {
+                    setTimeout(() => {
+                        google.maps.event.trigger(window.map, 'resize');
+                    }, 100);
+                }
+            });
+        });
+
+        // Mobile Navigation Toggle (if exists)
         const mobileNavToggle = document.getElementById('mobile-nav-toggle');
         const sidebar = document.getElementById('sidebar');
         
-        mobileNavToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            
-            if (sidebar.classList.contains('active')) {
-                mobileNavToggle.innerHTML = '<i class="ph ph-x"></i>';
-                // Add overlay to close sidebar when clicking outside
-                addSidebarOverlay();
-            } else {
-                mobileNavToggle.innerHTML = '<i class="ph ph-list"></i>';
-                // Remove overlay
-                removeSidebarOverlay();
-            }
+        if (mobileNavToggle && sidebar) {
+            mobileNavToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                
+                if (sidebar.classList.contains('active')) {
+                    mobileNavToggle.innerHTML = '<i class="ph ph-x"></i>';
+                    // Add overlay to close sidebar when clicking outside
+                    addSidebarOverlay();
+                } else {
+                    mobileNavToggle.innerHTML = '<i class="ph ph-list"></i>';
+                    // Remove overlay
+                    removeSidebarOverlay();
+                }
 
-            // On iOS/Safari, when the drawer opens/closes, force map to resize to avoid cut layouts
-            if (typeof google !== 'undefined' && window.map) {
-                setTimeout(() => {
-                    google.maps.event.trigger(window.map, 'resize');
-                }, 250);
-            }
-        });
+                // On iOS/Safari, when the drawer opens/closes, force map to resize to avoid cut layouts
+                if (typeof google !== 'undefined' && window.map) {
+                    setTimeout(() => {
+                        google.maps.event.trigger(window.map, 'resize');
+                    }, 250);
+                }
+            });
+        }
         
         // Add overlay to close sidebar when clicking outside
         function addSidebarOverlay() {
@@ -2174,13 +2144,15 @@
             });
         });
         
-        // AI Assistant
+        // AI Assistant (if exists)
         const aiAssistant = document.getElementById('ai-assistant');
         
-        aiAssistant.addEventListener('click', () => {
-            // Show AI assistant modal or chat interface
-            alert('AI Travel Assistant: How can I help you plan your journey today?');
-        });
+        if (aiAssistant) {
+            aiAssistant.addEventListener('click', () => {
+                // Show AI assistant modal or chat interface
+                alert('AI Travel Assistant: How can I help you plan your journey today?');
+            });
+        }
         
         // Initialize Google Maps
         let map;
@@ -2427,8 +2399,7 @@
             return marker;
         }
         
-        // Initialize map when page loads
-        window.addEventListener('load', initMap);
+        // Initialize via Maps callback; see script tag (callback=initMap)
     </script>
     
     <!-- PWA Service Worker Registration -->
@@ -2437,7 +2408,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 // Explicitly scope SW under /portal/
-                navigator.serviceWorker.register('/portal/sw.js', { scope: '/portal/' })
+                navigator.serviceWorker.register('sw.js', { scope: '/' })
                     .then(registration => {
                         console.log('Service Worker registered with scope:', registration.scope);
                         // Ensure only /portal/ scoped SW is active (remove any root-scoped registrations)
@@ -2625,6 +2596,99 @@
             bookmarkPrompt.classList.remove('show');
             localStorage.setItem('bookmark-status', 'dismissed');
         });
+
+        // Surge Factor Slider
+        const surgeSlider = document.getElementById('surge-factor');
+        const surgeLabel = document.getElementById('surge-label');
+        
+        if (surgeSlider && surgeLabel) {
+            surgeSlider.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                surgeLabel.textContent = `${value.toFixed(1)}x`;
+                
+                // Update ride estimates if function exists
+                if (typeof updateRideEstimates === 'function') {
+                    updateRideEstimates();
+                }
+            });
+        }
+
+        // Ride-hailing Deep Link Functions
+        window.openUberDeepLink = function() {
+            const from = window.currentFrom;
+            const to = window.currentTo;
+            
+            if (from && to) {
+                const uberUrl = `https://m.uber.com/ul/?action=setPickup&pickup[latitude]=${from.lat}&pickup[longitude]=${from.lng}&dropoff[latitude]=${to.lat}&dropoff[longitude]=${to.lng}`;
+                window.open(uberUrl, '_blank');
+            } else {
+                // Fallback to general Uber app
+                window.open('https://m.uber.com/', '_blank');
+            }
+        };
+
+        window.openOlaDeepLink = function() {
+            const from = window.currentFrom;
+            const to = window.currentTo;
+            
+            if (from && to) {
+                const olaUrl = `https://book.olacabs.com/?serviceType=p2p&lat=${from.lat}&lng=${from.lng}&drop_lat=${to.lat}&drop_lng=${to.lng}`;
+                window.open(olaUrl, '_blank');
+            } else {
+                // Fallback to general Ola app
+                window.open('https://book.olacabs.com/', '_blank');
+            }
+        };
+
+        // Ride Estimates Calculator
+        window.updateRideEstimates = function() {
+            const surgeFactor = parseFloat(document.getElementById('surge-factor')?.value || 1.0);
+            
+            // Mumbai ride-hailing base rates (approximate)
+            const rates = {
+                uberGo: { base: 25, perKm: 12 },
+                olaMini: { base: 23, perKm: 11 },
+                uberMoto: { base: 15, perKm: 8 },
+                olaAuto: { base: 20, perKm: 10 }
+            };
+            
+            const distances = [5, 10, 20];
+            if (window.currentDistanceKm) {
+                distances.push(window.currentDistanceKm);
+            }
+            
+            distances.forEach(km => {
+                const estimates = {
+                    uberGo: Math.round((rates.uberGo.base + rates.uberGo.perKm * km) * surgeFactor),
+                    olaMini: Math.round((rates.olaMini.base + rates.olaMini.perKm * km) * surgeFactor),
+                    uberMoto: Math.round((rates.uberMoto.base + rates.uberMoto.perKm * km) * surgeFactor),
+                    olaAuto: Math.round((rates.olaAuto.base + rates.olaAuto.perKm * km) * surgeFactor)
+                };
+                
+                let elementId;
+                if (km === 5) elementId = 'fare-5km';
+                else if (km === 10) elementId = 'fare-10km';
+                else if (km === 20) elementId = 'fare-20km';
+                else if (km === window.currentDistanceKm) elementId = 'fare-current';
+                
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.innerHTML = `
+                        Uber Go: ₹${estimates.uberGo}<br>
+                        Ola Mini: ₹${estimates.olaMini}<br>
+                        Uber Moto: ₹${estimates.uberMoto}<br>
+                        Ola Auto: ₹${estimates.olaAuto}
+                    `;
+                }
+            });
+        };
+
+        // Initialize ride estimates on page load
+        setTimeout(() => {
+            if (typeof updateRideEstimates === 'function') {
+                updateRideEstimates();
+            }
+        }, 1000);
     </script>
 </body>
 </html>
