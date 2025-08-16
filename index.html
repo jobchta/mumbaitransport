@@ -9,14 +9,14 @@
 
     <!-- PWA + Mobile meta -->
     <meta name="theme-color" content="#0ea5e9">
-    <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MT Hub">
     
     <!-- PWA Support -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/portal/manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Mumbai Transport">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
     
     <!-- Google Maps API with Advanced Visualization -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&loading=async"></script>
     
     <style>
         /* ========================================
@@ -2197,7 +2197,6 @@
             const mapOptions = {
                 center: mumbai,
                 zoom: 12,
-                mapId: 'future_mumbai_transport',
                 disableDefaultUI: true,
                 zoomControl: true,
                 mapTypeControl: false,
@@ -2437,10 +2436,22 @@
         // Register Service Worker for PWA functionality
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Use relative path so it works under /portal/
-                navigator.serviceWorker.register('./sw.js')
+                // Explicitly scope SW under /portal/
+                navigator.serviceWorker.register('/portal/sw.js', { scope: '/portal/' })
                     .then(registration => {
                         console.log('Service Worker registered with scope:', registration.scope);
+                        // Ensure only /portal/ scoped SW is active (remove any root-scoped registrations)
+                        try {
+                            navigator.serviceWorker.getRegistrations().then(regs => {
+                                regs.forEach(r => {
+                                    try {
+                                        if (!r.scope.endsWith('/portal/')) {
+                                            r.unregister().catch(() => {});
+                                        }
+                                    } catch {}
+                                });
+                            });
+                        } catch {}
                         
                         // Check for updates
                         registration.update();
