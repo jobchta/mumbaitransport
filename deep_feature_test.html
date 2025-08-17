@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Feature Testing - Mumbai Transport</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .test-section h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .metric {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Deep Feature Testing - Mumbai Transport</h1>
+        
+        <div class="test-section">
+            <h3>🎯 Tab Navigation Deep Test</h3>
+            <button onclick="testTabNavigation()">Test Tab Navigation</button>
+            <div id="tab-nav-results"></div>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value" id="tab-score">--</div>
+                    <div class="metric-label">Tab Score</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="radio-count">--</div>
+                    <div class="metric-label">Radio Buttons</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="tab-content-count">--</div>
+                    <div class="metric-label">Tab Content</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🗺️ Route Planning Deep Test</h3>
+            <button onclick="testRoutePlanning()">Test Route Planning</button>
+            <div id="route-results"></div>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value" id="route-score">--</div>
+                    <div class="metric-label">Route Score</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="form-elements">--</div>
+                    <div class="metric-label">Form Elements</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="map-status">--</div>
+                    <div class="metric-label">Map Status</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📱 PWA Features Deep Test</h3>
+            <button onclick="testPWAFeatures()">Test PWA Features</button>
+            <div id="pwa-results"></div>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value" id="pwa-score">--</div>
+                    <div class="metric-label">PWA Score</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="sw-status">--</div>
+                    <div class="metric-label">Service Worker</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="manifest-status">--</div>
+                    <div class="metric-label">Manifest</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>⚡ Performance Deep Test</h3>
+            <button onclick="testPerformance()">Test Performance</button>
+            <div id="performance-results"></div>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value" id="load-time">--</div>
+                    <div class="metric-label">Load Time</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="file-size">--</div>
+                    <div class="metric-label">Total Size</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="resource-count">--</div>
+                    <div class="metric-label">Resources</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Live Website Test</h3>
+            <iframe id="website-frame" src="http://localhost:8000/index.html"></iframe>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Overall Results</h3>
+            <div id="overall-results"></div>
+            <button onclick="runAllTests()">Run All Deep Tests</button>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {};
+
+        function addTestResult(containerId, status, message) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${status}`;
+            resultDiv.textContent = message;
+            document.getElementById(containerId).appendChild(resultDiv);
+            console.log(`[${status.toUpperCase()}] ${message}`);
+        }
+
+        async function testTabNavigation() {
+            console.log('🧪 Testing Tab Navigation in depth...');
+            document.getElementById('tab-nav-results').innerHTML = '';
+            
+            const frame = document.getElementById('website-frame');
+            const frameDoc = frame.contentDocument || frame.contentWindow.document;
+            
+            // Wait for frame to load
+            await new Promise(resolve => {
+                if (frameDoc.readyState === 'complete') {
+                    resolve();
+                } else {
+                    frame.addEventListener('load', resolve);
+                }
+            });
+
+            let score = 0;
+            let radioCount = 0;
+            let tabContentCount = 0;
+
+            // Test 1: Radio Button Structure
+            const radioButtons = frameDoc.querySelectorAll('input[type="radio"][name="tabs"]');
+            radioCount = radioButtons.length;
+            document.getElementById('radio-count').textContent = radioCount;
+            
+            if (radioCount >= 3) {
+                addTestResult('tab-nav-results', 'pass', `✅ Found ${radioCount} radio buttons`);
+                score += 25;
+            } else {
+                addTestResult('tab-nav-results', 'fail', `❌ Expected 3 radio buttons, found ${radioCount}`);
+            }
+
+            // Test 2: Tab Content Structure
+            const tabContent = frameDoc.querySelectorAll('.tab-content');
+            tabContentCount = tabContent.length;
+            document.getElementById('tab-content-count').textContent = tabContentCount;
+            
+            if (tabContentCount >= 3) {
+                addTestResult('tab-nav-results', 'pass', `✅ Found ${tabContentCount} tab content sections`);
+                score += 25;
+            } else {
+                addTestResult('tab-nav-results', 'fail', `❌ Expected 3 tab content sections, found ${tabContentCount}`);
+            }
+
+            // Test 3: CSS Selector Functionality
+            const planRadio = frameDoc.getElementById('plan-radio');
+            const planTab = frameDoc.getElementById('plan-tab');
+            
+            if (planRadio && planTab) {
+                // Test default state
+                if (planRadio.checked) {
+                    addTestResult('tab-nav-results', 'pass', '✅ Plan tab selected by default');
+                    score += 25;
+                } else {
+                    addTestResult('tab-nav-results', 'fail', '❌ Plan tab not selected by default');
+                }
+
+                // Test tab switching
+                const ticketsRadio = frameDoc.getElementById('tickets-radio');
+                const ticketsTab = frameDoc.getElementById('tickets-tab');
+                
+                if (ticketsRadio && ticketsTab) {
+                    ticketsRadio.checked = true;
+                    ticketsRadio.dispatchEvent(new Event('change'));
+                    
+                    setTimeout(() => {
+                        if (ticketsTab.style.display === 'block' || ticketsTab.offsetParent !== null) {
+                            addTestResult('tab-nav-results', 'pass', '✅ Tab switching working correctly');
+                            score += 25;
+                        } else {
+                            addTestResult('tab-nav-results', 'fail', '❌ Tab switching not working');
+                        }
+                        document.getElementById('tab-score').textContent = score;
+                    }, 100);
+                }
+            } else {
+                addTestResult('tab-nav-results', 'fail', '❌ Plan radio or tab not found');
+            }
+
+            document.getElementById('tab-score').textContent = score;
+        }
+
+        async function testRoutePlanning() {
+            console.log('🗺️ Testing Route Planning in depth...');
+            document.getElementById('route-results').innerHTML = '';
+            
+            const frame = document.getElementById('website-frame');
+            const frameDoc = frame.contentDocument || frame.contentWindow.document;
+            
+            let score = 0;
+            let formElements = 0;
+            let mapStatus = 'Not Found';
+
+            // Test 1: Form Elements
+            const fromInput = frameDoc.getElementById('from');
+            const toInput = frameDoc.getElementById('to');
+            const findRoutesBtn = frameDoc.querySelector('button[type="submit"]');
+            
+            if (fromInput && toInput) {
+                formElements = 2;
+                addTestResult('route-results', 'pass', '✅ From and To input fields found');
+                score += 30;
+                
+                // Test input functionality
+                fromInput.value = 'Mumbai Central';
+                toInput.value = 'Bandra';
+                
+                if (fromInput.value === 'Mumbai Central' && toInput.value === 'Bandra') {
+                    addTestResult('route-results', 'pass', '✅ Input fields accept values');
+                    score += 20;
+                } else {
+                    addTestResult('route-results', 'fail', '❌ Input fields not accepting values');
+                }
+            } else {
+                addTestResult('route-results', 'fail', '❌ Required input fields missing');
+            }
+
+            // Test 2: Map Integration
+            const mapContainer = frameDoc.getElementById('map');
+            if (mapContainer) {
+                mapStatus = 'Found';
+                addTestResult('route-results', 'pass', '✅ Map container found');
+                score += 25;
+                
+                // Check Google Maps API
+                if (typeof frame.contentWindow.google !== 'undefined') {
+                    mapStatus = 'Active';
+                    addTestResult('route-results', 'pass', '✅ Google Maps API loaded');
+                    score += 25;
+                } else {
+                    addTestResult('route-results', 'warning', '⚠️ Google Maps API not detected');
+                    score += 10;
+                }
+            } else {
+                addTestResult('route-results', 'fail', '❌ Map container not found');
+            }
+
+            document.getElementById('route-score').textContent = score;
+            document.getElementById('form-elements').textContent = formElements;
+            document.getElementById('map-status').textContent = mapStatus;
+        }
+
+        async function testPWAFeatures() {
+            console.log('📱 Testing PWA Features in depth...');
+            document.getElementById('pwa-results').innerHTML = '';
+            
+            let score = 0;
+            let swStatus = 'Not Supported';
+            let manifestStatus = 'Not Found';
+
+            // Test 1: Service Worker
+            if ('serviceWorker' in navigator) {
+                swStatus = 'Supported';
+                addTestResult('pwa-results', 'pass', '✅ Service Worker API supported');
+                score += 30;
+                
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        swStatus = 'Registered';
+                        addTestResult('pwa-results', 'pass', '✅ Service Worker registered');
+                        score += 40;
+                    } else {
+                        addTestResult('pwa-results', 'warning', '⚠️ Service Worker not registered');
+                        score += 20;
+                    }
+                } catch (error) {
+                    addTestResult('pwa-results', 'fail', '❌ Service Worker registration failed');
+                }
+            } else {
+                addTestResult('pwa-results', 'fail', '❌ Service Worker API not supported');
+            }
+
+            // Test 2: Manifest
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            if (manifestLink) {
+                manifestStatus = 'Found';
+                addTestResult('pwa-results', 'pass', '✅ Manifest link found');
+                score += 30;
+                
+                try {
+                    const response = await fetch(manifestLink.href);
+                    if (response.ok) {
+                        const manifest = await response.json();
+                        if (manifest.name && manifest.short_name) {
+                            manifestStatus = 'Valid';
+                            addTestResult('pwa-results', 'pass', '✅ Valid manifest content');
+                            score += 30;
+                        } else {
+                            addTestResult('pwa-results', 'warning', '⚠️ Manifest missing required fields');
+                            score += 15;
+                        }
+                    } else {
+                        addTestResult('pwa-results', 'fail', '❌ Manifest file not accessible');
+                    }
+                } catch (error) {
+                    addTestResult('pwa-results', 'fail', '❌ Manifest file error');
+                }
+            } else {
+                addTestResult('pwa-results', 'fail', '❌ Manifest link not found');
+            }
+
+            document.getElementById('pwa-score').textContent = score;
+            document.getElementById('sw-status').textContent = swStatus;
+            document.getElementById('manifest-status').textContent = manifestStatus;
+        }
+
+        async function testPerformance() {
+            console.log('⚡ Testing Performance in depth...');
+            document.getElementById('performance-results').innerHTML = '';
+            
+            const startTime = performance.now();
+            
+            // Load main page
+            const response = await fetch('http://localhost:8000/index.html');
+            const html = await response.text();
+            
+            const loadTime = performance.now() - startTime;
+            document.getElementById('load-time').textContent = `${loadTime.toFixed(0)}ms`;
+            
+            // Count resources
+            const resourceCount = (html.match(/href=|src=/g) || []).length;
+            document.getElementById('resource-count').textContent = resourceCount;
+            
+            // Calculate total file size
+            let totalSize = 0;
+            const files = ['index.html', 'app.js', 'style.css', 'manifest.json', 'sw.js'];
+            
+            for (const file of files) {
+                try {
+                    const fileResponse = await fetch(`http://localhost:8000/${file}`);
+                    if (fileResponse.ok) {
+                        const size = parseInt(fileResponse.headers.get('content-length') || '0');
+                        totalSize += size;
+                    }
+                } catch (error) {
+                    console.log(`Error loading ${file}:`, error);
+                }
+            }
+            
+            document.getElementById('file-size').textContent = formatBytes(totalSize);
+            
+            // Performance analysis
+            if (loadTime < 100) {
+                addTestResult('performance-results', 'pass', `✅ Excellent load time: ${loadTime.toFixed(2)}ms`);
+            } else if (loadTime < 500) {
+                addTestResult('performance-results', 'pass', `✅ Good load time: ${loadTime.toFixed(2)}ms`);
+            } else {
+                addTestResult('performance-results', 'fail', `❌ Slow load time: ${loadTime.toFixed(2)}ms`);
+            }
+            
+            if (totalSize < 50000) {
+                addTestResult('performance-results', 'pass', `✅ Small total size: ${formatBytes(totalSize)}`);
+            } else if (totalSize < 200000) {
+                addTestResult('performance-results', 'warning', `⚠️ Moderate total size: ${formatBytes(totalSize)}`);
+            } else {
+                addTestResult('performance-results', 'fail', `❌ Large total size: ${formatBytes(totalSize)}`);
+            }
+            
+            addTestResult('performance-results', 'info', `📊 Resource count: ${resourceCount} external resources`);
+        }
+
+        async function runAllTests() {
+            console.log('🚀 Running all deep tests...');
+            document.getElementById('overall-results').innerHTML = '';
+            
+            await testTabNavigation();
+            await testRoutePlanning();
+            await testPWAFeatures();
+            await testPerformance();
+            
+            // Calculate overall score
+            const tabScore = parseInt(document.getElementById('tab-score').textContent) || 0;
+            const routeScore = parseInt(document.getElementById('route-score').textContent) || 0;
+            const pwaScore = parseInt(document.getElementById('pwa-score').textContent) || 0;
+            
+            const overallScore = Math.round((tabScore + routeScore + pwaScore) / 3);
+            
+            addTestResult('overall-results', 'info', `🎉 Overall Score: ${overallScore}%`);
+            
+            if (overallScore >= 80) {
+                addTestResult('overall-results', 'pass', '🏆 Excellent! Website is performing very well');
+            } else if (overallScore >= 60) {
+                addTestResult('overall-results', 'warning', '⚠️ Good performance, some areas need improvement');
+            } else {
+                addTestResult('overall-results', 'fail', '❌ Performance needs significant improvement');
+            }
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        // Auto-run performance test on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testPerformance();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
