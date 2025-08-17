@@ -18,21 +18,80 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
     
-    <!-- Application Styles -->
+    <!-- Local Styles -->
     <link rel="stylesheet" href="src/styles/style.css">
     
-    <!-- Application Scripts -->
-    <script defer src="src/js/component-loader.js"></script>
-    <script defer src="src/js/app.js"></script>
-    
     <!-- Google Maps API -->
-    <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&v=weekly&callback=initMap"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
 </head>
 <body>
     <!-- Application Shell -->
     <div class="app-shell">
-        <!-- Header Container -->
-        <div id="header-container"></div>
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="app-title">Mumbai Transport</h1>
+                    <p class="app-subtitle">Plan • Book • Travel</p>
+                </div>
+                <div class="header-right">
+                    <!-- Language Selector -->
+                    <div class="language-selector">
+                        <button class="language-btn" id="language-btn">
+                            <i class="ph ph-globe"></i>
+                            <span id="current-language">English</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+                        <div class="language-dropdown" id="language-dropdown">
+                            <div class="language-option active" data-lang="en">
+                                <span>🇺🇸</span>
+                                <span>English</span>
+                            </div>
+                            <div class="language-option" data-lang="hi">
+                                <span>🇮🇳</span>
+                                <span>हिंदी (Hindi)</span>
+                            </div>
+                            <div class="language-option" data-lang="mr">
+                                <span>🇮🇳</span>
+                                <span>मराठी (Marathi)</span>
+                            </div>
+                            <div class="language-option" data-lang="gu">
+                                <span>🇮🇳</span>
+                                <span>ગુજરાતી (Gujarati)</span>
+                            </div>
+                            <div class="language-option" data-lang="bn">
+                                <span>🇮🇳</span>
+                                <span>বাংলা (Bengali)</span>
+                            </div>
+                            <div class="language-option" data-lang="ta">
+                                <span>🇮🇳</span>
+                                <span>தமிழ் (Tamil)</span>
+                            </div>
+                            <div class="language-option" data-lang="te">
+                                <span>🇮🇳</span>
+                                <span>తెలుగు (Telugu)</span>
+                            </div>
+                            <div class="language-option" data-lang="kn">
+                                <span>🇮🇳</span>
+                                <span>ಕನ್ನಡ (Kannada)</span>
+                            </div>
+                            <div class="language-option" data-lang="ml">
+                                <span>🇮🇳</span>
+                                <span>മലയാളം (Malayalam)</span>
+                            </div>
+                            <div class="language-option" data-lang="pa">
+                                <span>🇮🇳</span>
+                                <span>ਪੰਜਾਬੀ (Punjabi)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                        <i class="ph ph-sun"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
 
         <!-- Hidden Radio Inputs for CSS-Only Tab Control -->
         <input type="radio" name="tabs" id="plan-radio" class="tab-radio" checked>
@@ -41,272 +100,206 @@
 
         <!-- App Content -->
         <main class="app-content">
-            <!-- Plan Tab Container -->
-            <div id="plan-tab-container"></div>
+            <!-- Plan Tab -->
+            <div class="tab-content" id="plan-tab">
+                <div class="section-title">Plan Your Journey</div>
+                
+                <!-- Transport Modes -->
+                <div class="transport-modes">
+                    <button class="mode-tab active" data-mode="all">
+                        <i class="ph ph-shuffle"></i>
+                        <span>All</span>
+                    </button>
+                    <button class="mode-tab" data-mode="metro">
+                        <i class="ph ph-train"></i>
+                        <span>Metro</span>
+                    </button>
+                    <button class="mode-tab" data-mode="bus">
+                        <i class="ph ph-bus"></i>
+                        <span>Bus</span>
+                    </button>
+                    <button class="mode-tab" data-mode="train">
+                        <i class="ph ph-train-regional"></i>
+                        <span>Train</span>
+                    </button>
+                </div>
+                
+                <!-- Journey Form -->
+                <form id="journey-form">
+                    <div class="form-group">
+                        <label class="form-label" for="from">From</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-map-pin input-icon"></i>
+                            <input type="text" id="from" class="form-input" placeholder="Current location or address">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="to">To</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-map-pin-line input-icon"></i>
+                            <input type="text" id="to" class="form-input" placeholder="Destination">
+                            <button type="button" class="location-swap" id="swap-locations">
+                                <i class="ph ph-arrows-down-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full btn-large">
+                        <i class="ph ph-route"></i>
+                        Find Routes
+                    </button>
+                </form>
+                
+                <!-- Map Container -->
+                <div id="map" class="map-container" style="height: 300px; margin-top: 1rem;"></div>
+            </div>
             
-            <!-- Tickets Tab Container -->
-            <div id="tickets-tab-container"></div>
+            <!-- Tickets Tab -->
+            <div class="tab-content" id="tickets-tab">
+                <div class="section-title">Metro Tickets & Fares</div>
+                
+                <!-- Metro Lines -->
+                <div class="metro-lines">
+                    <div class="metro-line">
+                        <div class="line-info">
+                            <div class="line-color" style="background: #FF6B35;"></div>
+                            <div class="line-details">
+                                <h3>Line 1 (Versova-Andheri-Ghatkopar)</h3>
+                                <p>Operational: 5:30 AM - 12:00 AM</p>
+                            </div>
+                        </div>
+                        <div class="line-actions">
+                            <button class="btn btn-secondary" onclick="buyTicket('line1')">
+                                <i class="ph ph-ticket"></i>
+                                Buy Ticket
+                            </button>
+                            <button class="btn btn-outline" onclick="checkFare('line1')">
+                                <i class="ph ph-currency-inr"></i>
+                                Check Fare
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Fare Information -->
+                <div class="fare-info">
+                    <div class="section-title">Current Fares</div>
+                    <div class="fare-grid">
+                        <div class="fare-card">
+                            <div class="fare-amount">₹10</div>
+                            <div class="fare-distance">0-3 km</div>
+                        </div>
+                        <div class="fare-card">
+                            <div class="fare-amount">₹20</div>
+                            <div class="fare-distance">3-12 km</div>
+                        </div>
+                        <div class="fare-card">
+                            <div class="fare-amount">₹30</div>
+                            <div class="fare-distance">12-27 km</div>
+                        </div>
+                        <div class="fare-card">
+                            <div class="fare-amount">₹40</div>
+                            <div class="fare-distance">27+ km</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
-            <!-- Compare Tab Container -->
-            <div id="compare-tab-container"></div>
+            <!-- Compare Tab -->
+            <div class="tab-content" id="compare-tab">
+                <div class="section-title">Compare Rides</div>
+                
+                <!-- Ride Comparison -->
+                <div class="ride-comparison">
+                    <div class="comparison-card">
+                        <div class="ride-option">
+                            <div class="ride-icon">
+                                <i class="ph ph-train"></i>
+                            </div>
+                            <div class="ride-details">
+                                <h3>Metro</h3>
+                                <div class="ride-metrics">
+                                    <span class="metric">
+                                        <i class="ph ph-clock"></i>
+                                        25 min
+                                    </span>
+                                    <span class="metric">
+                                        <i class="ph ph-currency-inr"></i>
+                                        ₹30
+                                    </span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="selectRide('metro')">
+                                Select
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-card">
+                        <div class="ride-option">
+                            <div class="ride-icon">
+                                <i class="ph ph-bus"></i>
+                            </div>
+                            <div class="ride-details">
+                                <h3>Bus</h3>
+                                <div class="ride-metrics">
+                                    <span class="metric">
+                                        <i class="ph ph-clock"></i>
+                                        45 min
+                                    </span>
+                                    <span class="metric">
+                                        <i class="ph ph-currency-inr"></i>
+                                        ₹15
+                                    </span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="selectRide('bus')">
+                                Select
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
 
-        <!-- Tab Navigation Container -->
-        <div id="tab-navigation-container"></div>
+        <!-- Bottom Tab Bar -->
+        <nav class="bottom-tab-bar">
+            <label for="plan-radio" class="tab-item">
+                <i class="ph ph-map-trifold"></i>
+                <span>Plan</span>
+            </label>
+            <label for="tickets-radio" class="tab-item">
+                <i class="ph ph-ticket"></i>
+                <span>Tickets</span>
+            </label>
+            <label for="compare-radio" class="tab-item">
+                <i class="ph ph-scales"></i>
+                <span>Compare</span>
+            </label>
+        </nav>
     </div>
 
+    <!-- Service Worker -->
+    <script src="src/sw.js"></script>
+    
+    <!-- App Scripts -->
+    <script src="src/js/app.js"></script>
+    <script src="src/js/language-manager.js"></script>
+    
     <script>
-        // Global Variables
-        let map;
-        let directionsService;
-        let directionsRenderer;
-        let placesService;
-
-        // Initialize Google Maps
-        function initMap() {
-            console.log('🗺️ Initializing Google Maps...');
-            
-            const mapElement = document.getElementById('map');
-            if (!mapElement) {
-                console.warn('⚠️ Map container not found');
-                return;
-            }
-
-            map = new google.maps.Map(mapElement, {
-                center: { lat: 19.0760, lng: 72.8777 },
-                zoom: 12,
-                styles: [
-                    {
-                        featureType: 'transit',
-                        elementType: 'labels.icon',
-                        stylers: [{ visibility: 'on' }]
-                    }
-                ]
-            });
-
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer();
-            directionsRenderer.setMap(map);
-            placesService = new google.maps.places.PlacesService(map);
-
-            console.log('✅ Google Maps initialized');
-        }
-
-        // Initialize the application
+        // Initialize app when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('📱 DOM loaded, initializing app...');
+            console.log('🚀 Mumbai Transport App loaded');
             
-            // Initialize components
-            initTabNavigation();
-            initThemeToggle();
-            initFormHandlers();
-            initLanguageSelector();
+            // Initialize core functionality
+            initApp();
             
-            // Show welcome message
-            showToast('Mumbai Transport Hub loaded successfully!', 'success');
+            // Initialize language manager
+            if (window.languageManager) {
+                window.languageManager.updateLanguage();
+            }
         });
-
-        // Initialize tab navigation
-        function initTabNavigation() {
-            console.log('📱 Initializing tab navigation...');
-            
-            // Add map resize functionality for plan tab when it becomes active
-            const planRadio = document.getElementById('plan-radio');
-            if (planRadio) {
-                planRadio.addEventListener('change', () => {
-                    if (planRadio.checked && typeof google !== 'undefined' && map) {
-                        setTimeout(() => {
-                            google.maps.event.trigger(map, 'resize');
-                            console.log('🗺️ Map resized for plan tab');
-                        }, 100);
-                    }
-                });
-            }
-            
-            // Add click handlers for transport mode tabs
-            const modeTabs = document.querySelectorAll('.mode-tab');
-            modeTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    modeTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    const mode = tab.getAttribute('data-mode');
-                    console.log(`🚇 Transport mode selected: ${mode}`);
-                });
-            });
-        }
-
-        // Initialize theme toggle
-        function initThemeToggle() {
-            const themeToggle = document.getElementById('theme-toggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', () => {
-                    const currentTheme = document.documentElement.getAttribute('data-theme');
-                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                    
-                    document.documentElement.setAttribute('data-theme', newTheme);
-                    localStorage.setItem('mumbai-transport-theme', newTheme);
-                    
-                    const icon = themeToggle.querySelector('i');
-                    if (icon) {
-                        icon.className = newTheme === 'dark' ? 'ph ph-moon' : 'ph ph-sun';
-                    }
-                });
-                
-                // Load saved theme
-                const savedTheme = localStorage.getItem('mumbai-transport-theme');
-                if (savedTheme) {
-                    document.documentElement.setAttribute('data-theme', savedTheme);
-                    const icon = themeToggle.querySelector('i');
-                    if (icon) {
-                        icon.className = savedTheme === 'dark' ? 'ph ph-moon' : 'ph ph-sun';
-                    }
-                }
-            }
-        }
-
-        // Initialize form handlers
-        function initFormHandlers() {
-            const journeyForm = document.getElementById('journey-form');
-            if (journeyForm) {
-                journeyForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    handleJourneyForm();
-                });
-            }
-            
-            const swapButton = document.getElementById('swap-locations');
-            if (swapButton) {
-                swapButton.addEventListener('click', () => {
-                    const fromInput = document.getElementById('from');
-                    const toInput = document.getElementById('to');
-                    
-                    if (fromInput && toInput) {
-                        const temp = fromInput.value;
-                        fromInput.value = toInput.value;
-                        toInput.value = temp;
-                        console.log('🔄 Locations swapped');
-                    }
-                });
-            }
-        }
-
-        // Handle journey form
-        function handleJourneyForm() {
-            const from = document.getElementById('from')?.value;
-            const to = document.getElementById('to')?.value;
-            
-            if (!from || !to) {
-                showToast('Please enter both from and to locations', 'error');
-                return;
-            }
-            
-            console.log(`🗺️ Planning route from ${from} to ${to}`);
-            showToast('Finding routes...', 'success');
-        }
-
-        // Initialize language selector
-        function initLanguageSelector() {
-            const languageBtn = document.getElementById('language-btn');
-            const languageDropdown = document.getElementById('language-dropdown');
-            const languageOptions = document.querySelectorAll('.language-option');
-
-            if (languageBtn) {
-                languageBtn.addEventListener('click', () => {
-                    languageDropdown.classList.toggle('show');
-                });
-            }
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.language-selector')) {
-                    languageDropdown.classList.remove('show');
-                }
-            });
-
-            // Language option selection
-            languageOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    const lang = option.getAttribute('data-lang');
-                    setLanguage(lang);
-                    languageDropdown.classList.remove('show');
-                });
-            });
-        }
-
-        // Set language
-        function setLanguage(lang) {
-            const currentLanguageElement = document.getElementById('current-language');
-            const languageOptions = document.querySelectorAll('.language-option');
-            
-            // Update current language display
-            if (currentLanguageElement) {
-                const languageNames = {
-                    'en': 'English',
-                    'hi': 'हिंदी',
-                    'mr': 'मराठी',
-                    'gu': 'ગુજરાતી',
-                    'bn': 'বাংলা',
-                    'ta': 'தமிழ்',
-                    'te': 'తెలుగు',
-                    'kn': 'ಕನ್ನಡ',
-                    'ml': 'മലയാളം',
-                    'pa': 'ਪੰਜਾਬੀ'
-                };
-                currentLanguageElement.textContent = languageNames[lang] || 'English';
-            }
-            
-            // Update active language option
-            languageOptions.forEach(option => {
-                option.classList.remove('active');
-                if (option.getAttribute('data-lang') === lang) {
-                    option.classList.add('active');
-                }
-            });
-            
-            localStorage.setItem('mumbai-transport-language', lang);
-            console.log(`🌍 Language changed to: ${lang}`);
-            showToast(`Language changed to ${lang}`, 'success');
-        }
-
-        // Utility functions
-        function showToast(message, type = 'success') {
-            const existingToasts = document.querySelectorAll('.toast');
-            existingToasts.forEach(toast => toast.remove());
-            
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.remove();
-                }
-            }, 3000);
-        }
-
-        function buyTicket(line) {
-            console.log(`🎫 Buying ticket for ${line}`);
-            showToast(`Redirecting to ticket purchase for ${line}...`, 'success');
-        }
-
-        function checkFare(line) {
-            console.log(`💰 Checking fare for ${line}`);
-            showToast(`Fare information for ${line}`, 'success');
-        }
-
-        function selectRide(type) {
-            console.log(`🚗 Selected ride type: ${type}`);
-            showToast(`${type} selected for comparison`, 'success');
-        }
-
-        // Export functions
-        window.showToast = showToast;
-        window.initMap = initMap;
-        window.buyTicket = buyTicket;
-        window.checkFare = checkFare;
-        window.selectRide = selectRide;
     </script>
 </body>
 </html>
