@@ -20,6 +20,10 @@
     <!-- Phosphor Icons -->
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
     
+    <!-- Local CSS and JavaScript -->
+    <link rel="stylesheet" href="style.css">
+    <script defer src="app.js"></script>
+    
     <!-- Google Maps API with callback for reliable init -->
     <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&v=weekly&callback=initMap"></script>
     
@@ -426,41 +430,41 @@
             display: none;
         }
 
-        /* CSS-Only Tab Content Visibility Control - FIXED SELECTORS */
-        #plan-radio:checked ~ .app-shell .app-content #plan-tab {
+        /* CSS-Only Tab Content Visibility Control */
+        #plan-radio:checked ~ .app-content #plan-tab {
             display: block;
         }
 
-        #tickets-radio:checked ~ .app-shell .app-content #tickets-tab {
+        #tickets-radio:checked ~ .app-content #tickets-tab {
             display: block;
         }
 
-        #compare-radio:checked ~ .app-shell .app-content #compare-tab {
+        #compare-radio:checked ~ .app-content #compare-tab {
             display: block;
         }
 
-        /* CSS-Only Tab Button Active State Control - FIXED SELECTORS */
-        #plan-radio:checked ~ .app-shell .bottom-tab-bar label[for="plan-radio"] {
+        /* CSS-Only Tab Button Active State Control */
+        #plan-radio:checked ~ .bottom-tab-bar label[for="plan-radio"] {
             color: var(--primary);
         }
 
-        #plan-radio:checked ~ .app-shell .bottom-tab-bar label[for="plan-radio"] i {
+        #plan-radio:checked ~ .bottom-tab-bar label[for="plan-radio"] i {
             transform: scale(1.1);
         }
 
-        #tickets-radio:checked ~ .app-shell .bottom-tab-bar label[for="tickets-radio"] {
+        #tickets-radio:checked ~ .bottom-tab-bar label[for="tickets-radio"] {
             color: var(--primary);
         }
 
-        #tickets-radio:checked ~ .app-shell .bottom-tab-bar label[for="tickets-radio"] i {
+        #tickets-radio:checked ~ .bottom-tab-bar label[for="tickets-radio"] i {
             transform: scale(1.1);
         }
 
-        #compare-radio:checked ~ .app-shell .bottom-tab-bar label[for="compare-radio"] {
+        #compare-radio:checked ~ .bottom-tab-bar label[for="compare-radio"] {
             color: var(--primary);
         }
 
-        #compare-radio:checked ~ .app-shell .bottom-tab-bar label[for="compare-radio"] i {
+        #compare-radio:checked ~ .bottom-tab-bar label[for="compare-radio"] i {
             transform: scale(1.1);
         }
         
@@ -1152,6 +1156,10 @@
         </header>
 
         <!-- App Content -->
+<!-- Hidden Radio Inputs for CSS-Only Tab Control -->
+<input type="radio" name="tabs" id="plan-radio" class="tab-radio" checked>
+<input type="radio" name="tabs" id="tickets-radio" class="tab-radio">
+<input type="radio" name="tabs" id="compare-radio" class="tab-radio">
         <main class="app-content">
             <!-- Plan Tab -->
             <div class="tab-content" id="plan-tab">
@@ -1447,103 +1455,26 @@
         // MUMBAI TRANSPORT APP FUNCTIONALITY
         // ========================================
         
-        // FORCE TAB SWITCH - Global function for inline onclick
-        window.forceTabSwitch = function(targetTab, buttonElement) {
-            console.log('🚨 FORCE TAB SWITCH:', targetTab);
-            
-            try {
-                // Remove active from all buttons
-                const allButtons = document.querySelectorAll('.tab-button');
-                allButtons.forEach(btn => btn.classList.remove('active'));
-                
-                // Remove active from all content
-                const allContents = document.querySelectorAll('.tab-content');
-                allContents.forEach(content => content.classList.remove('active'));
-                
-                // Activate clicked button
-                if (buttonElement) {
-                    buttonElement.classList.add('active');
-                    console.log('✅ Button force activated:', targetTab);
-                }
-                
-                // Activate target content
-                const targetContent = document.getElementById(targetTab + '-tab');
-                if (targetContent) {
-                    targetContent.classList.add('active');
-                    console.log('✅ Content force activated:', targetTab);
-                    
-                    // Resize map for plan tab
-                    if (targetTab === 'plan' && typeof google !== 'undefined' && window.map) {
+        // CSS-only tab navigation system - no JavaScript interference
+        console.log('📱 CSS-only tab navigation system active');
+        
+        // Add map resize functionality for plan tab when it becomes active
+        document.addEventListener('DOMContentLoaded', function() {
+            const planRadio = document.getElementById('plan-radio');
+            if (planRadio) {
+                planRadio.addEventListener('change', () => {
+                    if (planRadio.checked && typeof google !== 'undefined' && window.map) {
                         setTimeout(() => {
                             google.maps.event.trigger(window.map, 'resize');
-                            console.log('🗺️ Map force resized');
+                            console.log('🗺️ Map resized for plan tab');
                         }, 100);
                     }
-                } else {
-                    console.error('❌ Target content not found:', targetTab + '-tab');
-                }
-            } catch (error) {
-                console.error('❌ Force tab switch error:', error);
+                });
             }
-        };
-        
-        // Aggressive Tab Navigation System
-        function initializeAggressiveTabNavigation() {
-            console.log('🚀 Initializing AGGRESSIVE tab navigation...');
             
-            // Multiple initialization attempts
-            const initAttempts = [0, 100, 500, 1000, 2000];
-            
-            initAttempts.forEach(delay => {
-                setTimeout(() => {
-                    console.log(`🔄 Init attempt at ${delay}ms`);
-                    
-                    // Get buttons by multiple methods
-                    const buttons = [
-                        ...document.querySelectorAll('.tab-button'),
-                        document.getElementById('plan-btn'),
-                        document.getElementById('tickets-btn'),
-                        document.getElementById('compare-btn')
-                    ].filter(Boolean);
-                    
-                    console.log(`📱 Found ${buttons.length} buttons to bind`);
-                    
-                    buttons.forEach((button, index) => {
-                        if (!button) return;
-                        
-                        const tabName = button.getAttribute('data-tab') || button.id.replace('-btn', '');
-                        console.log(`🎯 Binding aggressive handler ${index + 1}: ${tabName}`);
-                        
-                        // Remove all existing listeners
-                        const newButton = button.cloneNode(true);
-                        button.parentNode.replaceChild(newButton, button);
-                        
-                        // Add multiple event types
-                        ['click', 'touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(eventType => {
-                            newButton.addEventListener(eventType, function(e) {
-                                if (eventType === 'click' || eventType === 'touchend') {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    console.log(`🖱️ ${eventType.toUpperCase()} handler triggered for:`, tabName);
-                                    window.forceTabSwitch(tabName, this);
-                                }
-                            }, { passive: false, capture: true });
-                        });
-                    });
-                }, delay);
-            });
-            
-            console.log('🎯 Aggressive tab navigation setup complete');
-        }
-        
-        // Initialize immediately and with multiple fallbacks
-        initializeAggressiveTabNavigation();
-        
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeAggressiveTabNavigation);
-        }
-        
-        window.addEventListener('load', initializeAggressiveTabNavigation);
+            // Test tab functionality
+            console.log('✅ Tab navigation system initialized');
+        });
         
         // Global Variables
         let map;

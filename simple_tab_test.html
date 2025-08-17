@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Navigation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Hide radio buttons */
+        .tab-radio {
+            display: none;
+        }
+        
+        /* Tab content - hidden by default */
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        /* Show content when radio is checked */
+        #plan-radio:checked ~ .app-content #plan-tab {
+            display: block;
+        }
+        
+        #tickets-radio:checked ~ .app-content #tickets-tab {
+            display: block;
+        }
+        
+        #compare-radio:checked ~ .app-content #compare-tab {
+            display: block;
+        }
+        
+        /* Tab bar styling */
+        .bottom-tab-bar {
+            display: flex;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        
+        .tab-button:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        /* Active state when radio is checked */
+        #plan-radio:checked ~ .bottom-tab-bar label[for="plan-radio"] {
+            color: #007bff;
+            background: #e3f2fd;
+        }
+        
+        #tickets-radio:checked ~ .bottom-tab-bar label[for="tickets-radio"] {
+            color: #007bff;
+            background: #e3f2fd;
+        }
+        
+        #compare-radio:checked ~ .bottom-tab-bar label[for="compare-radio"] {
+            color: #007bff;
+            background: #e3f2fd;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🧪 CSS-Only Tab Navigation Test</h1>
+    
+    <div class="container">
+        <!-- Hidden Radio Inputs for CSS-Only Tab Control -->
+        <input type="radio" name="tabs" id="plan-radio" class="tab-radio" checked>
+        <input type="radio" name="tabs" id="tickets-radio" class="tab-radio">
+        <input type="radio" name="tabs" id="compare-radio" class="tab-radio">
+        
+        <!-- App Content -->
+        <main class="app-content">
+            <!-- Plan Tab -->
+            <div class="tab-content" id="plan-tab">
+                <h2>📋 Plan Tab</h2>
+                <p>This is the Plan tab content. It should be visible by default.</p>
+                <p>✅ If you can see this, the CSS-only tab system is working!</p>
+            </div>
+            
+            <!-- Tickets Tab -->
+            <div class="tab-content" id="tickets-tab">
+                <h2>🎫 Tickets Tab</h2>
+                <p>This is the Tickets tab content.</p>
+                <p>✅ If you can see this after clicking "Tickets", the tabs work!</p>
+            </div>
+            
+            <!-- Compare Tab -->
+            <div class="tab-content" id="compare-tab">
+                <h2>⚖️ Compare Tab</h2>
+                <p>This is the Compare tab content.</p>
+                <p>✅ If you can see this after clicking "Compare", the tabs work!</p>
+            </div>
+        </main>
+        
+        <!-- Bottom Tab Bar -->
+        <nav class="bottom-tab-bar">
+            <label for="plan-radio" class="tab-button">
+                📋 Plan
+            </label>
+            <label for="tickets-radio" class="tab-button">
+                🎫 Tickets
+            </label>
+            <label for="compare-radio" class="tab-button">
+                ⚖️ Compare
+            </label>
+        </nav>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <h3>Test Results:</h3>
+        <div id="test-results"></div>
+        <button onclick="runTabTest()">Run Tab Test</button>
+    </div>
+    
+    <script>
+        function addTestResult(message, status) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${status}`;
+            resultDiv.textContent = message;
+            document.getElementById('test-results').appendChild(resultDiv);
+        }
+        
+        function runTabTest() {
+            document.getElementById('test-results').innerHTML = '';
+            
+            addTestResult('Starting tab navigation test...', 'info');
+            
+            // Test 1: Check if radio buttons exist
+            const planRadio = document.getElementById('plan-radio');
+            const ticketsRadio = document.getElementById('tickets-radio');
+            const compareRadio = document.getElementById('compare-radio');
+            
+            if (planRadio && ticketsRadio && compareRadio) {
+                addTestResult('✅ Radio buttons found', 'pass');
+            } else {
+                addTestResult('❌ Radio buttons missing', 'fail');
+                return;
+            }
+            
+            // Test 2: Check if tab content exists
+            const planTab = document.getElementById('plan-tab');
+            const ticketsTab = document.getElementById('tickets-tab');
+            const compareTab = document.getElementById('compare-tab');
+            
+            if (planTab && ticketsTab && compareTab) {
+                addTestResult('✅ Tab content found', 'pass');
+            } else {
+                addTestResult('❌ Tab content missing', 'fail');
+                return;
+            }
+            
+            // Test 3: Check if plan tab is visible by default
+            if (planTab.style.display === 'block' || planTab.offsetParent !== null) {
+                addTestResult('✅ Plan tab visible by default', 'pass');
+            } else {
+                addTestResult('❌ Plan tab not visible by default', 'fail');
+            }
+            
+            // Test 4: Test switching to tickets tab
+            ticketsRadio.checked = true;
+            ticketsRadio.dispatchEvent(new Event('change'));
+            
+            setTimeout(() => {
+                if (ticketsTab.style.display === 'block' || ticketsTab.offsetParent !== null) {
+                    addTestResult('✅ Tickets tab switching works', 'pass');
+                } else {
+                    addTestResult('❌ Tickets tab switching failed', 'fail');
+                }
+                
+                // Test 5: Test switching to compare tab
+                compareRadio.checked = true;
+                compareRadio.dispatchEvent(new Event('change'));
+                
+                setTimeout(() => {
+                    if (compareTab.style.display === 'block' || compareTab.offsetParent !== null) {
+                        addTestResult('✅ Compare tab switching works', 'pass');
+                    } else {
+                        addTestResult('❌ Compare tab switching failed', 'fail');
+                    }
+                    
+                    // Reset to plan tab
+                    planRadio.checked = true;
+                    planRadio.dispatchEvent(new Event('change'));
+                    
+                    addTestResult('🎉 Tab navigation test completed!', 'info');
+                }, 100);
+            }, 100);
+        }
+        
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            setTimeout(runTabTest, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Website Diagnostics</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .content {
+            padding: 30px;
+        }
+        .diagnostic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .diagnostic-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 5px solid #0ea5e9;
+            transition: all 0.3s ease;
+        }
+        .diagnostic-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .diagnostic-card h3 {
+            margin: 0 0 15px 0;
+            color: #1f2937;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .metric:last-child {
+            border-bottom: none;
+        }
+        .metric-label {
+            font-weight: 500;
+            color: #374151;
+        }
+        .metric-value {
+            font-weight: 600;
+            color: #0ea5e9;
+        }
+        .metric-value.success { color: #10b981; }
+        .metric-value.warning { color: #f59e0b; }
+        .metric-value.error { color: #ef4444; }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #0ea5e9);
+            transition: width 0.3s ease;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.3);
+        }
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        .live-preview {
+            background: #1f2937;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .live-preview h3 {
+            color: white;
+            margin: 0 0 15px 0;
+        }
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+        }
+        .performance-score {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #10b981, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .issues-list {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .issues-list h4 {
+            color: #dc2626;
+            margin: 0 0 15px 0;
+        }
+        .issue-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .issue-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 Advanced Website Diagnostics</h1>
+            <p>Comprehensive analysis of Mumbai Transport website performance and functionality</p>
+        </div>
+        
+        <div class="content">
+            <div class="performance-score" id="performance-score">--</div>
+            
+            <div class="diagnostic-grid">
+                <div class="diagnostic-card">
+                    <h3>📁 File System Analysis</h3>
+                    <div class="metric">
+                        <span class="metric-label">Total Files</span>
+                        <span class="metric-value" id="total-files">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">CSS Size</span>
+                        <span class="metric-value" id="css-size">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">JavaScript Size</span>
+                        <span class="metric-value" id="js-size">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">HTML Size</span>
+                        <span class="metric-value" id="html-size">--</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="file-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="diagnostic-card">
+                    <h3>🎯 Functionality Tests</h3>
+                    <div class="metric">
+                        <span class="metric-label">Tab Navigation</span>
+                        <span class="metric-value" id="tab-nav-status">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Route Planning</span>
+                        <span class="metric-value" id="route-status">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">PWA Features</span>
+                        <span class="metric-value" id="pwa-status">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Responsive Design</span>
+                        <span class="metric-value" id="responsive-status">--</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="functionality-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="diagnostic-card">
+                    <h3>⚡ Performance Metrics</h3>
+                    <div class="metric">
+                        <span class="metric-label">Load Time</span>
+                        <span class="metric-value" id="load-time">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Resource Count</span>
+                        <span class="metric-value" id="resource-count">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">CSS Rules</span>
+                        <span class="metric-value" id="css-rules">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">JavaScript Functions</span>
+                        <span class="metric-value" id="js-functions">--</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="performance-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="diagnostic-card">
+                    <h3>🔧 Technical Analysis</h3>
+                    <div class="metric">
+                        <span class="metric-label">CSS Selectors</span>
+                        <span class="metric-value" id="css-selectors">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">JavaScript Lines</span>
+                        <span class="metric-value" id="js-lines">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">HTML Elements</span>
+                        <span class="metric-value" id="html-elements">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">External Dependencies</span>
+                        <span class="metric-value" id="dependencies">--</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="technical-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="runAdvancedDiagnostics()">Run Advanced Diagnostics</button>
+                <button class="btn btn-secondary" onclick="testTabNavigation()">Test Tab Navigation</button>
+                <button class="btn btn-secondary" onclick="analyzePerformance()">Analyze Performance</button>
+                <button class="btn btn-secondary" onclick="generateReport()">Generate Report</button>
+            </div>
+            
+            <div class="live-preview">
+                <h3>🎯 Live Website Preview</h3>
+                <iframe id="website-preview" src="http://localhost:8000/index.html"></iframe>
+            </div>
+            
+            <div class="issues-list" id="issues-list" style="display: none;">
+                <h4>🚨 Issues Found</h4>
+                <div id="issues-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let diagnosticsData = {};
+        let issues = [];
+
+        async function runAdvancedDiagnostics() {
+            console.log('🔬 Starting advanced diagnostics...');
+            
+            // Reset data
+            diagnosticsData = {};
+            issues = [];
+            
+            // File System Analysis
+            await analyzeFileSystem();
+            
+            // Functionality Tests
+            await testFunctionality();
+            
+            // Performance Analysis
+            await analyzePerformance();
+            
+            // Technical Analysis
+            await analyzeTechnicalDetails();
+            
+            // Calculate overall score
+            calculatePerformanceScore();
+            
+            // Display issues
+            displayIssues();
+        }
+
+        async function analyzeFileSystem() {
+            console.log('📁 Analyzing file system...');
+            
+            const files = [
+                'index.html', 'app.js', 'style.css', 'manifest.json', 
+                'sw.js', 'real_mumbai_transport_data.js', 'working_route_planner.html'
+            ];
+            
+            let totalSize = 0;
+            let loadedFiles = 0;
+            
+            for (const file of files) {
+                try {
+                    const response = await fetch(`http://localhost:8000/${file}`);
+                    if (response.ok) {
+                        const size = parseInt(response.headers.get('content-length') || '0');
+                        totalSize += size;
+                        loadedFiles++;
+                        
+                        // Store file data
+                        diagnosticsData[file] = { size, status: 'loaded' };
+                    } else {
+                        diagnosticsData[file] = { size: 0, status: 'failed' };
+                        issues.push(`${file} failed to load (${response.status})`);
+                    }
+                } catch (error) {
+                    diagnosticsData[file] = { size: 0, status: 'error' };
+                    issues.push(`${file} error: ${error.message}`);
+                }
+            }
+            
+            // Update UI
+            document.getElementById('total-files').textContent = loadedFiles;
+            document.getElementById('css-size').textContent = formatBytes(diagnosticsData['style.css']?.size || 0);
+            document.getElementById('js-size').textContent = formatBytes(diagnosticsData['app.js']?.size || 0);
+            document.getElementById('html-size').textContent = formatBytes(diagnosticsData['index.html']?.size || 0);
+            
+            const progress = (loadedFiles / files.length) * 100;
+            document.getElementById('file-progress').style.width = `${progress}%`;
+        }
+
+        async function testFunctionality() {
+            console.log('🎯 Testing functionality...');
+            
+            const frame = document.getElementById('website-preview');
+            const frameDoc = frame.contentDocument || frame.contentWindow.document;
+            
+            // Wait for frame to load
+            await new Promise(resolve => {
+                if (frameDoc.readyState === 'complete') {
+                    resolve();
+                } else {
+                    frame.addEventListener('load', resolve);
+                }
+            });
+            
+            let functionalityScore = 0;
+            const tests = [
+                { name: 'Tab Navigation', test: () => testTabNavigationInternal(frameDoc) },
+                { name: 'Route Planning', test: () => testRoutePlanningInternal(frameDoc) },
+                { name: 'PWA Features', test: () => testPWAFeaturesInternal() },
+                { name: 'Responsive Design', test: () => testResponsiveDesignInternal() }
+            ];
+            
+            for (const test of tests) {
+                try {
+                    const result = await test.test();
+                    if (result) {
+                        functionalityScore += 25;
+                        updateMetric(test.name, 'success', '✅ Working');
+                    } else {
+                        updateMetric(test.name, 'error', '❌ Failed');
+                        issues.push(`${test.name} test failed`);
+                    }
+                } catch (error) {
+                    updateMetric(test.name, 'error', '❌ Error');
+                    issues.push(`${test.name} error: ${error.message}`);
+                }
+            }
+            
+            document.getElementById('functionality-progress').style.width = `${functionalityScore}%`;
+        }
+
+        function testTabNavigationInternal(frameDoc) {
+            const radioButtons = frameDoc.querySelectorAll('input[type="radio"][name="tabs"]');
+            const tabContent = frameDoc.querySelectorAll('.tab-content');
+            
+            return radioButtons.length >= 3 && tabContent.length >= 3;
+        }
+
+        function testRoutePlanningInternal(frameDoc) {
+            const fromInput = frameDoc.getElementById('from');
+            const toInput = frameDoc.getElementById('to');
+            const mapContainer = frameDoc.getElementById('map');
+            
+            return fromInput && toInput && mapContainer;
+        }
+
+        function testPWAFeaturesInternal() {
+            return 'serviceWorker' in navigator && 'beforeinstallprompt' in window;
+        }
+
+        function testResponsiveDesignInternal() {
+            return window.innerWidth > 0 && window.innerHeight > 0;
+        }
+
+        async function analyzePerformance() {
+            console.log('⚡ Analyzing performance...');
+            
+            const startTime = performance.now();
+            
+            // Load main page
+            const response = await fetch('http://localhost:8000/index.html');
+            const html = await response.text();
+            
+            const loadTime = performance.now() - startTime;
+            
+            // Count resources
+            const resourceCount = (html.match(/href=|src=/g) || []).length;
+            
+            // Count CSS rules
+            const cssResponse = await fetch('http://localhost:8000/style.css');
+            const css = await cssResponse.text();
+            const cssRules = (css.match(/\{[^}]*\}/g) || []).length;
+            
+            // Count JavaScript functions
+            const jsResponse = await fetch('http://localhost:8000/app.js');
+            const js = await jsResponse.text();
+            const jsFunctions = (js.match(/function\s+\w+/g) || []).length;
+            
+            // Update UI
+            document.getElementById('load-time').textContent = `${loadTime.toFixed(2)}ms`;
+            document.getElementById('resource-count').textContent = resourceCount;
+            document.getElementById('css-rules').textContent = cssRules;
+            document.getElementById('js-functions').textContent = jsFunctions;
+            
+            const performanceScore = Math.min(100, (1000 - loadTime) / 10);
+            document.getElementById('performance-progress').style.width = `${performanceScore}%`;
+        }
+
+        async function analyzeTechnicalDetails() {
+            console.log('🔧 Analyzing technical details...');
+            
+            // Analyze CSS
+            const cssResponse = await fetch('http://localhost:8000/style.css');
+            const css = await cssResponse.text();
+            const cssSelectors = (css.match(/[.#][a-zA-Z0-9_-]+/g) || []).length;
+            
+            // Analyze JavaScript
+            const jsResponse = await fetch('http://localhost:8000/app.js');
+            const js = await jsResponse.text();
+            const jsLines = js.split('\n').length;
+            
+            // Analyze HTML
+            const htmlResponse = await fetch('http://localhost:8000/index.html');
+            const html = await htmlResponse.text();
+            const htmlElements = (html.match(/<[^>]+>/g) || []).length;
+            
+            // Count dependencies
+            const dependencies = (html.match(/https?:\/\//g) || []).length;
+            
+            // Update UI
+            document.getElementById('css-selectors').textContent = cssSelectors;
+            document.getElementById('js-lines').textContent = jsLines;
+            document.getElementById('html-elements').textContent = htmlElements;
+            document.getElementById('dependencies').textContent = dependencies;
+            
+            const technicalScore = Math.min(100, (cssSelectors + jsLines) / 10);
+            document.getElementById('technical-progress').style.width = `${technicalScore}%`;
+        }
+
+        function calculatePerformanceScore() {
+            const fileProgress = parseInt(document.getElementById('file-progress').style.width) || 0;
+            const functionalityProgress = parseInt(document.getElementById('functionality-progress').style.width) || 0;
+            const performanceProgress = parseInt(document.getElementById('performance-progress').style.width) || 0;
+            const technicalProgress = parseInt(document.getElementById('technical-progress').style.width) || 0;
+            
+            const overallScore = Math.round((fileProgress + functionalityProgress + performanceProgress + technicalProgress) / 4);
+            
+            document.getElementById('performance-score').textContent = `${overallScore}%`;
+            
+            // Color coding
+            const scoreElement = document.getElementById('performance-score');
+            if (overallScore >= 90) {
+                scoreElement.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            } else if (overallScore >= 70) {
+                scoreElement.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+            } else {
+                scoreElement.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            }
+        }
+
+        function displayIssues() {
+            const issuesList = document.getElementById('issues-list');
+            const issuesContent = document.getElementById('issues-content');
+            
+            if (issues.length > 0) {
+                issuesContent.innerHTML = issues.map(issue => 
+                    `<div class="issue-item">• ${issue}</div>`
+                ).join('');
+                issuesList.style.display = 'block';
+            } else {
+                issuesList.style.display = 'none';
+            }
+        }
+
+        function updateMetric(name, status, value) {
+            const element = document.getElementById(name.toLowerCase().replace(/\s+/g, '-') + '-status');
+            if (element) {
+                element.textContent = value;
+                element.className = `metric-value ${status}`;
+            }
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function testTabNavigation() {
+            console.log('🧪 Testing tab navigation specifically...');
+            const frame = document.getElementById('website-preview');
+            const frameDoc = frame.contentDocument || frame.contentWindow.document;
+            
+            // Test clicking each tab
+            const radioButtons = frameDoc.querySelectorAll('input[type="radio"][name="tabs"]');
+            radioButtons.forEach((radio, index) => {
+                setTimeout(() => {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change'));
+                    console.log(`Tab ${index + 1} clicked`);
+                }, index * 1000);
+            });
+        }
+
+        function analyzePerformance() {
+            console.log('📊 Detailed performance analysis...');
+            // This would include more detailed metrics
+        }
+
+        function generateReport() {
+            console.log('📄 Generating comprehensive report...');
+            
+            const report = {
+                timestamp: new Date().toISOString(),
+                performanceScore: document.getElementById('performance-score').textContent,
+                diagnosticsData,
+                issues,
+                recommendations: generateRecommendations()
+            };
+            
+            // Create downloadable report
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mumbai-transport-diagnostics-report.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function generateRecommendations() {
+            const recommendations = [];
+            
+            if (issues.length > 0) {
+                recommendations.push('Fix identified issues to improve functionality');
+            }
+            
+            if (parseInt(document.getElementById('performance-score').textContent) < 90) {
+                recommendations.push('Optimize performance for better user experience');
+            }
+            
+            if (parseInt(document.getElementById('css-rules').textContent) > 1000) {
+                recommendations.push('Consider CSS optimization to reduce file size');
+            }
+            
+            return recommendations;
+        }
+
+        // Auto-run diagnostics on page load
+        window.addEventListener('load', () => {
+            setTimeout(runAdvancedDiagnostics, 2000);
+        });
+    </script>
+</body>
+</html>

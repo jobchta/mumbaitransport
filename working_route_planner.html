@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Working Route Planner</title>
+    <script src="real_mumbai_transport_data.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -121,19 +122,57 @@
     </div>
 
     <script>
-        // Simple Route Database
-        const routes = [
-            { id: 'A1', name: 'A-1 Express', from: 'Colaba', to: 'Bandra', time: 45, fare: 15, transfers: 0 },
-            { id: 'A2', name: 'A-2 Express', from: 'Colaba', to: 'Andheri', time: 60, fare: 20, transfers: 0 },
-            { id: 'A3', name: 'A-3 Express', from: 'Colaba', to: 'Borivali', time: 90, fare: 25, transfers: 0 },
-            { id: '21', name: 'Route 21', from: 'Bandra', to: 'Andheri', time: 35, fare: 12, transfers: 0 },
-            { id: '31', name: 'Route 31', from: 'Andheri', to: 'Borivali', time: 45, fare: 15, transfers: 0 },
-            { id: '101', name: 'Route 101', from: 'Worli', to: 'Bandra', time: 40, fare: 12, transfers: 0 },
-            { id: '201', name: 'Route 201', from: 'Airport', to: 'Colaba', time: 90, fare: 30, transfers: 0 },
-            { id: '202', name: 'Route 202', from: 'Airport', to: 'Mumbai Central', time: 70, fare: 25, transfers: 0 },
-            { id: '203', name: 'Route 203', from: 'Airport', to: 'Bandra', time: 50, fare: 18, transfers: 0 },
-            { id: '204', name: 'Route 204', from: 'Airport', to: 'Andheri', time: 30, fare: 10, transfers: 0 }
-        ];
+        // Use real Mumbai transport data if available, otherwise fallback to sample data
+        let routes = [];
+        
+        if (typeof REAL_MUMBAI_TRANSPORT_DATA !== 'undefined') {
+            console.log('✅ Using real Mumbai transport data');
+            // Convert real data to route format
+            routes = REAL_MUMBAI_TRANSPORT_DATA.bestBusRoutes.map(route => ({
+                id: route.routeId,
+                name: route.name,
+                from: route.from,
+                to: route.to,
+                time: route.estimatedDuration,
+                fare: route.fare,
+                transfers: 0,
+                type: 'bus',
+                stops: route.stops,
+                timings: route.timings
+            }));
+            
+            // Add local train routes if available
+            if (REAL_MUMBAI_TRANSPORT_DATA.localTrainLines) {
+                REAL_MUMBAI_TRANSPORT_DATA.localTrainLines.forEach(line => {
+                    routes.push({
+                        id: `train-${line.lineId}`,
+                        name: `${line.name} Line`,
+                        from: line.stations[0],
+                        to: line.stations[line.stations.length - 1],
+                        time: line.estimatedDuration,
+                        fare: line.fare,
+                        transfers: 0,
+                        type: 'train',
+                        stops: line.stations
+                    });
+                });
+            }
+        } else {
+            console.log('⚠️ Using fallback sample data');
+            // Fallback sample data
+            routes = [
+                { id: 'A1', name: 'A-1 Express', from: 'Colaba', to: 'Bandra', time: 45, fare: 15, transfers: 0 },
+                { id: 'A2', name: 'A-2 Express', from: 'Colaba', to: 'Andheri', time: 60, fare: 20, transfers: 0 },
+                { id: 'A3', name: 'A-3 Express', from: 'Colaba', to: 'Borivali', time: 90, fare: 25, transfers: 0 },
+                { id: '21', name: 'Route 21', from: 'Bandra', to: 'Andheri', time: 35, fare: 12, transfers: 0 },
+                { id: '31', name: 'Route 31', from: 'Andheri', to: 'Borivali', time: 45, fare: 15, transfers: 0 },
+                { id: '101', name: 'Route 101', from: 'Worli', to: 'Bandra', time: 40, fare: 12, transfers: 0 },
+                { id: '201', name: 'Route 201', from: 'Airport', to: 'Colaba', time: 90, fare: 30, transfers: 0 },
+                { id: '202', name: 'Route 202', from: 'Airport', to: 'Mumbai Central', time: 70, fare: 25, transfers: 0 },
+                { id: '203', name: 'Route 203', from: 'Airport', to: 'Bandra', time: 50, fare: 18, transfers: 0 },
+                { id: '204', name: 'Route 204', from: 'Airport', to: 'Andheri', time: 30, fare: 10, transfers: 0 }
+            ];
+        }
 
         function planRoute() {
             const from = document.getElementById('from').value.trim();
