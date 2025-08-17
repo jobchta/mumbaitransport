@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Mumbai Transport - AI-Powered Journey Planning with Real-Time Data">
+    <meta name="description" content="Mumbai Transport - Plan journeys, buy tickets, compare rides">
     <meta name="theme-color" content="#0ea5e9">
-    <title>Mumbai Transport - AI Smart Hub</title>
+    <title>Mumbai Transport</title>
 
     <!-- PWA Configuration -->
     <link rel="manifest" href="src/manifest.json">
@@ -15,95 +15,29 @@
     <link rel="apple-touch-icon" href="src/assets/icons/icon-192x192.png">
     
     <!-- External Dependencies -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
     
     <!-- Application Styles -->
     <link rel="stylesheet" href="src/styles/style.css">
     
+    <!-- Application Scripts -->
+    <script defer src="src/js/app.js"></script>
+    
     <!-- Google Maps API -->
     <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&v=weekly&callback=initMap"></script>
 </head>
 <body>
-    <!-- AI Status Bar -->
-    <div class="ai-status-bar" id="ai-status-bar">
-        <div class="ai-status-content">
-            <i class="ph ph-brain"></i>
-            <span>AI Smart Routing Active</span>
-            <div class="ai-indicator"></div>
-        </div>
-    </div>
-
     <!-- Application Shell -->
     <div class="app-shell">
         <!-- Header -->
         <header class="app-header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1 class="app-title">
-                        <i class="ph ph-lightning"></i>
-                        Mumbai Transport
-                    </h1>
-                    <p class="app-subtitle">AI-Powered • Real-Time • Smart</p>
+                    <h1 class="app-title">Mumbai Transport</h1>
+                    <p class="app-subtitle">Plan • Book • Travel</p>
                 </div>
                 <div class="header-right">
-                    <!-- Real-Time Status -->
-                    <div class="status-indicator" id="status-indicator">
-                        <i class="ph ph-wifi-high"></i>
-                        <span>Live</span>
-                    </div>
-                    
-                    <!-- Language Selector -->
-                    <div class="language-selector">
-                        <button class="language-btn" id="language-btn">
-                            <i class="ph ph-globe"></i>
-                            <span id="current-language">English</span>
-                            <i class="ph ph-caret-down"></i>
-                        </button>
-                        <div class="language-dropdown" id="language-dropdown">
-                            <div class="language-option active" data-lang="en">
-                                <span>🇺🇸</span>
-                                <span>English</span>
-                            </div>
-                            <div class="language-option" data-lang="hi">
-                                <span>🇮🇳</span>
-                                <span>हिंदी (Hindi)</span>
-                            </div>
-                            <div class="language-option" data-lang="mr">
-                                <span>🇮🇳</span>
-                                <span>मराठी (Marathi)</span>
-                            </div>
-                            <div class="language-option" data-lang="gu">
-                                <span>🇮🇳</span>
-                                <span>ગુજરાતી (Gujarati)</span>
-                            </div>
-                            <div class="language-option" data-lang="bn">
-                                <span>🇮🇳</span>
-                                <span>বাংলা (Bengali)</span>
-                            </div>
-                            <div class="language-option" data-lang="ta">
-                                <span>🇮🇳</span>
-                                <span>தமிழ் (Tamil)</span>
-                            </div>
-                            <div class="language-option" data-lang="te">
-                                <span>🇮🇳</span>
-                                <span>తెలుగు (Telugu)</span>
-                            </div>
-                            <div class="language-option" data-lang="kn">
-                                <span>🇮🇳</span>
-                                <span>ಕನ್ನಡ (Kannada)</span>
-                            </div>
-                            <div class="language-option" data-lang="ml">
-                                <span>🇮🇳</span>
-                                <span>മലയാളം (Malayalam)</span>
-                            </div>
-                            <div class="language-option" data-lang="pa">
-                                <span>🇮🇳</span>
-                                <span>ਪੰਜਾਬੀ (Punjabi)</span>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
                         <i class="ph ph-sun"></i>
                     </button>
@@ -115,34 +49,18 @@
         <input type="radio" name="tabs" id="plan-radio" class="tab-radio" checked>
         <input type="radio" name="tabs" id="tickets-radio" class="tab-radio">
         <input type="radio" name="tabs" id="compare-radio" class="tab-radio">
-        <input type="radio" name="tabs" id="ai-insights-radio" class="tab-radio">
 
         <!-- App Content -->
         <main class="app-content">
             <!-- Plan Tab -->
             <div class="tab-content" id="plan-tab">
-                <div class="section-title">
-                    <i class="ph ph-route"></i>
-                    AI Smart Journey Planning
-                </div>
-                
-                <!-- AI Optimization Toggle -->
-                <div class="ai-optimization-toggle">
-                    <label class="ai-toggle">
-                        <input type="checkbox" id="ai-optimization" checked>
-                        <span class="ai-toggle-slider"></span>
-                        <span class="ai-toggle-label">
-                            <i class="ph ph-brain"></i>
-                            AI Route Optimization
-                        </span>
-                    </label>
-                </div>
+                <div class="section-title">Plan Your Journey</div>
                 
                 <!-- Transport Modes -->
                 <div class="transport-modes">
                     <button class="mode-tab active" data-mode="all">
                         <i class="ph ph-shuffle"></i>
-                        <span>Smart Mix</span>
+                        <span>All</span>
                     </button>
                     <button class="mode-tab" data-mode="metro">
                         <i class="ph ph-train"></i>
@@ -156,33 +74,20 @@
                         <i class="ph ph-train-regional"></i>
                         <span>Train</span>
                     </button>
-                    <button class="mode-tab" data-mode="auto">
-                        <i class="ph ph-taxi"></i>
-                        <span>Auto</span>
-                    </button>
                 </div>
                 
                 <!-- Journey Form -->
                 <form id="journey-form">
                     <div class="form-group">
-                        <label class="form-label" for="from">
-                            <i class="ph ph-map-pin"></i>
-                            From
-                        </label>
+                        <label class="form-label" for="from">From</label>
                         <div class="input-wrapper">
                             <i class="ph ph-map-pin input-icon"></i>
                             <input type="text" id="from" class="form-input" placeholder="Current location or address">
-                            <button type="button" class="location-btn" id="current-location-btn">
-                                <i class="ph ph-navigation"></i>
-                            </button>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label" for="to">
-                            <i class="ph ph-map-pin-line"></i>
-                            To
-                        </label>
+                        <label class="form-label" for="to">To</label>
                         <div class="input-wrapper">
                             <i class="ph ph-map-pin-line input-icon"></i>
                             <input type="text" id="to" class="form-input" placeholder="Destination">
@@ -192,101 +97,19 @@
                         </div>
                     </div>
                     
-                    <!-- Advanced Options -->
-                    <div class="advanced-options">
-                        <div class="option-group">
-                            <label class="form-label">Preferences</label>
-                            <div class="preference-toggles">
-                                <label class="preference-toggle">
-                                    <input type="checkbox" id="avoid-crowds" checked>
-                                    <span class="preference-slider"></span>
-                                    <span>Avoid Crowds</span>
-                                </label>
-                                <label class="preference-toggle">
-                                    <input type="checkbox" id="eco-friendly">
-                                    <span class="preference-slider"></span>
-                                    <span>Eco-Friendly</span>
-                                </label>
-                                <label class="preference-toggle">
-                                    <input type="checkbox" id="accessible">
-                                    <span class="preference-slider"></span>
-                                    <span>Accessible</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <button type="submit" class="btn btn-primary btn-full btn-large">
-                        <i class="ph ph-brain"></i>
-                        Find Smart Routes
+                        <i class="ph ph-route"></i>
+                        Find Routes
                     </button>
                 </form>
                 
                 <!-- Map Container -->
                 <div id="map" class="map-container" style="height: 300px; margin-top: 1rem;"></div>
-                
-                <!-- AI Route Suggestions -->
-                <div class="ai-suggestions" id="ai-suggestions" style="display: none;">
-                    <div class="section-title">
-                        <i class="ph ph-lightbulb"></i>
-                        AI Smart Suggestions
-                    </div>
-                    <div class="suggestion-cards">
-                        <div class="suggestion-card optimal">
-                            <div class="suggestion-header">
-                                <i class="ph ph-crown"></i>
-                                <span>Optimal Route</span>
-                            </div>
-                            <div class="suggestion-details">
-                                <div class="route-info">
-                                    <span class="time">25 min</span>
-                                    <span class="cost">₹30</span>
-                                    <span class="crowd-level low">Low Crowd</span>
-                                </div>
-                                <div class="route-steps">
-                                    <div class="step">🚶 Walk 5 min to Metro</div>
-                                    <div class="step">🚇 Metro Line 1 (15 min)</div>
-                                    <div class="step">🚶 Walk 5 min to destination</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             
             <!-- Tickets Tab -->
             <div class="tab-content" id="tickets-tab">
-                <div class="section-title">
-                    <i class="ph ph-ticket"></i>
-                    Smart Ticketing & Real-Time Updates
-                </div>
-                
-                <!-- Live Status -->
-                <div class="live-status">
-                    <div class="status-card">
-                        <div class="status-header">
-                            <i class="ph ph-wifi-high"></i>
-                            <span>Live Metro Status</span>
-                        </div>
-                        <div class="status-grid">
-                            <div class="status-item operational">
-                                <span class="line-name">Line 1</span>
-                                <span class="status-text">Operational</span>
-                                <span class="frequency">Every 3 min</span>
-                            </div>
-                            <div class="status-item operational">
-                                <span class="line-name">Line 2A</span>
-                                <span class="status-text">Operational</span>
-                                <span class="frequency">Every 4 min</span>
-                            </div>
-                            <div class="status-item delay">
-                                <span class="line-name">Line 7</span>
-                                <span class="status-text">5 min delay</span>
-                                <span class="frequency">Every 6 min</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div class="section-title">Metro Tickets & Fares</div>
                 
                 <!-- Metro Lines -->
                 <div class="metro-lines">
@@ -296,10 +119,6 @@
                             <div class="line-details">
                                 <h3>Line 1 (Versova-Andheri-Ghatkopar)</h3>
                                 <p>Operational: 5:30 AM - 12:00 AM</p>
-                                <div class="live-info">
-                                    <span class="next-train">Next: 2 min</span>
-                                    <span class="crowd-level">Crowd: Moderate</span>
-                                </div>
                             </div>
                         </div>
                         <div class="line-actions">
@@ -317,27 +136,23 @@
                 
                 <!-- Fare Information -->
                 <div class="fare-info">
-                    <div class="section-title">Dynamic Pricing</div>
+                    <div class="section-title">Current Fares</div>
                     <div class="fare-grid">
                         <div class="fare-card">
                             <div class="fare-amount">₹10</div>
                             <div class="fare-distance">0-3 km</div>
-                            <div class="fare-time">Peak: ₹12</div>
                         </div>
                         <div class="fare-card">
                             <div class="fare-amount">₹20</div>
                             <div class="fare-distance">3-12 km</div>
-                            <div class="fare-time">Peak: ₹25</div>
                         </div>
                         <div class="fare-card">
                             <div class="fare-amount">₹30</div>
                             <div class="fare-distance">12-27 km</div>
-                            <div class="fare-time">Peak: ₹35</div>
                         </div>
                         <div class="fare-card">
                             <div class="fare-amount">₹40</div>
                             <div class="fare-distance">27+ km</div>
-                            <div class="fare-time">Peak: ₹45</div>
                         </div>
                     </div>
                 </div>
@@ -345,28 +160,17 @@
             
             <!-- Compare Tab -->
             <div class="tab-content" id="compare-tab">
-                <div class="section-title">
-                    <i class="ph ph-scales"></i>
-                    AI-Powered Ride Comparison
-                </div>
-                
-                <!-- Comparison Filters -->
-                <div class="comparison-filters">
-                    <button class="filter-btn active" data-filter="all">All Options</button>
-                    <button class="filter-btn" data-filter="fastest">Fastest</button>
-                    <button class="filter-btn" data-filter="cheapest">Cheapest</button>
-                    <button class="filter-btn" data-filter="eco">Eco-Friendly</button>
-                </div>
+                <div class="section-title">Compare Rides</div>
                 
                 <!-- Ride Comparison -->
                 <div class="ride-comparison">
-                    <div class="comparison-card optimal">
+                    <div class="comparison-card">
                         <div class="ride-option">
                             <div class="ride-icon">
                                 <i class="ph ph-train"></i>
                             </div>
                             <div class="ride-details">
-                                <h3>Metro + Walk</h3>
+                                <h3>Metro</h3>
                                 <div class="ride-metrics">
                                     <span class="metric">
                                         <i class="ph ph-clock"></i>
@@ -376,14 +180,6 @@
                                         <i class="ph ph-currency-inr"></i>
                                         ₹30
                                     </span>
-                                    <span class="metric">
-                                        <i class="ph ph-leaf"></i>
-                                        Low Carbon
-                                    </span>
-                                </div>
-                                <div class="ai-insight">
-                                    <i class="ph ph-lightbulb"></i>
-                                    AI Recommended: Best balance of speed and cost
                                 </div>
                             </div>
                             <button class="btn btn-primary" onclick="selectRide('metro')">
@@ -408,117 +204,11 @@
                                         <i class="ph ph-currency-inr"></i>
                                         ₹15
                                     </span>
-                                    <span class="metric">
-                                        <i class="ph ph-leaf"></i>
-                                        Very Low Carbon
-                                    </span>
-                                </div>
-                                <div class="ai-insight">
-                                    <i class="ph ph-lightbulb"></i>
-                                    AI Insight: Cheapest option, good for budget travelers
                                 </div>
                             </div>
                             <button class="btn btn-primary" onclick="selectRide('bus')">
                                 Select
                             </button>
-                        </div>
-                    </div>
-                    
-                    <div class="comparison-card">
-                        <div class="ride-option">
-                            <div class="ride-icon">
-                                <i class="ph ph-taxi"></i>
-                            </div>
-                            <div class="ride-details">
-                                <h3>Auto Rickshaw</h3>
-                                <div class="ride-metrics">
-                                    <span class="metric">
-                                        <i class="ph ph-clock"></i>
-                                        20 min
-                                    </span>
-                                    <span class="metric">
-                                        <i class="ph ph-currency-inr"></i>
-                                        ₹80
-                                    </span>
-                                    <span class="metric">
-                                        <i class="ph ph-leaf"></i>
-                                        Medium Carbon
-                                    </span>
-                                </div>
-                                <div class="ai-insight">
-                                    <i class="ph ph-lightbulb"></i>
-                                    AI Insight: Fastest option, good for urgent trips
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" onclick="selectRide('auto')">
-                                Select
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- AI Insights Tab -->
-            <div class="tab-content" id="ai-insights-tab">
-                <div class="section-title">
-                    <i class="ph ph-brain"></i>
-                    AI Travel Insights
-                </div>
-                
-                <!-- Personal Analytics -->
-                <div class="analytics-section">
-                    <div class="analytics-card">
-                        <div class="analytics-header">
-                            <i class="ph ph-chart-line"></i>
-                            <span>Your Travel Analytics</span>
-                        </div>
-                        <div class="analytics-content">
-                            <div class="stat-item">
-                                <div class="stat-value">₹1,250</div>
-                                <div class="stat-label">Saved this month</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">45 min</div>
-                                <div class="stat-label">Time saved daily</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">2.3 kg</div>
-                                <div class="stat-label">CO2 reduced</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Smart Recommendations -->
-                <div class="recommendations-section">
-                    <div class="section-title">Smart Recommendations</div>
-                    <div class="recommendation-cards">
-                        <div class="recommendation-card">
-                            <div class="rec-icon">
-                                <i class="ph ph-clock"></i>
-                            </div>
-                            <div class="rec-content">
-                                <h4>Optimal Departure Time</h4>
-                                <p>Leave 15 minutes earlier to avoid peak crowds</p>
-                            </div>
-                        </div>
-                        <div class="recommendation-card">
-                            <div class="rec-icon">
-                                <i class="ph ph-route"></i>
-                            </div>
-                            <div class="rec-content">
-                                <h4>Alternative Route</h4>
-                                <p>Try Line 2A for 10% less crowd during your commute</p>
-                            </div>
-                        </div>
-                        <div class="recommendation-card">
-                            <div class="rec-icon">
-                                <i class="ph ph-ticket"></i>
-                            </div>
-                            <div class="rec-content">
-                                <h4>Smart Pass</h4>
-                                <p>Monthly pass would save you ₹200 this month</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -529,33 +219,25 @@
         <nav class="bottom-tab-bar">
             <label for="plan-radio" class="tab-button">
                 <i class="ph ph-route"></i>
-                <span>Smart Plan</span>
+                <span>Plan</span>
             </label>
             <label for="tickets-radio" class="tab-button">
                 <i class="ph ph-ticket"></i>
-                <span>Live Tickets</span>
+                <span>Tickets</span>
             </label>
             <label for="compare-radio" class="tab-button">
                 <i class="ph ph-scales"></i>
                 <span>Compare</span>
             </label>
-            <label for="ai-insights-radio" class="tab-button">
-                <i class="ph ph-brain"></i>
-                <span>AI Insights</span>
-            </label>
         </nav>
     </div>
 
-    <!-- Application Scripts -->
-    <script defer src="src/js/ai-route-optimizer.js"></script>
-    <script defer src="src/js/app.js"></script>
     <script>
         // Global Variables
         let map;
         let directionsService;
         let directionsRenderer;
         let placesService;
-        let currentLocation = null;
 
         // Initialize Google Maps
         function initMap() {
@@ -589,73 +271,20 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Initializing AI-Powered Mumbai Transport...');
+            console.log('📱 DOM loaded, initializing app...');
             
             // Initialize components
             initTabNavigation();
             initThemeToggle();
             initFormHandlers();
-            initLanguageSelector();
-            initAIFeatures();
-            initRealTimeUpdates();
             
             // Show welcome message
-            showToast('AI Smart Transport Hub activated! 🧠', 'success');
+            showToast('Mumbai Transport Hub loaded successfully!', 'success');
         });
-
-        // Initialize AI Features
-        function initAIFeatures() {
-            // AI Optimization toggle
-            const aiToggle = document.getElementById('ai-optimization');
-            if (aiToggle) {
-                aiToggle.addEventListener('change', () => {
-                    const isEnabled = aiToggle.checked;
-                    showToast(`AI Optimization ${isEnabled ? 'enabled' : 'disabled'}`, 'success');
-                    updateAIStatus(isEnabled);
-                });
-            }
-
-            // Preference toggles
-            const preferenceToggles = document.querySelectorAll('.preference-toggle input');
-            preferenceToggles.forEach(toggle => {
-                toggle.addEventListener('change', () => {
-                    const preference = toggle.id;
-                    const isEnabled = toggle.checked;
-                    showToast(`${preference.replace('-', ' ')} ${isEnabled ? 'enabled' : 'disabled'}`, 'success');
-                });
-            });
-        }
-
-        // Update AI Status
-        function updateAIStatus(enabled) {
-            const aiStatusBar = document.getElementById('ai-status-bar');
-            if (aiStatusBar) {
-                aiStatusBar.style.display = enabled ? 'block' : 'none';
-            }
-        }
-
-        // Initialize Real-Time Updates
-        function initRealTimeUpdates() {
-            // Simulate real-time updates
-            setInterval(() => {
-                updateLiveStatus();
-            }, 30000); // Update every 30 seconds
-        }
-
-        // Update Live Status
-        function updateLiveStatus() {
-            const statusIndicator = document.getElementById('status-indicator');
-            if (statusIndicator) {
-                statusIndicator.classList.add('pulse');
-                setTimeout(() => {
-                    statusIndicator.classList.remove('pulse');
-                }, 1000);
-            }
-        }
 
         // Initialize tab navigation
         function initTabNavigation() {
-            console.log('📱 Initializing smart tab navigation...');
+            console.log('📱 Initializing tab navigation...');
             
             // Add map resize functionality for plan tab when it becomes active
             const planRadio = document.getElementById('plan-radio');
@@ -678,18 +307,6 @@
                     tab.classList.add('active');
                     const mode = tab.getAttribute('data-mode');
                     console.log(`🚇 Transport mode selected: ${mode}`);
-                    showToast(`Smart routing for ${mode} mode activated`, 'success');
-                });
-            });
-
-            // Comparison filters
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    const filter = btn.getAttribute('data-filter');
-                    console.log(`🔍 Filter applied: ${filter}`);
                 });
             });
         }
@@ -709,8 +326,6 @@
                     if (icon) {
                         icon.className = newTheme === 'dark' ? 'ph ph-moon' : 'ph ph-sun';
                     }
-                    
-                    showToast(`Theme changed to ${newTheme} mode`, 'success');
                 });
                 
                 // Load saved theme
@@ -746,45 +361,8 @@
                         fromInput.value = toInput.value;
                         toInput.value = temp;
                         console.log('🔄 Locations swapped');
-                        showToast('Locations swapped', 'success');
                     }
                 });
-            }
-
-            // Current location button
-            const currentLocationBtn = document.getElementById('current-location-btn');
-            if (currentLocationBtn) {
-                currentLocationBtn.addEventListener('click', getCurrentLocation);
-            }
-        }
-
-        // Get current location
-        function getCurrentLocation() {
-            if (navigator.geolocation) {
-                showToast('Getting your location...', 'success');
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-                        currentLocation = { lat, lng };
-                        
-                        // Reverse geocode to get address
-                        const geocoder = new google.maps.Geocoder();
-                        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-                            if (status === 'OK' && results[0]) {
-                                document.getElementById('from').value = results[0].formatted_address;
-                                showToast('Current location set!', 'success');
-                            } else {
-                                showToast('Could not get address for current location', 'error');
-                            }
-                        });
-                    },
-                    (error) => {
-                        showToast('Location access denied', 'error');
-                    }
-                );
-            } else {
-                showToast('Geolocation not supported', 'error');
             }
         }
 
@@ -792,88 +370,14 @@
         function handleJourneyForm() {
             const from = document.getElementById('from')?.value;
             const to = document.getElementById('to')?.value;
-            const aiOptimization = document.getElementById('ai-optimization')?.checked;
             
             if (!from || !to) {
                 showToast('Please enter both from and to locations', 'error');
                 return;
             }
             
-            console.log(`🧠 AI Planning route from ${from} to ${to}`);
-            showToast('AI analyzing optimal routes...', 'success');
-            
-            // Simulate AI route planning
-            setTimeout(() => {
-                const aiSuggestions = document.getElementById('ai-suggestions');
-                if (aiSuggestions) {
-                    aiSuggestions.style.display = 'block';
-                }
-                showToast('AI found 3 optimal routes!', 'success');
-            }, 2000);
-        }
-
-        // Initialize language selector
-        function initLanguageSelector() {
-            const languageBtn = document.getElementById('language-btn');
-            const languageDropdown = document.getElementById('language-dropdown');
-            const languageOptions = document.querySelectorAll('.language-option');
-
-            if (languageBtn) {
-                languageBtn.addEventListener('click', () => {
-                    languageDropdown.classList.toggle('show');
-                });
-            }
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.language-selector')) {
-                    languageDropdown.classList.remove('show');
-                }
-            });
-
-            // Language option selection
-            languageOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    const lang = option.getAttribute('data-lang');
-                    setLanguage(lang);
-                    languageDropdown.classList.remove('show');
-                });
-            });
-        }
-
-        // Set language
-        function setLanguage(lang) {
-            const currentLanguageElement = document.getElementById('current-language');
-            const languageOptions = document.querySelectorAll('.language-option');
-            
-            // Update current language display
-            if (currentLanguageElement) {
-                const languageNames = {
-                    'en': 'English',
-                    'hi': 'हिंदी',
-                    'mr': 'मराठी',
-                    'gu': 'ગુજરાતી',
-                    'bn': 'বাংলা',
-                    'ta': 'தமிழ்',
-                    'te': 'తెలుగు',
-                    'kn': 'ಕನ್ನಡ',
-                    'ml': 'മലയാളം',
-                    'pa': 'ਪੰਜਾਬੀ'
-                };
-                currentLanguageElement.textContent = languageNames[lang] || 'English';
-            }
-            
-            // Update active language option
-            languageOptions.forEach(option => {
-                option.classList.remove('active');
-                if (option.getAttribute('data-lang') === lang) {
-                    option.classList.add('active');
-                }
-            });
-            
-            localStorage.setItem('mumbai-transport-language', lang);
-            console.log(`🌍 Language changed to: ${lang}`);
-            showToast(`Language changed to ${lang}`, 'success');
+            console.log(`🗺️ Planning route from ${from} to ${to}`);
+            showToast('Finding routes...', 'success');
         }
 
         // Utility functions
@@ -896,17 +400,17 @@
 
         function buyTicket(line) {
             console.log(`🎫 Buying ticket for ${line}`);
-            showToast(`Redirecting to smart ticket purchase for ${line}...`, 'success');
+            showToast(`Redirecting to ticket purchase for ${line}...`, 'success');
         }
 
         function checkFare(line) {
-            console.log(`💰 Checking dynamic fare for ${line}`);
-            showToast(`Real-time fare information for ${line}`, 'success');
+            console.log(`💰 Checking fare for ${line}`);
+            showToast(`Fare information for ${line}`, 'success');
         }
 
         function selectRide(type) {
             console.log(`🚗 Selected ride type: ${type}`);
-            showToast(`${type} selected - AI optimizing your route!`, 'success');
+            showToast(`${type} selected for comparison`, 'success');
         }
 
         // Export functions
