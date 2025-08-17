@@ -95,3 +95,15 @@ logs
 # Build outputs
 dist/
 build/
+
+# Coders in Flow
+.codersinflow
+.vscode
+node_modules
+.venv
+.codex
+out
+dist
+*.vsix
+.claude
+CLAUDE.md

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Mumbai Transport - Plan journeys, buy tickets, compare rides">
+    <meta name="theme-color" content="#0ea5e9">
+    <title>Mumbai Transport</title>
+
+    <!-- PWA + iOS Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Mumbai Transport">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- Essential Fonts Only -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
+    
+    <!-- Local CSS and JavaScript -->
+    <link rel="stylesheet" href="style.css">
+    <script defer src="app.js"></script>
+    <script defer src="js/component-loader.js"></script>
+    
+    <!-- Google Maps API with callback for reliable init -->
+    <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&v=weekly&callback=initMap"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <!-- Header Container -->
+        <div id="header-container"></div>
+
+        <!-- App Content -->
+        <main class="app-content">
+            <!-- Plan Tab Container -->
+            <div id="plan-tab-container"></div>
+            
+            <!-- Tickets Tab Container -->
+            <div id="tickets-tab-container"></div>
+            
+            <!-- Compare Tab Container -->
+            <div id="compare-tab-container"></div>
+        </main>
+
+        <!-- Tab Navigation Container -->
+        <div id="tab-navigation-container"></div>
+    </div>
+
+    <!-- PWA Install Banner -->
+    <div class="pwa-install-banner" id="pwa-install-banner">
+        <div class="pwa-banner-content">
+            <div class="pwa-banner-icon">
+                <i class="ph ph-download-simple"></i>
+            </div>
+            <div class="pwa-banner-text">
+                <h3>Install Mumbai Transport</h3>
+                <p>Add to your home screen for quick access</p>
+            </div>
+        </div>
+        <div class="pwa-banner-actions">
+            <button class="pwa-btn pwa-btn-primary" id="pwa-install-btn">Install</button>
+            <button class="pwa-btn pwa-btn-secondary" id="pwa-dismiss-btn">Not Now</button>
+        </div>
+    </div>
+
+    <!-- iOS Install Hint -->
+    <div class="ios-install-hint" id="ios-install-hint">
+        <div class="ios-hint-content">
+            <div class="ios-hint-icon">
+                <i class="ph ph-device-mobile"></i>
+            </div>
+            <div class="ios-hint-text">
+                <h4>Add to Home Screen</h4>
+                <p>Install this app on your iPhone: tap the share button and then "Add to Home Screen".</p>
+                <div class="ios-hint-steps">
+                    <i class="ph ph-share"></i>
+                    <span>Share</span>
+                    <i class="ph ph-arrow-right"></i>
+                    <span>Add to Home Screen</span>
+                </div>
+            </div>
+            <button class="ios-hint-close" id="ios-hint-close">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Global Variables
+        let map;
+        let directionsService;
+        let directionsRenderer;
+        let placesService;
+        let fromAutocomplete;
+        let toAutocomplete;
+
+        // Initialize Google Maps
+        function initMap() {
+            console.log('🗺️ Initializing Google Maps...');
+            
+            // Initialize map
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 19.0760, lng: 72.8777 }, // Mumbai coordinates
+                zoom: 12,
+                styles: [
+                    {
+                        featureType: 'transit',
+                        elementType: 'labels.icon',
+                        stylers: [{ visibility: 'on' }]
+                    }
+                ]
+            });
+
+            // Initialize services
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
+            placesService = new google.maps.places.PlacesService(map);
+
+            console.log('✅ Google Maps initialized');
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 DOM loaded, initializing app...');
+            
+            // Initialize PWA features
+            initPWA();
+            
+            // Show welcome message
+            showToast('Mumbai Transport Hub loaded successfully!', 'success');
+        });
+
+        // PWA initialization
+        function initPWA() {
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.log('❌ Service Worker registration failed:', error);
+                    });
+            }
+            
+            // Handle install prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                console.log('📱 Install prompt ready');
+            });
+            
+            window.addEventListener('appinstalled', () => {
+                console.log('📱 App installed successfully');
+                deferredPrompt = null;
+            });
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            // Remove existing toasts
+            const existingToasts = document.querySelectorAll('.toast');
+            existingToasts.forEach(toast => toast.remove());
+            
+            // Create new toast
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 3000);
+        }
+
+        // Export functions for use in components
+        window.showToast = showToast;
+        window.initMap = initMap;
+    </script>
+</body>
+</html>
