@@ -292,15 +292,15 @@ class ComponentLoader {
         console.log('🚀 Initializing component loader...');
         
         try {
-            await this.loadAllComponents();
-            
-            // Insert components into their respective containers
-            this.insertComponent('header', '#header-container');
-            this.insertComponent('tab-navigation', '#tab-navigation-container');
-            this.insertComponent('plan-tab', '#plan-tab-container');
-            this.insertComponent('tickets-tab', '#tickets-tab-container');
-            this.insertComponent('compare-tab', '#compare-tab-container');
-            
+        await this.loadAllComponents();
+        
+        // Insert components into their respective containers
+        this.insertComponent('header', '#header-container');
+        this.insertComponent('tab-navigation', '#tab-navigation-container');
+        this.insertComponent('plan-tab', '#plan-tab-container');
+        this.insertComponent('tickets-tab', '#tickets-tab-container');
+        this.insertComponent('compare-tab', '#compare-tab-container');
+        
             console.log('✅ Application initialized with components');
             
             // Trigger any initialization functions
