@@ -38,6 +38,57 @@
                     <p class="app-subtitle">Plan • Book • Travel</p>
                 </div>
                 <div class="header-right">
+                    <!-- Language Selector -->
+                    <div class="language-selector">
+                        <button class="language-btn" id="language-btn">
+                            <i class="ph ph-globe"></i>
+                            <span id="current-language">English</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+                        <div class="language-dropdown" id="language-dropdown">
+                            <div class="language-option active" data-lang="en">
+                                <span>🇺🇸</span>
+                                <span>English</span>
+                            </div>
+                            <div class="language-option" data-lang="hi">
+                                <span>🇮🇳</span>
+                                <span>हिंदी (Hindi)</span>
+                            </div>
+                            <div class="language-option" data-lang="mr">
+                                <span>🇮🇳</span>
+                                <span>मराठी (Marathi)</span>
+                            </div>
+                            <div class="language-option" data-lang="gu">
+                                <span>🇮🇳</span>
+                                <span>ગુજરાતી (Gujarati)</span>
+                            </div>
+                            <div class="language-option" data-lang="bn">
+                                <span>🇮🇳</span>
+                                <span>বাংলা (Bengali)</span>
+                            </div>
+                            <div class="language-option" data-lang="ta">
+                                <span>🇮🇳</span>
+                                <span>தமிழ் (Tamil)</span>
+                            </div>
+                            <div class="language-option" data-lang="te">
+                                <span>🇮🇳</span>
+                                <span>తెలుగు (Telugu)</span>
+                            </div>
+                            <div class="language-option" data-lang="kn">
+                                <span>🇮🇳</span>
+                                <span>ಕನ್ನಡ (Kannada)</span>
+                            </div>
+                            <div class="language-option" data-lang="ml">
+                                <span>🇮🇳</span>
+                                <span>മലയാളം (Malayalam)</span>
+                            </div>
+                            <div class="language-option" data-lang="pa">
+                                <span>🇮🇳</span>
+                                <span>ਪੰਜਾਬੀ (Punjabi)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
                         <i class="ph ph-sun"></i>
                     </button>
@@ -277,6 +328,7 @@
             initTabNavigation();
             initThemeToggle();
             initFormHandlers();
+            initLanguageSelector();
             
             // Show welcome message
             showToast('Mumbai Transport Hub loaded successfully!', 'success');
@@ -378,6 +430,70 @@
             
             console.log(`🗺️ Planning route from ${from} to ${to}`);
             showToast('Finding routes...', 'success');
+        }
+
+        // Initialize language selector
+        function initLanguageSelector() {
+            const languageBtn = document.getElementById('language-btn');
+            const languageDropdown = document.getElementById('language-dropdown');
+            const languageOptions = document.querySelectorAll('.language-option');
+
+            if (languageBtn) {
+                languageBtn.addEventListener('click', () => {
+                    languageDropdown.classList.toggle('show');
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.language-selector')) {
+                    languageDropdown.classList.remove('show');
+                }
+            });
+
+            // Language option selection
+            languageOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const lang = option.getAttribute('data-lang');
+                    setLanguage(lang);
+                    languageDropdown.classList.remove('show');
+                });
+            });
+        }
+
+        // Set language
+        function setLanguage(lang) {
+            const currentLanguageElement = document.getElementById('current-language');
+            const languageOptions = document.querySelectorAll('.language-option');
+            
+            // Update current language display
+            if (currentLanguageElement) {
+                const languageNames = {
+                    'en': 'English',
+                    'hi': 'हिंदी',
+                    'mr': 'मराठी',
+                    'gu': 'ગુજરાતી',
+                    'bn': 'বাংলা',
+                    'ta': 'தமிழ்',
+                    'te': 'తెలుగు',
+                    'kn': 'ಕನ್ನಡ',
+                    'ml': 'മലയാളം',
+                    'pa': 'ਪੰਜਾਬੀ'
+                };
+                currentLanguageElement.textContent = languageNames[lang] || 'English';
+            }
+            
+            // Update active language option
+            languageOptions.forEach(option => {
+                option.classList.remove('active');
+                if (option.getAttribute('data-lang') === lang) {
+                    option.classList.add('active');
+                }
+            });
+            
+            localStorage.setItem('mumbai-transport-language', lang);
+            console.log(`🌍 Language changed to: ${lang}`);
+            showToast(`Language changed to ${lang}`, 'success');
         }
 
         // Utility functions
