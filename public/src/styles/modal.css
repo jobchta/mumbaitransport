@@ -1,4 +1,4 @@
-/* Modal Styles for Neo UI */
+/* Modal Styles for Neo v2 UI */
 
 .modal-overlay {
     position: fixed;
@@ -6,15 +6,15 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(10, 10, 24, 0.8);
-    backdrop-filter: blur(10px);
+    background: rgba(10, 10, 24, 0.9);
+    backdrop-filter: blur(15px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10000;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modal-overlay.show {
@@ -24,7 +24,7 @@
 
 .modal-content {
     background: var(--card-bg);
-    border: 1px solid rgba(0, 247, 255, 0.2);
+    border: 1px solid var(--primary);
     border-radius: 20px;
     padding: 30px;
     width: 90%;
@@ -32,40 +32,43 @@
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    box-shadow: 0 0 40px rgba(0, 247, 255, 0.2);
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
+    box-shadow: 0 0 50px rgba(0, 247, 255, 0.3);
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modal-overlay.show .modal-content {
-    transform: scale(1);
+    transform: translateY(0) scale(1);
 }
 
 .modal-close-btn {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: 20px;
+    right: 20px;
     background: transparent;
-    border: 1px solid var(--primary);
+    border: 2px solid var(--primary);
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
     color: var(--primary);
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    z-index: 2; /* Ensure close button is on top */
 }
 
 .modal-close-btn:hover {
     background: var(--primary);
     color: var(--dark);
-    transform: rotate(90deg);
+    transform: rotate(180deg);
 }
 
 .modal-body {
     color: #fff;
+    position: relative;
+    z-index: 1;
 }
