@@ -1,0 +1,22 @@
+<div class="section-title">Plan Your Journey</div>
+<form id="journey-form">
+    <div class="form-group">
+        <label class="form-label" for="from">From</label>
+        <div class="input-wrapper">
+            <i class="ph ph-map-pin input-icon"></i>
+            <input type="text" id="from" class="form-input" placeholder="Current location or address">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="to">To</label>
+        <div class="input-wrapper">
+            <i class="ph ph-map-pin-line input-icon"></i>
+            <input type="text" id="to" class="form-input" placeholder="Destination">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-full btn-large">
+        <i class="ph ph-route"></i>
+        Find Routes
+    </button>
+</form>
+<div id="map-container-modal" class="map-container" style="height: 300px; margin-top: 1rem;"></div>
