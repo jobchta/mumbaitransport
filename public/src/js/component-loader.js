@@ -10,6 +10,7 @@ class ComponentLoader {
             'header': 'src/components/header.html',
             'tab-navigation': 'src/components/tab-navigation.html',
             'plan-tab': 'src/components/plan-tab.html',
+            'metro-tab': 'src/components/metro-tab.html',
             'tickets-tab': 'src/components/tickets-tab.html',
             'compare-tab': 'src/components/compare-tab.html'
         };
@@ -298,6 +299,7 @@ class ComponentLoader {
         this.insertComponent('header', '#header-container');
         this.insertComponent('tab-navigation', '#tab-navigation-container');
         this.insertComponent('plan-tab', '#plan-tab-container');
+        this.insertComponent('metro-tab', '#metro-tab-container');
         this.insertComponent('tickets-tab', '#tickets-tab-container');
         this.insertComponent('compare-tab', '#compare-tab-container');
         

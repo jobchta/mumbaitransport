@@ -8,11 +8,11 @@
     <title>Mumbai Transport</title>
 
     <!-- PWA + iOS Support -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="src/manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Mumbai Transport">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="src/assets/icons/icon-192x192.png">
     
     <!-- Essential Fonts Only -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,15 +21,22 @@
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
     
     <!-- Local CSS and JavaScript -->
-    <link rel="stylesheet" href="style.css">
-    <script defer src="app.js"></script>
-    <script defer src="js/component-loader.js"></script>
+    <link rel="stylesheet" href="src/styles/style.css">
+    <link rel="stylesheet" href="src/styles/metro-tab.css">
+    <script defer src="src/js/app.js"></script>
+    <script defer src="src/js/component-loader.js"></script>
     
     <!-- Google Maps API with callback for reliable init -->
     <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&v=weekly&callback=initMap"></script>
 </head>
 <body>
     <div class="app-shell">
+        <!-- Hidden Radio Inputs for CSS-Only Tab Control -->
+        <input type="radio" name="tabs" id="plan-radio" class="tab-radio" checked>
+        <input type="radio" name="tabs" id="metro-radio" class="tab-radio">
+        <input type="radio" name="tabs" id="tickets-radio" class="tab-radio">
+        <input type="radio" name="tabs" id="compare-radio" class="tab-radio">
+
         <!-- Header Container -->
         <div id="header-container"></div>
 
@@ -37,6 +44,9 @@
         <main class="app-content">
             <!-- Plan Tab Container -->
             <div id="plan-tab-container"></div>
+
+            <!-- Metro Tab Container -->
+            <div id="metro-tab-container"></div>
             
             <!-- Tickets Tab Container -->
             <div id="tickets-tab-container"></div>
@@ -138,7 +148,7 @@
         function initPWA() {
             // Register service worker
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js')
+                navigator.serviceWorker.register('src/sw.js')
                     .then(registration => {
                         console.log('✅ Service Worker registered:', registration);
                     })

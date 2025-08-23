@@ -144,21 +144,26 @@ body {
 }
 
 /* Tab Content Visibility */
-.tab-content {
+#plan-tab-container,
+#metro-tab-container,
+#tickets-tab-container,
+#compare-tab-container {
     display: none;
 }
 
 /* CSS-only tab switching */
-#plan-radio:checked ~ .app-content #plan-tab,
-#tickets-radio:checked ~ .app-content #tickets-tab,
-#compare-radio:checked ~ .app-content #compare-tab {
+#plan-radio:checked ~ main #plan-tab-container,
+#metro-radio:checked ~ main #metro-tab-container,
+#tickets-radio:checked ~ main #tickets-tab-container,
+#compare-radio:checked ~ main #compare-tab-container {
     display: block;
 }
 
 /* Active tab button styling */
-#plan-radio:checked ~ .bottom-tab-bar label[for="plan-radio"],
-#tickets-radio:checked ~ .bottom-tab-bar label[for="tickets-radio"],
-#compare-radio:checked ~ .bottom-tab-bar label[for="compare-radio"] {
+#plan-radio:checked ~ #tab-navigation-container .bottom-tab-bar label[for="plan-radio"],
+#metro-radio:checked ~ #tab-navigation-container .bottom-tab-bar label[for="metro-radio"],
+#tickets-radio:checked ~ #tab-navigation-container .bottom-tab-bar label[for="tickets-radio"],
+#compare-radio:checked ~ #tab-navigation-container .bottom-tab-bar label[for="compare-radio"] {
     color: var(--primary);
     background: rgba(14, 165, 233, 0.1);
 }
@@ -1163,4 +1168,39 @@ body {
     .fare-card {
         border: 2px solid currentColor;
     }
+}
+
+/* Tickets Tab Styles */
+#tickets-tab .whatsapp-ticketing {
+    margin-bottom: 2rem;
+    background-color: var(--background);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+#tickets-tab .ticket-info-card {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 5px solid var(--primary);
+    color: #343a40; /* Dark text color */
+}
+
+#tickets-tab .ticket-info-card h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+#tickets-tab .ticket-info-card p {
+    margin-bottom: 0.5rem;
+}
+
+#tickets-tab .ticket-info-card ol {
+    padding-left: 1.5rem;
+}
+
+#tickets-tab .ticket-info-card li {
+    margin-bottom: 0.25rem;
 }

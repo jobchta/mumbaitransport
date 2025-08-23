@@ -1,0 +1,74 @@
+/* Styles for the Metro Tab */
+
+.metro-lines-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.metro-line-card {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    border-left: 5px solid #ccc; /* Default border color */
+}
+
+.metro-line-card .line-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.metro-line-card .line-color-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.metro-line-card h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.metro-line-card .line-details p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Line-specific border colors */
+.blue-line { border-left-color: #007bff; }
+.yellow-line { border-left-color: #ffc107; }
+.aqua-line { border-left-color: #17a2b8; }
+.green-line { border-left-color: #28a745; }
+.orange-line { border-left-color: #fd7e14; }
+.pink-line { border-left-color: #e83e8c; }
+.red-line { border-left-color: #dc3545; }
+.gold-line { border-left-color: #ffc107; }
+.purple-line { border-left-color: #6f42c1; }
+.magenta-line { border-left-color: #d63384; }
+
+
+.summary-table-container {
+    overflow-x: auto;
+}
+
+.summary-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.summary-table-container th,
+.summary-table-container td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.summary-table-container th {
+    background-color: #e9ecef;
+    font-weight: 600;
+}
