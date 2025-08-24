@@ -17,12 +17,13 @@ function initApp() {
     console.log('🚀 Enhanced Mumbai Transport App loaded');
     
     // Initialize all systems
-    initAdvancedMap();
+    // initializeMap() is called by the component loader after the map container is loaded.
     initRealTimeTracking();
     initAIOptimizer();
     initLiveTraffic();
     initTabNavigation();
     initThemeToggle();
+    initTicketsTab();
     initFormHandlers();
     initMapResize();
     initPWA();
@@ -34,7 +35,7 @@ function initApp() {
 }
 
 // Advanced Map with Real-time Features
-function initAdvancedMap() {
+window.initializeMap = function() {
     console.log('🗺️ Initializing Advanced Google Maps...');
     
     const mapElement = document.getElementById('map');
@@ -447,25 +448,96 @@ function getCustomMapStyle() {
     ];
 }
 
+// Data for Metro Lines
+const metroLineData = [
+    {
+        id: 'line1',
+        name: 'Line 1 (Versova-Andheri-Ghatkopar)',
+        operational: '5:30 AM - 12:00 AM',
+        color: '#FF6B35',
+        fares: { min: 10, max: 40 }
+    },
+    {
+        id: 'line2a',
+        name: 'Line 2A (Dahisar-DN Nagar)',
+        operational: '6:00 AM - 11:30 PM',
+        color: '#4ECDC4',
+        fares: { min: 10, max: 50 }
+    },
+    {
+        id: 'line7',
+        name: 'Line 7 (Dahisar East-Andheri East)',
+        operational: '6:00 AM - 11:30 PM',
+        color: '#45B7D1',
+        fares: { min: 10, max: 60 }
+    }
+];
+
+// Initialize Tickets Tab
+function initTicketsTab() {
+    const container = document.querySelector('.metro-lines');
+    if (!container) return;
+
+    container.innerHTML = ''; // Clear existing static content
+    metroLineData.forEach(line => {
+        const lineElement = document.createElement('div');
+        lineElement.className = 'metro-line';
+        lineElement.innerHTML = `
+            <div class="line-info">
+                <div class="line-color" style="background: ${line.color};"></div>
+                <div class="line-details">
+                    <h3>${line.name}</h3>
+                    <p>Operational: ${line.operational}</p>
+                </div>
+            </div>
+            <div class="line-actions">
+                <button class="btn btn-secondary" data-line-id="${line.id}" data-action="buy">
+                    <i class="ph ph-ticket"></i>
+                    Buy Ticket
+                </button>
+                <button class="btn btn-outline" data-line-id="${line.id}" data-action="fare">
+                    <i class="ph ph-currency-inr"></i>
+                    Check Fare
+                </button>
+            </div>
+        `;
+        container.appendChild(lineElement);
+    });
+
+    // Add event listeners
+    container.addEventListener('click', function(event) {
+        const button = event.target.closest('button');
+        if (!button) return;
+
+        const lineId = button.dataset.lineId;
+        const action = button.dataset.action;
+
+        if (action === 'buy') {
+            buyTicket(lineId);
+        } else if (action === 'fare') {
+            checkFare(lineId);
+        }
+    });
+}
+
 // Enhanced Ticket Functions
-function buyTicket(line) {
-    showToast('🎫 Opening ticket booking...', 'info');
+function buyTicket(lineId) {
+    const line = metroLineData.find(l => l.id === lineId);
+    showToast(`🎫 Opening ticket booking for ${line.name}...`, 'info');
     // Simulate ticket booking process
     setTimeout(() => {
         showToast('✅ Ticket booked successfully!', 'success');
-        sendNotification('Ticket Booked', `Your ticket for ${line} has been confirmed.`);
+        sendNotification('Ticket Booked', `Your ticket for ${line.name} has been confirmed.`);
     }, 2000);
 }
 
-function checkFare(line) {
-    const fares = {
-        'line1': { min: 10, max: 40 },
-        'line2': { min: 10, max: 50 },
-        'line3': { min: 10, max: 60 }
-    };
-    
-    const fare = fares[line] || { min: 10, max: 40 };
-    showToast(`💰 Fare: ₹${fare.min} - ₹${fare.max}`, 'info');
+function checkFare(lineId) {
+    const line = metroLineData.find(l => l.id === lineId);
+    if (line && line.fares) {
+        showToast(`💰 Fare for ${line.name}: ₹${line.fares.min} - ₹${line.fares.max}`, 'info');
+    } else {
+        showToast('Fare information not available.', 'error');
+    }
 }
 
 // Enhanced Ride Functions
@@ -652,5 +724,4 @@ function updateOfflineStatus() {
     }
 }
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', initApp);
+// App is initialized by component-loader.js after components are loaded.

@@ -298,6 +298,14 @@ class ComponentLoader {
         this.insertComponent('header', '#header-container');
         this.insertComponent('tab-navigation', '#tab-navigation-container');
         this.insertComponent('plan-tab', '#plan-tab-container');
+
+        // Initialize the map only after its container is loaded
+        if (window.google && window.google.maps) {
+            if (window.initializeMap) {
+                window.initializeMap();
+            }
+        }
+
         this.insertComponent('tickets-tab', '#tickets-tab-container');
         this.insertComponent('compare-tab', '#compare-tab-container');
         
