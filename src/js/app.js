@@ -17,7 +17,7 @@ function initApp() {
     console.log('🚀 Enhanced Mumbai Transport App loaded');
     
     // Initialize all systems
-    initAdvancedMap();
+    // initializeMap() is called by the component loader after the map container is loaded.
     initRealTimeTracking();
     initAIOptimizer();
     initLiveTraffic();
@@ -35,7 +35,7 @@ function initApp() {
 }
 
 // Advanced Map with Real-time Features
-function initAdvancedMap() {
+window.initializeMap = function() {
     console.log('🗺️ Initializing Advanced Google Maps...');
     
     const mapElement = document.getElementById('map');
