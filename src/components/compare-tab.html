@@ -4,70 +4,24 @@
     
     <!-- Ride Comparison -->
     <div class="ride-comparison">
-        <div class="comparison-card">
-            <div class="ride-option">
-                <div class="ride-icon">
-                    <i class="ph ph-train"></i>
-                </div>
-                <div class="ride-details">
-                    <h3>Metro</h3>
-                    <div class="ride-metrics">
-                        <span class="metric">
-                            <i class="ph ph-clock"></i>
-                            25 min
-                        </span>
-                        <span class="metric">
-                            <i class="ph ph-currency-inr"></i>
-                            ₹30
-                        </span>
-                    </div>
-                </div>
-                <button class="btn btn-primary" onclick="selectRide('metro')">
-                    Select
-                </button>
-            </div>
-        </div>
-        
-        <div class="comparison-card">
-            <div class="ride-option">
-                <div class="ride-icon">
-                    <i class="ph ph-bus"></i>
-                </div>
-                <div class="ride-details">
-                    <h3>Bus</h3>
-                    <div class="ride-metrics">
-                        <span class="metric">
-                            <i class="ph ph-clock"></i>
-                            45 min
-                        </span>
-                        <span class="metric">
-                            <i class="ph ph-currency-inr"></i>
-                            ₹15
-                        </span>
-                    </div>
-                </div>
-                <button class="btn btn-primary" onclick="selectRide('bus')">
-                    Select
-                </button>
-            </div>
-        </div>
+        <!-- Ride comparison cards are dynamically populated by app.js -->
     </div>
     
     <!-- Account Connections -->
     <div class="account-connections">
         <div class="section-title">Account Connections</div>
         <div class="connection-grid">
-            <button class="connection-btn" id="google-signin" onclick="signInWithGoogle()">
+            <button class="connection-btn" id="google-signin">
                 <i class="ph ph-google-logo"></i>
                 <span>Sign in with Google</span>
             </button>
             
-            <button class="connection-btn" id="uber-connect" onclick="connectUber()">
+            <button class="connection-btn" id="uber-connect">
                 <i class="ph ph-car"></i>
                 <span>Connect Uber</span>
             </button>
             
-            <button class="connection-btn" id="ola-connect" onclick="connectOla()">
+            <button class="connection-btn" id="ola-connect">
                 <i class="ph ph-car"></i>
                 <span>Connect Ola</span>
             </button>

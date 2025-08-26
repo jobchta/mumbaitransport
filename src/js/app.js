@@ -24,6 +24,7 @@ function initApp() {
     initTabNavigation();
     initThemeToggle();
     initTicketsTab();
+    initCompareTab();
     initFormHandlers();
     initMapResize();
     initPWA();
@@ -540,6 +541,81 @@ function checkFare(lineId) {
     }
 }
 
+// Data for Ride Comparison
+const rideComparisonData = [
+    {
+        type: 'metro',
+        icon: 'ph-train',
+        time: '25 min',
+        cost: '₹30',
+        color: 'var(--primary)'
+    },
+    {
+        type: 'bus',
+        icon: 'ph-bus',
+        time: '45 min',
+        cost: '₹15',
+        color: 'var(--success)'
+    },
+    {
+        type: 'auto',
+        icon: 'ph-jeep',
+        time: '20 min',
+        cost: '₹80',
+        color: 'var(--warning)'
+    }
+];
+
+// Initialize Compare Tab
+function initCompareTab() {
+    const container = document.querySelector('.ride-comparison');
+    if (!container) return;
+
+    container.innerHTML = ''; // Clear static content
+    rideComparisonData.forEach(ride => {
+        const card = document.createElement('div');
+        card.className = 'comparison-card';
+        card.innerHTML = `
+            <div class="ride-option">
+                <div class="ride-icon" style="background: ${ride.color};">
+                    <i class="ph ${ride.icon}"></i>
+                </div>
+                <div class="ride-details">
+                    <h3>${ride.type.charAt(0).toUpperCase() + ride.type.slice(1)}</h3>
+                    <div class="ride-metrics">
+                        <span class="metric">
+                            <i class="ph ph-clock"></i>
+                            ${ride.time}
+                        </span>
+                        <span class="metric">
+                            <i class="ph ph-currency-inr"></i>
+                            ${ride.cost}
+                        </span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" data-ride-type="${ride.type}">
+                    Select
+                </button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+
+    // Add event listeners for ride selection
+    container.addEventListener('click', function(event) {
+        const button = event.target.closest('button');
+        if (button && button.dataset.rideType) {
+            selectRide(button.dataset.rideType);
+        }
+    });
+
+    // Add event listeners for account connections
+    document.getElementById('google-signin')?.addEventListener('click', signInWithGoogle);
+    document.getElementById('uber-connect')?.addEventListener('click', connectUber);
+    document.getElementById('ola-connect')?.addEventListener('click', connectOla);
+}
+
+
 // Enhanced Ride Functions
 function selectRide(type) {
     showToast(`🚗 ${type.charAt(0).toUpperCase() + type.slice(1)} selected!`, 'success');
@@ -548,6 +624,22 @@ function selectRide(type) {
         showToast('🎉 Ride confirmed! Driver arriving in 5 minutes.', 'success');
         sendNotification('Ride Confirmed', `Your ${type} ride has been confirmed.`);
     }, 1500);
+}
+
+// Placeholder functions for account connections
+function signInWithGoogle() {
+    showToast('Signing in with Google...', 'info');
+    // Placeholder for Google Sign-In logic
+}
+
+function connectUber() {
+    showToast('Connecting with Uber...', 'info');
+    // Placeholder for Uber connection logic
+}
+
+function connectOla() {
+    showToast('Connecting with Ola...', 'info');
+    // Placeholder for Ola connection logic
 }
 
 // Notification System
