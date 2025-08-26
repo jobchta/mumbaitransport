@@ -56,7 +56,7 @@ export default {
 
     const upstreamUrl = new URL(`https://jobchta.github.io/mumbaitransport${upstreamPath}${incomingUrl.search}`);
 
-    // Build subrequest
+    // Build subrequest with CF-Bypass header
     const init = {
       method: request.method,
       headers: new Headers(request.headers),
@@ -71,43 +71,54 @@ export default {
     ];
     hopHeaders.forEach(h => init.headers.delete(h));
 
+    // Add CF-Bypass header to potentially avoid Cloudflare interference
+    init.headers.set('x-cf-bypass', 'bypass_value');
+
     let upstreamReq;
     if (request.method === 'GET' || request.method === 'HEAD') {
       upstreamReq = new Request(upstreamUrl.toString(), init);
     } else {
-      upstreamReq = new Request(upstreamUrl.toString(), request);
+      // For non-GET/HEAD requests, we need to handle the body properly
+      const body = await request.arrayBuffer();
+      init.body = body;
+      upstreamReq = new Request(upstreamUrl.toString(), init);
     }
 
     // Cache static assets aggressively
     const isAsset = /\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|json|txt|xml|map|woff2?)$/i.test(upstreamPath);
     const cf = isAsset ? { cacheEverything: true, cacheTtl: 3600 } : { cacheEverything: true, cacheTtl: 120 };
 
-    const upstreamRes = await fetch(upstreamReq, { redirect: 'follow', cf });
+    try {
+      const upstreamRes = await fetch(upstreamReq, { redirect: 'follow', cf });
 
-    // Clone headers and adjust for portal path
-    const headers = new Headers(upstreamRes.headers);
+      // Clone headers and adjust for portal path
+      const headers = new Headers(upstreamRes.headers);
 
-    // Ensure correct content type falls back if missing
-    if (!headers.get('content-type')) {
-      const guessed = guessContentType(upstreamPath);
-      if (guessed) headers.set('content-type', guessed);
+      // Ensure correct content type falls back if missing
+      if (!headers.get('content-type')) {
+        const guessed = guessContentType(upstreamPath);
+        if (guessed) headers.set('content-type', guessed);
+      }
+
+      // CORS for XHR/fetch requests
+      const origin = request.headers.get('Origin');
+      if (origin) {
+        headers.set('Access-Control-Allow-Origin', origin);
+        headers.set('Vary', (headers.get('Vary') ? headers.get('Vary') + ', ' : '') + 'Origin');
+        headers.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+        const reqHeaders = request.headers.get('Access-Control-Request-Headers');
+        if (reqHeaders) headers.set('Access-Control-Allow-Headers', reqHeaders);
+      }
+
+      return new Response(upstreamRes.body, {
+        status: upstreamRes.status,
+        statusText: upstreamRes.statusText,
+        headers,
+      });
+    } catch (error) {
+      console.error('Upstream fetch error:', error);
+      return new Response('Failed to fetch from upstream', { status: 502 });
     }
-
-    // CORS for XHR/fetch requests
-    const origin = request.headers.get('Origin');
-    if (origin) {
-      headers.set('Access-Control-Allow-Origin', origin);
-      headers.set('Vary', (headers.get('Vary') ? headers.get('Vary') + ', ' : '') + 'Origin');
-      headers.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
-      const reqHeaders = request.headers.get('Access-Control-Request-Headers');
-      if (reqHeaders) headers.set('Access-Control-Allow-Headers', reqHeaders);
-    }
-
-    return new Response(upstreamRes.body, {
-      status: upstreamRes.status,
-      statusText: upstreamRes.statusText,
-      headers,
-    });
   }
 }
 
