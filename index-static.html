@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Mumbai Transport - Plan journeys, buy tickets, compare rides">
+    <meta name="theme-color" content="#0ea5e9">
+    <title>Mumbai Transport</title>
+
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="src/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Mumbai Transport">
+    <link rel="apple-touch-icon" href="src/assets/icons/icon-192x192.png">
+
+    <!-- External Dependencies -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Application Styles -->
+    <link rel="stylesheet" href="src/styles/style.css">
+
+    <!-- Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places"></script>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background-animation">
+        <div class="floating-orb orb-1"></div>
+        <div class="floating-orb orb-2"></div>
+        <div class="floating-orb orb-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="#" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-subway"></i>
+                </div>
+                <span class="logo-text">Mumbai Transit</span>
+            </a>
+
+            <div class="header-right">
+                <!-- Language Selector -->
+                <div class="language-selector">
+                    <button class="language-btn" id="language-btn">
+                        <i class="fas fa-globe"></i>
+                        <span id="current-language">English</span>
+                        <i class="fas fa-caret-down"></i>
+                    </button>
+                    <div class="language-dropdown" id="language-dropdown">
+                        <div class="language-option active" data-lang="en">
+                            <span>🇺🇸</span>
+                            <span>English</span>
+                        </div>
+                        <div class="language-option" data-lang="hi">
+                            <span>🇮🇳</span>
+                            <span>हिंदी (Hindi)</span>
+                        </div>
+                        <div class="language-option" data-lang="mr">
+                            <span>🇮🇳</span>
+                            <span>मराठी (Marathi)</span>
+                        </div>
+                        <div class="language-option" data-lang="gu">
+                            <span>🇮🇳</span>
+                            <span>ગુજરાતી (Gujarati)</span>
+                        </div>
+                        <div class="language-option" data-lang="bn">
+                            <span>🇮🇳</span>
+                            <span>বাংলা (Bengali)</span>
+                        </div>
+                        <div class="language-option" data-lang="ta">
+                            <span>🇮🇳</span>
+                            <span>தமிழ் (Tamil)</span>
+                        </div>
+                        <div class="language-option" data-lang="te">
+                            <span>🇮🇳</span>
+                            <span>తెలుగు (Telugu)</span>
+                        </div>
+                        <div class="language-option" data-lang="kn">
+                            <span>🇮🇳</span>
+                            <span>ಕನ್ನಡ (Kannada)</span>
+                        </div>
+                        <div class="language-option" data-lang="ml">
+                            <span>🇮🇳</span>
+                            <span>മലയാളം (Malayalam)</span>
+                        </div>
+                        <div class="language-option" data-lang="pa">
+                            <span>🇮🇳</span>
+                            <span>ਪੰਜਾਬੀ (Punjabi)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                    <i class="fas fa-sun"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title">Navigate Mumbai</h1>
+        <p class="hero-subtitle">Experience the future of urban mobility with AI-powered routing and real-time insights</p>
+
+        <div class="cta-buttons">
+            <button class="cta-button cta-primary" id="planJourneyBtn" onclick="handlePlanJourney()">
+                <i class="fas fa-route"></i> Plan Your Journey
+            </button>
+            <button class="cta-button cta-secondary" id="viewMapBtn" onclick="handleViewMap()">
+                <i class="fas fa-map-marked-alt"></i> View Network Map
+            </button>
+            <button class="cta-button cta-secondary" id="bookmarkBtn" onclick="handleBookmark()">
+                <i class="fas fa-bookmark"></i> Bookmark This Page
+            </button>
+        </div>
+    </section>
+
+    <!-- Hidden Radio Inputs for CSS-Only Tab Control -->
+    <input type="radio" name="tabs" id="plan-radio" class="tab-radio" checked>
+    <input type="radio" name="tabs" id="tickets-radio" class="tab-radio">
+    <input type="radio" name="tabs" id="compare-radio" class="tab-radio">
+
+    <!-- Dashboard -->
+    <main class="dashboard app-content">
+        <!-- Plan Tab -->
+        <div class="tab-content" id="plan-tab">
+            <div class="section-header">
+                <h2 class="section-title">Plan Your Journey</h2>
+                <div class="section-line"></div>
+            </div>
+
+            <!-- Transport Modes -->
+            <div class="transport-modes">
+                <button class="micro-btn active" data-mode="all" onclick="filterTransportMode('all')">
+                    <i class="fas fa-shuffle"></i>
+                    <span>All</span>
+                </button>
+                <button class="micro-btn" data-mode="metro" onclick="filterTransportMode('metro')">
+                    <i class="fas fa-train"></i>
+                    <span>Metro</span>
+                </button>
+                <button class="micro-btn" data-mode="bus" onclick="filterTransportMode('bus')">
+                    <i class="fas fa-bus"></i>
+                    <span>Bus</span>
+                </button>
+                <button class="micro-btn" data-mode="train" onclick="filterTransportMode('train')">
+                    <i class="fas fa-train"></i>
+                    <span>Train</span>
+                </button>
+            </div>
+
+            <!-- Journey Form -->
+            <form id="journey-form">
+                <div class="form-group">
+                    <label class="form-label" for="from">From</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-map-pin input-icon"></i>
+                        <input type="text" id="from" class="form-input" placeholder="Current location or address">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="to">To</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-map-pin input-icon"></i>
+                        <input type="text" id="to" class="form-input" placeholder="Destination">
+                        <button type="button" class="location-swap" id="swap-locations">
+                            <i class="fas fa-arrows-up-down"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full btn-large">
+                    <i class="fas fa-route"></i>
+                    Find Routes
+                </button>
+            </form>
+
+            <!-- Map Container -->
+            <div id="map" class="map-container" style="height: 300px; margin-top: 1.5rem;"></div>
+        </div>
+
+        <!-- Tickets Tab -->
+        <div class="tab-content" id="tickets-tab">
+            <div class="section-header">
+                <h2 class="section-title">Metro Tickets & Fares</h2>
+                <div class="section-line"></div>
+            </div>
+
+            <!-- Metro Lines -->
+            <div class="metro-lines">
+                <div class="metro-line">
+                    <div class="line-info">
+                        <div class="line-color" style="background: #FF6B35;"></div>
+                        <div class="line-details">
+                            <h3>Line 1 (Versova-Andheri-Ghatkopar)</h3>
+                            <p>Operational: 5:30 AM - 12:00 AM</p>
+                        </div>
+                    </div>
+                    <div class="line-actions">
+                        <button class="btn btn-secondary" onclick="buyTicket('line1')">
+                            <i class="fas fa-ticket"></i>
+                            Buy Ticket
+                        </button>
+                        <button class="btn btn-outline" onclick="checkFare('line1')">
+                            <i class="fas fa-indian-rupee-sign"></i>
+                            Check Fare
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fare Information -->
+            <div class="fare-info">
+                <div class="section-header">
+                    <h2 class="section-title">Current Fares</h2>
+                    <div class="section-line"></div>
+                </div>
+                <div class="fare-grid">
+                    <div class="fare-card">
+                        <div class="fare-amount">₹10</div>
+                        <div class="fare-distance">0-3 km</div>
+                    </div>
+                    <div class="fare-card">
+                        <div class="fare-amount">₹20</div>
+                        <div class="fare-distance">3-12 km</div>
+                    </div>
+                    <div class="fare-card">
+                        <div class="fare-amount">₹30</div>
+                        <div class="fare-distance">12-27 km</div>
+                    </div>
+                    <div class="fare-card">
+                        <div class="fare-amount">₹40</div>
+                        <div class="fare-distance">27+ km</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compare Tab -->
+        <div class="tab-content" id="compare-tab">
+            <div class="section-header">
+                <h2 class="section-title">Compare Rides</h2>
+                <div class="section-line"></div>
+            </div>
+
+            <!-- Ride Comparison -->
+            <div class="ride-comparison">
+                <div class="comparison-card">
+                    <div class="ride-option">
+                        <div class="ride-icon">
+                            <i class="fas fa-train"></i>
+                        </div>
+                        <div class="ride-details">
+                            <h3>Metro</h3>
+                            <div class="ride-metrics">
+                                <span class="metric">
+                                    <i class="fas fa-clock"></i>
+                                    25 min
+                                </span>
+                                <span class="metric">
+                                    <i class="fas fa-indian-rupee-sign"></i>
+                                    ₹30
+                                </span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="selectRide('metro')">
+                            Select
+                        </button>
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <div class="ride-option">
+                        <div class="ride-icon">
+                            <i class="fas fa-bus"></i>
+                        </div>
+                        <div class="ride-details">
+                            <h3>Bus</h3>
+                            <div class="ride-metrics">
+                                <span class="metric">
+                                    <i class="fas fa-clock"></i>
+                                    45 min
+                                </span>
+                                <span class="metric">
+                                    <i class="fas fa-indian-rupee-sign"></i>
+                                    ₹15
+                                </span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="selectRide('bus')">
+                            Select
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Install Prompt Button (hidden by default) -->
+    <button id="installBtn" class="install-btn" style="display: none;">
+        <i class="fas fa-download"></i>
+        Install App
+    </button>
+
+    <!-- Bottom Tab Bar -->
+    <nav class="bottom-tab-bar">
+        <label for="plan-radio" class="tab-item">
+            <i class="fas fa-route"></i>
+            <span>Plan</span>
+        </label>
+        <label for="tickets-radio" class="tab-item">
+            <i class="fas fa-ticket"></i>
+            <span>Tickets</span>
+        </label>
+        <label for="compare-radio" class="tab-item">
+            <i class="fas fa-scale-balanced"></i>
+            <span>Compare</span>
+        </label>
+    </nav>
+
+    <!-- Service Worker -->
+    <script src="src/sw.js"></script>
+
+    <!-- Static App Scripts (No Backend Required) -->
+    <script src="src/js/static-app.js"></script>
+    <script src="src/js/language-manager.js"></script>
+
+    <script>
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Mumbai Transport App (Static Version) loaded');
+
+            // Initialize core functionality
+            initApp();
+
+            // Initialize language manager
+            if (window.languageManager) {
+                window.languageManager.updateLanguage();
+            }
+
+            // Language selector functionality
+            const languageBtn = document.getElementById('language-btn');
+            const languageDropdown = document.getElementById('language-dropdown');
+            const languageOptions = document.querySelectorAll('.language-option');
+
+            languageBtn.addEventListener('click', function() {
+                languageDropdown.classList.toggle('show');
+            });
+
+            languageOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    document.getElementById('current-language').textContent = this.querySelector('span:last-child').textContent;
+
+                    languageOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+
+                    languageDropdown.classList.remove('show');
+
+                    if (window.languageManager) {
+                        window.languageManager.setLanguage(lang);
+                    }
+                });
+            });
+
+            // Close language dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!languageBtn.contains(event.target) && !languageDropdown.contains(event.target)) {
+                    languageDropdown.classList.remove('show');
+                }
+            });
+
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('light-theme');
+                const icon = themeToggle.querySelector('i');
+
+                if (document.body.classList.contains('light-theme')) {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                } else {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
+            });
+
+            // Install prompt functionality
+            let deferredPrompt;
+            const installBtn = document.getElementById('installBtn');
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installBtn.style.display = 'flex';
+            });
+
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installBtn.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
