@@ -70,7 +70,7 @@ class ComponentLoader {
                         </div>
                         <div class="header-right">
                             <button class="theme-toggle" id="theme-toggle">
-                                <i class="ph ph-sun"></i>
+                                <i class="fas fa-sun"></i>
                             </button>
                         </div>
                     </div>
@@ -82,15 +82,15 @@ class ComponentLoader {
                 <input type="radio" name="tabs" id="compare-radio" class="tab-radio">
                 <nav class="bottom-tab-bar">
                     <label for="plan-radio" class="tab-button">
-                        <i class="ph ph-route"></i>
+                        <i class="fas fa-route"></i>
                         <span>Plan</span>
                     </label>
                     <label for="tickets-radio" class="tab-button">
-                        <i class="ph ph-ticket"></i>
+                        <i class="fas fa-ticket"></i>
                         <span>Tickets</span>
                     </label>
                     <label for="compare-radio" class="tab-button">
-                        <i class="ph ph-scales"></i>
+                        <i class="fas fa-scale-balanced"></i>
                         <span>Compare</span>
                     </label>
                 </nav>
@@ -100,19 +100,19 @@ class ComponentLoader {
                     <div class="section-title">Plan Your Journey</div>
                     <div class="transport-modes">
                         <button class="mode-tab active" data-mode="all">
-                            <i class="ph ph-shuffle"></i>
+                            <i class="fas fa-shuffle"></i>
                             <span>All</span>
                         </button>
                         <button class="mode-tab" data-mode="metro">
-                            <i class="ph ph-train"></i>
+                            <i class="fas fa-train"></i>
                             <span>Metro</span>
                         </button>
                         <button class="mode-tab" data-mode="bus">
-                            <i class="ph ph-bus"></i>
+                            <i class="fas fa-bus"></i>
                             <span>Bus</span>
                         </button>
                         <button class="mode-tab" data-mode="train">
-                            <i class="ph ph-train-regional"></i>
+                            <i class="fas fa-train"></i>
                             <span>Train</span>
                         </button>
                     </div>
@@ -120,22 +120,22 @@ class ComponentLoader {
                         <div class="form-group">
                             <label class="form-label" for="from">From</label>
                             <div class="input-wrapper">
-                                <i class="ph ph-map-pin input-icon"></i>
+                                <i class="fas fa-map-pin input-icon"></i>
                                 <input type="text" id="from" class="form-input" placeholder="Current location or address">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="to">To</label>
                             <div class="input-wrapper">
-                                <i class="ph ph-map-pin-line input-icon"></i>
+                                <i class="fas fa-location-dot input-icon"></i>
                                 <input type="text" id="to" class="form-input" placeholder="Destination">
                                 <button type="button" class="location-swap" id="swap-locations">
-                                    <i class="ph ph-arrows-down-up"></i>
+                                    <i class="fas fa-arrows-up-down"></i>
                                 </button>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary btn-full btn-large">
-                            <i class="ph ph-route"></i>
+                            <i class="fas fa-route"></i>
                             Find Routes
                         </button>
                     </form>
@@ -156,11 +156,11 @@ class ComponentLoader {
                             </div>
                             <div class="line-actions">
                                 <button class="btn btn-secondary" onclick="buyTicket('line1')">
-                                    <i class="ph ph-ticket"></i>
+                                    <i class="fas fa-ticket"></i>
                                     Buy Ticket
                                 </button>
                                 <button class="btn btn-outline" onclick="checkFare('line1')">
-                                    <i class="ph ph-currency-inr"></i>
+                                    <i class="fas fa-indian-rupee-sign"></i>
                                     Check Fare
                                 </button>
                             </div>
@@ -196,17 +196,17 @@ class ComponentLoader {
                         <div class="comparison-card">
                             <div class="ride-option">
                                 <div class="ride-icon">
-                                    <i class="ph ph-train"></i>
+                                    <i class="fas fa-train"></i>
                                 </div>
                                 <div class="ride-details">
                                     <h3>Metro</h3>
                                     <div class="ride-metrics">
                                         <span class="metric">
-                                            <i class="ph ph-clock"></i>
+                                            <i class="fas fa-clock"></i>
                                             25 min
                                         </span>
                                         <span class="metric">
-                                            <i class="ph ph-currency-inr"></i>
+                                            <i class="fas fa-indian-rupee-sign"></i>
                                             ₹30
                                         </span>
                                     </div>
@@ -219,17 +219,17 @@ class ComponentLoader {
                         <div class="comparison-card">
                             <div class="ride-option">
                                 <div class="ride-icon">
-                                    <i class="ph ph-bus"></i>
+                                    <i class="fas fa-bus"></i>
                                 </div>
                                 <div class="ride-details">
                                     <h3>Bus</h3>
                                     <div class="ride-metrics">
                                         <span class="metric">
-                                            <i class="ph ph-clock"></i>
+                                            <i class="fas fa-clock"></i>
                                             45 min
                                         </span>
                                         <span class="metric">
-                                            <i class="ph ph-currency-inr"></i>
+                                            <i class="fas fa-indian-rupee-sign"></i>
                                             ₹15
                                         </span>
                                     </div>

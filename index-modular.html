@@ -8,11 +8,11 @@
     <title>Mumbai Transport</title>
 
     <!-- PWA + iOS Support -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="src/manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Mumbai Transport">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="src/assets/icons/icon-192x192.png">
     
     <!-- Essential Fonts Only -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,12 +21,12 @@
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
     
     <!-- Local CSS and JavaScript -->
-    <link rel="stylesheet" href="style.css">
-    <script defer src="app.js"></script>
-    <script defer src="js/component-loader.js"></script>
+    <link rel="stylesheet" href="src/styles/style.css">
+    <script defer src="src/js/app.js"></script>
+    <script defer src="src/js/component-loader.js"></script>
     
     <!-- Google Maps API with callback for reliable init -->
-    <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places,geometry,visualization&v=weekly&callback=initMap"></script>
+    <script defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,geometry,visualization&v=weekly&callback=initMap"></script>
 </head>
 <body>
     <div class="app-shell">
@@ -53,7 +53,7 @@
     <div class="pwa-install-banner" id="pwa-install-banner">
         <div class="pwa-banner-content">
             <div class="pwa-banner-icon">
-                <i class="ph ph-download-simple"></i>
+                <i class="fas fa-download"></i>
             </div>
             <div class="pwa-banner-text">
                 <h3>Install Mumbai Transport</h3>
@@ -70,20 +70,20 @@
     <div class="ios-install-hint" id="ios-install-hint">
         <div class="ios-hint-content">
             <div class="ios-hint-icon">
-                <i class="ph ph-device-mobile"></i>
+                <i class="fas fa-mobile-screen-button"></i>
             </div>
             <div class="ios-hint-text">
                 <h4>Add to Home Screen</h4>
                 <p>Install this app on your iPhone: tap the share button and then "Add to Home Screen".</p>
                 <div class="ios-hint-steps">
-                    <i class="ph ph-share"></i>
+                    <i class="fas fa-share"></i>
                     <span>Share</span>
-                    <i class="ph ph-arrow-right"></i>
+                    <i class="fas fa-arrow-right"></i>
                     <span>Add to Home Screen</span>
                 </div>
             </div>
             <button class="ios-hint-close" id="ios-hint-close">
-                <i class="ph ph-x"></i>
+                <i class="fas fa-x"></i>
             </button>
         </div>
     </div>
@@ -138,7 +138,7 @@
         function initPWA() {
             // Register service worker
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js')
+                navigator.serviceWorker.register('src/sw.js')
                     .then(registration => {
                         console.log('✅ Service Worker registered:', registration);
                     })

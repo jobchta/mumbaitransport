@@ -1,12 +1,18 @@
-// Lightweight, scope-safe Service Worker for /portal/ (installed via ./sw.js)
-const CACHE_VERSION = 'mt-portal-v1';
+// Lightweight, scope-safe Service Worker for Mumbai Transport (installed via ./src/sw.js)
+const CACHE_VERSION = 'mt-v1';
 const CACHE_NAME = `mt-cache-${CACHE_VERSION}`;
 
-// App shell (relative to scope). Keep small; HTML is runtime-updated.
+// App shell (relative to service worker location in src/). Keep small; HTML is runtime-updated.
 const PRECACHE_ASSETS = [
-  './',
-  './index.html',
-  './offline.html',
+  '../',  // Root directory
+  '../index.html',
+  '../offline.html',
+  './manifest.json',
+  './styles/style.css',
+  './js/app.js',
+  './js/language-manager.js',
+  './assets/icons/icon-192x192.png',
+  './assets/icons/icon-512x512.png'
 ];
 
 // Install: pre-cache minimal shell
@@ -57,7 +63,7 @@ self.addEventListener('fetch', (event) => {
          const cached = await caches.match(request);
          if (cached) return cached;
          // Fallback to offline shell
-         return caches.match('./offline.html');
+         return caches.match('../offline.html');
        })
    );
    return;

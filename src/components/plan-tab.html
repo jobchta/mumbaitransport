@@ -5,19 +5,19 @@
     <!-- Transport Modes -->
     <div class="transport-modes">
         <button class="mode-tab active" data-mode="all">
-            <i class="ph ph-shuffle"></i>
+            <i class="fas fa-shuffle"></i>
             <span>All</span>
         </button>
         <button class="mode-tab" data-mode="metro">
-            <i class="ph ph-train"></i>
+            <i class="fas fa-train"></i>
             <span>Metro</span>
         </button>
         <button class="mode-tab" data-mode="bus">
-            <i class="ph ph-bus"></i>
+            <i class="fas fa-bus"></i>
             <span>Bus</span>
         </button>
         <button class="mode-tab" data-mode="train">
-            <i class="ph ph-train-regional"></i>
+            <i class="fas fa-train"></i>
             <span>Train</span>
         </button>
     </div>
@@ -27,26 +27,26 @@
         <div class="form-group">
             <label class="form-label" for="from">From</label>
             <div class="input-wrapper">
-                <i class="ph ph-map-pin input-icon"></i>
+                <i class="fas fa-map-pin input-icon"></i>
                 <input type="text" id="from" class="form-input" placeholder="Current location or address">
             </div>
         </div>
-        
+
         <div class="form-group">
             <label class="form-label" for="to">To</label>
             <div class="input-wrapper">
-                <i class="ph ph-map-pin-line input-icon"></i>
+                <i class="fas fa-location-dot input-icon"></i>
                 <input type="text" id="to" class="form-input" placeholder="Destination">
                 <button type="button" class="location-swap" id="swap-locations">
-                    <i class="ph ph-arrows-down-up"></i>
+                    <i class="fas fa-arrows-up-down"></i>
                 </button>
             </div>
         </div>
-        
+
         <div class="form-group">
             <label class="form-label">When</label>
             <div class="input-wrapper">
-                <i class="ph ph-clock input-icon"></i>
+                <i class="fas fa-clock input-icon"></i>
                 <select class="form-input" id="departure-time">
                     <option value="now">Leave now</option>
                     <option value="depart">Depart at</option>
@@ -57,13 +57,13 @@
         
         <div class="form-group" id="time-selector" style="display: none;">
             <div class="input-wrapper">
-                <i class="ph ph-calendar input-icon"></i>
+                <i class="fas fa-calendar input-icon"></i>
                 <input type="datetime-local" class="form-input" id="custom-time">
             </div>
         </div>
-        
+
         <button type="submit" class="btn btn-primary btn-full btn-large">
-            <i class="ph ph-route" style="font-size: 1.5rem;"></i>
+            <i class="fas fa-route" style="font-size: 1.5rem;"></i>
             Find Routes
         </button>
     </form>
@@ -80,8 +80,8 @@
                 <div style="font-weight: 600; color: var(--primary);">₹30</div>
             </div>
             <div style="display: flex; gap: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
-                <span><i class="ph ph-clock"></i> Depart 5:45 PM</span>
-                <span><i class="ph ph-footprints"></i> 400m walk</span>
+                <span><i class="fas fa-clock"></i> Depart 5:45 PM</span>
+                <span><i class="fas fa-person-walking"></i> 400m walk</span>
             </div>
         </div>
     </div>
