@@ -653,64 +653,273 @@ function showToast(message, type = 'info') {
  */
 async function handlePlanJourney() {
     console.log('🗺️ Plan Your Journey button clicked');
-    switchTab('plan');
-    showToast('Switched to journey planning', 'info');
 
-    // Focus on the from input
+    // Switch to plan tab
+    switchTab('plan');
+    showToast('Ready to plan your journey!', 'info');
+
+    // Focus on the from input for immediate use
     const fromInput = document.getElementById('from');
     if (fromInput) {
         fromInput.focus();
+        // Add placeholder text to guide user
+        fromInput.placeholder = 'Enter starting point (e.g., Andheri Station)';
     }
 
-    // Test backend connection
+    // Test backend connection and show route planning interface
     try {
         const response = await fetch('http://localhost:3001/api/health');
         if (response.ok) {
             console.log('✅ Backend connection successful');
-            showToast('Connected to transport services', 'success');
+            showToast('Connected to Mumbai transport services', 'success');
+
+            // Enable advanced features
+            enableAdvancedPlanning();
         } else {
-            console.log('⚠️ Backend not available, using offline mode');
-            showToast('Working in offline mode', 'info');
+            console.log('⚠️ Backend not available, using basic mode');
+            showToast('Using basic planning mode', 'info');
         }
     } catch (error) {
-        console.log('⚠️ Backend not available, using offline mode');
-        showToast('Working in offline mode', 'info');
+        console.log('⚠️ Backend not available, using basic mode');
+        showToast('Using basic planning mode', 'info');
     }
+}
+
+/**
+ * Enable advanced planning features when backend is available
+ */
+function enableAdvancedPlanning() {
+    const toInput = document.getElementById('to');
+    if (toInput) {
+        toInput.placeholder = 'Enter destination (e.g., Ghatkopar Station)';
+    }
+
+    // Add real-time suggestions (would connect to Google Places API)
+    console.log('🚀 Advanced planning features enabled');
 }
 
 function handleViewMap() {
     console.log('🗺️ View Network Map button clicked');
-    switchTab('plan');
-    showToast('Network map displayed', 'info');
 
-    // Center map on Mumbai if available
+    // Switch to plan tab to show the map
+    switchTab('plan');
+    showToast('Loading Mumbai metro network map...', 'info');
+
+    // Center map on Mumbai metro network
     if (window.mapInstance) {
         const mumbaiCenter = { lat: 19.0760, lng: 72.8777 };
         window.mapInstance.setCenter(mumbaiCenter);
         window.mapInstance.setZoom(11);
+
+        // Add metro line overlays after a short delay
+        setTimeout(() => {
+            addMetroLinesToMap();
+            showToast('Mumbai metro network displayed', 'success');
+        }, 1000);
+    } else {
+        // If map is not loaded yet, show message
+        showToast('Map loading... Please wait', 'info');
+
+        // Try again after map loads
+        const checkMapLoaded = setInterval(() => {
+            if (window.mapInstance) {
+                clearInterval(checkMapLoaded);
+                handleViewMap(); // Retry
+            }
+        }, 500);
     }
+}
+
+/**
+ * Add Mumbai metro lines to the map
+ */
+function addMetroLinesToMap() {
+    if (!window.mapInstance) return;
+
+    // Define metro line coordinates (simplified)
+    const metroLines = [
+        {
+            name: 'Line 1 (Blue) - Versova to Ghatkopar',
+            color: '#1e40af',
+            path: [
+                { lat: 19.1200, lng: 72.8200 }, // Versova
+                { lat: 19.1130, lng: 72.8430 }, // D.N. Nagar
+                { lat: 19.1080, lng: 72.8510 }, // Azad Nagar
+                { lat: 19.1130, lng: 72.8690 }, // Andheri
+                { lat: 19.1270, lng: 72.8460 }, // Western Express Highway
+                { lat: 19.1360, lng: 72.8270 }, // Chakala
+                { lat: 19.1440, lng: 72.8210 }, // Airport Road
+                { lat: 19.1520, lng: 72.8290 }, // Marol Naka
+                { lat: 19.1590, lng: 72.8360 }, // Saki Naka
+                { lat: 19.1660, lng: 72.8440 }, // Asalpha
+                { lat: 19.1730, lng: 72.8610 }, // Jagruti Nagar
+                { lat: 19.0860, lng: 72.9080 }  // Ghatkopar
+            ]
+        },
+        {
+            name: 'Line 2A (Yellow) - Dahisar to D N Nagar',
+            color: '#eab308',
+            path: [
+                { lat: 19.2490, lng: 72.8590 }, // Dahisar East
+                { lat: 19.2080, lng: 72.8490 }, // Anand Nagar
+                { lat: 19.1640, lng: 72.8460 }, // Goregaon
+                { lat: 19.1400, lng: 72.8460 }, // Oshiwara
+                { lat: 19.1230, lng: 72.8460 }, // Jogeshwari
+                { lat: 19.1130, lng: 72.8430 }, // Adarsh Nagar
+                { lat: 19.1080, lng: 72.8510 }  // D N Nagar
+            ]
+        },
+        {
+            name: 'Line 3 (Aqua) - Colaba to Bandra',
+            color: '#06b6d4',
+            path: [
+                { lat: 18.9067, lng: 72.8147 }, // Colaba
+                { lat: 18.9388, lng: 72.8267 }, // Churchgate
+                { lat: 18.9690, lng: 72.8190 }, // Mumbai Central
+                { lat: 19.0070, lng: 72.8170 }, // Mahalaxmi
+                { lat: 19.0170, lng: 72.8170 }, // Lower Parel
+                { lat: 19.0270, lng: 72.8230 }, // Prabhadevi
+                { lat: 19.0170, lng: 72.8470 }, // Dadar
+                { lat: 19.0170, lng: 72.8570 }, // Matunga Road
+                { lat: 19.0170, lng: 72.8670 }, // Mahim Junction
+                { lat: 19.0540, lng: 72.8400 }  // Bandra
+            ]
+        }
+    ];
+
+    // Add each metro line to the map
+    metroLines.forEach(line => {
+        const metroPath = new google.maps.Polyline({
+            path: line.path,
+            geodesic: true,
+            strokeColor: line.color,
+            strokeOpacity: 0.8,
+            strokeWeight: 6,
+            title: line.name
+        });
+
+        metroPath.setMap(window.mapInstance);
+
+        // Add markers for stations
+        line.path.forEach((station, index) => {
+            const marker = new google.maps.Marker({
+                position: station,
+                map: window.mapInstance,
+                title: `${line.name} - Station ${index + 1}`,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 6,
+                    fillColor: line.color,
+                    fillOpacity: 1,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 2
+                }
+            });
+        });
+    });
+
+    console.log('🚇 Mumbai metro lines added to map');
 }
 
 function handleBookmark() {
     console.log('🔖 Bookmark button clicked');
 
-    if (window.safari) {
-        // Safari doesn't support the Web Share API for bookmarks
-        showToast('To bookmark: Press Ctrl+D (Windows/Linux) or Cmd+D (Mac)', 'info');
+    // Try to add to browser bookmarks
+    if (window.sidebar && window.sidebar.addPanel) {
+        // Firefox
+        window.sidebar.addPanel('Mumbai Transport', window.location.href, '');
+        showToast('Page bookmarked successfully!', 'success');
+    } else if (window.external && ('AddFavorite' in window.external)) {
+        // IE
+        window.external.AddFavorite(window.location.href, 'Mumbai Transport');
+        showToast('Page bookmarked successfully!', 'success');
     } else {
-        // Try to use the Web Share API or fallback to instructions
-        if (navigator.share) {
-            navigator.share({
-                title: 'Mumbai Transport',
-                text: 'Plan your journeys and buy tickets for Mumbai transport',
+        // Modern browsers - try Web Share API first
+        if (navigator.share && navigator.canShare) {
+            const shareData = {
+                title: 'Mumbai Transport - Plan Your Mumbai Journey',
+                text: 'Official app for planning journeys, buying tickets, and comparing rides in Mumbai',
                 url: window.location.href
-            }).catch(() => {
-                showToast('To bookmark: Press Ctrl+D (Windows/Linux) or Cmd+D (Mac)', 'info');
-            });
+            };
+
+            if (navigator.canShare(shareData)) {
+                navigator.share(shareData)
+                    .then(() => showToast('Shared successfully!', 'success'))
+                    .catch(() => showBookmarkInstructions());
+            } else {
+                showBookmarkInstructions();
+            }
         } else {
-            showToast('To bookmark: Press Ctrl+D (Windows/Linux) or Cmd+D (Mac)', 'info');
+            showBookmarkInstructions();
         }
     }
+}
+
+/**
+ * Show bookmark instructions for different browsers
+ */
+function showBookmarkInstructions() {
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    let instructions = '';
+
+    if (isMobile) {
+        if (isMac) {
+            instructions = 'Tap the share button, then "Add to Home Screen"';
+        } else {
+            instructions = 'Tap the menu (⋮), then "Add to Home screen"';
+        }
+    } else {
+        if (isMac) {
+            instructions = 'Press Cmd+D to bookmark this page';
+        } else {
+            instructions = 'Press Ctrl+D to bookmark this page';
+        }
+    }
+
+    showToast(instructions, 'info');
+
+    // Also show a modal with detailed instructions
+    showBookmarkModal(instructions);
+}
+
+/**
+ * Show detailed bookmark modal
+ */
+function showBookmarkModal(instructions) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content bookmark-modal">
+            <div class="modal-header">
+                <h3>Bookmark Mumbai Transport</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="bookmark-info">
+                    <p><strong>Why bookmark?</strong></p>
+                    <ul>
+                        <li>Quick access to journey planning</li>
+                        <li>Real-time ticket booking</li>
+                        <li>Live fare information</li>
+                        <li>Offline access when available</li>
+                    </ul>
+
+                    <p><strong>How to bookmark:</strong></p>
+                    <div class="bookmark-steps">
+                        <p>${instructions}</p>
+                        <p><em>Or use your browser's bookmark feature</em></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Got it!</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
 }
 
 /**
@@ -1048,9 +1257,27 @@ async function processTicketPurchase(line) {
     const to = document.getElementById('ticket-to')?.value;
     const quantity = document.getElementById('ticket-quantity')?.value || 1;
 
-    if (!from || !to || from === to) {
-        showToast('Please select valid departure and destination stations', 'error');
+    // Validate inputs
+    if (!from || !to) {
+        showToast('Please select both departure and destination stations', 'error');
         return;
+    }
+
+    if (from === to) {
+        showToast('Departure and destination cannot be the same', 'error');
+        return;
+    }
+
+    if (quantity < 1 || quantity > 10) {
+        showToast('Please select 1-10 tickets', 'error');
+        return;
+    }
+
+    // Show processing state
+    const purchaseBtn = document.querySelector('.ticket-modal .btn-primary');
+    if (purchaseBtn) {
+        purchaseBtn.disabled = true;
+        purchaseBtn.textContent = 'Processing...';
     }
 
     showToast(`Processing ${quantity} ticket(s) from ${from} to ${to}...`, 'info');
@@ -1066,7 +1293,9 @@ async function processTicketPurchase(line) {
                 line,
                 from,
                 to,
-                quantity: parseInt(quantity)
+                quantity: parseInt(quantity),
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
             })
         });
 
@@ -1074,26 +1303,119 @@ async function processTicketPurchase(line) {
             const result = await response.json();
             console.log('✅ Ticket purchased successfully:', result);
 
-            // Show success message with ticket details
-            showToast(`Ticket purchased! ID: ${result.data.ticketId}`, 'success');
+            // Show detailed success message
+            showPurchaseSuccess(result.data, from, to, quantity);
 
             // Close modal after success
             setTimeout(() => {
                 document.querySelector('.ticket-modal')?.closest('.modal-overlay').remove();
-                showToast('Ticket details sent to your email', 'info');
-            }, 1000);
+                showTicketConfirmation(result.data);
+            }, 2000);
         } else {
-            console.error('❌ Ticket purchase failed');
-            showToast('Ticket purchase failed. Please try again.', 'error');
+            const errorData = await response.json();
+            console.error('❌ Ticket purchase failed:', errorData);
+            showToast(errorData.error || 'Ticket purchase failed. Please try again.', 'error');
+
+            // Re-enable button
+            if (purchaseBtn) {
+                purchaseBtn.disabled = false;
+                purchaseBtn.textContent = 'Purchase Ticket';
+            }
         }
     } catch (error) {
         console.error('❌ Error purchasing ticket:', error);
-        // Fallback to mock success
-        setTimeout(() => {
-            showToast('Ticket purchased successfully! Check your email for confirmation.', 'success');
-            document.querySelector('.ticket-modal')?.closest('.modal-overlay').remove();
-        }, 2000);
+        showToast('Network error. Please check your connection and try again.', 'error');
+
+        // Re-enable button
+        if (purchaseBtn) {
+            purchaseBtn.disabled = false;
+            purchaseBtn.textContent = 'Purchase Ticket';
+        }
     }
+}
+
+/**
+ * Show purchase success message with details
+ */
+function showPurchaseSuccess(ticketData, from, to, quantity) {
+    const totalAmount = ticketData.totalAmount || (ticketData.price * quantity);
+
+    showToast(`✅ Ticket purchased successfully! Total: ₹${totalAmount}`, 'success');
+
+    // Log purchase for analytics (in real app)
+    console.log('📊 Ticket Purchase Analytics:', {
+        ticketId: ticketData.ticketId,
+        from,
+        to,
+        quantity,
+        totalAmount,
+        timestamp: new Date().toISOString()
+    });
+}
+
+/**
+ * Show ticket confirmation modal
+ */
+function showTicketConfirmation(ticketData) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content confirmation-modal">
+            <div class="modal-header">
+                <h3>🎫 Ticket Confirmed!</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ticket-confirmation">
+                    <div class="ticket-details">
+                        <p><strong>Ticket ID:</strong> ${ticketData.ticketId}</p>
+                        <p><strong>Valid Until:</strong> ${new Date(ticketData.validUntil).toLocaleString()}</p>
+                        <p><strong>QR Code:</strong> ${ticketData.qrCode}</p>
+                        <p><strong>Total Amount:</strong> ₹${ticketData.totalAmount}</p>
+                    </div>
+
+                    <div class="ticket-actions">
+                        <p><strong>Next Steps:</strong></p>
+                        <ul>
+                            <li>Show this ticket at the station gate</li>
+                            <li>Scan QR code for entry</li>
+                            <li>Keep ticket safe until journey end</li>
+                            <li>Email confirmation sent to your inbox</li>
+                        </ul>
+                    </div>
+
+                    <div class="ticket-qr">
+                        <p><strong>Your QR Code:</strong></p>
+                        <div class="qr-placeholder">
+                            <div class="qr-code">${ticketData.qrCode}</div>
+                            <small>Scan this at station</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="downloadTicket('${ticketData.ticketId}')">Download PDF</button>
+                <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Done</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+/**
+ * Download ticket as PDF (simulation)
+ */
+function downloadTicket(ticketId) {
+    showToast('Downloading ticket PDF...', 'info');
+
+    // Simulate PDF download
+    setTimeout(() => {
+        showToast('Ticket PDF downloaded successfully!', 'success');
+
+        // In a real app, this would trigger actual PDF download
+        console.log(`📄 Downloading ticket ${ticketId} as PDF`);
+    }, 1500);
 }
 
 /**
@@ -1106,13 +1428,222 @@ function updateRideComparison(selectedRide, rideData) {
         const rideType = card.querySelector('.ride-details h3')?.textContent?.toLowerCase();
         if (rideType === selectedRide) {
             card.classList.add('selected');
+            // Add visual indicator
+            card.style.borderColor = 'var(--primary)';
+            card.style.boxShadow = '0 0 20px rgba(99, 102, 241, 0.3)';
         } else {
             card.classList.remove('selected');
+            card.style.borderColor = 'var(--glass-border)';
+            card.style.boxShadow = 'none';
         }
     });
 
-    // In a real implementation, you might update comparison data here
-    console.log(`Updated comparison for ${selectedRide}:`, rideData);
+    // Show ride booking options
+    showRideBookingOptions(selectedRide, rideData);
+
+    console.log(`✅ Selected ${selectedRide} for booking:`, rideData);
+}
+
+/**
+ * Show ride booking options for selected ride
+ */
+function showRideBookingOptions(rideType, rideData) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content booking-modal">
+            <div class="modal-header">
+                <h3>🚗 Book Your ${rideData.name}</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ride-booking">
+                    <div class="ride-summary">
+                        <div class="ride-icon-large">
+                            <i class="fas fa-${getRideIcon(rideType)}"></i>
+                        </div>
+                        <div class="ride-details-large">
+                            <h4>${rideData.name}</h4>
+                            <div class="ride-metrics-large">
+                                <span class="metric-large">
+                                    <i class="fas fa-clock"></i>
+                                    ${rideData.duration}
+                                </span>
+                                <span class="metric-large">
+                                    <i class="fas fa-indian-rupee-sign"></i>
+                                    ${rideData.fare}
+                                </span>
+                                <span class="metric-large">
+                                    <i class="fas fa-route"></i>
+                                    ${rideData.stops} stops
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-form">
+                        <div class="form-group">
+                            <label>Pickup Location:</label>
+                            <input type="text" id="pickup-location" class="form-input" placeholder="Enter pickup location">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Drop Location:</label>
+                            <input type="text" id="drop-location" class="form-input" placeholder="Enter destination">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Number of Passengers:</label>
+                            <select id="passengers" class="form-input">
+                                <option value="1">1 Passenger</option>
+                                <option value="2">2 Passengers</option>
+                                <option value="3">3 Passengers</option>
+                                <option value="4">4 Passengers</option>
+                            </select>
+                        </div>
+
+                        <div class="booking-summary">
+                            <div class="fare-breakdown">
+                                <p><strong>Fare Breakdown:</strong></p>
+                                <p>Base Fare: ${rideData.fare}</p>
+                                <p>Service Fee: ₹10</p>
+                                <p><strong>Total: ₹${calculateTotalFare(rideData.fare, 1)}</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmRideBooking('${rideType}')">Confirm Booking</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Update fare when passenger count changes
+    const passengerSelect = modal.querySelector('#passengers');
+    const fareDisplay = modal.querySelector('.fare-breakdown p:last-child');
+
+    passengerSelect.addEventListener('change', () => {
+        const passengers = parseInt(passengerSelect.value);
+        const totalFare = calculateTotalFare(rideData.fare, passengers);
+        fareDisplay.innerHTML = `<strong>Total: ₹${totalFare}</strong>`;
+    });
+}
+
+/**
+ * Get icon for ride type
+ */
+function getRideIcon(rideType) {
+    const iconMap = {
+        'metro': 'train',
+        'bus': 'bus',
+        'auto': 'taxi',
+        'taxi': 'taxi',
+        'coolcab': 'car',
+        'aggregator': 'car'
+    };
+    return iconMap[rideType] || 'car';
+}
+
+/**
+ * Calculate total fare
+ */
+function calculateTotalFare(baseFare, passengers) {
+    const baseAmount = parseInt(baseFare.replace('₹', ''));
+    const serviceFee = 10;
+    return (baseAmount + serviceFee) * passengers;
+}
+
+/**
+ * Confirm ride booking
+ */
+function confirmRideBooking(rideType) {
+    const pickup = document.getElementById('pickup-location')?.value;
+    const drop = document.getElementById('drop-location')?.value;
+    const passengers = document.getElementById('passengers')?.value;
+
+    if (!pickup || !drop) {
+        showToast('Please enter pickup and drop locations', 'error');
+        return;
+    }
+
+    // Disable button during processing
+    const confirmBtn = document.querySelector('.booking-modal .btn-primary');
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Booking...';
+    }
+
+    showToast('Processing your booking...', 'info');
+
+    // Simulate booking process
+    setTimeout(() => {
+        const bookingId = `BK${Date.now()}`;
+        showToast(`✅ Booking confirmed! ID: ${bookingId}`, 'success');
+
+        // Close modal and show confirmation
+        document.querySelector('.booking-modal')?.closest('.modal-overlay').remove();
+        showBookingConfirmation(bookingId, rideType, pickup, drop, passengers);
+    }, 2000);
+}
+
+/**
+ * Show booking confirmation
+ */
+function showBookingConfirmation(bookingId, rideType, pickup, drop, passengers) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content confirmation-modal">
+            <div class="modal-header">
+                <h3>🎫 Booking Confirmed!</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="booking-confirmation">
+                    <div class="booking-details">
+                        <p><strong>Booking ID:</strong> ${bookingId}</p>
+                        <p><strong>Ride Type:</strong> ${rideType.charAt(0).toUpperCase() + rideType.slice(1)}</p>
+                        <p><strong>From:</strong> ${pickup}</p>
+                        <p><strong>To:</strong> ${drop}</p>
+                        <p><strong>Passengers:</strong> ${passengers}</p>
+                        <p><strong>Status:</strong> <span class="status-confirmed">Confirmed</span></p>
+                    </div>
+
+                    <div class="booking-next-steps">
+                        <p><strong>Next Steps:</strong></p>
+                        <ul>
+                            <li>Driver will arrive in 5-10 minutes</li>
+                            <li>You will receive SMS with driver details</li>
+                            <li>Track your ride in real-time</li>
+                            <li>Payment will be collected at the end of trip</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="trackRide('${bookingId}')">Track Ride</button>
+                <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Done</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+/**
+ * Track ride (simulation)
+ */
+function trackRide(bookingId) {
+    showToast('Opening ride tracking...', 'info');
+
+    // In a real app, this would open a tracking interface
+    setTimeout(() => {
+        showToast(`Tracking ride ${bookingId}`, 'info');
+    }, 1000);
 }
 
 // Additional utility functions for various app features

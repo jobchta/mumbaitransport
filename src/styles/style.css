@@ -936,10 +936,191 @@ body {
     border-color: var(--primary);
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+    animation: selectedPulse 0.5s ease-out;
 }
 
 .comparison-card.selected .ride-option {
     transform: scale(1.02);
+}
+
+@keyframes selectedPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Booking Modal Styles */
+.booking-modal .ride-booking {
+    text-align: center;
+}
+
+.ride-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--glass-light);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+.ride-icon-large {
+    width: 60px;
+    height: 60px;
+    background: var(--gradient-primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.ride-details-large h4 {
+    margin: 0 0 0.5rem 0;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.ride-metrics-large {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.metric-large {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+.fare-breakdown {
+    background: var(--glass-light);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.fare-breakdown p {
+    margin: 0.25rem 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.fare-breakdown p:last-child {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Confirmation Modal Styles */
+.confirmation-modal .ticket-confirmation,
+.confirmation-modal .booking-confirmation {
+    text-align: left;
+}
+
+.ticket-details,
+.booking-details {
+    background: var(--glass-light);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.ticket-details p,
+.booking-details p {
+    margin: 0.5rem 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.ticket-actions,
+.booking-next-steps {
+    background: var(--glass-light);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.ticket-actions ul,
+.booking-next-steps ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.5rem;
+}
+
+.ticket-actions li,
+.booking-next-steps li {
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.ticket-qr {
+    text-align: center;
+    background: var(--glass-light);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.qr-placeholder {
+    margin: 1rem 0;
+}
+
+.qr-code {
+    font-family: monospace;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: white;
+    color: black;
+    padding: 1rem;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    border: 2px solid var(--primary);
+}
+
+.status-confirmed {
+    color: var(--success);
+    font-weight: 600;
+}
+
+/* Bookmark Modal Styles */
+.bookmark-modal .bookmark-info {
+    text-align: left;
+}
+
+.bookmark-info p {
+    margin: 1rem 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.bookmark-info ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.5rem;
+}
+
+.bookmark-info li {
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.bookmark-steps {
+    background: var(--glass-light);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.bookmark-steps p {
+    margin: 0.5rem 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
 }
 
 /* Transport Mode Button Active State */
