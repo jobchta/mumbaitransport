@@ -107,7 +107,7 @@
         <p class="hero-subtitle">Experience the future of urban mobility with AI-powered routing and real-time insights</p>
         
         <div class="cta-buttons">
-            <button class="cta-button cta-primary" id="planJourneyBtn" onclick="console.log('Button clicked!'); handlePlanJourney()">
+            <button class="cta-button cta-primary" id="planJourneyBtn" onclick="handlePlanJourney()">
                 <i class="fas fa-route"></i> Plan Your Journey
             </button>
             <button class="cta-button cta-secondary" id="viewMapBtn" onclick="handleViewMap()">
@@ -346,23 +346,6 @@
                 window.languageManager.updateLanguage();
             }
 
-            // Debug: Check if functions are available
-            console.log('🔍 Debug: Checking function availability...');
-            console.log('handlePlanJourney:', typeof window.handlePlanJourney);
-            console.log('handleViewMap:', typeof window.handleViewMap);
-            console.log('handleBookmark:', typeof window.handleBookmark);
-            console.log('filterTransportMode:', typeof window.filterTransportMode);
-            console.log('buyTicket:', typeof window.buyTicket);
-            console.log('checkFare:', typeof window.checkFare);
-            console.log('selectRide:', typeof window.selectRide);
-
-            // Debug: Add global click listener to catch all button clicks
-            document.addEventListener('click', function(event) {
-                if (event.target.matches('button[onclick]') || event.target.closest('button[onclick]')) {
-                    const button = event.target.matches('button[onclick]') ? event.target : event.target.closest('button[onclick]');
-                    console.log('🎯 Button clicked:', button.id || button.textContent.trim());
-                }
-            });
 
         });
 

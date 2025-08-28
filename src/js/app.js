@@ -641,31 +641,14 @@ function showToast(message, type = 'info') {
  * Handle hero section CTA buttons
  */
 function handlePlanJourney() {
-    console.log('🗺️ Plan Your Journey button clicked - FUNCTION CALLED');
-    console.log('🔍 Debug: switchTab function available:', typeof switchTab);
-    console.log('🔍 Debug: showToast function available:', typeof showToast);
-
-    try {
-        switchTab('plan');
-        console.log('✅ switchTab called successfully');
-    } catch (error) {
-        console.error('❌ Error calling switchTab:', error);
-    }
-
-    try {
-        showToast('Switched to journey planning', 'info');
-        console.log('✅ showToast called successfully');
-    } catch (error) {
-        console.error('❌ Error calling showToast:', error);
-    }
+    console.log('🗺️ Plan Your Journey button clicked');
+    switchTab('plan');
+    showToast('Switched to journey planning', 'info');
 
     // Focus on the from input
     const fromInput = document.getElementById('from');
     if (fromInput) {
         fromInput.focus();
-        console.log('✅ Focused on from input');
-    } else {
-        console.log('⚠️ From input not found');
     }
 }
 
