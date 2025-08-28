@@ -412,6 +412,13 @@ function initGoogleMaps() {
     try {
         console.log('🗺️ Initializing Google Maps...');
 
+        // Check if Google Maps is loaded
+        if (!window.google || !window.google.maps) {
+            console.error('❌ Google Maps API not loaded');
+            showToast('Google Maps API not loaded. Please refresh the page.', 'error');
+            return;
+        }
+
         // Default center (Mumbai)
         const defaultCenter = { lat: 19.0760, lng: 72.8777 };
 
@@ -464,7 +471,11 @@ function initGoogleMaps() {
         const mapContainer = document.getElementById('map');
         if (mapContainer) {
             mapContainer.style.display = 'block';
+            mapContainer.style.background = 'transparent';
+            console.log('✅ Map container displayed');
         }
+
+        showToast('Map loaded successfully!', 'success');
 
     } catch (error) {
         console.error('❌ Error initializing Google Maps:', error);
