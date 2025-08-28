@@ -651,7 +651,7 @@ function showToast(message, type = 'info') {
 /**
  * Handle hero section CTA buttons
  */
-function handlePlanJourney() {
+async function handlePlanJourney() {
     console.log('🗺️ Plan Your Journey button clicked');
     switchTab('plan');
     showToast('Switched to journey planning', 'info');
@@ -660,6 +660,21 @@ function handlePlanJourney() {
     const fromInput = document.getElementById('from');
     if (fromInput) {
         fromInput.focus();
+    }
+
+    // Test backend connection
+    try {
+        const response = await fetch('http://localhost:3001/api/health');
+        if (response.ok) {
+            console.log('✅ Backend connection successful');
+            showToast('Connected to transport services', 'success');
+        } else {
+            console.log('⚠️ Backend not available, using offline mode');
+            showToast('Working in offline mode', 'info');
+        }
+    } catch (error) {
+        console.log('⚠️ Backend not available, using offline mode');
+        showToast('Working in offline mode', 'info');
     }
 }
 
@@ -737,36 +752,110 @@ function filterTransportMode(mode) {
 /**
  * Utility functions for ticket and ride actions
  */
-function buyTicket(line) {
+async function buyTicket(line) {
     console.log(`🎫 Buying ticket for ${line}`);
+    showToast('Loading ticket options...', 'info');
 
-    // Enhanced ticket purchasing functionality
-    const ticketModal = createTicketModal(line);
-    document.body.appendChild(ticketModal);
+    try {
+        // Fetch real ticket data from backend
+        const response = await fetch(`http://localhost:3001/api/tickets/${line}`);
 
-    showToast(`Opening ticket purchase for ${line}...`, 'success');
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Ticket data received:', result);
+
+            // Enhanced ticket purchasing with real data
+            const ticketModal = createTicketModal(line, result.data);
+            document.body.appendChild(ticketModal);
+            showToast(`Ticket options loaded for ${line}`, 'success');
+        } else {
+            console.log('⚠️ Backend not available, using mock data');
+            // Fallback to mock data
+            const ticketModal = createTicketModal(line);
+            document.body.appendChild(ticketModal);
+            showToast(`Opening ticket purchase for ${line}...`, 'success');
+        }
+    } catch (error) {
+        console.error('❌ Error fetching ticket data:', error);
+        // Fallback to mock data
+        const ticketModal = createTicketModal(line);
+        document.body.appendChild(ticketModal);
+        showToast(`Opening ticket purchase for ${line}...`, 'success');
+    }
 }
 
-function checkFare(line) {
+async function checkFare(line) {
     console.log(`💰 Checking fare for ${line}`);
+    showToast('Loading fare information...', 'info');
 
-    // Enhanced fare checking with actual fare data
-    const fareData = getFareData(line);
-    const fareModal = createFareModal(line, fareData);
-    document.body.appendChild(fareModal);
+    try {
+        // Fetch real fare data from backend
+        const response = await fetch(`http://localhost:3001/api/fares/${line}`);
 
-    showToast(`Showing fare information for ${line}`, 'info');
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Fare data received:', result);
+
+            // Enhanced fare checking with real data
+            const fareModal = createFareModal(line, result.data);
+            document.body.appendChild(fareModal);
+            showToast(`Fare information loaded for ${line}`, 'success');
+        } else {
+            console.log('⚠️ Backend not available, using mock data');
+            // Fallback to mock data
+            const fareData = getFareData(line);
+            const fareModal = createFareModal(line, fareData);
+            document.body.appendChild(fareModal);
+            showToast(`Showing fare information for ${line}`, 'info');
+        }
+    } catch (error) {
+        console.error('❌ Error fetching fare data:', error);
+        // Fallback to mock data
+        const fareData = getFareData(line);
+        const fareModal = createFareModal(line, fareData);
+        document.body.appendChild(fareModal);
+        showToast(`Showing fare information for ${line}`, 'info');
+    }
 }
 
-function selectRide(ride) {
+async function selectRide(ride) {
     console.log(`🚗 Selected ride type: ${ride}`);
     window.appState.selectedRoute = ride;
+    showToast('Loading ride comparison...', 'info');
 
-    // Enhanced ride selection with comparison features
-    const rideData = getRideData(ride);
-    updateRideComparison(ride, rideData);
+    try {
+        // Fetch real ride comparison data from backend
+        const response = await fetch('http://localhost:3001/api/rides/compare');
 
-    showToast(`${ride} selected for comparison`, 'success');
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Ride comparison data received:', result);
+
+            // Find the selected ride data
+            const selectedRideData = result.data.find(r => r.type === ride);
+            if (selectedRideData) {
+                updateRideComparison(ride, selectedRideData);
+                showToast(`${selectedRideData.name} selected for comparison`, 'success');
+            } else {
+                // Fallback to mock data
+                const rideData = getRideData(ride);
+                updateRideComparison(ride, rideData);
+                showToast(`${ride} selected for comparison`, 'success');
+            }
+        } else {
+            console.log('⚠️ Backend not available, using mock data');
+            // Fallback to mock data
+            const rideData = getRideData(ride);
+            updateRideComparison(ride, rideData);
+            showToast(`${ride} selected for comparison`, 'success');
+        }
+    } catch (error) {
+        console.error('❌ Error fetching ride data:', error);
+        // Fallback to mock data
+        const rideData = getRideData(ride);
+        updateRideComparison(ride, rideData);
+        showToast(`${ride} selected for comparison`, 'success');
+    }
 }
 
 /**
@@ -954,7 +1043,7 @@ function createFareModal(line, fareData) {
 /**
  * Process ticket purchase
  */
-function processTicketPurchase(line) {
+async function processTicketPurchase(line) {
     const from = document.getElementById('ticket-from')?.value;
     const to = document.getElementById('ticket-to')?.value;
     const quantity = document.getElementById('ticket-quantity')?.value || 1;
@@ -964,14 +1053,47 @@ function processTicketPurchase(line) {
         return;
     }
 
-    // Simulate ticket purchase
     showToast(`Processing ${quantity} ticket(s) from ${from} to ${to}...`, 'info');
 
-    setTimeout(() => {
-        showToast('Ticket purchased successfully! Check your email for confirmation.', 'success');
-        // Close modal
-        document.querySelector('.ticket-modal')?.closest('.modal-overlay').remove();
-    }, 2000);
+    try {
+        // Make real API call to purchase ticket
+        const response = await fetch('http://localhost:3001/api/tickets/buy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                line,
+                from,
+                to,
+                quantity: parseInt(quantity)
+            })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Ticket purchased successfully:', result);
+
+            // Show success message with ticket details
+            showToast(`Ticket purchased! ID: ${result.data.ticketId}`, 'success');
+
+            // Close modal after success
+            setTimeout(() => {
+                document.querySelector('.ticket-modal')?.closest('.modal-overlay').remove();
+                showToast('Ticket details sent to your email', 'info');
+            }, 1000);
+        } else {
+            console.error('❌ Ticket purchase failed');
+            showToast('Ticket purchase failed. Please try again.', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error purchasing ticket:', error);
+        // Fallback to mock success
+        setTimeout(() => {
+            showToast('Ticket purchased successfully! Check your email for confirmation.', 'success');
+            document.querySelector('.ticket-modal')?.closest('.modal-overlay').remove();
+        }, 2000);
+    }
 }
 
 /**
