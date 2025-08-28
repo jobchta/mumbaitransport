@@ -668,7 +668,7 @@ async function handlePlanJourney() {
 
     // Test backend connection and show route planning interface
     try {
-        const response = await fetch('http://localhost:3001/api/health');
+        const response = await fetch('/api/health');
         if (response.ok) {
             console.log('✅ Backend connection successful');
             showToast('Connected to Mumbai transport services', 'success');
@@ -967,7 +967,7 @@ async function buyTicket(line) {
 
     try {
         // Fetch real ticket data from backend
-        const response = await fetch(`http://localhost:3001/api/tickets/${line}`);
+        const response = await fetch(`/api/tickets/${line}`);
 
         if (response.ok) {
             const result = await response.json();
@@ -999,7 +999,7 @@ async function checkFare(line) {
 
     try {
         // Fetch real fare data from backend
-        const response = await fetch(`http://localhost:3001/api/fares/${line}`);
+        const response = await fetch(`/api/fares/${line}`);
 
         if (response.ok) {
             const result = await response.json();
@@ -1034,7 +1034,7 @@ async function selectRide(ride) {
 
     try {
         // Fetch real ride comparison data from backend
-        const response = await fetch('http://localhost:3001/api/rides/compare');
+        const response = await fetch('/api/rides/compare');
 
         if (response.ok) {
             const result = await response.json();
@@ -1284,7 +1284,7 @@ async function processTicketPurchase(line) {
 
     try {
         // Make real API call to purchase ticket
-        const response = await fetch('http://localhost:3001/api/tickets/buy', {
+        const response = await fetch('/api/tickets/buy', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
