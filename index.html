@@ -337,14 +337,24 @@
         // Initialize app when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Mumbai Transport App loaded');
-            
+
             // Initialize core functionality
             initApp();
-            
+
             // Initialize language manager
             if (window.languageManager) {
                 window.languageManager.updateLanguage();
             }
+
+            // Debug: Check if functions are available
+            console.log('🔍 Debug: Checking function availability...');
+            console.log('handlePlanJourney:', typeof window.handlePlanJourney);
+            console.log('handleViewMap:', typeof window.handleViewMap);
+            console.log('handleBookmark:', typeof window.handleBookmark);
+            console.log('filterTransportMode:', typeof window.filterTransportMode);
+            console.log('buyTicket:', typeof window.buyTicket);
+            console.log('checkFare:', typeof window.checkFare);
+            console.log('selectRide:', typeof window.selectRide);
 
         });
 
