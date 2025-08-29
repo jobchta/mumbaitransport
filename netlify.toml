@@ -50,6 +50,6 @@
 [functions]
   directory = "netlify/functions"
 
-# Edge functions (for advanced routing)
-[edge_functions]
-  directory = "netlify/edge-functions"
+# Edge functions can be added later if needed
+# [edge_functions]
+#   directory = "netlify/edge-functions"

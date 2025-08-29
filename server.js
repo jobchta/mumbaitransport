@@ -1,338 +1,274 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static('.'));
 
-// Real Mumbai transport data
-const mockData = {
-  tickets: {
-    line1: {
-      name: 'Line 1 – Blue Line (Versova ↔ Ghatkopar)',
-      price: 30,
-      available: true,
-      nextTrain: '5 minutes',
-      route: 'Versova ↔ Ghatkopar via Andheri (11.4 km, 12 stations)',
-      operator: 'MMRDA'
-    },
-    line2a: {
-      name: 'Line 2A – Yellow Line (Dahisar East ↔ D N Nagar)',
-      price: 25,
-      available: true,
-      nextTrain: '3 minutes',
-      route: 'Dahisar East ↔ D N Nagar (18.6 km, 17 stations)',
-      operator: 'MMRDA'
-    },
-    line2b: {
-      name: 'Line 2B – Yellow Line (D N Nagar ↔ Mandale)',
-      price: 35,
-      available: false,
-      nextTrain: 'Under construction',
-      route: 'D N Nagar ↔ Mandale (23.6 km, 20 stations)',
-      operator: 'MMRDA'
-    },
-    line3: {
-      name: 'Line 3 – Aqua Line (Colaba–Bandra–Aarey)',
-      price: 40,
-      available: true,
-      nextTrain: '8 minutes',
-      route: 'Colaba ↔ Aarey (33.5 km, 27 stations)',
-      operator: 'MMRC & DMRC'
-    },
-    line7: {
-      name: 'Line 7 – Red Line (Dahisar East ↔ Andheri East)',
-      price: 28,
-      available: true,
-      nextTrain: '4 minutes',
-      route: 'Dahisar East ↔ Andheri East (16.5 km)',
-      operator: 'MMRDA'
-    }
-  },
-  fares: {
-    line1: [
+// In-memory storage for demo purposes
+let tickets = [];
+let bookings = [];
+
+// API Routes
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    message: 'Mumbai Transport API is running',
+    version: '1.0.0'
+  });
+});
+
+// Get ticket data for a line
+app.get('/api/tickets/:line', (req, res) => {
+  const { line } = req.params;
+
+  const ticketData = {
+    line: line,
+    available: true,
+    price: Math.floor(Math.random() * 30) + 10,
+    stations: ['Versova', 'Andheri', 'Ghatkopar'],
+    lastUpdated: new Date().toISOString()
+  };
+
+  res.json({
+    success: true,
+    data: ticketData
+  });
+});
+
+// Buy ticket
+app.post('/api/tickets/buy', (req, res) => {
+  const { line, from, to, quantity, timestamp, userAgent } = req.body;
+
+  // Validate input
+  if (!from || !to || !quantity) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing required fields: from, to, quantity'
+    });
+  }
+
+  if (from === to) {
+    return res.status(400).json({
+      success: false,
+      error: 'Departure and destination cannot be the same'
+    });
+  }
+
+  if (quantity < 1 || quantity > 10) {
+    return res.status(400).json({
+      success: false,
+      error: 'Quantity must be between 1 and 10'
+    });
+  }
+
+  // Calculate fare (simple logic)
+  const baseFare = Math.floor(Math.random() * 30) + 10;
+  const totalAmount = baseFare * quantity;
+
+  // Generate ticket
+  const ticketId = `TKT${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+  const qrCode = `QR${Date.now()}`;
+
+  const ticket = {
+    ticketId,
+    qrCode,
+    line,
+    from,
+    to,
+    quantity,
+    price: baseFare,
+    totalAmount,
+    validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
+    purchasedAt: timestamp,
+    status: 'active',
+    userAgent
+  };
+
+  // Store ticket
+  tickets.push(ticket);
+
+  res.json({
+    success: true,
+    data: ticket,
+    message: 'Ticket purchased successfully'
+  });
+});
+
+// Get fare data for a line
+app.get('/api/fares/:line', (req, res) => {
+  const { line } = req.params;
+
+  const fareData = {
+    name: line === 'line1' ? 'Line 1 (Versova-Andheri-Ghatkopar)' : 'Line 2 (Dahisar-Charkop-Bandra)',
+    fares: [
       { distance: '0-3 km', fare: 10 },
       { distance: '3-12 km', fare: 20 },
       { distance: '12-27 km', fare: 30 },
       { distance: '27+ km', fare: 40 }
     ],
-    line2a: [
-      { distance: '0-3 km', fare: 10 },
-      { distance: '3-12 km', fare: 18 },
-      { distance: '12-27 km', fare: 25 },
-      { distance: '27+ km', fare: 35 }
-    ],
-    line3: [
-      { distance: '0-3 km', fare: 10 },
-      { distance: '3-12 km', fare: 22 },
-      { distance: '12-27 km', fare: 35 },
-      { distance: '27+ km', fare: 45 }
-    ],
-    line7: [
-      { distance: '0-3 km', fare: 10 },
-      { distance: '3-12 km', fare: 20 },
-      { distance: '12-27 km', fare: 28 },
-      { distance: '27+ km', fare: 38 }
-    ]
-  },
-  routes: [
-    {
-      id: 1,
-      from: 'Versova',
-      to: 'Ghatkopar',
-      duration: '21 min',
-      fare: 30,
-      type: 'metro',
-      line: 'Line 1 (Blue)',
-      stops: ['Versova', 'D.N. Nagar', 'Azad Nagar', 'Andheri', 'Western Express Highway', 'Chakala', 'Airport Road', 'Marol Naka', 'Saki Naka', 'Asalpha', 'Jagruti Nagar', 'Ghatkopar']
-    },
-    {
-      id: 2,
-      from: 'Dahisar East',
-      to: 'D N Nagar',
-      duration: '32 min',
-      fare: 25,
-      type: 'metro',
-      line: 'Line 2A (Yellow)',
-      stops: ['Dahisar East', 'Anand Nagar', 'Goregaon', 'Oshiwara', 'Jogeshwari', 'Adarsh Nagar', 'D N Nagar']
-    },
-    {
-      id: 3,
-      from: 'Colaba',
-      to: 'Bandra',
-      duration: '18 min',
-      fare: 22,
-      type: 'metro',
-      line: 'Line 3 (Aqua)',
-      stops: ['Colaba', 'Churchgate', 'Mumbai Central', 'Mahalaxmi', 'Lower Parel', 'Prabhadevi', 'Dadar', 'Matunga Road', 'Mahim Junction', 'Bandra']
-    },
-    {
-      id: 4,
-      from: 'Dahisar East',
-      to: 'Andheri East',
-      duration: '28 min',
-      fare: 28,
-      type: 'metro',
-      line: 'Line 7 (Red)',
-      stops: ['Dahisar East', 'Borivali', 'Kandivali', 'Malad', 'Goregaon', 'Jogeshwari', 'Andheri East']
-    }
-  ],
-  // Real Mumbai fare data for different transport modes
-  transportFares: {
-    autoRickshaw: {
-      name: 'Auto-Rickshaw (CNG, Metered)',
-      minimumFare: 26,
-      perKmRate: 17.14,
-      nightSurcharge: 25,
-      minimumDistance: 1.5
-    },
-    kaaliPeeliTaxi: {
-      name: 'Kaali-Peeli Taxi (CNG, Metered)',
-      minimumFare: 31,
-      perKmRate: 20.66,
-      nightSurcharge: 25,
-      minimumDistance: 1.5,
-      acExtra: 10
-    },
-    coolCab: {
-      name: 'Cool Cab (AC Metered Taxi)',
-      minimumFare: 48,
-      perKmRate: 37.20,
-      nightSurcharge: 25,
-      minimumDistance: 1.5
-    },
-    aggregatorCab: {
-      name: 'App Aggregator (Uber/Ola)',
-      pricing: 'Dynamic',
-      surgeCap: 1.5,
-      discountCap: 25,
-      minimumTrip: 3,
-      driverShare: 80
-    }
-  }
-};
-
-// API Routes
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Mumbai Transport API is running' });
-});
-
-app.get('/api/tickets/:line', (req, res) => {
-  const { line } = req.params;
-  const ticketData = mockData.tickets[line];
-
-  if (ticketData) {
-    res.json({
-      success: true,
-      data: ticketData
-    });
-  } else {
-    res.status(404).json({
-      success: false,
-      error: 'Line not found'
-    });
-  }
-});
-
-app.post('/api/tickets/buy', (req, res) => {
-  const { line, from, to, quantity = 1 } = req.body;
-
-  // Simulate ticket purchase
-  setTimeout(() => {
-    res.json({
-      success: true,
-      data: {
-        ticketId: `TICKET-${Date.now()}`,
-        line,
-        from,
-        to,
-        quantity,
-        totalAmount: mockData.tickets[line]?.price * quantity || 30,
-        validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        qrCode: `QR-${Math.random().toString(36).substr(2, 9)}`
-      }
-    });
-  }, 1000); // Simulate processing delay
-});
-
-app.get('/api/fares/:line', (req, res) => {
-  const { line } = req.params;
-  const fareData = mockData.fares[line];
-
-  if (fareData) {
-    res.json({
-      success: true,
-      data: {
-        line: mockData.tickets[line]?.name || line,
-        fares: fareData
-      }
-    });
-  } else {
-    res.status(404).json({
-      success: false,
-      error: 'Fare data not found'
-    });
-  }
-});
-
-app.get('/api/routes', (req, res) => {
-  const { from, to } = req.query;
-
-  let routes = mockData.routes;
-
-  if (from) {
-    routes = routes.filter(route => route.from.toLowerCase().includes(from.toLowerCase()));
-  }
-
-  if (to) {
-    routes = routes.filter(route => route.to.toLowerCase().includes(to.toLowerCase()));
-  }
+    lastUpdated: new Date().toISOString()
+  };
 
   res.json({
     success: true,
-    data: routes
+    data: fareData
   });
 });
 
-app.post('/api/routes/plan', (req, res) => {
-  const { from, to } = req.body;
-
-  // Simulate route planning
-  setTimeout(() => {
-    const routes = mockData.routes.filter(route =>
-      route.from.toLowerCase().includes(from.toLowerCase()) ||
-      route.to.toLowerCase().includes(to.toLowerCase())
-    );
-
-    res.json({
-      success: true,
-      data: {
-        from,
-        to,
-        routes: routes.length > 0 ? routes : mockData.routes.slice(0, 2),
-        totalRoutes: routes.length > 0 ? routes.length : 2
-      }
-    });
-  }, 1500); // Simulate planning delay
-});
-
+// Get ride comparison data
 app.get('/api/rides/compare', (req, res) => {
-  const { from, to } = req.query;
-
-  // Real Mumbai transport comparison data
-  const comparison = [
+  const rideData = [
     {
       type: 'metro',
       name: 'Metro',
-      duration: '21-32 min',
-      fare: '₹22-40',
-      stops: '12-27 stations',
-      frequency: 'Every 3-8 min',
-      lines: ['Line 1 (Blue)', 'Line 2A (Yellow)', 'Line 3 (Aqua)', 'Line 7 (Red)']
+      duration: '25 min',
+      fare: '₹30',
+      stops: 8,
+      frequency: 'Every 3-5 min',
+      rating: 4.5,
+      availability: 'High'
+    },
+    {
+      type: 'bus',
+      name: 'Bus',
+      duration: '45 min',
+      fare: '₹15',
+      stops: 12,
+      frequency: 'Every 10-15 min',
+      rating: 3.8,
+      availability: 'Medium'
     },
     {
       type: 'auto',
-      name: 'Auto-Rickshaw (CNG)',
-      duration: '15-25 min',
-      fare: '₹26-80',
-      stops: 'Direct',
+      name: 'Auto Rickshaw',
+      duration: '20 min',
+      fare: '₹80',
+      stops: 0,
       frequency: 'On demand',
-      minimumFare: '₹26 (first 1.5km)',
-      perKmRate: '₹17.14'
-    },
-    {
-      type: 'taxi',
-      name: 'Kaali-Peeli Taxi (CNG)',
-      duration: '15-25 min',
-      fare: '₹31-90',
-      stops: 'Direct',
-      frequency: 'On demand',
-      minimumFare: '₹31 (first 1.5km)',
-      perKmRate: '₹20.66'
-    },
-    {
-      type: 'coolcab',
-      name: 'Cool Cab (AC Taxi)',
-      duration: '15-25 min',
-      fare: '₹48-120',
-      stops: 'Direct',
-      frequency: 'On demand',
-      minimumFare: '₹48 (first 1.5km)',
-      perKmRate: '₹37.20'
-    },
-    {
-      type: 'aggregator',
-      name: 'Uber/Ola (App-based)',
-      duration: '15-25 min',
-      fare: '₹40-150',
-      stops: 'Direct',
-      frequency: 'On demand',
-      surgeCap: 'Max 1.5x base fare',
-      driverShare: '80% of fare'
+      rating: 4.2,
+      availability: 'High'
     }
   ];
 
   res.json({
     success: true,
-    data: comparison,
-    note: 'Fares are estimates and may vary based on distance, time, and demand. Night surcharge (+25%) applies from 12 AM to 5 AM.'
+    data: rideData
   });
 });
 
-app.get('/api/transport/fares', (req, res) => {
+// Book a ride
+app.post('/api/rides/book', (req, res) => {
+  const { rideType, pickup, drop, passengers } = req.body;
+
+  // Validate input
+  if (!pickup || !drop || !passengers) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing required fields'
+    });
+  }
+
+  // Generate booking
+  const bookingId = `BK${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+  const driver = {
+    name: 'Rajesh Kumar',
+    phone: '+91-9876543210',
+    vehicle: rideType === 'auto' ? 'Auto Rickshaw' : 'Sedan',
+    rating: (Math.random() * 0.5 + 4.5).toFixed(1),
+    eta: Math.floor(Math.random() * 15) + 5 // 5-20 minutes
+  };
+
+  const booking = {
+    bookingId,
+    rideType,
+    pickup,
+    drop,
+    passengers: parseInt(passengers),
+    driver,
+    status: 'confirmed',
+    bookedAt: new Date().toISOString(),
+    estimatedArrival: new Date(Date.now() + driver.eta * 60 * 1000).toISOString()
+  };
+
+  // Store booking
+  bookings.push(booking);
+
   res.json({
     success: true,
-    data: mockData.transportFares,
-    lastUpdated: 'September 2025',
-    source: 'Mumbai RTO Official Rates'
+    data: booking,
+    message: 'Ride booked successfully'
   });
 });
 
-// Error handling
+// Get user bookings
+app.get('/api/bookings/:userId?', (req, res) => {
+  const { userId } = req.params;
+
+  // In a real app, you'd filter by user ID
+  const userBookings = bookings.slice(-5); // Last 5 bookings
+
+  res.json({
+    success: true,
+    data: userBookings
+  });
+});
+
+// Get route planning data
+app.post('/api/routes/plan', (req, res) => {
+  const { from, to, preferences } = req.body;
+
+  if (!from || !to) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing from or to location'
+    });
+  }
+
+  // Simulate route planning
+  const routes = [
+    {
+      id: 'route1',
+      type: 'metro',
+      name: 'Metro Route 1',
+      from: from,
+      to: to,
+      duration: '25 min',
+      fare: 30,
+      stops: ['Station A', 'Station B', 'Station C'],
+      nextDeparture: '2 min',
+      frequency: 'Every 3-5 min'
+    },
+    {
+      id: 'route2',
+      type: 'bus',
+      name: 'Bus Route 45',
+      from: from,
+      to: to,
+      duration: '45 min',
+      fare: 15,
+      stops: ['Stop 1', 'Stop 2', 'Stop 3', 'Stop 4'],
+      nextDeparture: '5 min',
+      frequency: 'Every 10-15 min'
+    }
+  ];
+
+  res.json({
+    success: true,
+    data: routes,
+    message: `Found ${routes.length} routes from ${from} to ${to}`
+  });
+});
+
+// Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Error:', err);
   res.status(500).json({
     success: false,
     error: 'Internal server error'
@@ -347,7 +283,13 @@ app.use('*', (req, res) => {
   });
 });
 
+// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Mumbai Transport API server running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🚀 Mumbai Transport API Server running on port ${PORT}`);
+  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🎫 Tickets API: http://localhost:${PORT}/api/tickets/line1`);
+  console.log(`💰 Fares API: http://localhost:${PORT}/api/fares/line1`);
+  console.log(`🚗 Rides API: http://localhost:${PORT}/api/rides/compare`);
 });
+
+module.exports = app;
