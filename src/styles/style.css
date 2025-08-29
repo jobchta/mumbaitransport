@@ -2333,3 +2333,379 @@ body.light-theme .btn-outline:hover {
         font-size: 1rem;
     }
 }
+
+/* ===== ADVANCED BUTTON FEATURES ===== */
+
+/* Progress Bars */
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: progress-shine 2s infinite;
+}
+
+@keyframes progress-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin: 0;
+    text-align: center;
+}
+
+/* Purchase Progress */
+.purchase-progress {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+}
+
+/* Booking Progress */
+.booking-progress {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+}
+
+/* Tracking Modal Styles */
+.tracking-modal .modal-content {
+    max-width: 600px;
+}
+
+.ride-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+.status-indicator {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.status-active {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    animation: pulse-glow 2s infinite;
+}
+
+.status-nearby {
+    background: linear-gradient(135deg, var(--warning), #f59e0b);
+}
+
+.status-arrived {
+    background: linear-gradient(135deg, var(--success), #10b981);
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.8);
+        transform: scale(1.05);
+    }
+}
+
+.status-details h4 {
+    margin: 0 0 0.25rem 0;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.status-details p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.driver-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+.driver-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.driver-details {
+    flex: 1;
+}
+
+.driver-details h5 {
+    margin: 0 0 0.25rem 0;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.driver-details p {
+    margin: 0.25rem 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+}
+
+.contact-options {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.contact-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--glass-light);
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.contact-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.1);
+}
+
+.tracking-map {
+    margin-bottom: 1.5rem;
+}
+
+.map-placeholder {
+    height: 200px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px dashed var(--glass-border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+}
+
+.map-placeholder i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.ride-details {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-row span:first-child {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.detail-row span:last-child {
+    color: white;
+    text-align: right;
+}
+
+/* Enhanced Form Validation */
+.form-input.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.form-input.success {
+    border-color: var(--success);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/* Loading States */
+.btn.loading {
+    pointer-events: none;
+    position: relative;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Notification Styles */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--gray-900);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+    color: white;
+    z-index: 10000;
+    max-width: 300px;
+    box-shadow: var(--shadow-intense);
+    animation: slideInRight 0.3s ease-out;
+}
+
+.toast.toast-success {
+    border-color: var(--success);
+    background: linear-gradient(135deg, var(--gray-900), rgba(16, 185, 129, 0.1));
+}
+
+.toast.toast-error {
+    border-color: var(--error);
+    background: linear-gradient(135deg, var(--gray-900), rgba(239, 68, 68, 0.1));
+}
+
+.toast.toast-warning {
+    border-color: var(--warning);
+    background: linear-gradient(135deg, var(--gray-900), rgba(245, 158, 11, 0.1));
+}
+
+.toast.toast-info {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--gray-900), rgba(99, 102, 241, 0.1));
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.toast-close:hover {
+    color: white;
+}
+
+/* Enhanced Mobile Styles */
+@media (max-width: 768px) {
+    .tracking-modal .modal-content {
+        margin: 1rem;
+        max-width: none;
+    }
+
+    .ride-status,
+    .driver-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    .contact-options {
+        justify-content: center;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .detail-row span:last-child {
+        text-align: left;
+    }
+
+    .map-placeholder {
+        height: 150px;
+    }
+
+    .toast {
+        left: 1rem;
+        right: 1rem;
+        margin: 0 1rem;
+        max-width: none;
+    }
+}

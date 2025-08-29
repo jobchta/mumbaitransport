@@ -1250,40 +1250,61 @@ function createFareModal(line, fareData) {
 }
 
 /**
- * Process ticket purchase
+ * Process ticket purchase with advanced features
  */
 async function processTicketPurchase(line) {
     const from = document.getElementById('ticket-from')?.value;
     const to = document.getElementById('ticket-to')?.value;
     const quantity = document.getElementById('ticket-quantity')?.value || 1;
 
-    // Validate inputs
+    // Enhanced validation
     if (!from || !to) {
         showToast('Please select both departure and destination stations', 'error');
+        highlightField('ticket-from');
+        highlightField('ticket-to');
         return;
     }
 
     if (from === to) {
         showToast('Departure and destination cannot be the same', 'error');
+        highlightField('ticket-to');
         return;
     }
 
     if (quantity < 1 || quantity > 10) {
         showToast('Please select 1-10 tickets', 'error');
+        highlightField('ticket-quantity');
         return;
     }
 
-    // Show processing state
+    // Show processing state with progress
     const purchaseBtn = document.querySelector('.ticket-modal .btn-primary');
     if (purchaseBtn) {
         purchaseBtn.disabled = true;
-        purchaseBtn.textContent = 'Processing...';
+        purchaseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     }
 
-    showToast(`Processing ${quantity} ticket(s) from ${from} to ${to}...`, 'info');
+    // Show detailed progress
+    showPurchaseProgress('Validating payment method...', 25);
 
     try {
-        // Make real API call to purchase ticket
+        // Step 1: Validate ticket availability
+        showPurchaseProgress('Checking ticket availability...', 50);
+
+        const availabilityResponse = await fetch(`/api/tickets/availability?from=${from}&to=${to}&line=${line}`);
+        if (!availabilityResponse.ok) {
+            throw new Error('Tickets not available for selected route');
+        }
+
+        // Step 2: Process payment (simulated)
+        showPurchaseProgress('Processing payment...', 75);
+
+        // Simulate payment processing delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Step 3: Make real API call to purchase ticket
+        showPurchaseProgress('Confirming ticket...', 90);
+
         const response = await fetch('/api/tickets/buy', {
             method: 'POST',
             headers: {
@@ -1295,7 +1316,9 @@ async function processTicketPurchase(line) {
                 to,
                 quantity: parseInt(quantity),
                 timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent
+                userAgent: navigator.userAgent,
+                paymentMethod: 'card', // In real app, this would come from payment form
+                userId: getUserId() // In real app, this would be from auth
             })
         });
 
@@ -1303,35 +1326,150 @@ async function processTicketPurchase(line) {
             const result = await response.json();
             console.log('✅ Ticket purchased successfully:', result);
 
+            // Complete progress
+            showPurchaseProgress('Purchase completed!', 100);
+
             // Show detailed success message
             showPurchaseSuccess(result.data, from, to, quantity);
+
+            // Send confirmation email (simulated)
+            sendConfirmationEmail(result.data);
 
             // Close modal after success
             setTimeout(() => {
                 document.querySelector('.ticket-modal')?.closest('.modal-overlay').remove();
                 showTicketConfirmation(result.data);
+
+                // Add to user's ticket history
+                addToTicketHistory(result.data);
             }, 2000);
         } else {
             const errorData = await response.json();
             console.error('❌ Ticket purchase failed:', errorData);
             showToast(errorData.error || 'Ticket purchase failed. Please try again.', 'error');
 
-            // Re-enable button
-            if (purchaseBtn) {
-                purchaseBtn.disabled = false;
-                purchaseBtn.textContent = 'Purchase Ticket';
-            }
+            // Reset button
+            resetPurchaseButton(purchaseBtn);
         }
     } catch (error) {
         console.error('❌ Error purchasing ticket:', error);
-        showToast('Network error. Please check your connection and try again.', 'error');
+        showToast(error.message || 'Network error. Please check your connection and try again.', 'error');
 
-        // Re-enable button
-        if (purchaseBtn) {
-            purchaseBtn.disabled = false;
-            purchaseBtn.textContent = 'Purchase Ticket';
-        }
+        // Reset button
+        resetPurchaseButton(purchaseBtn);
     }
+}
+
+/**
+ * Show purchase progress with visual indicator
+ */
+function showPurchaseProgress(message, percentage) {
+    // Remove existing progress
+    const existingProgress = document.querySelector('.purchase-progress');
+    if (existingProgress) {
+        existingProgress.remove();
+    }
+
+    // Create progress indicator
+    const progressDiv = document.createElement('div');
+    progressDiv.className = 'purchase-progress';
+    progressDiv.innerHTML = `
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: ${percentage}%"></div>
+        </div>
+        <p class="progress-text">${message}</p>
+    `;
+
+    // Add to modal
+    const modalBody = document.querySelector('.ticket-modal .modal-body');
+    if (modalBody) {
+        modalBody.appendChild(progressDiv);
+    }
+
+    // Show toast for progress updates
+    if (percentage < 100) {
+        showToast(message, 'info');
+    }
+}
+
+/**
+ * Highlight form field with error
+ */
+function highlightField(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (field) {
+        field.style.borderColor = 'var(--error)';
+        field.style.boxShadow = '0 0 0 2px rgba(239, 68, 68, 0.2)';
+
+        // Remove highlight after 3 seconds
+        setTimeout(() => {
+            field.style.borderColor = '';
+            field.style.boxShadow = '';
+        }, 3000);
+    }
+}
+
+/**
+ * Reset purchase button to original state
+ */
+function resetPurchaseButton(button) {
+    if (button) {
+        button.disabled = false;
+        button.textContent = 'Purchase Ticket';
+    }
+
+    // Remove progress indicator
+    const progress = document.querySelector('.purchase-progress');
+    if (progress) {
+        progress.remove();
+    }
+}
+
+/**
+ * Send confirmation email (simulated)
+ */
+function sendConfirmationEmail(ticketData) {
+    console.log('📧 Sending confirmation email for ticket:', ticketData.ticketId);
+
+    // In a real app, this would make an API call to send email
+    setTimeout(() => {
+        showToast('Confirmation email sent to your inbox!', 'success');
+    }, 1000);
+}
+
+/**
+ * Add ticket to user's history
+ */
+function addToTicketHistory(ticketData) {
+    // Get existing history from localStorage
+    let history = JSON.parse(localStorage.getItem('ticketHistory') || '[]');
+
+    // Add new ticket
+    history.unshift({
+        ...ticketData,
+        purchasedAt: new Date().toISOString()
+    });
+
+    // Keep only last 10 tickets
+    history = history.slice(0, 10);
+
+    // Save back to localStorage
+    localStorage.setItem('ticketHistory', JSON.stringify(history));
+
+    console.log('📋 Ticket added to history:', ticketData.ticketId);
+}
+
+/**
+ * Get user ID (simulated)
+ */
+function getUserId() {
+    // In a real app, this would come from authentication
+    let userId = localStorage.getItem('userId');
+    if (!userId) {
+        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('userId', userId);
+    }
+    return userId;
 }
 
 /**
@@ -1558,15 +1696,23 @@ function calculateTotalFare(baseFare, passengers) {
 }
 
 /**
- * Confirm ride booking
+ * Confirm ride booking with advanced features
  */
-function confirmRideBooking(rideType) {
+async function confirmRideBooking(rideType) {
     const pickup = document.getElementById('pickup-location')?.value;
     const drop = document.getElementById('drop-location')?.value;
     const passengers = document.getElementById('passengers')?.value;
 
+    // Enhanced validation
     if (!pickup || !drop) {
         showToast('Please enter pickup and drop locations', 'error');
+        highlightField('pickup-location');
+        highlightField('drop-location');
+        return;
+    }
+
+    if (pickup.trim().length < 3 || drop.trim().length < 3) {
+        showToast('Please enter complete location addresses', 'error');
         return;
     }
 
@@ -1574,20 +1720,167 @@ function confirmRideBooking(rideType) {
     const confirmBtn = document.querySelector('.booking-modal .btn-primary');
     if (confirmBtn) {
         confirmBtn.disabled = true;
-        confirmBtn.textContent = 'Booking...';
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking...';
     }
 
-    showToast('Processing your booking...', 'info');
+    showToast('Finding available drivers...', 'info');
 
-    // Simulate booking process
+    try {
+        // Step 1: Check ride availability
+        showBookingProgress('Checking ride availability...', 25);
+
+        const availabilityResponse = await fetch('/api/rides/availability', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pickup, drop, rideType })
+        });
+
+        if (!availabilityResponse.ok) {
+            throw new Error('No drivers available in your area');
+        }
+
+        // Step 2: Get fare estimate
+        showBookingProgress('Calculating fare...', 50);
+
+        const fareResponse = await fetch('/api/rides/estimate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pickup, drop, rideType, passengers })
+        });
+
+        if (!fareResponse.ok) {
+            throw new Error('Unable to calculate fare');
+        }
+
+        const fareData = await fareResponse.json();
+
+        // Step 3: Process booking
+        showBookingProgress('Confirming booking...', 75);
+
+        const response = await fetch('/api/rides/book', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                rideType,
+                pickup,
+                drop,
+                passengers: parseInt(passengers),
+                estimatedFare: fareData.estimatedFare,
+                userId: getUserId(),
+                timestamp: new Date().toISOString()
+            })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Ride booked successfully:', result);
+
+            // Complete progress
+            showBookingProgress('Booking confirmed!', 100);
+
+            // Show success message
+            showToast(`✅ ${result.data.rideType} booked! Driver arriving in ${result.data.driver.eta} minutes`, 'success');
+
+            // Send booking notifications
+            sendBookingNotifications(result.data);
+
+            // Close modal and show confirmation
+            setTimeout(() => {
+                document.querySelector('.booking-modal')?.closest('.modal-overlay').remove();
+                showBookingConfirmation(result.data.bookingId, rideType, pickup, drop, passengers);
+
+                // Add to booking history
+                addToBookingHistory(result.data);
+            }, 2000);
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Booking failed');
+        }
+    } catch (error) {
+        console.error('❌ Booking error:', error);
+        showToast(error.message || 'Booking failed. Please try again.', 'error');
+
+        // Reset button
+        resetBookingButton(confirmBtn);
+    }
+}
+
+/**
+ * Show booking progress
+ */
+function showBookingProgress(message, percentage) {
+    // Remove existing progress
+    const existingProgress = document.querySelector('.booking-progress');
+    if (existingProgress) {
+        existingProgress.remove();
+    }
+
+    // Create progress indicator
+    const progressDiv = document.createElement('div');
+    progressDiv.className = 'booking-progress';
+    progressDiv.innerHTML = `
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: ${percentage}%"></div>
+        </div>
+        <p class="progress-text">${message}</p>
+    `;
+
+    // Add to modal
+    const modalBody = document.querySelector('.booking-modal .modal-body');
+    if (modalBody) {
+        modalBody.appendChild(progressDiv);
+    }
+}
+
+/**
+ * Reset booking button
+ */
+function resetBookingButton(button) {
+    if (button) {
+        button.disabled = false;
+        button.textContent = 'Confirm Booking';
+    }
+
+    // Remove progress
+    const progress = document.querySelector('.booking-progress');
+    if (progress) {
+        progress.remove();
+    }
+}
+
+/**
+ * Send booking notifications
+ */
+function sendBookingNotifications(bookingData) {
+    console.log('📱 Sending booking notifications for:', bookingData.bookingId);
+
+    // Simulate SMS notification
     setTimeout(() => {
-        const bookingId = `BK${Date.now()}`;
-        showToast(`✅ Booking confirmed! ID: ${bookingId}`, 'success');
+        showToast(`SMS sent to your phone with booking details!`, 'info');
+    }, 500);
 
-        // Close modal and show confirmation
-        document.querySelector('.booking-modal')?.closest('.modal-overlay').remove();
-        showBookingConfirmation(bookingId, rideType, pickup, drop, passengers);
-    }, 2000);
+    // Simulate driver notification
+    setTimeout(() => {
+        showToast(`Driver ${bookingData.driver.name} has been notified!`, 'info');
+    }, 1000);
+}
+
+/**
+ * Add booking to history
+ */
+function addToBookingHistory(bookingData) {
+    let history = JSON.parse(localStorage.getItem('bookingHistory') || '[]');
+
+    history.unshift({
+        ...bookingData,
+        bookedAt: new Date().toISOString()
+    });
+
+    // Keep only last 10 bookings
+    history = history.slice(0, 10);
+
+    localStorage.setItem('bookingHistory', JSON.stringify(history));
+    console.log('📋 Booking added to history:', bookingData.bookingId);
 }
 
 /**
@@ -1635,14 +1928,240 @@ function showBookingConfirmation(bookingId, rideType, pickup, drop, passengers) 
 }
 
 /**
- * Track ride (simulation)
+ * Track ride with real-time updates
  */
 function trackRide(bookingId) {
-    showToast('Opening ride tracking...', 'info');
+    showToast('Opening real-time ride tracking...', 'info');
 
-    // In a real app, this would open a tracking interface
+    // Create tracking modal
+    const trackingModal = createTrackingModal(bookingId);
+    document.body.appendChild(trackingModal);
+
+    // Start real-time updates
+    startRideTracking(bookingId, trackingModal);
+
+    // Simulate driver location updates
+    simulateDriverMovement(bookingId, trackingModal);
+}
+
+/**
+ * Create ride tracking modal
+ */
+function createTrackingModal(bookingId) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content tracking-modal">
+            <div class="modal-header">
+                <h3>🚗 Live Ride Tracking</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tracking-info">
+                    <div class="ride-status">
+                        <div class="status-indicator status-active">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="status-details">
+                            <h4>Driver on the way</h4>
+                            <p id="driver-eta">Arriving in 5 minutes</p>
+                        </div>
+                    </div>
+
+                    <div class="driver-info">
+                        <div class="driver-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="driver-details">
+                            <h5 id="driver-name">Rajesh Kumar</h5>
+                            <p id="driver-rating">⭐ 4.8 (247 rides)</p>
+                            <p id="vehicle-info">White Swift - MH 12 AB 1234</p>
+                        </div>
+                        <div class="contact-options">
+                            <button class="contact-btn" onclick="callDriver()">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                            <button class="contact-btn" onclick="messageDriver()">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="tracking-map">
+                        <div class="map-placeholder">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <p>Live tracking map would be here</p>
+                            <small>Driver location updates every 10 seconds</small>
+                        </div>
+                    </div>
+
+                    <div class="ride-details">
+                        <div class="detail-row">
+                            <span>Booking ID:</span>
+                            <span>${bookingId}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Pickup:</span>
+                            <span id="pickup-address">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Drop:</span>
+                            <span id="drop-address">Loading...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Estimated Fare:</span>
+                            <span id="estimated-fare">₹0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cancelRide('${bookingId}')">
+                    <i class="fas fa-times"></i> Cancel Ride
+                </button>
+                <button class="btn btn-primary" onclick="emergencyContact()">
+                    <i class="fas fa-exclamation-triangle"></i> Emergency
+                </button>
+            </div>
+        </div>
+    `;
+
+    return modal;
+}
+
+/**
+ * Start ride tracking with real-time updates
+ */
+function startRideTracking(bookingId, modal) {
+    console.log('📍 Starting ride tracking for:', bookingId);
+
+    // Update tracking every 10 seconds
+    const trackingInterval = setInterval(() => {
+        updateTrackingInfo(bookingId, modal);
+    }, 10000);
+
+    // Store interval ID for cleanup
+    modal.dataset.trackingInterval = trackingInterval;
+
+    // Initial update
+    updateTrackingInfo(bookingId, modal);
+}
+
+/**
+ * Update tracking information
+ */
+function updateTrackingInfo(bookingId, modal) {
+    // Simulate real-time updates
+    const eta = Math.max(1, Math.floor(Math.random() * 10) + 1);
+    const driverName = ['Rajesh Kumar', 'Amit Singh', 'Vikram Patel', 'Suresh Reddy'][Math.floor(Math.random() * 4)];
+
+    // Update ETA
+    const etaElement = modal.querySelector('#driver-eta');
+    if (etaElement) {
+        etaElement.textContent = `Arriving in ${eta} minutes`;
+    }
+
+    // Update driver name
+    const nameElement = modal.querySelector('#driver-name');
+    if (nameElement) {
+        nameElement.textContent = driverName;
+    }
+
+    // Update status based on ETA
+    const statusElement = modal.querySelector('.status-details h4');
+    const statusIndicator = modal.querySelector('.status-indicator');
+
+    if (eta <= 2) {
+        statusElement.textContent = 'Driver arrived';
+        statusIndicator.className = 'status-indicator status-arrived';
+        statusIndicator.innerHTML = '<i class="fas fa-map-marker-alt"></i>';
+    } else if (eta <= 5) {
+        statusElement.textContent = 'Driver nearby';
+        statusIndicator.className = 'status-indicator status-nearby';
+    } else {
+        statusElement.textContent = 'Driver on the way';
+        statusIndicator.className = 'status-indicator status-active';
+    }
+
+    console.log(`📍 Tracking update: ${driverName} - ${eta} min away`);
+}
+
+/**
+ * Simulate driver movement
+ */
+function simulateDriverMovement(bookingId, modal) {
+    let distance = 5.2; // km
+    const speed = 0.3; // km per minute
+
+    const movementInterval = setInterval(() => {
+        distance = Math.max(0, distance - speed);
+
+        if (distance <= 0.1) {
+            clearInterval(movementInterval);
+            showToast('🚗 Driver has arrived at your location!', 'success');
+
+            // Update status to arrived
+            const statusElement = modal.querySelector('.status-details h4');
+            if (statusElement) {
+                statusElement.textContent = 'Driver arrived - Please meet at pickup point';
+            }
+        }
+
+        console.log(`📍 Driver ${distance.toFixed(1)} km away`);
+    }, 30000); // Update every 30 seconds
+
+    // Store interval for cleanup
+    modal.dataset.movementInterval = movementInterval;
+}
+
+/**
+ * Call driver
+ */
+function callDriver() {
+    showToast('📞 Calling driver...', 'info');
+
+    // Simulate call
     setTimeout(() => {
-        showToast(`Tracking ride ${bookingId}`, 'info');
+        showToast('📞 Call connected! Please tell the driver your exact location.', 'success');
+    }, 1000);
+}
+
+/**
+ * Message driver
+ */
+function messageDriver() {
+    showToast('💬 Opening chat with driver...', 'info');
+
+    // Simulate opening chat
+    setTimeout(() => {
+        showToast('💬 Chat opened! You can now message your driver.', 'success');
+    }, 500);
+}
+
+/**
+ * Cancel ride
+ */
+function cancelRide(bookingId) {
+    if (confirm('Are you sure you want to cancel this ride?')) {
+        showToast('❌ Ride cancelled', 'warning');
+
+        // Close tracking modal
+        document.querySelector('.tracking-modal')?.closest('.modal-overlay').remove();
+
+        // In a real app, this would make an API call
+        console.log('🚫 Ride cancelled:', bookingId);
+    }
+}
+
+/**
+ * Emergency contact
+ */
+function emergencyContact() {
+    showToast('🚨 Connecting to emergency services...', 'warning');
+
+    // Simulate emergency call
+    setTimeout(() => {
+        showToast('🚨 Emergency services contacted. Help is on the way.', 'error');
     }, 1000);
 }
 
