@@ -223,8 +223,11 @@ function handleJourneyForm(event) {
  */
 function planRealRoute(from, to) {
     try {
+        console.log(`🗺️ Planning route from "${from}" to "${to}"`);
+
         // Check if real transport data is available
         if (!window.REAL_MUMBAI_TRANSPORT_DATA) {
+            console.error('❌ Transport data not loaded');
             showToast('Transport data not loaded. Please refresh the page.', 'error');
             return;
         }
@@ -232,8 +235,20 @@ function planRealRoute(from, to) {
         const routeEngine = window.REAL_MUMBAI_TRANSPORT_DATA.routePlanningEngine;
         const routes = routeEngine.findRoutes(from, to);
 
+        console.log(`📊 Route search results:`, routes);
+
         if (routes.length === 0) {
-            showToast('No direct routes found. Try different locations or check spelling.', 'warning');
+            console.log('⚠️ No routes found, trying fuzzy matching...');
+            // Try fuzzy matching for common location variations
+            const fuzzyRoutes = findRoutesWithFuzzyMatching(from, to);
+            if (fuzzyRoutes.length > 0) {
+                console.log(`✅ Found ${fuzzyRoutes.length} routes with fuzzy matching`);
+                displayRoutes(fuzzyRoutes, from, to);
+                showToast(`Found ${fuzzyRoutes.length} routes!`, 'success');
+                return;
+            }
+
+            showToast('No routes found. Try locations like "Andheri", "Bandra", "Dadar", etc.', 'warning');
             return;
         }
 
@@ -255,30 +270,180 @@ function planRealRoute(from, to) {
 }
 
 /**
+ * Find routes with fuzzy matching for common location variations
+ */
+function findRoutesWithFuzzyMatching(from, to) {
+    const fuzzyRoutes = [];
+
+    // Common location mappings
+    const locationMappings = {
+        'andheri': ['andheri', 'andheri station', 'andheri west', 'andheri east'],
+        'bandra': ['bandra', 'bandra station', 'bandra west', 'bandra east'],
+        'dadar': ['dadar', 'dadar station', 'dadar west', 'dadar east'],
+        'borivali': ['borivali', 'borivali station', 'borivali west', 'borivali east'],
+        'thane': ['thane', 'thane station'],
+        'ghatkopar': ['ghatkopar', 'ghatkopar station'],
+        'mulund': ['mulund', 'mulund station'],
+        'bhandup': ['bhandup', 'bhandup station'],
+        'sion': ['sion', 'sion station'],
+        'kurla': ['kurla', 'kurla station'],
+        'matunga': ['matunga', 'matunga station'],
+        'mahim': ['mahim', 'mahim station'],
+        'santacruz': ['santacruz', 'santacruz station'],
+        'khar': ['khar', 'khar road', 'khar station'],
+        'jogeshwari': ['jogeshwari', 'jogeshwari station'],
+        'goregaon': ['goregaon', 'goregaon station'],
+        'malad': ['malad', 'malad station'],
+        'kandivali': ['kandivali', 'kandivali station'],
+        'dahisar': ['dahisar', 'dahisar station'],
+        'mira road': ['mira road', 'mira road station'],
+        'bhayandar': ['bhayandar', 'bhayandar station'],
+        'naigaon': ['naigaon', 'naigaon station'],
+        'vasai': ['vasai', 'vasai road', 'vasai road station'],
+        'virar': ['virar', 'virar station'],
+        'churchgate': ['churchgate', 'churchgate station'],
+        'marine lines': ['marine lines', 'marine lines station'],
+        'charni road': ['charni road', 'charni road station'],
+        'grant road': ['grant road', 'grant road station'],
+        'mumbai central': ['mumbai central', 'mumbai central station'],
+        'mahalaxmi': ['mahalaxmi', 'mahalaxmi station'],
+        'lower parel': ['lower parel', 'lower parel station'],
+        'elphinstone': ['elphinstone', 'elphinstone road', 'elphinstone road station'],
+        'prabhadevi': ['prabhadevi', 'prabhadevi station'],
+        'parel': ['parel', 'parel station'],
+        'currey road': ['currey road', 'currey road station'],
+        'chinchpokli': ['chinchpokli', 'chinchpokli station'],
+        'byculla': ['byculla', 'byculla station'],
+        'sandhurst road': ['sandhurst road', 'sandhurst road station'],
+        'masjid': ['masjid', 'masjid station'],
+        'cst': ['cst', 'cst station', 'chatrapati shivaji terminus'],
+        'colaba': ['colaba', 'colaba causeway'],
+        'gateway': ['gateway', 'gateway of india'],
+        'nariman point': ['nariman point'],
+        'marine drive': ['marine drive'],
+        'worli': ['worli', 'worli sea face'],
+        'haji ali': ['haji ali'],
+        'mahalaxmi racecourse': ['mahalaxmi racecourse'],
+        'seepz': ['seepz', 'seepz andheri'],
+        'powai': ['powai'],
+        'vikhroli': ['vikhroli', 'vikhroli station'],
+        'kanjurmarg': ['kanjurmarg', 'kanjurmarg station'],
+        'nahur': ['nahur', 'nahur station']
+    };
+
+    // Find matching locations
+    const fromMatches = findMatchingLocations(from, locationMappings);
+    const toMatches = findMatchingLocations(to, locationMappings);
+
+    if (fromMatches.length > 0 && toMatches.length > 0) {
+        // Try route planning with matched locations
+        const routeEngine = window.REAL_MUMBAI_TRANSPORT_DATA.routePlanningEngine;
+
+        fromMatches.forEach(fromMatch => {
+            toMatches.forEach(toMatch => {
+                const routes = routeEngine.findRoutes(fromMatch, toMatch);
+                fuzzyRoutes.push(...routes);
+            });
+        });
+    }
+
+    // Remove duplicates and return
+    return removeDuplicateRoutes(fuzzyRoutes);
+}
+
+/**
+ * Find matching locations using fuzzy search
+ */
+function findMatchingLocations(input, mappings) {
+    const matches = [];
+    const inputLower = input.toLowerCase().trim();
+
+    for (const [canonical, variations] of Object.entries(mappings)) {
+        for (const variation of variations) {
+            if (variation.toLowerCase().includes(inputLower) ||
+                inputLower.includes(variation.toLowerCase())) {
+                matches.push(canonical);
+                break;
+            }
+        }
+    }
+
+    return [...new Set(matches)]; // Remove duplicates
+}
+
+/**
+ * Remove duplicate routes
+ */
+function removeDuplicateRoutes(routes) {
+    const seen = new Set();
+    return routes.filter(route => {
+        const key = `${route.type}-${route.from}-${route.to}`;
+        if (seen.has(key)) {
+            return false;
+        }
+        seen.add(key);
+        return true;
+    });
+}
+
+/**
  * Display found routes in the UI
  */
 function displayRoutes(routes, from, to) {
-    const resultsContainer = document.getElementById('route-results');
+    console.log(`📋 Displaying ${routes.length} routes from ${from} to ${to}`);
+
+    let resultsContainer = document.getElementById('route-results');
     if (!resultsContainer) {
         console.log('Route results container not found, creating one...');
         createRouteResultsContainer();
+        // Wait a bit for DOM to update
+        setTimeout(() => {
+            resultsContainer = document.getElementById('route-results');
+            if (resultsContainer) {
+                displayRoutesInContainer(routes, from, to, resultsContainer);
+            }
+        }, 100);
         return;
     }
 
+    displayRoutesInContainer(routes, from, to, resultsContainer);
+}
+
+/**
+ * Display routes in the container
+ */
+function displayRoutesInContainer(routes, from, to, container) {
     // Clear previous results
-    resultsContainer.innerHTML = '';
+    container.innerHTML = '';
+
+    if (routes.length === 0) {
+        container.innerHTML = `
+            <div class="no-routes">
+                <i class="fas fa-search"></i>
+                <h3>No routes found</h3>
+                <p>Try different locations or check spelling</p>
+                <p><strong>Popular locations:</strong> Andheri, Bandra, Dadar, Borivali, Thane</p>
+            </div>
+        `;
+        showToast('No routes found. Try popular locations like Andheri, Bandra, Dadar.', 'warning');
+        return;
+    }
 
     // Create route cards
     routes.forEach((route, index) => {
         const routeCard = createRouteCard(route, index);
-        resultsContainer.appendChild(routeCard);
+        container.appendChild(routeCard);
     });
 
     // Show results section
     const resultsSection = document.getElementById('route-results-section');
     if (resultsSection) {
         resultsSection.style.display = 'block';
+        // Scroll to results
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+    console.log(`✅ Displayed ${routes.length} routes successfully`);
 }
 
 /**
@@ -2526,7 +2691,31 @@ window.planSmartRoute = planSmartRoute;
 window.trackRoute = trackRoute;
 window.selectSimpleRoute = selectSimpleRoute;
 
+// Test route planning functionality
+function testRoutePlanning() {
+    console.log('🧪 Testing route planning...');
+
+    // Test with known locations
+    const testCases = [
+        { from: 'Andheri', to: 'Bandra' },
+        { from: 'Dadar', to: 'Thane' },
+        { from: 'Borivali', to: 'Andheri' },
+        { from: 'Churchgate', to: 'CST' }
+    ];
+
+    testCases.forEach((testCase, index) => {
+        setTimeout(() => {
+            console.log(`Test ${index + 1}: ${testCase.from} → ${testCase.to}`);
+            planRealRoute(testCase.from, testCase.to);
+        }, index * 2000);
+    });
+}
+
+// Make test function available globally
+window.testRoutePlanning = testRoutePlanning;
+
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', initApp);
 
 console.log('📱 Mumbai Transport App script loaded');
+console.log('💡 Try: testRoutePlanning() in console to test route finding');
