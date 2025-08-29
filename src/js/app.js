@@ -590,45 +590,105 @@ function initGoogleMaps() {
             mapContainer.style.background = 'rgba(0,0,0,0.1)';
         }
 
-        // Create map
+        // Create advanced map with full Google Maps API features
         window.mapInstance = new google.maps.Map(document.getElementById('map'), {
             zoom: 12,
             center: defaultCenter,
             styles: [
+                // Enhanced dark theme for Mumbai Transport
+                {
+                    featureType: 'all',
+                    elementType: 'labels.text.fill',
+                    stylers: [{ color: '#ffffff' }]
+                },
+                {
+                    featureType: 'all',
+                    elementType: 'labels.text.stroke',
+                    stylers: [{ color: '#000000' }, { lightness: 13 }]
+                },
+                {
+                    featureType: 'administrative',
+                    elementType: 'geometry.fill',
+                    stylers: [{ color: '#000000' }]
+                },
+                {
+                    featureType: 'administrative',
+                    elementType: 'geometry.stroke',
+                    stylers: [{ color: '#144b53' }, { lightness: 14 }, { weight: 1.4 }]
+                },
+                {
+                    featureType: 'landscape',
+                    elementType: 'all',
+                    stylers: [{ color: '#08304b' }]
+                },
+                {
+                    featureType: 'poi',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#0c4152' }, { lightness: 5 }]
+                },
+                {
+                    featureType: 'road.highway',
+                    elementType: 'geometry.fill',
+                    stylers: [{ color: '#000000' }]
+                },
+                {
+                    featureType: 'road.highway',
+                    elementType: 'geometry.stroke',
+                    stylers: [{ color: '#0b434f' }, { lightness: 25 }]
+                },
+                {
+                    featureType: 'road.arterial',
+                    elementType: 'geometry.fill',
+                    stylers: [{ color: '#000000' }]
+                },
+                {
+                    featureType: 'road.arterial',
+                    elementType: 'geometry.stroke',
+                    stylers: [{ color: '#0b3d51' }, { lightness: 16 }]
+                },
+                {
+                    featureType: 'road.local',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#000000' }]
+                },
                 {
                     featureType: 'transit',
+                    elementType: 'all',
+                    stylers: [{ color: '#146474' }]
+                },
+                {
+                    featureType: 'transit.station',
                     elementType: 'labels.icon',
                     stylers: [{ visibility: 'on' }]
                 },
                 {
-                    featureType: 'poi',
-                    elementType: 'labels.icon',
-                    stylers: [{ visibility: 'off' }]
-                },
-                {
-                    featureType: 'road',
-                    elementType: 'geometry',
-                    stylers: [{ color: '#2d3748' }]
-                },
-                {
-                    featureType: 'landscape',
-                    elementType: 'geometry',
-                    stylers: [{ color: '#1a202c' }]
-                },
-                {
                     featureType: 'water',
-                    elementType: 'geometry',
-                    stylers: [{ color: '#2b6cb0' }]
+                    elementType: 'all',
+                    stylers: [{ color: '#021019' }]
                 }
             ],
+            // Enhanced controls
             disableDefaultUI: false,
             zoomControl: true,
-            mapTypeControl: false,
+            mapTypeControl: true,
+            mapTypeControlOptions: {
+                style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+                position: google.maps.ControlPosition.TOP_RIGHT
+            },
             scaleControl: true,
-            streetViewControl: false,
-            rotateControl: false,
-            fullscreenControl: true
+            streetViewControl: true,
+            rotateControl: true,
+            fullscreenControl: true,
+            // Additional options
+            gestureHandling: 'greedy',
+            clickableIcons: true,
+            disableDoubleClickZoom: false
         });
+
+        // Initialize advanced map features
+        initializeMapLayers();
+        initializeMapControls();
+        initializeMapEvents();
 
         // Initialize Places service
         window.placesService = new google.maps.places.PlacesService(window.mapInstance);
@@ -661,6 +721,162 @@ function initGoogleMaps() {
         });
 
         console.log('✅ Google Maps initialized successfully');
+    }
+    } catch (error) {
+        console.error('❌ Error initializing Google Maps:', error);
+        showMapError('Error loading maps. Please check your connection.');
+    }
+}
+
+/**
+ * Initialize advanced map layers (Traffic, Transit, Bicycling)
+ */
+function initializeMapLayers() {
+    // Traffic Layer
+    window.trafficLayer = new google.maps.TrafficLayer();
+    window.trafficLayer.setMap(null); // Start hidden
+
+    // Transit Layer
+    window.transitLayer = new google.maps.TransitLayer();
+    window.transitLayer.setMap(window.mapInstance); // Show by default for transport app
+
+    // Bicycling Layer
+    window.bicyclingLayer = new google.maps.BicyclingLayer();
+    window.bicyclingLayer.setMap(null); // Start hidden
+
+    console.log('🗺️ Map layers initialized');
+}
+
+/**
+ * Initialize custom map controls
+ */
+function initializeMapControls() {
+    // Create custom control panel
+    const controlDiv = document.createElement('div');
+    controlDiv.style.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+    controlDiv.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+    controlDiv.style.borderRadius = '8px';
+    controlDiv.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
+    controlDiv.style.cursor = 'pointer';
+    controlDiv.style.marginBottom = '22px';
+    controlDiv.style.textAlign = 'center';
+    controlDiv.style.padding = '8px';
+    controlDiv.title = 'Click to toggle layers';
+
+    const controlText = document.createElement('div');
+    controlText.style.color = 'rgb(25,25,25)';
+    controlText.style.fontFamily = 'Inter, Arial, sans-serif';
+    controlText.style.fontSize = '12px';
+    controlText.style.lineHeight = '16px';
+    controlText.style.paddingLeft = '5px';
+    controlText.style.paddingRight = '5px';
+    controlText.innerHTML = `
+        <div style="color: white; font-weight: 600; margin-bottom: 8px;">Map Layers</div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label style="display: flex; align-items: center; cursor: pointer; color: rgba(255,255,255,0.8);">
+                <input type="checkbox" id="traffic-toggle" style="margin-right: 5px;">
+                <i class="fas fa-traffic-light" style="margin-right: 5px;"></i>Traffic
+            </label>
+            <label style="display: flex; align-items: center; cursor: pointer; color: rgba(255,255,255,0.8);">
+                <input type="checkbox" id="transit-toggle" checked style="margin-right: 5px;">
+                <i class="fas fa-train" style="margin-right: 5px;"></i>Transit
+            </label>
+            <label style="display: flex; align-items: center; cursor: pointer; color: rgba(255,255,255,0.8);">
+                <input type="checkbox" id="bicycling-toggle" style="margin-right: 5px;">
+                <i class="fas fa-bicycle" style="margin-right: 5px;"></i>Bicycling
+            </label>
+        </div>
+    `;
+
+    controlDiv.appendChild(controlText);
+
+    // Add control to map
+    window.mapInstance.controls[google.maps.ControlPosition.TOP_LEFT].push(controlDiv);
+
+    // Add event listeners for toggles
+    setTimeout(() => {
+        document.getElementById('traffic-toggle').addEventListener('change', function(e) {
+            if (e.target.checked) {
+                window.trafficLayer.setMap(window.mapInstance);
+                showToast('Traffic layer enabled', 'info');
+            } else {
+                window.trafficLayer.setMap(null);
+                showToast('Traffic layer disabled', 'info');
+            }
+        });
+
+        document.getElementById('transit-toggle').addEventListener('change', function(e) {
+            if (e.target.checked) {
+                window.transitLayer.setMap(window.mapInstance);
+                showToast('Transit layer enabled', 'info');
+            } else {
+                window.transitLayer.setMap(null);
+                showToast('Transit layer disabled', 'info');
+            }
+        });
+
+        document.getElementById('bicycling-toggle').addEventListener('change', function(e) {
+            if (e.target.checked) {
+                window.bicyclingLayer.setMap(window.mapInstance);
+                showToast('Bicycling layer enabled', 'info');
+            } else {
+                window.bicyclingLayer.setMap(null);
+                showToast('Bicycling layer disabled', 'info');
+            }
+        });
+    }, 100);
+
+    console.log('🎛️ Custom map controls added');
+}
+
+/**
+ * Initialize map event listeners
+ */
+function initializeMapEvents() {
+    // Click event on map
+    window.mapInstance.addListener('click', function(event) {
+        console.log('📍 Map clicked at:', event.latLng.lat(), event.latLng.lng());
+
+        // If planning journey, use clicked location
+        if (window.appState.currentTab === 'plan') {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: event.latLng }, function(results, status) {
+                if (status === google.maps.GeocoderStatus.OK && results[0]) {
+                    const address = results[0].formatted_address;
+                    console.log('📍 Clicked location:', address);
+
+                    // Auto-fill the from input if empty
+                    const fromInput = document.getElementById('from');
+                    if (fromInput && !fromInput.value) {
+                        fromInput.value = address;
+                        showToast('Location selected from map', 'info');
+                    }
+                }
+            });
+        }
+    });
+
+    // Bounds changed event
+    window.mapInstance.addListener('bounds_changed', function() {
+        // Update visible area for any markers or overlays
+        console.log('🗺️ Map bounds changed');
+    });
+
+    // Zoom changed event
+    window.mapInstance.addListener('zoom_changed', function() {
+        const zoom = window.mapInstance.getZoom();
+        console.log('🔍 Map zoom changed to:', zoom);
+
+        // Adjust marker visibility based on zoom
+        if (zoom > 14) {
+            // Show detailed markers
+        } else {
+            // Show simplified markers
+        }
+    });
+
+    console.log('👂 Map event listeners initialized');
+}
 
     } catch (error) {
         console.error('❌ Error initializing Google Maps:', error);
@@ -755,45 +971,193 @@ function initAutocomplete() {
 }
 
 /**
- * Calculate and display route on Google Maps
+ * Calculate and display route on Google Maps with full API utilization
  */
 function calculateAndDisplayRoute(fromLocation, toLocation) {
-    if (!window.directionsService || !window.directionsRenderer) {
-        console.log('🗺️ Directions service not available');
+    if (!window.directionsService || !window.directionsRenderer || !window.mapInstance) {
+        console.log('🗺️ Google Maps services not available');
+        showToast('Map services not ready. Please wait for map to load.', 'warning');
         return;
     }
 
-    const request = {
-        origin: fromLocation,
-        destination: toLocation,
-        travelMode: google.maps.TravelMode.TRANSIT,
-        transitOptions: {
-            modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.TRAIN, google.maps.TransitMode.SUBWAY],
-            routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
-        },
-        provideRouteAlternatives: true
-    };
+    console.log(`🗺️ Calculating route from "${fromLocation}" to "${toLocation}"`);
 
-    window.directionsService.route(request, (response, status) => {
+    // Show loading state
+    showToast('Calculating best routes...', 'info');
+
+    // Enhanced request with multiple travel modes
+    const requests = [
+        {
+            origin: fromLocation,
+            destination: toLocation,
+            travelMode: google.maps.TravelMode.TRANSIT,
+            transitOptions: {
+                modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.TRAIN, google.maps.TransitMode.SUBWAY],
+                routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
+            },
+            provideRouteAlternatives: true,
+            optimizeWaypoints: true
+        },
+        {
+            origin: fromLocation,
+            destination: toLocation,
+            travelMode: google.maps.TravelMode.DRIVING,
+            drivingOptions: {
+                departureTime: new Date(Date.now() + 60000), // 1 minute from now
+                trafficModel: 'bestguess'
+            },
+            provideRouteAlternatives: true
+        }
+    ];
+
+    // Clear previous routes
+    window.directionsRenderer.setDirections({ routes: [] });
+
+    // Process transit routes first (primary)
+    window.directionsService.route(requests[0], (response, status) => {
         if (status === google.maps.DirectionsStatus.OK) {
             window.directionsRenderer.setDirections(response);
 
             // Fit map to show entire route
             const bounds = new google.maps.LatLngBounds();
-            response.routes[0].legs.forEach(leg => {
-                leg.steps.forEach(step => {
-                    bounds.extend(step.start_location);
-                    bounds.extend(step.end_location);
+            response.routes.forEach(route => {
+                route.legs.forEach(leg => {
+                    bounds.extend(leg.start_location);
+                    bounds.extend(leg.end_location);
                 });
             });
             window.mapInstance.fitBounds(bounds);
 
-            console.log('🛣️ Route displayed on map');
+            // Add route information panel
+            displayRouteDetails(response);
+
+            console.log('🛣️ Transit route displayed on map');
+            showToast(`Found ${response.routes.length} transit route(s)!`, 'success');
+
+            // Also try driving routes for comparison
+            calculateDrivingRoute(fromLocation, toLocation);
+
         } else {
-            console.error('❌ Directions request failed:', status);
-            showToast('Could not calculate route. Please try different locations.', 'warning');
+            console.error('❌ Transit directions failed:', status);
+
+            // Fallback to driving routes
+            window.directionsService.route(requests[1], (response, status) => {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    window.directionsRenderer.setDirections(response);
+
+                    const bounds = new google.maps.LatLngBounds();
+                    response.routes.forEach(route => {
+                        route.legs.forEach(leg => {
+                            bounds.extend(leg.start_location);
+                            bounds.extend(leg.end_location);
+                        });
+                    });
+                    window.mapInstance.fitBounds(bounds);
+
+                    displayRouteDetails(response);
+                    console.log('🚗 Driving route displayed as fallback');
+                    showToast('Showing driving route (transit unavailable)', 'info');
+                } else {
+                    console.error('❌ All directions failed:', status);
+                    showToast('Could not calculate route. Please try different locations.', 'error');
+                }
+            });
         }
     });
+}
+
+/**
+ * Calculate driving route for comparison
+ */
+function calculateDrivingRoute(fromLocation, toLocation) {
+    if (!window.directionsService) return;
+
+    const request = {
+        origin: fromLocation,
+        destination: toLocation,
+        travelMode: google.maps.TravelMode.DRIVING,
+        drivingOptions: {
+            departureTime: new Date(Date.now() + 60000),
+            trafficModel: 'bestguess'
+        },
+        provideRouteAlternatives: false
+    };
+
+    window.directionsService.route(request, (response, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+            // Store driving route for comparison
+            window.drivingRoute = response;
+            console.log('🚗 Driving route calculated for comparison');
+        }
+    });
+}
+
+/**
+ * Display detailed route information
+ */
+function displayRouteDetails(response) {
+    if (!response.routes || response.routes.length === 0) return;
+
+    const route = response.routes[0];
+    const leg = route.legs[0];
+
+    // Create route info panel
+    const routeInfo = document.createElement('div');
+    routeInfo.className = 'route-info-panel';
+    routeInfo.innerHTML = `
+        <div class="route-summary">
+            <h4>Route Details</h4>
+            <div class="route-stats">
+                <div class="stat">
+                    <i class="fas fa-clock"></i>
+                    <span>${leg.duration.text}</span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-road"></i>
+                    <span>${leg.distance.text}</span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>₹${Math.round(leg.distance.value * 0.012)}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="route-steps">
+            <h5>Journey Steps:</h5>
+            <div class="steps-list">
+                ${leg.steps.map((step, index) => `
+                    <div class="step">
+                        <div class="step-number">${index + 1}</div>
+                        <div class="step-content">
+                            <div class="step-instruction">${step.instructions}</div>
+                            <div class="step-details">${step.distance.text} • ${step.duration.text}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    // Remove existing route info
+    const existingInfo = document.querySelector('.route-info-panel');
+    if (existingInfo) {
+        existingInfo.remove();
+    }
+
+    // Add to map container
+    const mapContainer = document.getElementById('map');
+    if (mapContainer) {
+        mapContainer.appendChild(routeInfo);
+
+        // Auto-hide after 10 seconds
+        setTimeout(() => {
+            if (routeInfo.parentNode) {
+                routeInfo.style.opacity = '0';
+                setTimeout(() => routeInfo.remove(), 300);
+            }
+        }, 10000);
+    }
 }
 
 /**
