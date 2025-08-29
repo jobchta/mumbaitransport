@@ -369,13 +369,8 @@ function swapLocations() {
  * Initialize location services and Google Maps
  */
 function initLocationServices() {
-    // Initialize Google Maps when API is loaded
-    if (typeof google !== 'undefined' && google.maps) {
-        initGoogleMaps();
-    } else {
-        // Wait for Google Maps API to load
-        window.initGoogleMaps = initGoogleMaps;
-    }
+    // Google Maps will be initialized via callback when API loads
+    // The callback is set in the HTML script tag
 
     // Request user location if available
     if ('geolocation' in navigator) {
@@ -415,12 +410,20 @@ function initGoogleMaps() {
         // Check if Google Maps is loaded
         if (!window.google || !window.google.maps) {
             console.error('❌ Google Maps API not loaded');
-            showToast('Google Maps API not loaded. Please refresh the page.', 'error');
+            showMapError('Google Maps API not loaded. Please refresh the page.');
             return;
         }
 
         // Default center (Mumbai)
         const defaultCenter = { lat: 19.0760, lng: 72.8777 };
+
+        // Show loading state
+        const mapContainer = document.getElementById('map');
+        if (mapContainer) {
+            mapContainer.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: rgba(255,255,255,0.7);"><i class="fas fa-spinner fa-spin"></i> Loading map...</div>';
+            mapContainer.style.display = 'block';
+            mapContainer.style.background = 'rgba(0,0,0,0.1)';
+        }
 
         // Create map
         window.mapInstance = new google.maps.Map(document.getElementById('map'), {
@@ -436,6 +439,21 @@ function initGoogleMaps() {
                     featureType: 'poi',
                     elementType: 'labels.icon',
                     stylers: [{ visibility: 'off' }]
+                },
+                {
+                    featureType: 'road',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#2d3748' }]
+                },
+                {
+                    featureType: 'landscape',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#1a202c' }]
+                },
+                {
+                    featureType: 'water',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#2b6cb0' }]
                 }
             ],
             disableDefaultUI: false,
@@ -465,21 +483,71 @@ function initGoogleMaps() {
         // Initialize autocomplete for from/to inputs
         initAutocomplete();
 
+        // Add event listener for map load
+        google.maps.event.addListenerOnce(window.mapInstance, 'tilesloaded', function() {
+            console.log('✅ Google Maps tiles loaded successfully');
+
+            // Clear loading state
+            if (mapContainer) {
+                mapContainer.style.background = 'transparent';
+            }
+
+            showToast('Map loaded successfully!', 'success');
+        });
+
         console.log('✅ Google Maps initialized successfully');
-
-        // Show map container
-        const mapContainer = document.getElementById('map');
-        if (mapContainer) {
-            mapContainer.style.display = 'block';
-            mapContainer.style.background = 'transparent';
-            console.log('✅ Map container displayed');
-        }
-
-        showToast('Map loaded successfully!', 'success');
 
     } catch (error) {
         console.error('❌ Error initializing Google Maps:', error);
-        showToast('Error loading maps. Please check your connection.', 'error');
+        showMapError('Error loading maps. Please check your connection.');
+    }
+}
+
+/**
+ * Show map error with fallback
+ */
+function showMapError(message) {
+    const mapContainer = document.getElementById('map');
+    if (mapContainer) {
+        mapContainer.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: rgba(255,255,255,0.7); text-align: center; padding: 1rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem; color: #ef4444;"></i>
+                <h4 style="margin-bottom: 0.5rem; color: #ef4444;">Map Unavailable</h4>
+                <p style="margin-bottom: 1rem;">${message}</p>
+                <button onclick="retryMapLoad()" style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
+                    <i class="fas fa-refresh"></i> Retry
+                </button>
+            </div>
+        `;
+        mapContainer.style.display = 'block';
+        mapContainer.style.background = 'rgba(0,0,0,0.1)';
+    }
+
+    showToast(message, 'error');
+}
+
+/**
+ * Retry map loading
+ */
+function retryMapLoad() {
+    console.log('🔄 Retrying map load...');
+    showToast('Retrying map load...', 'info');
+
+    // Clear any existing map instance
+    if (window.mapInstance) {
+        window.mapInstance = null;
+    }
+
+    // Try to reinitialize
+    if (window.google && window.google.maps) {
+        initGoogleMaps();
+    } else {
+        // Reload the Google Maps script
+        const script = document.createElement('script');
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places&callback=initGoogleMaps';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
     }
 }
 
@@ -2423,6 +2491,7 @@ window.handleViewMap = handleViewMap;
 window.handleBookmark = handleBookmark;
 window.filterTransportMode = filterTransportMode;
 window.processTicketPurchase = processTicketPurchase;
+window.retryMapLoad = retryMapLoad;
 
 // Export additional functions
 window.signInWithGoogle = signInWithGoogle;
