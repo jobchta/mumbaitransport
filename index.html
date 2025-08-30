@@ -107,13 +107,13 @@
         <p class="hero-subtitle">Experience the future of urban mobility with AI-powered routing and real-time insights</p>
         
         <div class="cta-buttons">
-            <button class="cta-button cta-primary" id="planJourneyBtn" onclick="handlePlanJourney()">
+            <button class="cta-button cta-primary" id="planJourneyBtn">
                 <i class="fas fa-route"></i> Plan Your Journey
             </button>
-            <button class="cta-button cta-secondary" id="viewMapBtn" onclick="handleViewMap()">
+            <button class="cta-button cta-secondary" id="viewMapBtn">
                 <i class="fas fa-map-marked-alt"></i> View Network Map
             </button>
-            <button class="cta-button cta-secondary" id="bookmarkBtn" onclick="handleBookmark()">
+            <button class="cta-button cta-secondary" id="bookmarkBtn">
                 <i class="fas fa-bookmark"></i> Bookmark This Page
             </button>
         </div>
@@ -135,19 +135,19 @@
             
             <!-- Transport Modes -->
             <div class="transport-modes">
-                <button class="micro-btn active" data-mode="all" onclick="filterTransportMode('all')">
+                <button class="micro-btn active" data-mode="all">
                     <i class="fas fa-shuffle"></i>
                     <span>All</span>
                 </button>
-                <button class="micro-btn" data-mode="metro" onclick="filterTransportMode('metro')">
+                <button class="micro-btn" data-mode="metro">
                     <i class="fas fa-train"></i>
                     <span>Metro</span>
                 </button>
-                <button class="micro-btn" data-mode="bus" onclick="filterTransportMode('bus')">
+                <button class="micro-btn" data-mode="bus">
                     <i class="fas fa-bus"></i>
                     <span>Bus</span>
                 </button>
-                <button class="micro-btn" data-mode="train" onclick="filterTransportMode('train')">
+                <button class="micro-btn" data-mode="train">
                     <i class="fas fa-train"></i>
                     <span>Train</span>
                 </button>
@@ -203,11 +203,11 @@
                         </div>
                     </div>
                     <div class="line-actions">
-                        <button class="btn btn-secondary" onclick="buyTicket('line1')">
+                        <button class="btn btn-secondary" data-action="buy-ticket" data-line="line1">
                             <i class="fas fa-ticket"></i>
                             Buy Ticket
                         </button>
-                        <button class="btn btn-outline" onclick="checkFare('line1')">
+                        <button class="btn btn-outline" data-action="check-fare" data-line="line1">
                             <i class="fas fa-indian-rupee-sign"></i>
                             Check Fare
                         </button>
@@ -224,11 +224,11 @@
                         </div>
                     </div>
                     <div class="line-actions">
-                        <button class="btn btn-secondary" onclick="buyTicket('line2a')">
+                        <button class="btn btn-secondary" data-action="buy-ticket" data-line="line2a">
                             <i class="fas fa-ticket"></i>
                             Buy Ticket
                         </button>
-                        <button class="btn btn-outline" onclick="checkFare('line2a')">
+                        <button class="btn btn-outline" data-action="check-fare" data-line="line2a">
                             <i class="fas fa-indian-rupee-sign"></i>
                             Check Fare
                         </button>
@@ -245,11 +245,11 @@
                         </div>
                     </div>
                     <div class="line-actions">
-                        <button class="btn btn-secondary" onclick="buyTicket('line3')">
+                        <button class="btn btn-secondary" data-action="buy-ticket" data-line="line3">
                             <i class="fas fa-ticket"></i>
                             Buy Ticket
                         </button>
-                        <button class="btn btn-outline" onclick="checkFare('line3')">
+                        <button class="btn btn-outline" data-action="check-fare" data-line="line3">
                             <i class="fas fa-indian-rupee-sign"></i>
                             Check Fare
                         </button>
@@ -266,11 +266,11 @@
                         </div>
                     </div>
                     <div class="line-actions">
-                        <button class="btn btn-secondary" onclick="buyTicket('line7')">
+                        <button class="btn btn-secondary" data-action="buy-ticket" data-line="line7">
                             <i class="fas fa-ticket"></i>
                             Buy Ticket
                         </button>
-                        <button class="btn btn-outline" onclick="checkFare('line7')">
+                        <button class="btn btn-outline" data-action="check-fare" data-line="line7">
                             <i class="fas fa-indian-rupee-sign"></i>
                             Check Fare
                         </button>
@@ -332,7 +332,7 @@
                                 </span>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="selectRide('metro')">
+                        <button class="btn btn-primary" data-action="select-ride" data-ride="metro">
                             Select
                         </button>
                     </div>
@@ -356,7 +356,7 @@
                                 </span>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="selectRide('bus')">
+                        <button class="btn btn-primary" data-action="select-ride" data-ride="bus">
                             Select
                         </button>
                     </div>
@@ -387,32 +387,7 @@
         </label>
     </nav>
 
-    <!-- Service Worker -->
-    <script src="src/sw.js"></script>
-
-    <!-- Real Mumbai Transport Data -->
-    <script src="real_mumbai_transport_data.js"></script>
-
-    <!-- Real Backend API Scripts -->
-    <script src="src/js/app.js"></script>
-    <script src="src/js/language-manager.js"></script>
-    
-    <script>
-        // Initialize app when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Mumbai Transport App loaded');
-
-            // Initialize core functionality
-            initApp();
-
-            // Initialize language manager
-            if (window.languageManager) {
-                window.languageManager.updateLanguage();
-            }
-
-
-        });
-
-    </script>
+    <!-- Main Application Script -->
+    <script type="module" src="src/js/app.js"></script>
 </body>
 </html>
