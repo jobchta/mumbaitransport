@@ -14,7 +14,11 @@ export default {
     }
 
     // API passthroughs (keep as-is if you use them)
+    // JSON GTFS endpoint (expects env to provide *_JSON_URL)
+    if (pathname.startsWith("/api/gtfs/json/")) return handleGtfsJson(request, env);
+    // Protobuf GTFS passthrough (returns application/x-protobuf)
     if (pathname.startsWith("/api/gtfs/")) return handleGtfsApi(request, env);
+    // Google proxy with key injection via env
     if (pathname.startsWith("/api/google/")) return handleGoogleApi(request, env);
 
     // Root -> /portal/
@@ -211,6 +215,58 @@ async function handleGoogleApi(request, env) {
     cors.set("Vary", "Origin");
   }
   return new Response(resp.body, { status: resp.status, headers: cors });
+}
+
+/**
+ * JSON GTFS passthrough. Expects env secrets like:
+ *  - MMRDA_METRO_JSON_URL
+ *  - BEST_BUS_JSON_URL
+ * Optionally:
+ *  - MMRDA_AUTH_HEADER / MMRDA_AUTH_VALUE
+ */
+async function handleGtfsJson(request, env) {
+  const url = new URL(request.url);
+  const parts = url.pathname.split("/").filter(Boolean); // ['api','gtfs','json','{agency}','{feed}']
+  const agency = (parts[3] || "").toUpperCase();
+  const feed   = (parts[4] || "").toUpperCase();
+
+  if (!agency || !feed) {
+    return json({ error: "Bad request: expected /api/gtfs/json/{agency}/{feed}" }, 400, request);
+  }
+
+  const key = `${agency}_${feed}_JSON_URL`;
+  const upstream = env[key];
+  if (!upstream) {
+    return json({ error: `JSON endpoint not configured for ${agency}/${feed}`, hint: `Set secret ${key}` }, 501, request);
+  }
+
+  const authHeaderName  = env[`${agency}_AUTH_HEADER`];
+  const authHeaderValue = env[`${agency}_AUTH_VALUE`];
+
+  const upstreamInit = {
+    method: "GET",
+    headers: new Headers(),
+    cf: { cacheEverything: true, cacheTtl: 15 }
+  };
+  if (authHeaderName && authHeaderValue) {
+    upstreamInit.headers.set(authHeaderName, authHeaderValue);
+  }
+
+  const resp = await fetch(upstream, upstreamInit);
+  if (!resp.ok) {
+    return json({ error: "Upstream error", status: resp.status }, 502, request);
+  }
+
+  const headers = new Headers({
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "public, max-age=15"
+  });
+  const origin = request.headers.get("Origin");
+  if (origin) {
+    headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("Vary", "Origin");
+  }
+  return new Response(resp.body, { status: 200, headers });
 }
 
 function corsHeaders(request) {

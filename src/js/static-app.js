@@ -1438,3 +1438,177 @@ function setupRealRouting() {
 document.addEventListener('DOMContentLoaded', () => {
   try { setupRealRouting(); } catch (e) { console.log('setupRealRouting error', e); }
 });
+/* === GTFS Realtime (JSON) integration via Cloudflare Worker proxy ===================
+   Frontend polls same-origin endpoints that the Worker exposes:
+
+   - /api/gtfs/json/MMRDA/METRO    -> env.MMRDA_METRO_JSON_URL
+   - /api/gtfs/json/BEST/BUS       -> env.BEST_BUS_JSON_URL
+   - /api/gtfs/json/MRVC/TRAIN     -> env.MRVC_TRAIN_JSON_URL
+
+   Each URL should return a GTFS-RT feed converted to JSON (entity array with .vehicle/.alert/.trip_update).
+   Configure those env secrets in Cloudflare Worker > Settings > Variables (Secrets).
+   This keeps private feeds and keys out of the repo and avoids protobuf parsing in the browser.
+==================================================================================== */
+
+window.realtime = {
+  markers: {
+    METRO: new Map(),
+    BUS: new Map(),
+    TRAIN: new Map()
+  },
+  lastAlerts: [],
+  timer: null
+};
+
+const REALTIME_CONFIG = {
+  METRO: { endpoint: '/api/gtfs/json/MMRDA/METRO', color: '#1e40af', type: 'METRO' },
+  BUS:   { endpoint: '/api/gtfs/json/BEST/BUS',    color: '#10b981', type: 'BUS' },
+  TRAIN: { endpoint: '/api/gtfs/json/MRVC/TRAIN',  color: '#ef4444', type: 'TRAIN' }
+};
+
+/* Build a simple circular symbol for vehicles */
+function buildVehicleSymbol(color) {
+  return {
+    path: google.maps.SymbolPath.CIRCLE,
+    fillColor: color,
+    fillOpacity: 0.95,
+    scale: 5.5,
+    strokeColor: '#ffffff',
+    strokeWeight: 1.5
+  };
+}
+
+function upsertVehicleMarker(vType, vehId, lat, lng, color, label = '') {
+  if (!window.mapInstance) return;
+
+  const id = String(vehId || `${vType}-${lat}-${lng}-${Date.now()}`);
+  const mm = window.realtime.markers[vType];
+  if (!mm) return;
+
+  const position = new google.maps.LatLng(lat, lng);
+  let marker = mm.get(id);
+  if (marker) {
+    marker.setPosition(position);
+  } else {
+    marker = new google.maps.Marker({
+      position,
+      map: window.mapInstance,
+      icon: buildVehicleSymbol(color),
+      title: label || `${vType} ${id}`
+    });
+    mm.set(id, marker);
+  }
+  return id;
+}
+
+function sweepStaleMarkers(vType, aliveIds) {
+  const mm = window.realtime.markers[vType];
+  if (!mm) return;
+  for (const [id, marker] of mm.entries()) {
+    if (!aliveIds.has(id)) {
+      marker.setMap(null);
+      mm.delete(id);
+    }
+  }
+}
+
+/* Parse a GTFS-RT JSON entity block defensively */
+function extractVehicleFromEntity(entity) {
+  // Expected structure: entity.vehicle.position.{latitude, longitude}
+  if (!entity || !entity.vehicle || !entity.vehicle.position) return null;
+  const pos = entity.vehicle.position;
+  const meta = entity.vehicle.vehicle || {};
+  const id = meta.id || meta.label || entity.id || Math.random().toString(36).slice(2);
+  if (typeof pos.latitude !== 'number' || typeof pos.longitude !== 'number') return null;
+  return { id, lat: pos.latitude, lng: pos.longitude, label: meta.label || '' };
+}
+
+function extractAlertText(alertEntity) {
+  try {
+    const a = alertEntity.alert;
+    if (!a) return null;
+    // Try multiple proto-JSON shapes
+    const headerTx = a.headerText?.translation?.[0]?.text ||
+                     a.headerText?.translatedText?.text ||
+                     a.headerText?.text ||
+                     a.headerText ||
+                     null;
+    const descTx = a.descriptionText?.translation?.[0]?.text ||
+                   a.descriptionText?.translatedText?.text ||
+                   a.descriptionText?.text ||
+                   a.descriptionText ||
+                   '';
+    return (headerTx || 'Service Alert') + (descTx ? ` — ${descTx}` : '');
+  } catch {
+    return null;
+  }
+}
+
+async function fetchGtfsJson(endpoint) {
+  try {
+    const res = await fetch(endpoint, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    console.log(`GTFS fetch failed for ${endpoint}:`, e.message || e);
+    return null;
+  }
+}
+
+async function updateVehiclesFor(config) {
+  const feed = await fetchGtfsJson(config.endpoint);
+  if (!feed || !Array.isArray(feed.entity)) return;
+
+  const alive = new Set();
+  for (const ent of feed.entity) {
+    const v = extractVehicleFromEntity(ent);
+    if (!v) continue;
+    const markerId = upsertVehicleMarker(config.type, v.id, v.lat, v.lng, config.color, v.label);
+    if (markerId) alive.add(markerId);
+  }
+  sweepStaleMarkers(config.type, alive);
+
+  // Alerts (if any) from this feed
+  const panel = document.getElementById('alerts');
+  if (panel) {
+    const alerts = feed.entity.filter(e => e.alert).map(extractAlertText).filter(Boolean);
+    if (alerts.length) {
+      window.realtime.lastAlerts = alerts;
+    }
+    // Render deduped, last 5 alerts
+    const unique = [...new Set(window.realtime.lastAlerts)].slice(0, 5);
+    panel.innerHTML = unique.map(a => `<div class="alert-item">${a}</div>`).join('');
+  }
+}
+
+async function updateAllRealtime() {
+  // Parallel fetch across configured modes
+  await Promise.all([
+    updateVehiclesFor(REALTIME_CONFIG.METRO),
+    updateVehiclesFor(REALTIME_CONFIG.BUS),
+    updateVehiclesFor(REALTIME_CONFIG.TRAIN)
+  ]);
+}
+
+function startRealtimePolling() {
+  // Avoid double timers
+  if (window.realtime.timer) return;
+  // First tick
+  updateAllRealtime().catch(() => {});
+  // Poll every 30s (tunable)
+  window.realtime.timer = setInterval(() => {
+    updateAllRealtime().catch(() => {});
+  }, 30000);
+}
+
+/* Hook into existing Google Maps init to start RT loop when map is ready */
+(function hookRealtimeToMapInit(){
+  const originalInit = window.initGoogleMaps;
+  window.initGoogleMaps = function() {
+    try {
+      if (typeof originalInit === 'function') originalInit();
+    } finally {
+      try { startRealtimePolling(); } catch (e) { console.log('realtime start err', e); }
+    }
+  };
+})();
