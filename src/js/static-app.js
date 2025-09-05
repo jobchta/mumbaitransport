@@ -1,3 +1,64 @@
+/* Places Autocomplete for From/To with India restriction and Mumbai bias */
+function initPlacesAutocomplete() {
+  try {
+    if (!(window.google && google.maps && google.maps.places)) {
+      console.log('⚠️ Places API not available on google.maps');
+      return;
+    }
+
+    const fromInput = document.getElementById('from');
+    const toInput   = document.getElementById('to');
+    const options = {
+      componentRestrictions: { country: 'in' },
+      fields: ['place_id', 'name', 'formatted_address', 'geometry'],
+      types: ['geocode', 'establishment']
+    };
+
+    // Bias to Mumbai area if map exists
+    let bounds = null;
+    try {
+      const mumbai = new google.maps.LatLng(19.0760, 72.8777);
+      const circle = new google.maps.Circle({ center: mumbai, radius: 35000 });
+      bounds = circle.getBounds();
+    } catch {}
+
+    if (fromInput) {
+      const acFrom = new google.maps.places.Autocomplete(fromInput, options);
+      if (bounds) acFrom.setBounds(bounds);
+      acFrom.addListener('place_changed', () => {
+        const p = acFrom.getPlace();
+        window._fromPlace = p && p.place_id ? { place_id: p.place_id, name: p.name, address: p.formatted_address, loc: p.geometry?.location || null } : null;
+        if (window._fromPlace?.loc && window.mapInstance) {
+          // Optional: softly pan to hint user
+          try { window.mapInstance.panTo(window._fromPlace.loc); } catch {}
+        }
+      });
+      // If user clears the field, clear stored place_id
+      fromInput.addEventListener('input', () => {
+        if (!fromInput.value) window._fromPlace = null;
+      });
+    }
+
+    if (toInput) {
+      const acTo = new google.maps.places.Autocomplete(toInput, options);
+      if (bounds) acTo.setBounds(bounds);
+      acTo.addListener('place_changed', () => {
+        const p = acTo.getPlace();
+        window._toPlace = p && p.place_id ? { place_id: p.place_id, name: p.name, address: p.formatted_address, loc: p.geometry?.location || null } : null;
+        if (window._toPlace?.loc && window.mapInstance) {
+          try { window.mapInstance.panTo(window._toPlace.loc); } catch {}
+        }
+      });
+      toInput.addEventListener('input', () => {
+        if (!toInput.value) window._toPlace = null;
+      });
+    }
+
+    console.log('✅ Places Autocomplete initialized');
+  } catch (e) {
+    console.log('❌ initPlacesAutocomplete error', e);
+  }
+}
 /**
  * Mumbai Transport App - Static Version (No Backend Required)
  * This version works on GitHub Pages, Netlify, and Cloudflare
@@ -1340,6 +1401,7 @@ window.initGoogleMaps = function initGoogleMaps() {
       const transit = new google.maps.TransitLayer();
       transit.setMap(window.mapInstance);
     } catch (e) {}
+    initPlacesAutocomplete();
     console.log('✅ Google Maps initialized');
   } catch (err) {
     console.error('❌ initGoogleMaps error:', err);
@@ -1379,7 +1441,7 @@ async function routeWithGoogle(from, to) {
   // Primary: TRANSIT
   await new Promise((resolve) => {
     window.directionsService.route({
-      origin: from,
+      origin: (window._fromPlace && window._fromPlace.place_id) ? { placeId: window._fromPlace.place_id } : from,
       destination: to,
       travelMode: google.maps.TravelMode.TRANSIT,
       transitOptions: {
@@ -1397,7 +1459,7 @@ window.directionsRenderer.setDirections(response);
       } else {
         // Fallback: DRIVING
         window.directionsService.route({
-          origin: from,
+          origin: (window._fromPlace && window._fromPlace.place_id) ? { placeId: window._fromPlace.place_id } : from,
           destination: to,
           travelMode: google.maps.TravelMode.DRIVING,
           provideRouteAlternatives: true
