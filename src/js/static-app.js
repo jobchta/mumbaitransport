@@ -1311,3 +1311,130 @@ function injectCabAutoCalculatorButton() {
 document.addEventListener('DOMContentLoaded', () => {
   try { injectCabAutoCalculatorButton(); } catch(e) { console.log('inject calc btn error', e); }
 });
+/* === Real Google Maps Directions (no API key in repo; Worker injects JS with key) === */
+
+/* Ensure global map + services */
+window.initGoogleMaps = function initGoogleMaps() {
+  try {
+    const el = document.getElementById('map');
+    if (!el) return;
+
+    const mumbai = { lat: 19.0760, lng: 72.8777 };
+    window.mapInstance = new google.maps.Map(el, {
+      center: mumbai,
+      zoom: 12,
+      disableDefaultUI: false,
+      zoomControl: true,
+      fullscreenControl: true
+    });
+
+    window.directionsService = new google.maps.DirectionsService();
+    window.directionsRenderer = new google.maps.DirectionsRenderer({
+      map: window.mapInstance,
+      suppressMarkers: false,
+      polylineOptions: { strokeColor: '#6366f1', strokeOpacity: 0.9, strokeWeight: 6 }
+    });
+
+    // Optional layers
+    try {
+      const transit = new google.maps.TransitLayer();
+      transit.setMap(window.mapInstance);
+    } catch (e) {}
+    console.log('✅ Google Maps initialized');
+  } catch (err) {
+    console.error('❌ initGoogleMaps error:', err);
+  }
+};
+
+/* Route via Google Directions (Transit first, Driving fallback) */
+async function routeWithGoogle(from, to) {
+  if (!from || !to) {
+    showToast && showToast('Please enter both locations', 'error');
+    return;
+  }
+  if (!window.mapInstance || !window.directionsService || !window.directionsRenderer) {
+    if (window.google && window.google.maps) {
+      window.initGoogleMaps();
+    } else {
+      showToast && showToast('Map not ready. Please wait...', 'warning');
+      return;
+    }
+  }
+
+  console.log('🗺️ Routing:', from, '→', to);
+  showToast && showToast('Finding best routes...', 'info');
+
+  // Helper to fit route bounds
+  function fitBoundsFromResponse(resp) {
+    const bounds = new google.maps.LatLngBounds();
+    resp.routes.forEach(route => {
+      route.legs.forEach(leg => {
+        bounds.extend(leg.start_location);
+        bounds.extend(leg.end_location);
+      });
+    });
+    window.mapInstance.fitBounds(bounds);
+  }
+
+  // Primary: TRANSIT
+  await new Promise((resolve) => {
+    window.directionsService.route({
+      origin: from,
+      destination: to,
+      travelMode: google.maps.TravelMode.TRANSIT,
+      transitOptions: {
+        modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.TRAIN, google.maps.TransitMode.SUBWAY],
+        routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
+      },
+      provideRouteAlternatives: true
+    }, (response, status) => {
+      if (status === google.maps.DirectionsStatus.OK) {
+        window.directionsRenderer.setDirections(response);
+        fitBoundsFromResponse(response);
+        showToast && showToast(`Found ${response.routes.length} public transit route(s)`, 'success');
+        resolve(true);
+      } else {
+        // Fallback: DRIVING
+        window.directionsService.route({
+          origin: from,
+          destination: to,
+          travelMode: google.maps.TravelMode.DRIVING,
+          provideRouteAlternatives: true
+        }, (drResp, drStatus) => {
+          if (drStatus === google.maps.DirectionsStatus.OK) {
+            window.directionsRenderer.setDirections(drResp);
+            fitBoundsFromResponse(drResp);
+            showToast && showToast('Public transit unavailable; showing driving route', 'info');
+          } else {
+            showToast && showToast('Could not calculate route. Try different locations.', 'error');
+          }
+          resolve(true);
+        });
+      }
+    });
+  });
+}
+
+/* Override journey form to use REAL directions (and not mock) */
+function setupRealRouting() {
+  const form = document.getElementById('journey-form');
+  if (!form) return;
+
+  // Override any previously attached handlers
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const from = document.getElementById('from')?.value?.trim();
+    const to   = document.getElementById('to')?.value?.trim();
+
+    // Ensure map exists
+    if (!window.mapInstance && window.google && window.google.maps) {
+      window.initGoogleMaps();
+    }
+    routeWithGoogle(from, to);
+  };
+}
+
+/* Attach on DOM ready */
+document.addEventListener('DOMContentLoaded', () => {
+  try { setupRealRouting(); } catch (e) { console.log('setupRealRouting error', e); }
+});
