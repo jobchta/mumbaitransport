@@ -4,16 +4,15 @@ const CACHE_NAME = `mt-cache-${CACHE_VERSION}`;
 
 // App shell (relative to root directory since sw.js is imported from root). Keep small; HTML is runtime-updated.
 const PRECACHE_ASSETS = [
-  './',  // Root directory
-  './index.html',
-  './offline.html',
-  './src/manifest.json',
-  './src/styles/style.css',
-  './src/js/app.js',
-  './src/js/language-manager.js',
-  './src/assets/icons/icon-192x192.png',
-  './src/assets/icons/icon-512x512.png',
-  './real_mumbai_transport_data.js'
+  '../',                 // Root (service worker is under /src/)
+  '../index.html',
+  '../offline.html',
+  './manifest.json',
+  './styles/style.css',
+  './js/static-app.js',          // Correct main script
+  './js/language-manager.js',
+  './assets/icons/icon-192x192.png',
+  './assets/icons/icon-512x512.png'
 ];
 
 // Install: pre-cache minimal shell
@@ -64,7 +63,7 @@ self.addEventListener('fetch', (event) => {
          const cached = await caches.match(request);
          if (cached) return cached;
          // Fallback to offline shell
-         return caches.match('./offline.html');
+         return caches.match('../offline.html');
        })
    );
    return;

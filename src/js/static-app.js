@@ -1090,3 +1090,224 @@ window.updateRideComparison = updateRideComparison;
 document.addEventListener('DOMContentLoaded', initApp);
 
 console.log('📱 Mumbai Transport App (Static Version) script loaded');
+/* === Additions: Regulated Fare Calculator (Sept 2025) + Better Metro Fare === */
+
+/* Govt regulated fares (Sept 2025) */
+const REGULATED_RATES = {
+  auto:    { base: 26, perKm: 17.14, nightPct: 25, initialKm: 1.5 },
+  taxi:    { base: 31, perKm: 20.66, nightPct: 25, initialKm: 1.5 },
+  coolcab: { base: 48, perKm: 37.20, nightPct: 25, initialKm: 1.5 }
+};
+
+/* Calculate regulated fare with 1.5 km base and optional night surcharge */
+function calculateRegulatedFare(mode, km, isNight) {
+  const r = REGULATED_RATES[mode];
+  if (!r) return 0;
+  const d = Math.max(0, parseFloat(km || 0));
+  const beyond = Math.max(0, d - r.initialKm);
+  let total = r.base + beyond * r.perKm;
+  if (isNight) total *= (1 + r.nightPct / 100);
+  return Math.round(total);
+}
+
+/* Simple number -> INR */
+function toINR(n) {
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n || 0);
+}
+
+/* Modal: Cab & Auto Fare Calculator */
+function openFareCalculator() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content fare-modal">
+      <div class="modal-header">
+        <h3>Cab & Auto Fare Calculator (Mumbai – Sept 2025)</h3>
+        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="fare-info">
+          <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+            <div class="form-group">
+              <label>Mode</label>
+              <select id="fc-mode" class="form-input">
+                <option value="auto">Auto‑Rickshaw</option>
+                <option value="taxi">Kaali‑Peeli Taxi</option>
+                <option value="coolcab">Cool Cab (AC)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Distance (km)</label>
+              <input id="fc-km" type="number" min="0" step="0.1" value="5" class="form-input"/>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;gap:8px;">
+              <input id="fc-night" type="checkbox"/>
+              <label for="fc-night" style="margin:0;">Night (12am–5am) +25%</label>
+            </div>
+          </div>
+
+          <div class="fare-grid" style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+            <div class="fare-card">
+              <div class="fare-amount" id="fc-result">₹0</div>
+              <div class="fare-distance" id="fc-breakdown">Base + per‑km (beyond 1.5 km)</div>
+            </div>
+          </div>
+
+          <div class="fare-notes" style="margin-top:8px;">
+            <p><strong>Notes:</strong></p>
+            <ul>
+              <li>Auto min ₹26, Taxi min ₹31, Cool Cab min ₹48 (covers first 1.5 km).</li>
+              <li>Beyond 1.5 km: per‑km as per regulation. Night surcharge +25% (12am–5am).</li>
+              <li>App cabs (Uber/Ola) are dynamic; new policy caps surge ≤1.5× base.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const $mode = modal.querySelector('#fc-mode');
+  const $km   = modal.querySelector('#fc-km');
+  const $night= modal.querySelector('#fc-night');
+  const $out  = modal.querySelector('#fc-result');
+  const $bd   = modal.querySelector('#fc-breakdown');
+
+  function recompute() {
+    const m = $mode.value;
+    const k = parseFloat($km.value || '0');
+    const n = !!$night.checked;
+    const r = REGULATED_RATES[m];
+    const fare = calculateRegulatedFare(m, k, n);
+    $out.textContent = toINR(fare);
+    $bd.textContent = `Base ${toINR(r.base)} + ${toINR(r.perKm)}/km beyond ${r.initialKm} km${n ? ' (+25% night)' : ''}`;
+  }
+  [$mode,$km,$night].forEach(el => el.addEventListener('input', recompute));
+  recompute();
+}
+
+/* Inject a button into Tickets tab to open calculator */
+function injectCabAutoCalculatorButton() {
+  const ticketsTab = document.querySelector('#tickets-tab');
+  if (!ticketsTab) return;
+  if (document.getElementById('cab-auto-calc-btn')) return;
+
+  const wrap = document.createElement('div');
+  wrap.style.marginTop = '12px';
+  wrap.innerHTML = `
+    <div class="section-header">
+      <h2 class="section-title">Cabs & Autos</h2>
+      <div class="section-line"></div>
+    </div>
+    <button id="cab-auto-calc-btn" class="btn btn-outline">
+      <i class="fas fa-indian-rupee-sign"></i> Cab & Auto Fare Calculator
+    </button>
+  `;
+  ticketsTab.appendChild(wrap);
+  wrap.querySelector('#cab-auto-calc-btn').addEventListener('click', openFareCalculator);
+}
+
+/* More realistic Metro ticket fare inside ticket modal (slab based) */
+(function overrideTicketModal() {
+  // Slab: 0–3 = 10, 3–12 = 20, 12–27 = 30, 27+ = 40
+  function metroFareFromDistance(km) {
+    const d = Math.max(0, km);
+    if (d <= 3) return 10;
+    if (d <= 12) return 20;
+    if (d <= 27) return 30;
+    return 40;
+  }
+  // Approx distances between demo stations
+  const METRO_DISTANCES = {
+    versova:   { andheri: 4.0, ghatkopar: 16.0 },
+    andheri:   { versova: 4.0, ghatkopar: 12.0 },
+    ghatkopar: { versova: 16.0, andheri: 12.0 }
+  };
+
+  // Override existing createTicketModal with slab-based fare calc
+  const originalCreateTicketModal = window.createTicketModal;
+  window.createTicketModal = function(line) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-content ticket-modal">
+        <div class="modal-header">
+          <h3>Buy Metro Ticket</h3>
+          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="ticket-info">
+            <h4>Line: ${line?.toUpperCase?.() || 'Metro'}</h4>
+            <p>Select your journey details:</p>
+
+            <div class="ticket-form">
+              <div class="form-group">
+                <label>From Station:</label>
+                <select id="ticket-from" class="form-input">
+                  <option value="">Select departure station</option>
+                  <option value="versova">Versova</option>
+                  <option value="andheri">Andheri</option>
+                  <option value="ghatkopar">Ghatkopar</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>To Station:</label>
+                <select id="ticket-to" class="form-input">
+                  <option value="">Select destination station</option>
+                  <option value="versova">Versova</option>
+                  <option value="andheri">Andheri</option>
+                  <option value="ghatkopar">Ghatkopar</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Number of Tickets:</label>
+                <input type="number" id="ticket-quantity" class="form-input" value="1" min="1" max="10">
+              </div>
+
+              <div class="fare-display">
+                <p>Estimated Fare: <span id="estimated-fare">₹0</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+          <button class="btn btn-primary" onclick="processTicketPurchase('${line}')">Purchase Ticket</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const fromSelect = modal.querySelector('#ticket-from');
+    const toSelect   = modal.querySelector('#ticket-to');
+    const qtyInput   = modal.querySelector('#ticket-quantity');
+    const fareOut    = modal.querySelector('#estimated-fare');
+
+    function updateFare() {
+      const from = fromSelect.value;
+      const to   = toSelect.value;
+      const qty  = Math.max(1, parseInt(qtyInput.value || '1', 10));
+      if (!from || !to || from === to) { fareOut.textContent = '₹0'; return; }
+      const d = (METRO_DISTANCES[from] && METRO_DISTANCES[from][to]) || 0;
+      const single = metroFareFromDistance(d);
+      fareOut.textContent = toINR(single * qty);
+    }
+    [fromSelect, toSelect, qtyInput].forEach(el => el.addEventListener('input', updateFare));
+    updateFare();
+
+    return modal;
+  };
+
+  // keep reference for safety
+  window._originalCreateTicketModal = originalCreateTicketModal;
+})();
+
+/* Ensure the button appears after DOM & initial JS setup */
+document.addEventListener('DOMContentLoaded', () => {
+  try { injectCabAutoCalculatorButton(); } catch(e) { console.log('inject calc btn error', e); }
+});

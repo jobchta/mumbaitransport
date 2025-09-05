@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mumbai Transport — Offline</title>
+  <link rel="stylesheet" href="src/styles/style.css" />
+  <style>
+    body { display:flex; align-items:center; justify-content:center; min-height:100vh; background:#0b1220; color:#e5e7eb; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    .box { max-width: 560px; margin: 16px; padding: 24px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; }
+    h1 { font-size: 1.5rem; margin: 0 0 8px; }
+    p { margin: 6px 0; color: #cbd5e1; }
+    .tips { margin-top: 12px; font-size: 0.9rem; }
+    .btn { margin-top: 16px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>You're offline</h1>
+    <p>The Mumbai Transport app is not connected to the internet. Some features like live routes, maps and ticketing need connectivity.</p>
+    <div class="tips">
+      <p>What you can still do:</p>
+      <ul>
+        <li>View previously cached pages</li>
+        <li>Open fare calculator (when cached)</li>
+      </ul>
+    </div>
+    <button class="btn" onclick="location.reload()">Retry</button>
+  </div>
+</body>
+</html>
