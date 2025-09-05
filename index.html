@@ -13,7 +13,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Mumbai Transport">
     <link rel="apple-touch-icon" href="src/assets/icons/icon-192x192.png">
-    
+
     <!-- External Dependencies -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="src/styles/style.css">
 
     <!-- Google Maps API -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places&callback=initGoogleMaps"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4VXgebBaqOojiujAPYIP8Qv-iYPSFVWw&libraries=places"></script>
 </head>
 <body>
     <!-- Animated Background -->
@@ -41,7 +41,7 @@
                 </div>
                 <span class="logo-text">Mumbai Transit</span>
             </a>
-            
+
             <div class="header-right">
                 <!-- Language Selector -->
                 <div class="language-selector">
@@ -93,7 +93,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
                     <i class="fas fa-sun"></i>
                 </button>
@@ -105,7 +105,7 @@
     <section class="hero">
         <h1 class="hero-title">Navigate Mumbai</h1>
         <p class="hero-subtitle">Experience the future of urban mobility with AI-powered routing and real-time insights</p>
-        
+
         <div class="cta-buttons">
             <button class="cta-button cta-primary" id="planJourneyBtn" onclick="handlePlanJourney()">
                 <i class="fas fa-route"></i> Plan Your Journey
@@ -132,7 +132,7 @@
                 <h2 class="section-title">Plan Your Journey</h2>
                 <div class="section-line"></div>
             </div>
-            
+
             <!-- Transport Modes -->
             <div class="transport-modes">
                 <button class="micro-btn active" data-mode="all" onclick="filterTransportMode('all')">
@@ -152,7 +152,7 @@
                     <span>Train</span>
                 </button>
             </div>
-            
+
             <!-- Journey Form -->
             <form id="journey-form">
                 <div class="form-group">
@@ -162,7 +162,7 @@
                         <input type="text" id="from" class="form-input" placeholder="Current location or address">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="to">To</label>
                     <div class="input-wrapper">
@@ -173,33 +173,32 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <button type="submit" class="btn btn-primary btn-full btn-large">
                     <i class="fas fa-route"></i>
                     Find Routes
                 </button>
             </form>
-            
+
             <!-- Map Container -->
             <div id="map" class="map-container" style="height: 300px; margin-top: 1.5rem;"></div>
         </div>
-        
+
         <!-- Tickets Tab -->
         <div class="tab-content" id="tickets-tab">
             <div class="section-header">
                 <h2 class="section-title">Metro Tickets & Fares</h2>
                 <div class="section-line"></div>
             </div>
-            
+
             <!-- Metro Lines -->
             <div class="metro-lines">
                 <div class="metro-line">
                     <div class="line-info">
-                        <div class="line-color" style="background: #1e40af;"></div>
+                        <div class="line-color" style="background: #FF6B35;"></div>
                         <div class="line-details">
-                            <h3>Line 1 – Blue Line</h3>
-                            <p>Versova ↔ Ghatkopar (11.4 km, 12 stations)</p>
-                            <small>MMRDA • Operational</small>
+                            <h3>Line 1 (Versova-Andheri-Ghatkopar)</h3>
+                            <p>Operational: 5:30 AM - 12:00 AM</p>
                         </div>
                     </div>
                     <div class="line-actions">
@@ -213,71 +212,8 @@
                         </button>
                     </div>
                 </div>
-
-                <div class="metro-line">
-                    <div class="line-info">
-                        <div class="line-color" style="background: #eab308;"></div>
-                        <div class="line-details">
-                            <h3>Line 2A – Yellow Line</h3>
-                            <p>Dahisar East ↔ D N Nagar (18.6 km, 17 stations)</p>
-                            <small>MMRDA • Operational</small>
-                        </div>
-                    </div>
-                    <div class="line-actions">
-                        <button class="btn btn-secondary" onclick="buyTicket('line2a')">
-                            <i class="fas fa-ticket"></i>
-                            Buy Ticket
-                        </button>
-                        <button class="btn btn-outline" onclick="checkFare('line2a')">
-                            <i class="fas fa-indian-rupee-sign"></i>
-                            Check Fare
-                        </button>
-                    </div>
-                </div>
-
-                <div class="metro-line">
-                    <div class="line-info">
-                        <div class="line-color" style="background: #06b6d4;"></div>
-                        <div class="line-details">
-                            <h3>Line 3 – Aqua Line</h3>
-                            <p>Colaba ↔ Aarey (33.5 km, 27 stations)</p>
-                            <small>MMRC & DMRC • Partially operational</small>
-                        </div>
-                    </div>
-                    <div class="line-actions">
-                        <button class="btn btn-secondary" onclick="buyTicket('line3')">
-                            <i class="fas fa-ticket"></i>
-                            Buy Ticket
-                        </button>
-                        <button class="btn btn-outline" onclick="checkFare('line3')">
-                            <i class="fas fa-indian-rupee-sign"></i>
-                            Check Fare
-                        </button>
-                    </div>
-                </div>
-
-                <div class="metro-line">
-                    <div class="line-info">
-                        <div class="line-color" style="background: #dc2626;"></div>
-                        <div class="line-details">
-                            <h3>Line 7 – Red Line</h3>
-                            <p>Dahisar East ↔ Andheri East (16.5 km)</p>
-                            <small>MMRDA • Operational</small>
-                        </div>
-                    </div>
-                    <div class="line-actions">
-                        <button class="btn btn-secondary" onclick="buyTicket('line7')">
-                            <i class="fas fa-ticket"></i>
-                            Buy Ticket
-                        </button>
-                        <button class="btn btn-outline" onclick="checkFare('line7')">
-                            <i class="fas fa-indian-rupee-sign"></i>
-                            Check Fare
-                        </button>
-                    </div>
-                </div>
             </div>
-            
+
             <!-- Fare Information -->
             <div class="fare-info">
                 <div class="section-header">
@@ -304,14 +240,14 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Compare Tab -->
         <div class="tab-content" id="compare-tab">
             <div class="section-header">
                 <h2 class="section-title">Compare Rides</h2>
                 <div class="section-line"></div>
             </div>
-            
+
             <!-- Ride Comparison -->
             <div class="ride-comparison">
                 <div class="comparison-card">
@@ -337,7 +273,7 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="comparison-card">
                     <div class="ride-option">
                         <div class="ride-icon">
@@ -390,17 +326,14 @@
     <!-- Service Worker -->
     <script src="src/sw.js"></script>
 
-    <!-- Real Mumbai Transport Data -->
-    <script src="real_mumbai_transport_data.js"></script>
-
-    <!-- Real Backend API Scripts -->
-    <script src="src/js/app.js"></script>
+    <!-- Static App Scripts (No Backend Required) -->
+    <script src="src/js/static-app.js"></script>
     <script src="src/js/language-manager.js"></script>
-    
+
     <script>
         // Initialize app when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Mumbai Transport App loaded');
+            console.log('🚀 Mumbai Transport App (Static Version) loaded');
 
             // Initialize core functionality
             initApp();
@@ -410,9 +343,74 @@
                 window.languageManager.updateLanguage();
             }
 
+            // Language selector functionality
+            const languageBtn = document.getElementById('language-btn');
+            const languageDropdown = document.getElementById('language-dropdown');
+            const languageOptions = document.querySelectorAll('.language-option');
 
+            languageBtn.addEventListener('click', function() {
+                languageDropdown.classList.toggle('show');
+            });
+
+            languageOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    document.getElementById('current-language').textContent = this.querySelector('span:last-child').textContent;
+
+                    languageOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+
+                    languageDropdown.classList.remove('show');
+
+                    if (window.languageManager) {
+                        window.languageManager.setLanguage(lang);
+                    }
+                });
+            });
+
+            // Close language dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!languageBtn.contains(event.target) && !languageDropdown.contains(event.target)) {
+                    languageDropdown.classList.remove('show');
+                }
+            });
+
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('light-theme');
+                const icon = themeToggle.querySelector('i');
+
+                if (document.body.classList.contains('light-theme')) {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                } else {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
+            });
+
+            // Install prompt functionality
+            let deferredPrompt;
+            const installBtn = document.getElementById('installBtn');
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installBtn.style.display = 'flex';
+            });
+
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installBtn.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                }
+            });
         });
-
     </script>
 </body>
 </html>

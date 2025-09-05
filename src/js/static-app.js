@@ -47,6 +47,296 @@ window.appState = {
 };
 
 /**
+ * Show toast notification
+ */
+function showToast(message, type = 'info') {
+    // Remove existing toasts
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
+
+    // Create new toast
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+
+    // Add close button
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '×';
+    closeBtn.className = 'toast-close';
+    closeBtn.onclick = () => toast.remove();
+    toast.appendChild(closeBtn);
+
+    document.body.appendChild(toast);
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+/**
+ * Initialize network status monitoring
+ */
+function initNetworkStatus() {
+    window.addEventListener('online', () => {
+        window.appState.isOnline = true;
+        showToast('You are back online', 'success');
+        console.log('📱 Network: Online');
+    });
+
+    window.addEventListener('offline', () => {
+        window.appState.isOnline = false;
+        showToast('You are offline. Some features may not work.', 'warning');
+        console.log('📱 Network: Offline');
+    });
+}
+
+/**
+ * Initialize tab navigation
+ */
+function initTabNavigation() {
+    const tabButtons = document.querySelectorAll('.tab-item');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('for')?.replace('-radio', '') ||
+                            button.querySelector('span')?.textContent?.toLowerCase();
+
+            if (targetTab) {
+                switchTab(targetTab);
+            }
+        });
+    });
+
+    // Handle radio button changes
+    const radioButtons = document.querySelectorAll('input[name="tabs"]');
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const tabName = e.target.id.replace('-radio', '');
+            switchTab(tabName);
+        });
+    });
+}
+
+/**
+ * Switch to a specific tab
+ */
+function switchTab(tabName) {
+    window.appState.currentTab = tabName;
+
+    // Update radio buttons
+    const radioButton = document.getElementById(`${tabName}-radio`);
+    if (radioButton) {
+        radioButton.checked = true;
+    }
+
+    // Update visual indicators
+    document.querySelectorAll('.tab-item').forEach(item => {
+        const itemTab = item.getAttribute('for')?.replace('-radio', '') ||
+                       item.querySelector('span')?.textContent?.toLowerCase();
+        if (itemTab === tabName) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+
+    console.log(`📱 Switched to tab: ${tabName}`);
+}
+
+/**
+ * Initialize theme toggle
+ */
+function initThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+        loadSavedTheme();
+    }
+}
+
+/**
+ * Toggle between light and dark theme
+ */
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('mumbai-transport-theme', newTheme);
+
+    // Update toggle button icon
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        const icon = themeToggle.querySelector('i');
+        if (icon) {
+            icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+    }
+
+    console.log(`🎨 Theme changed to: ${newTheme}`);
+}
+
+/**
+ * Load saved theme from localStorage
+ */
+function loadSavedTheme() {
+    const savedTheme = localStorage.getItem('mumbai-transport-theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('i');
+            if (icon) {
+                icon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+    }
+}
+
+/**
+ * Initialize form handlers
+ */
+function initFormHandlers() {
+    // Journey form
+    const journeyForm = document.getElementById('journey-form');
+    if (journeyForm) {
+        journeyForm.addEventListener('submit', handleJourneyForm);
+    }
+
+    // Location swap
+    const swapButton = document.getElementById('swap-locations');
+    if (swapButton) {
+        swapButton.addEventListener('click', swapLocations);
+    }
+}
+
+/**
+ * Handle journey form submission
+ */
+function handleJourneyForm(event) {
+    event.preventDefault();
+
+    const fromInput = document.getElementById('from');
+    const toInput = document.getElementById('to');
+
+    const from = fromInput?.value?.trim();
+    const to = toInput?.value?.trim();
+
+    if (!from || !to) {
+        showToast('Please enter both departure and destination locations', 'error');
+        return;
+    }
+
+    console.log(`🗺️ Planning route from "${from}" to "${to}"`);
+    showToast('Finding routes...', 'info');
+
+    // Show available routes
+    showAvailableRoutes();
+}
+
+/**
+ * Swap from and to locations
+ */
+function swapLocations() {
+    const fromInput = document.getElementById('from');
+    const toInput = document.getElementById('to');
+
+    if (fromInput && toInput) {
+        const temp = fromInput.value;
+        fromInput.value = toInput.value;
+        toInput.value = temp;
+        console.log('🔄 Locations swapped');
+        showToast('Locations swapped', 'info');
+    }
+}
+
+/**
+ * Initialize location services
+ */
+function initLocationServices() {
+    // Request user location if available
+    if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                window.appState.userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                console.log('📍 User location obtained:', window.appState.userLocation);
+            },
+            (error) => {
+                console.log('📍 Location access denied:', error.message);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 300000 // 5 minutes
+            }
+        );
+    }
+}
+
+/**
+ * Initialize PWA features
+ */
+function initPWA() {
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('src/sw.js')
+            .then(registration => {
+                console.log('✅ Service Worker registered:', registration);
+            })
+            .catch(error => {
+                console.log('❌ Service Worker registration failed:', error);
+            });
+    }
+
+    // Handle install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log('📱 Install prompt ready');
+
+        // Show install button if it exists
+        const installBtn = document.getElementById('installBtn');
+        if (installBtn) {
+            installBtn.style.display = 'flex';
+        }
+    });
+
+    window.addEventListener('appinstalled', () => {
+        console.log('📱 App installed successfully');
+        deferredPrompt = null;
+
+        const installBtn = document.getElementById('installBtn');
+        if (installBtn) {
+            installBtn.style.display = 'none';
+        }
+    });
+
+    // Handle install button click
+    const installBtn = document.getElementById('installBtn');
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+    }
+}
+
+/**
  * Initialize the application (Static Version)
  */
 function initApp() {
@@ -368,6 +658,413 @@ function confirmRideBooking(rideType) {
     }, 2000);
 }
 
+/**
+ * Display routes in the UI
+ */
+function displayRoutes(routes, from, to) {
+    console.log(`📋 Displaying ${routes.length} routes from ${from} to ${to}`);
+
+    let resultsContainer = document.getElementById('route-results');
+    if (!resultsContainer) {
+        console.log('Route results container not found, creating one...');
+        createRouteResultsContainer();
+        setTimeout(() => {
+            resultsContainer = document.getElementById('route-results');
+            if (resultsContainer) {
+                displayRoutesInContainer(routes, from, to, resultsContainer);
+            }
+        }, 100);
+        return;
+    }
+
+    displayRoutesInContainer(routes, from, to, resultsContainer);
+}
+
+/**
+ * Display routes in the container
+ */
+function displayRoutesInContainer(routes, from, to, container) {
+    container.innerHTML = '';
+
+    if (routes.length === 0) {
+        container.innerHTML = `
+            <div class="no-routes">
+                <i class="fas fa-search"></i>
+                <h3>No routes found</h3>
+                <p>Try different locations or check spelling</p>
+            </div>
+        `;
+        return;
+    }
+
+    routes.forEach((route, index) => {
+        const routeCard = createRouteCard(route, index);
+        container.appendChild(routeCard);
+    });
+
+    const resultsSection = document.getElementById('route-results-section');
+    if (resultsSection) {
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+/**
+ * Create a route card element
+ */
+function createRouteCard(route, index) {
+    const card = document.createElement('div');
+    card.className = 'route-card';
+    card.onclick = () => selectRoute(index, route);
+
+    const iconMap = {
+        'bus': 'fas fa-bus',
+        'train': 'fas fa-train',
+        'metro': 'fas fa-subway'
+    };
+
+    card.innerHTML = `
+        <div class="route-header">
+            <div class="route-icon">
+                <i class="${iconMap[route.type] || 'fas fa-route'}"></i>
+            </div>
+            <div class="route-info">
+                <h3>${route.name || route.line || `${route.type.toUpperCase()} Route`}</h3>
+                <p class="route-stops">${route.from} → ${route.to}</p>
+                <p class="route-details">${route.stops?.length || 0} stops • ${route.estimatedDuration || route.duration}</p>
+            </div>
+            <div class="route-fare">
+                <span class="fare-amount">₹${route.fare}</span>
+            </div>
+        </div>
+    `;
+
+    return card;
+}
+
+/**
+ * Create route results container
+ */
+function createRouteResultsContainer() {
+    const planTab = document.getElementById('plan-tab');
+    if (!planTab) return;
+
+    const resultsSection = document.createElement('div');
+    resultsSection.id = 'route-results-section';
+    resultsSection.innerHTML = `
+        <div class="section-header">
+            <h2 class="section-title">Available Routes</h2>
+            <div class="section-line"></div>
+        </div>
+        <div id="route-results" class="route-results"></div>
+    `;
+
+    const journeyForm = document.getElementById('journey-form');
+    if (journeyForm) {
+        journeyForm.insertAdjacentElement('afterend', resultsSection);
+    } else {
+        planTab.appendChild(resultsSection);
+    }
+}
+
+/**
+ * Select a route
+ */
+function selectRoute(index, route = null) {
+    console.log(`🛣️ Selecting route ${index}...`);
+    window.appState.selectedRoute = route || { index };
+
+    const routeCards = document.querySelectorAll('.route-card');
+    routeCards.forEach((card, i) => {
+        if (i === index) {
+            card.classList.add('selected');
+        } else {
+            card.classList.remove('selected');
+        }
+    });
+
+    showToast(`Route ${index + 1} selected`, 'success');
+}
+
+/**
+ * Show bookmark instructions for different browsers
+ */
+function showBookmarkInstructions() {
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    let instructions = '';
+
+    if (isMobile) {
+        if (isMac) {
+            instructions = 'Tap the share button, then "Add to Home Screen"';
+        } else {
+            instructions = 'Tap the menu (⋮), then "Add to Home screen"';
+        }
+    } else {
+        if (isMac) {
+            instructions = 'Press Cmd+D to bookmark this page';
+        } else {
+            instructions = 'Press Ctrl+D to bookmark this page';
+        }
+    }
+
+    showToast(instructions, 'info');
+}
+
+/**
+ * Get fare data for a specific line
+ */
+function getFareData(line) {
+    const fareMap = {
+        'line1': {
+            name: 'Line 1 (Versova-Andheri-Ghatkopar)',
+            fares: [
+                { distance: '0-3 km', fare: 10 },
+                { distance: '3-12 km', fare: 20 },
+                { distance: '12-27 km', fare: 30 },
+                { distance: '27+ km', fare: 40 }
+            ]
+        }
+    };
+
+    return fareMap[line] || fareMap['line1'];
+}
+
+/**
+ * Get ride data for comparison
+ */
+function getRideData(ride) {
+    const rideMap = {
+        'metro': {
+            name: 'Metro',
+            duration: '25 min',
+            fare: '₹30',
+            stops: 8,
+            frequency: 'Every 3-5 min'
+        },
+        'bus': {
+            name: 'Bus',
+            duration: '45 min',
+            fare: '₹15',
+            stops: 12,
+            frequency: 'Every 10-15 min'
+        }
+    };
+
+    return rideMap[ride] || rideMap['metro'];
+}
+
+/**
+ * Create ticket purchase modal
+ */
+function createTicketModal(line, ticketData = null) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content ticket-modal">
+            <div class="modal-header">
+                <h3>Buy Metro Ticket</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ticket-info">
+                    <h4>${getFareData(line).name}</h4>
+                    <p>Select your journey details:</p>
+
+                    <div class="ticket-form">
+                        <div class="form-group">
+                            <label>From Station:</label>
+                            <select id="ticket-from" class="form-input">
+                                <option value="">Select departure station</option>
+                                <option value="versova">Versova</option>
+                                <option value="andheri">Andheri</option>
+                                <option value="ghatkopar">Ghatkopar</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>To Station:</label>
+                            <select id="ticket-to" class="form-input">
+                                <option value="">Select destination station</option>
+                                <option value="versova">Versova</option>
+                                <option value="andheri">Andheri</option>
+                                <option value="ghatkopar">Ghatkopar</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Number of Tickets:</label>
+                            <input type="number" id="ticket-quantity" class="form-input" value="1" min="1" max="10">
+                        </div>
+
+                        <div class="fare-display">
+                            <p>Estimated Fare: <span id="estimated-fare">₹0</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                <button class="btn btn-primary" onclick="processTicketPurchase('${line}')">Purchase Ticket</button>
+            </div>
+        </div>
+    `;
+
+    return modal;
+}
+
+/**
+ * Create fare information modal
+ */
+function createFareModal(line, fareData) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content fare-modal">
+            <div class="modal-header">
+                <h3>Fare Information</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="fare-info">
+                    <h4>${fareData.data ? fareData.data.name : fareData.name}</h4>
+
+                    <div class="fare-table">
+                        <div class="fare-header">
+                            <span>Distance</span>
+                            <span>Fare</span>
+                        </div>
+                        ${(fareData.data ? fareData.data.fares : fareData.fares).map(fare => `
+                            <div class="fare-row">
+                                <span>${fare.distance}</span>
+                                <span>₹${fare.fare}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="fare-notes">
+                        <p><strong>Notes:</strong></p>
+                        <ul>
+                            <li>Fares are calculated based on distance traveled</li>
+                            <li>Children under 5 travel free</li>
+                            <li>Senior citizens (60+) get 50% discount</li>
+                            <li>Student concessions available with valid ID</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+            </div>
+        </div>
+    `;
+
+    return modal;
+}
+
+/**
+ * Show purchase success message
+ */
+function showPurchaseSuccess(ticketData, from, to, quantity) {
+    const totalAmount = ticketData.totalAmount || 30;
+    showToast(`✅ Ticket purchased successfully! Total: ₹${totalAmount}`, 'success');
+}
+
+/**
+ * Show ticket confirmation modal
+ */
+function showTicketConfirmation(ticketData) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content confirmation-modal">
+            <div class="modal-header">
+                <h3>🎫 Ticket Confirmed!</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ticket-confirmation">
+                    <div class="ticket-details">
+                        <p><strong>Ticket ID:</strong> ${ticketData.ticketId}</p>
+                        <p><strong>Valid Until:</strong> ${new Date(ticketData.validUntil).toLocaleString()}</p>
+                        <p><strong>QR Code:</strong> ${ticketData.qrCode}</p>
+                        <p><strong>Total Amount:</strong> ₹${ticketData.totalAmount}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Done</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+/**
+ * Update ride comparison display
+ */
+function updateRideComparison(selectedRide, rideData) {
+    const comparisonCards = document.querySelectorAll('.comparison-card');
+
+    comparisonCards.forEach(card => {
+        const rideType = card.querySelector('.ride-details h3')?.textContent?.toLowerCase();
+        if (rideType === selectedRide) {
+            card.classList.add('selected');
+            card.style.borderColor = 'var(--primary, #6366f1)';
+            card.style.boxShadow = '0 0 20px rgba(99, 102, 241, 0.3)';
+        } else {
+            card.classList.remove('selected');
+            card.style.borderColor = 'var(--glass-border, rgba(255,255,255,0.1))';
+            card.style.boxShadow = 'none';
+        }
+    });
+
+    console.log(`✅ Selected ${selectedRide} for booking:`, rideData);
+}
+
+/**
+ * Show booking confirmation
+ */
+function showBookingConfirmation(bookingId, rideType, pickup, drop, passengers) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content confirmation-modal">
+            <div class="modal-header">
+                <h3>🎫 Booking Confirmed!</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="booking-confirmation">
+                    <div class="booking-details">
+                        <p><strong>Booking ID:</strong> ${bookingId}</p>
+                        <p><strong>Ride Type:</strong> ${rideType.charAt(0).toUpperCase() + rideType.slice(1)}</p>
+                        <p><strong>From:</strong> ${pickup}</p>
+                        <p><strong>To:</strong> ${drop}</p>
+                        <p><strong>Passengers:</strong> ${passengers}</p>
+                        <p><strong>Status:</strong> <span class="status-confirmed">Confirmed</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Done</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+/**
+ * Add metro lines to map (placeholder)
+ */
+function addMetroLinesToMap() {
+    console.log('🚇 Adding Mumbai metro lines to map (placeholder)');
+    showToast('Metro network overlay added to map', 'success');
+}
+
 // Export functions to global scope
 window.initApp = initApp;
 window.showToast = showToast;
@@ -381,6 +1078,13 @@ window.handleViewMap = handleViewMap;
 window.handleBookmark = handleBookmark;
 window.filterTransportMode = filterTransportMode;
 window.processTicketPurchase = processTicketPurchase;
+window.confirmRideBooking = confirmRideBooking;
+window.selectRoute = selectRoute;
+window.displayRoutes = displayRoutes;
+window.createRouteCard = createRouteCard;
+window.getFareData = getFareData;
+window.getRideData = getRideData;
+window.updateRideComparison = updateRideComparison;
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', initApp);

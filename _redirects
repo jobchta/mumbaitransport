@@ -1,6 +1,0 @@
-# Netlify redirects file
-# Handle API routes for SPA
-/api/*  /api/index.html  200
-
-# Handle all other routes to index.html for SPA
-/*      /index.html       200
