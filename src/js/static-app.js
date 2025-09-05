@@ -1389,7 +1389,8 @@ async function routeWithGoogle(from, to) {
       provideRouteAlternatives: true
     }, (response, status) => {
       if (status === google.maps.DirectionsStatus.OK) {
-        window.directionsRenderer.setDirections(response);
+        window.directionsRenderer.setPanel(getDirectionsPanel());
+window.directionsRenderer.setDirections(response);
         fitBoundsFromResponse(response);
         showToast && showToast(`Found ${response.routes.length} public transit route(s)`, 'success');
         resolve(true);
@@ -1612,3 +1613,31 @@ function startRealtimePolling() {
     }
   };
 })();
+/* === Directions step-by-step panel helper (creates or returns panel under the map) === */
+function getDirectionsPanel() {
+  let p = document.getElementById('directions-panel');
+  if (!p) {
+    p = document.createElement('div');
+    p.id = 'directions-panel';
+    p.className = 'directions-panel';
+    // Lightweight inline styling so steps are readable without touching CSS
+    p.style.maxHeight = '240px';
+    p.style.overflow = 'auto';
+    p.style.marginTop = '12px';
+    p.style.padding = '10px';
+    p.style.borderRadius = '10px';
+    p.style.background = 'rgba(255,255,255,0.06)';
+    p.style.border = '1px solid rgba(255,255,255,0.15)';
+    p.style.lineHeight = '1.4';
+    p.style.fontSize = '14px';
+
+    const mapEl = document.getElementById('map');
+    const planTab = document.getElementById('plan-tab');
+    if (mapEl && mapEl.parentNode) {
+      mapEl.parentNode.insertBefore(p, mapEl.nextSibling);
+    } else if (planTab) {
+      planTab.appendChild(p);
+    }
+  }
+  return p;
+}
