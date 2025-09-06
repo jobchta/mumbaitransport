@@ -42,9 +42,13 @@ export default {
     let upstreamPath = pathname.replace(/^\/portal/, "") || "/";
     if (upstreamPath === "/") upstreamPath = "/index.html";
 
-    // Build upstream URL to GitHub Pages
+    // Build upstream URL to GitHub Pages with cache-busting for HTML and JS
+    let upstreamPathFinal = upstreamPath;
+    if (upstreamPath.endsWith('.html') || upstreamPath.endsWith('.js') || upstreamPath.endsWith('.css')) {
+      upstreamPathFinal += `?v=20240906-03`;
+    }
     const upstreamUrl = new URL(
-      `https://jobchta.github.io/mumbaitransport${upstreamPath}${incomingUrl.search}`
+      `https://jobchta.github.io/mumbaitransport${upstreamPathFinal}${incomingUrl.search}`
     );
 
     // Prepare request to upstream
@@ -84,11 +88,16 @@ export default {
         ? new Request(upstreamUrl.toString(), init)
         : new Request(upstreamUrl.toString(), request);
 
-    // Cache assets longer
+    // Disable caching for HTML and JS to fix persistent caching issue
     const isAsset = /\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|json|txt|xml|map|woff2?)$/i.test(
       upstreamPath
     );
-    const cf = isAsset ? { cacheEverything: true, cacheTtl: 3600 } : { cacheEverything: true, cacheTtl: 120 };
+    let cf;
+    if (isAsset && !upstreamPath.endsWith('.js') && !upstreamPath.endsWith('.css') && !upstreamPath.endsWith('.html')) {
+      cf = { cacheEverything: true, cacheTtl: 3600 };
+    } else {
+      cf = { cacheEverything: false };
+    }
 
     const upstreamRes = await fetch(upstreamReq, { redirect: "follow", cf });
     const headers = new Headers(upstreamRes.headers);

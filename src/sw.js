@@ -1,5 +1,5 @@
 // Lightweight, scope-safe Service Worker for Mumbai Transport (installed via ./src/sw.js)
-const CACHE_VERSION = 'mt-v1';
+const CACHE_VERSION = 'mt-v2';
 const CACHE_NAME = `mt-cache-${CACHE_VERSION}`;
 
 // App shell (relative to root directory since sw.js is imported from root). Keep small; HTML is runtime-updated.
@@ -91,4 +91,24 @@ self.addEventListener('fetch', (event) => {
 
   // Default: network
   // Avoid caching third-party APIs like Google Maps to keep API keys safe and fresh
-});
+  });
+  
+  // Listen for messages to clear cache
+  self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'CLEAR_CACHE') {
+      caches.keys().then((keys) => {
+        return Promise.all(keys.map((key) => caches.delete(key)));
+      }).then(() => {
+        console.log('🧹 Service worker cache cleared');
+      });
+    }
+  });
+  
+  // Force cache cleanup on activation
+  self.addEventListener('activate', (event) => {
+    event.waitUntil(
+      caches.keys().then((keys) =>
+        Promise.all(keys.filter((k) => k.startsWith('mt-cache-') || k.includes('route')).map((k) => caches.delete(k)))
+      ).then(() => self.clients.claim())
+    );
+  });

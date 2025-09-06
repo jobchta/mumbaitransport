@@ -2354,17 +2354,7 @@ body.light-theme .btn-outline:hover {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
 }
 
-/* Route Results Section */
-#route-results-section {
-    margin-top: 2rem;
-    display: none;
-}
-
-#route-results-section h2 {
-    color: white;
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-}
+/* Route Results Section - REMOVED */
 
 /* Mobile Route Results */
 @media (max-width: 768px) {

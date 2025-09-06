@@ -84,26 +84,7 @@ window.appState = {
                 ]
             }
         },
-        routes: [
-            {
-                name: 'Versova to Andheri',
-                type: 'metro',
-                from: 'Versova',
-                to: 'Andheri',
-                fare: 20,
-                duration: '15 min',
-                stops: ['Versova', 'D.N. Nagar', 'Azad Nagar', 'Andheri']
-            },
-            {
-                name: 'Andheri to Ghatkopar',
-                type: 'metro',
-                from: 'Andheri',
-                to: 'Ghatkopar',
-                fare: 30,
-                duration: '25 min',
-                stops: ['Andheri', 'Vile Parle', 'Santacruz', 'Khar Road', 'Bandra', 'Mahim', 'Matunga Road', 'Dadar', 'Prabhadevi', 'Lower Parel', 'Mahalaxmi', 'Mumbai Central', 'Grant Road', 'Charni Road', 'Marine Lines', 'Churchgate']
-            }
-        ]
+        routes: []
     }
 };
 
@@ -296,8 +277,12 @@ function handleJourneyForm(event) {
     console.log(`🗺️ Planning route from "${from}" to "${to}"`);
     showToast('Finding routes...', 'info');
 
-    // Show available routes
-    showAvailableRoutes();
+    try {
+        if (!window.mapInstance && window.google && window.google.maps) {
+            window.initGoogleMaps();
+        }
+    } catch (e) {}
+    routeWithGoogle(from, to);
 }
 
 /**
@@ -414,6 +399,16 @@ function initApp() {
         // Initialize PWA features
         initPWA();
 
+        // Force-remove any stale static "Available Routes" section
+        const stale = document.getElementById('route-results-section');
+        if (stale) stale.remove();
+
+        // Also clear any existing route results containers
+        const routeResults = document.getElementById('route-results');
+        if (routeResults) {
+            routeResults.innerHTML = '';
+        }
+
         // Show welcome message
         showToast('Mumbai Transport App loaded successfully!', 'success');
 
@@ -441,31 +436,12 @@ async function handlePlanJourney() {
         fromInput.placeholder = 'Enter starting point (e.g., Andheri Station)';
     }
 
-    // Show available routes
-    showAvailableRoutes();
+    
 
     console.log('✅ Journey planning interface ready');
 }
 
-function showAvailableRoutes() {
-    const routes = window.appState.staticData.routes;
-
-    if (routes.length > 0) {
-        showToast(`Found ${routes.length} available routes!`, 'success');
-
-        // Display routes in the UI
-        displayRoutes(routes.map(route => ({
-            ...route,
-            name: route.name,
-            line: route.name,
-            from: route.from,
-            to: route.to,
-            fare: route.fare,
-            estimatedDuration: route.duration,
-            stops: route.stops
-        })), 'Static Route', 'Static Destination');
-    }
-}
+// showAvailableRoutes function removed - using Google Directions only
 
 /**
  * Handle View Map button (Static Version)
@@ -719,133 +695,7 @@ function confirmRideBooking(rideType) {
     }, 2000);
 }
 
-/**
- * Display routes in the UI
- */
-function displayRoutes(routes, from, to) {
-    console.log(`📋 Displaying ${routes.length} routes from ${from} to ${to}`);
-
-    let resultsContainer = document.getElementById('route-results');
-    if (!resultsContainer) {
-        console.log('Route results container not found, creating one...');
-        createRouteResultsContainer();
-        setTimeout(() => {
-            resultsContainer = document.getElementById('route-results');
-            if (resultsContainer) {
-                displayRoutesInContainer(routes, from, to, resultsContainer);
-            }
-        }, 100);
-        return;
-    }
-
-    displayRoutesInContainer(routes, from, to, resultsContainer);
-}
-
-/**
- * Display routes in the container
- */
-function displayRoutesInContainer(routes, from, to, container) {
-    container.innerHTML = '';
-
-    if (routes.length === 0) {
-        container.innerHTML = `
-            <div class="no-routes">
-                <i class="fas fa-search"></i>
-                <h3>No routes found</h3>
-                <p>Try different locations or check spelling</p>
-            </div>
-        `;
-        return;
-    }
-
-    routes.forEach((route, index) => {
-        const routeCard = createRouteCard(route, index);
-        container.appendChild(routeCard);
-    });
-
-    const resultsSection = document.getElementById('route-results-section');
-    if (resultsSection) {
-        resultsSection.style.display = 'block';
-        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-}
-
-/**
- * Create a route card element
- */
-function createRouteCard(route, index) {
-    const card = document.createElement('div');
-    card.className = 'route-card';
-    card.onclick = () => selectRoute(index, route);
-
-    const iconMap = {
-        'bus': 'fas fa-bus',
-        'train': 'fas fa-train',
-        'metro': 'fas fa-subway'
-    };
-
-    card.innerHTML = `
-        <div class="route-header">
-            <div class="route-icon">
-                <i class="${iconMap[route.type] || 'fas fa-route'}"></i>
-            </div>
-            <div class="route-info">
-                <h3>${route.name || route.line || `${route.type.toUpperCase()} Route`}</h3>
-                <p class="route-stops">${route.from} → ${route.to}</p>
-                <p class="route-details">${route.stops?.length || 0} stops • ${route.estimatedDuration || route.duration}</p>
-            </div>
-            <div class="route-fare">
-                <span class="fare-amount">₹${route.fare}</span>
-            </div>
-        </div>
-    `;
-
-    return card;
-}
-
-/**
- * Create route results container
- */
-function createRouteResultsContainer() {
-    const planTab = document.getElementById('plan-tab');
-    if (!planTab) return;
-
-    const resultsSection = document.createElement('div');
-    resultsSection.id = 'route-results-section';
-    resultsSection.innerHTML = `
-        <div class="section-header">
-            <h2 class="section-title">Available Routes</h2>
-            <div class="section-line"></div>
-        </div>
-        <div id="route-results" class="route-results"></div>
-    `;
-
-    const journeyForm = document.getElementById('journey-form');
-    if (journeyForm) {
-        journeyForm.insertAdjacentElement('afterend', resultsSection);
-    } else {
-        planTab.appendChild(resultsSection);
-    }
-}
-
-/**
- * Select a route
- */
-function selectRoute(index, route = null) {
-    console.log(`🛣️ Selecting route ${index}...`);
-    window.appState.selectedRoute = route || { index };
-
-    const routeCards = document.querySelectorAll('.route-card');
-    routeCards.forEach((card, i) => {
-        if (i === index) {
-            card.classList.add('selected');
-        } else {
-            card.classList.remove('selected');
-        }
-    });
-
-    showToast(`Route ${index + 1} selected`, 'success');
-}
+// Static route display functions removed - using Google Directions only
 
 /**
  * Show bookmark instructions for different browsers
@@ -1140,9 +990,7 @@ window.handleBookmark = handleBookmark;
 window.filterTransportMode = filterTransportMode;
 window.processTicketPurchase = processTicketPurchase;
 window.confirmRideBooking = confirmRideBooking;
-window.selectRoute = selectRoute;
-window.displayRoutes = displayRoutes;
-window.createRouteCard = createRouteCard;
+// Static route functions removed
 window.getFareData = getFareData;
 window.getRideData = getRideData;
 window.updateRideComparison = updateRideComparison;
@@ -1442,7 +1290,7 @@ async function routeWithGoogle(from, to) {
   await new Promise((resolve) => {
     window.directionsService.route({
       origin: (window._fromPlace && window._fromPlace.place_id) ? { placeId: window._fromPlace.place_id } : from,
-      destination: to,
+      destination: (window._toPlace && window._toPlace.place_id) ? { placeId: window._toPlace.place_id } : to,
       travelMode: google.maps.TravelMode.TRANSIT,
       transitOptions: {
         modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.TRAIN, google.maps.TransitMode.SUBWAY],
@@ -1452,7 +1300,7 @@ async function routeWithGoogle(from, to) {
     }, (response, status) => {
       if (status === google.maps.DirectionsStatus.OK) {
         window.directionsRenderer.setPanel(getDirectionsPanel());
-window.directionsRenderer.setDirections(response);
+        window.directionsRenderer.setDirections(response);
         fitBoundsFromResponse(response);
         showToast && showToast(`Found ${response.routes.length} public transit route(s)`, 'success');
         resolve(true);
@@ -1460,11 +1308,12 @@ window.directionsRenderer.setDirections(response);
         // Fallback: DRIVING
         window.directionsService.route({
           origin: (window._fromPlace && window._fromPlace.place_id) ? { placeId: window._fromPlace.place_id } : from,
-          destination: to,
+          destination: (window._toPlace && window._toPlace.place_id) ? { placeId: window._toPlace.place_id } : to,
           travelMode: google.maps.TravelMode.DRIVING,
           provideRouteAlternatives: true
         }, (drResp, drStatus) => {
           if (drStatus === google.maps.DirectionsStatus.OK) {
+            window.directionsRenderer.setPanel(getDirectionsPanel());
             window.directionsRenderer.setDirections(drResp);
             fitBoundsFromResponse(drResp);
             showToast && showToast('Public transit unavailable; showing driving route', 'info');
@@ -1484,6 +1333,7 @@ function setupRealRouting() {
   if (!form) return;
 
   // Override any previously attached handlers
+  try { form.removeEventListener('submit', handleJourneyForm); } catch {}
   form.onsubmit = (e) => {
     e.preventDefault();
     const from = document.getElementById('from')?.value?.trim();
