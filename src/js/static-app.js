@@ -774,53 +774,53 @@ function getFareData(line) {
         'line1': {
             name: 'Line 1 (Versova-Andheri-Ghatkopar)',
             fares: [
-                { distance: '0-2 km', fare: 10 },
-                { distance: '2-5 km', fare: 20 },
-                { distance: '5-12 km', fare: 30 },
-                { distance: '12-21 km', fare: 40 },
-                { distance: '21-32 km', fare: 50 },
-                { distance: '32-43 km', fare: 60 },
-                { distance: '43-54 km', fare: 70 },
-                { distance: '54+ km', fare: 80 }
+                { stations: '1 station', fare: 10 },
+                { stations: '2 stations', fare: 20 },
+                { stations: '3 stations', fare: 30 },
+                { stations: '4 stations', fare: 40 },
+                { stations: '5 stations', fare: 50 },
+                { stations: '6 stations', fare: 60 },
+                { stations: '7 stations', fare: 70 },
+                { stations: '8+ stations', fare: 80 }
             ]
         },
         'line2a': {
             name: 'Line 2A (Dahisar East-DN Nagar)',
             fares: [
-                { distance: '0-2 km', fare: 10 },
-                { distance: '2-5 km', fare: 20 },
-                { distance: '5-12 km', fare: 30 },
-                { distance: '12-21 km', fare: 40 },
-                { distance: '21-32 km', fare: 50 },
-                { distance: '32-43 km', fare: 60 },
-                { distance: '43-54 km', fare: 70 },
-                { distance: '54+ km', fare: 80 }
+                { stations: '1 station', fare: 10 },
+                { stations: '2 stations', fare: 20 },
+                { stations: '3 stations', fare: 30 },
+                { stations: '4 stations', fare: 40 },
+                { stations: '5 stations', fare: 50 },
+                { stations: '6 stations', fare: 60 },
+                { stations: '7 stations', fare: 70 },
+                { stations: '8+ stations', fare: 80 }
             ]
         },
         'line3': {
             name: 'Line 3 (Cuffe Parade-Bandra)',
             fares: [
-                { distance: '0-2 km', fare: 10 },
-                { distance: '2-5 km', fare: 20 },
-                { distance: '5-12 km', fare: 30 },
-                { distance: '12-21 km', fare: 40 },
-                { distance: '21-32 km', fare: 50 },
-                { distance: '32-43 km', fare: 60 },
-                { distance: '43-54 km', fare: 70 },
-                { distance: '54+ km', fare: 80 }
+                { stations: '1 station', fare: 10 },
+                { stations: '2 stations', fare: 20 },
+                { stations: '3 stations', fare: 30 },
+                { stations: '4 stations', fare: 40 },
+                { stations: '5 stations', fare: 50 },
+                { stations: '6 stations', fare: 60 },
+                { stations: '7 stations', fare: 70 },
+                { stations: '8+ stations', fare: 80 }
             ]
         },
         'line7': {
             name: 'Line 7 (Dahisar-Andheri)',
             fares: [
-                { distance: '0-2 km', fare: 10 },
-                { distance: '2-5 km', fare: 20 },
-                { distance: '5-12 km', fare: 30 },
-                { distance: '12-21 km', fare: 40 },
-                { distance: '21-32 km', fare: 50 },
-                { distance: '32-43 km', fare: 60 },
-                { distance: '43-54 km', fare: 70 },
-                { distance: '54+ km', fare: 80 }
+                { stations: '1 station', fare: 10 },
+                { stations: '2 stations', fare: 20 },
+                { stations: '3 stations', fare: 30 },
+                { stations: '4 stations', fare: 40 },
+                { stations: '5 stations', fare: 50 },
+                { stations: '6 stations', fare: 60 },
+                { stations: '7 stations', fare: 70 },
+                { stations: '8+ stations', fare: 80 }
             ]
         }
     };
@@ -929,12 +929,12 @@ function createFareModal(line, fareData) {
 
                     <div class="fare-table">
                         <div class="fare-header">
-                            <span>Distance</span>
+                            <span>Stations</span>
                             <span>Fare</span>
                         </div>
                         ${(fareData.data ? fareData.data.fares : fareData.fares).map(fare => `
                             <div class="fare-row">
-                                <span>${fare.distance}</span>
+                                <span>${fare.stations}</span>
                                 <span>₹${fare.fare}</span>
                             </div>
                         `).join('')}
