@@ -104,7 +104,7 @@
     <!-- Hero Section -->
     <section class="hero">
         <h1 class="hero-title">Navigate Mumbai</h1>
-        <p class="hero-subtitle">Experience the future of urban mobility with AI-powered routing and real-time insights</p>
+        <p class="hero-subtitle">Plan your journeys across Mumbai's transport network with accurate fares and route planning</p>
 
         <div class="cta-buttons">
             <button class="cta-button cta-primary" id="planJourneyBtn" onclick="handlePlanJourney()">
@@ -202,7 +202,7 @@
                         <div class="line-color" style="background: #FF6B35;"></div>
                         <div class="line-details">
                             <h3>Line 1 (Versova-Andheri-Ghatkopar)</h3>
-                            <p>Operational: 5:30 AM - 12:00 AM</p>
+                            <p>12 stations • Operational: 5:30 AM - 12:00 AM</p>
                         </div>
                     </div>
                     <div class="line-actions">
@@ -211,6 +211,66 @@
                             Buy Ticket
                         </button>
                         <button class="btn btn-outline" onclick="checkFare('line1')">
+                            <i class="fas fa-indian-rupee-sign"></i>
+                            Check Fare
+                        </button>
+                    </div>
+                </div>
+
+                <div class="metro-line">
+                    <div class="line-info">
+                        <div class="line-color" style="background: #10B981;"></div>
+                        <div class="line-details">
+                            <h3>Line 2A (Dahisar East-DN Nagar)</h3>
+                            <p>17 stations • Operational: 5:30 AM - 12:00 AM</p>
+                        </div>
+                    </div>
+                    <div class="line-actions">
+                        <button class="btn btn-secondary" onclick="buyTicket('line2a')">
+                            <i class="fas fa-ticket"></i>
+                            Buy Ticket
+                        </button>
+                        <button class="btn btn-outline" onclick="checkFare('line2a')">
+                            <i class="fas fa-indian-rupee-sign"></i>
+                            Check Fare
+                        </button>
+                    </div>
+                </div>
+
+                <div class="metro-line">
+                    <div class="line-info">
+                        <div class="line-color" style="background: #3B82F6;"></div>
+                        <div class="line-details">
+                            <h3>Line 3 (Cuffe Parade-Bandra)</h3>
+                            <p>16 stations • Operational: 5:30 AM - 12:00 AM</p>
+                        </div>
+                    </div>
+                    <div class="line-actions">
+                        <button class="btn btn-secondary" onclick="buyTicket('line3')">
+                            <i class="fas fa-ticket"></i>
+                            Buy Ticket
+                        </button>
+                        <button class="btn btn-outline" onclick="checkFare('line3')">
+                            <i class="fas fa-indian-rupee-sign"></i>
+                            Check Fare
+                        </button>
+                    </div>
+                </div>
+
+                <div class="metro-line">
+                    <div class="line-info">
+                        <div class="line-color" style="background: #8B5CF6;"></div>
+                        <div class="line-details">
+                            <h3>Line 7 (Dahisar-Andheri)</h3>
+                            <p>14 stations • Operational: 5:30 AM - 12:00 AM</p>
+                        </div>
+                    </div>
+                    <div class="line-actions">
+                        <button class="btn btn-secondary" onclick="buyTicket('line7')">
+                            <i class="fas fa-ticket"></i>
+                            Buy Ticket
+                        </button>
+                        <button class="btn btn-outline" onclick="checkFare('line7')">
                             <i class="fas fa-indian-rupee-sign"></i>
                             Check Fare
                         </button>
@@ -227,19 +287,35 @@
                 <div class="fare-grid">
                     <div class="fare-card">
                         <div class="fare-amount">₹10</div>
-                        <div class="fare-distance">0-3 km</div>
+                        <div class="fare-distance">0-2 km</div>
                     </div>
                     <div class="fare-card">
                         <div class="fare-amount">₹20</div>
-                        <div class="fare-distance">3-12 km</div>
+                        <div class="fare-distance">2-5 km</div>
                     </div>
                     <div class="fare-card">
                         <div class="fare-amount">₹30</div>
-                        <div class="fare-distance">12-27 km</div>
+                        <div class="fare-distance">5-12 km</div>
                     </div>
                     <div class="fare-card">
                         <div class="fare-amount">₹40</div>
-                        <div class="fare-distance">27+ km</div>
+                        <div class="fare-distance">12-21 km</div>
+                    </div>
+                    <div class="fare-card">
+                        <div class="fare-amount">₹50</div>
+                        <div class="fare-distance">21-32 km</div>
+                    </div>
+                    <div class="fare-card">
+                        <div class="fare-amount">₹60</div>
+                        <div class="fare-distance">32-43 km</div>
+                    </div>
+                    <div class="fare-card">
+                        <div class="fare-amount">₹70</div>
+                        <div class="fare-distance">43-54 km</div>
+                    </div>
+                    <div class="fare-card">
+                        <div class="fare-amount">₹80</div>
+                        <div class="fare-distance">54+ km</div>
                     </div>
                 </div>
             </div>

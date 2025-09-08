@@ -77,10 +77,53 @@ window.appState = {
             'line1': {
                 name: 'Line 1 (Versova-Andheri-Ghatkopar)',
                 fares: [
-                    { distance: '0-3 km', fare: 10 },
-                    { distance: '3-12 km', fare: 20 },
-                    { distance: '12-27 km', fare: 30 },
-                    { distance: '27+ km', fare: 40 }
+                    { distance: '0-2 km', fare: 10 },
+                    { distance: '2-5 km', fare: 20 },
+                    { distance: '5-12 km', fare: 30 },
+                    { distance: '12-21 km', fare: 40 },
+                    { distance: '21-32 km', fare: 50 },
+                    { distance: '32-43 km', fare: 60 },
+                    { distance: '43-54 km', fare: 70 },
+                    { distance: '54+ km', fare: 80 }
+                ]
+            },
+            'line2a': {
+                name: 'Line 2A (Dahisar East-DN Nagar)',
+                fares: [
+                    { distance: '0-2 km', fare: 10 },
+                    { distance: '2-5 km', fare: 20 },
+                    { distance: '5-12 km', fare: 30 },
+                    { distance: '12-21 km', fare: 40 },
+                    { distance: '21-32 km', fare: 50 },
+                    { distance: '32-43 km', fare: 60 },
+                    { distance: '43-54 km', fare: 70 },
+                    { distance: '54+ km', fare: 80 }
+                ]
+            },
+            'line3': {
+                name: 'Line 3 (Cuffe Parade-Bandra)',
+                fares: [
+                    { distance: '0-2 km', fare: 10 },
+                    { distance: '2-5 km', fare: 20 },
+                    { distance: '5-12 km', fare: 30 },
+                    { distance: '12-21 km', fare: 40 },
+                    { distance: '21-32 km', fare: 50 },
+                    { distance: '32-43 km', fare: 60 },
+                    { distance: '43-54 km', fare: 70 },
+                    { distance: '54+ km', fare: 80 }
+                ]
+            },
+            'line7': {
+                name: 'Line 7 (Dahisar-Andheri)',
+                fares: [
+                    { distance: '0-2 km', fare: 10 },
+                    { distance: '2-5 km', fare: 20 },
+                    { distance: '5-12 km', fare: 30 },
+                    { distance: '12-21 km', fare: 40 },
+                    { distance: '21-32 km', fare: 50 },
+                    { distance: '32-43 km', fare: 60 },
+                    { distance: '43-54 km', fare: 70 },
+                    { distance: '54+ km', fare: 80 }
                 ]
             }
         },
@@ -731,10 +774,53 @@ function getFareData(line) {
         'line1': {
             name: 'Line 1 (Versova-Andheri-Ghatkopar)',
             fares: [
-                { distance: '0-3 km', fare: 10 },
-                { distance: '3-12 km', fare: 20 },
-                { distance: '12-27 km', fare: 30 },
-                { distance: '27+ km', fare: 40 }
+                { distance: '0-2 km', fare: 10 },
+                { distance: '2-5 km', fare: 20 },
+                { distance: '5-12 km', fare: 30 },
+                { distance: '12-21 km', fare: 40 },
+                { distance: '21-32 km', fare: 50 },
+                { distance: '32-43 km', fare: 60 },
+                { distance: '43-54 km', fare: 70 },
+                { distance: '54+ km', fare: 80 }
+            ]
+        },
+        'line2a': {
+            name: 'Line 2A (Dahisar East-DN Nagar)',
+            fares: [
+                { distance: '0-2 km', fare: 10 },
+                { distance: '2-5 km', fare: 20 },
+                { distance: '5-12 km', fare: 30 },
+                { distance: '12-21 km', fare: 40 },
+                { distance: '21-32 km', fare: 50 },
+                { distance: '32-43 km', fare: 60 },
+                { distance: '43-54 km', fare: 70 },
+                { distance: '54+ km', fare: 80 }
+            ]
+        },
+        'line3': {
+            name: 'Line 3 (Cuffe Parade-Bandra)',
+            fares: [
+                { distance: '0-2 km', fare: 10 },
+                { distance: '2-5 km', fare: 20 },
+                { distance: '5-12 km', fare: 30 },
+                { distance: '12-21 km', fare: 40 },
+                { distance: '21-32 km', fare: 50 },
+                { distance: '32-43 km', fare: 60 },
+                { distance: '43-54 km', fare: 70 },
+                { distance: '54+ km', fare: 80 }
+            ]
+        },
+        'line7': {
+            name: 'Line 7 (Dahisar-Andheri)',
+            fares: [
+                { distance: '0-2 km', fare: 10 },
+                { distance: '2-5 km', fare: 20 },
+                { distance: '5-12 km', fare: 30 },
+                { distance: '12-21 km', fare: 40 },
+                { distance: '21-32 km', fare: 50 },
+                { distance: '32-43 km', fare: 60 },
+                { distance: '43-54 km', fare: 70 },
+                { distance: '54+ km', fare: 80 }
             ]
         }
     };
