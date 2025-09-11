@@ -943,7 +943,7 @@ function createFareModal(line, fareData) {
                     <div class="fare-notes">
                         <p><strong>Notes:</strong></p>
                         <ul>
-                            <li>Fares are calculated based on distance traveled</li>
+                            <li>Metro fares are calculated by number of stations traveled</li>
                             <li>Children under 5 travel free</li>
                             <li>Senior citizens (60+) get 50% discount</li>
                             <li>Student concessions available with valid ID</li>

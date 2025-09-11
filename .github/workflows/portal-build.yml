@@ -1,0 +1,56 @@
+name: Build Svelte to /portal
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/portal-build.yml'
+      - 'cloudflare-worker-portal-proxy.js'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: |
+          npm ci || npm i
+
+      - name: Build Svelte app (adapter-static to /portal)
+        env:
+          NODE_ENV: production
+        working-directory: frontend
+        run: npm run build
+
+      - name: Commit /portal build artifacts
+        run: |
+          if [ -d "portal" ]; then
+            CHANGES=$(git status --porcelain portal)
+            if [ -n "$CHANGES" ]; then
+              git config user.name "github-actions[bot]"
+              git config user.email "github-actions[bot]@users.noreply.github.com"
+              git add portal
+              git commit -m "build(portal): publish Svelte app to /portal [skip ci]"
+              git push
+            else
+              echo "No changes in /portal to commit."
+            fi
+          else
+            echo "No /portal directory found after build. Verify adapter-static output paths in frontend/svelte.config.js."
+            exit 1
+          fi

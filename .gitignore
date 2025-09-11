@@ -85,6 +85,11 @@ live-gh-pages.html
 live-portal.html
 *.json
 !manifest.json
+
+# Allow Svelte build artifacts to be committed under /portal (including .json files)
+!/portal/**
+!/portal/**/*.json
+
 scripts/
 backup/
 

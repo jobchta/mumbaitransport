@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width" />
+		%sveltekit.head%
+		<script>
+			// Global callback for Worker-injected Google Maps JS.
+			// If Plan.svelte hasn't defined window.initGoogleMaps yet,
+			// this stub will fire a 'maps-ready' event which Plan.svelte listens for.
+			window.initGoogleMaps = window.initGoogleMaps || function () {
+				try { document.dispatchEvent(new CustomEvent('maps-ready')); } catch (e) {}
+			};
+		</script>
+		<!-- MAPS_JS_INJECTED_BY_WORKER -->
+	</head>
+	<body data-sveltekit-preload-data="hover" class="dark">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

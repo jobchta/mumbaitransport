@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/portal/favicon.png" />
+		<meta name="viewport" content="width=device-width" />
+		
+		<link rel="modulepreload" href="/portal/app/immutable/entry/start.DUDIr43e.js">
+		<link rel="modulepreload" href="/portal/app/immutable/chunks/BWsengzb.js">
+		<link rel="modulepreload" href="/portal/app/immutable/chunks/DNo6DNG-.js">
+		<link rel="modulepreload" href="/portal/app/immutable/chunks/BXVTs2KG.js">
+		<link rel="modulepreload" href="/portal/app/immutable/entry/app.BxGK2vR9.js">
+		<link rel="modulepreload" href="/portal/app/immutable/chunks/DsnmJJEf.js">
+		<link rel="modulepreload" href="/portal/app/immutable/chunks/D7l3XPer.js">
+		<link rel="modulepreload" href="/portal/app/immutable/chunks/DmQgnB4J.js">
+		<script>
+			// Global callback for Worker-injected Google Maps JS.
+			// If Plan.svelte hasn't defined window.initGoogleMaps yet,
+			// this stub will fire a 'maps-ready' event which Plan.svelte listens for.
+			window.initGoogleMaps = window.initGoogleMaps || function () {
+				try { document.dispatchEvent(new CustomEvent('maps-ready')); } catch (e) {}
+			};
+		</script>
+		<!-- MAPS_JS_INJECTED_BY_WORKER -->
+	</head>
+	<body data-sveltekit-preload-data="hover" class="dark">
+		<div style="display: contents">
+			<script>
+				{
+					__sveltekit_se3bj2 = {
+						base: "/portal",
+						assets: "/portal"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/portal/app/immutable/entry/start.DUDIr43e.js"),
+						import("/portal/app/immutable/entry/app.BxGK2vR9.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

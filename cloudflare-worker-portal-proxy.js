@@ -38,18 +38,19 @@ export default {
       return new Response("Not Found", { status: 404 });
     }
 
-    // Map /portal/* -> upstream root /*
-    let upstreamPath = pathname.replace(/^\/portal/, "") || "/";
-    if (upstreamPath === "/") upstreamPath = "/index.html";
+    // Map /portal/* -> upstream /portal/* so Svelte build can live under /portal
+    let upstreamPath = pathname; // keep /portal prefix
+    if (upstreamPath === "/portal") upstreamPath = "/portal/";
+    if (upstreamPath === "/portal/") upstreamPath = "/portal/index.html";
 
-    // Build upstream URL to GitHub Pages with cache-busting for HTML and JS
-    let upstreamPathFinal = upstreamPath;
-    if (upstreamPath.endsWith('.html') || upstreamPath.endsWith('.js') || upstreamPath.endsWith('.css')) {
-      upstreamPathFinal += `?v=20240906-03`;
-    }
-    const upstreamUrl = new URL(
-      `https://jobchta.github.io/mumbaitransport${upstreamPathFinal}${incomingUrl.search}`
-    );
+    // Build upstream URL to GitHub Pages with cache-busting (rotate via env.PORTAL_VERSION)
+    const VERSION = (env && (env.PORTAL_VERSION || env.BUILD_VERSION)) || '20250911-01';
+    const upstreamUrl = new URL(`https://jobchta.github.io/mumbaitransport`);
+    upstreamUrl.pathname = upstreamPath;
+    // Preserve incoming search params and add cache-buster for html/js/css
+    const isHtmlJsCss = /\.(html|js|css)$/i.test(upstreamPath);
+    if (incomingUrl.search) upstreamUrl.search = incomingUrl.search;
+    if (isHtmlJsCss) upstreamUrl.searchParams.set('v', VERSION);
 
     // Prepare request to upstream
     const init = {
