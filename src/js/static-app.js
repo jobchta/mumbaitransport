@@ -64,6 +64,156 @@ function initPlacesAutocomplete() {
  * This version works on GitHub Pages, Netlify, and Cloudflare
  */
 
+/* Accurate station-based metro fares (Sept 2025) provided by operator/user */
+const FARES_2025 = {
+  line1: { '1': 10, '2': 20, '3': 20, '4': 30, '5': 40, '6': 40, '7': 40, '8+': 40 },         // MMOPL Line 1 cap ₹40
+  line2a:{ '1': 10, '2': 20, '3': 30, '4': 40, '5': 50, '6': 60, '7': 70, '8+': 80 },         // MMMOCL
+  line7: { '1': 10, '2': 20, '3': 30, '4': 40, '5': 50, '6': 60, '7': 70, '8+': 80 },         // MMMOCL
+  line3: { note: 'Aqua Line (MMRCL) – fares to be confirmed; show official link instead' }     // MMRCL (underground) – placeholder
+};
+const FARES_LAST_VERIFIED = '2025-09';
+
+/* Aqua Line (Line 3) and related network info – Sept 2025 (provided) */
+const AQUA_INFO = {
+  "lines": {
+    "line3_aqua": {
+      "name": "Aqua Line (Aarey-Cuffe Parade)",
+      "status": "Partially operational since October 2024",
+      "length_km": 33.5,
+      "type": "Underground",
+      "stations_count": 27,
+      "timings": {
+        "first_train": "5:30 AM",
+        "last_train": "11:30 PM",
+        "frequency_peak": "3.5 minutes",
+        "frequency_offpeak": "7-10 minutes"
+      },
+      "operational_sections": {
+        "phase1": {
+          "route": "Aarey to BKC",
+          "opened": "October 2024",
+          "stations": [
+            "Aarey JVLR", "SEEPZ", "MIDC-Andheri", "Marol Naka",
+            "CSMIA Airport T2", "Sahar Road", "CSMIA Airport T1",
+            "Santacruz", "Bandra Colony", "Bandra-Kurla Complex"
+          ]
+        },
+        "phase2": {
+          "route": "BKC to Worli",
+          "opened": "May 2025",
+          "stations": [
+            "Dharavi", "Shitladevi Temple", "Dadar",
+            "Siddhivinayak Temple", "Worli"
+          ]
+        },
+        "phase3": {
+          "route": "Worli to Cuffe Parade",
+          "expected": "August 2025",
+          "stations": [
+            "Acharya Atre Chowk", "Science Museum", "Mahalakshmi",
+            "Mumbai Central", "Grant Road", "Girgaon", "Kalbadevi",
+            "CSMT", "Hutatma Chowk", "Churchgate", "Vidhan Bhavan", "Cuffe Parade"
+          ]
+        }
+      },
+      "key_interchanges": [
+        { "station": "Marol Naka", "connects": "Line 1" },
+        { "station": "BKC", "connects": "Line 2B (planned)" },
+        { "station": "CSMIA Airport T1/T2", "connects": "Airport" },
+        { "station": "Dadar", "connects": "Western & Central Railway" },
+        { "station": "Mumbai Central", "connects": "Western Railway" },
+        { "station": "CSMT", "connects": "Central Railway, Harbour Line" }
+      ]
+    },
+    "line7_red": {
+      "name": "Red Line (Dahisar East-Gundavali)",
+      "status": "Operational since January 2023",
+      "length_km": 16.4,
+      "type": "Elevated",
+      "stations_count": 14,
+      "timings": {
+        "first_train": "6:00 AM",
+        "last_train": "10:30 PM",
+        "frequency_peak": "10-12 minutes",
+        "frequency_offpeak": "15 minutes"
+      },
+      "stations": [
+        { "code": "DHE", "name": "Dahisar (East)", "zone": "Western", "interchange": "Line 2A" },
+        { "code": "OVA", "name": "Ovaripada", "zone": "Western", "interchange": null },
+        { "code": "NAP", "name": "National Park", "zone": "Western", "interchange": null },
+        { "code": "DEV", "name": "Devipada", "zone": "Western", "interchange": null },
+        { "code": "MAG", "name": "Magathane", "zone": "Western", "interchange": null },
+        { "code": "POI", "name": "Poisar", "zone": "Western", "interchange": null },
+        { "code": "AKU", "name": "Akurli", "zone": "Western", "interchange": null },
+        { "code": "KUR", "name": "Kurar", "zone": "Western", "interchange": null },
+        { "code": "DIN", "name": "Dindoshi", "zone": "Western", "interchange": null },
+        { "code": "AAR", "name": "Aarey", "zone": "Western", "interchange": null },
+        { "code": "GOE", "name": "Goregaon (East)", "zone": "Eastern", "interchange": null },
+        { "code": "JOE", "name": "Jogeshwari (East)", "zone": "Eastern", "interchange": null },
+        { "code": "SHA", "name": "Shankarwadi", "zone": "Eastern", "interchange": null },
+        { "code": "GUN", "name": "Gundavali (Andheri East)", "zone": "Eastern", "interchange": null }
+      ]
+    }
+  },
+  "under_construction": {
+    "line2b_yellow_extension": {
+      "name": "Yellow Line Extension (Andheri West-Mandale)",
+      "expected_opening": "December 2025-2027",
+      "length_km": 23.6,
+      "stations_count": 20,
+      "key_stations": ["ESIC Nagar", "Bandra", "BKC", "Kurla East", "Chembur", "Mankhurd", "Mandale"]
+    },
+    "line7a_red_extension": {
+      "name": "Red Line Airport Extension (Andheri East-CSIA T2)",
+      "expected_opening": "2025-2026",
+      "length_km": 3.17,
+      "stations_count": 2,
+      "stations": ["Airport Colony", "CSIA Terminal 2"]
+    },
+    "line9_red_north": {
+      "name": "Red Line North Extension (Dahisar East-Mira Bhayandar)",
+      "expected_opening": "2025-2026",
+      "length_km": 11.4,
+      "stations_count": 7,
+      "stations": ["Pandurang Wadi", "Miragaon", "Kashigaon", "Sai Baba Nagar", "Meditya Nagar", "Shaheed Bhaghat Singh Garden", "Subhash Chandra Bose Ground"]
+    }
+  },
+  "payment_methods": {
+    "single_journey_token": "₹10-80 based on distance",
+    "mumbai1_smart_card": "5-10% discount, ₹100-3000 recharge",
+    "whatsapp_ticketing": "Available via 86526 35500",
+    "mobile_app": "QR code tickets via Mumbai Metro app",
+    "contactless_payment": "UPI, cards accepted at all stations"
+  },
+  "updated_date": "September 2025",
+  "source": "MMRDA, MMRC, Reliance Mumbai Metro official data"
+};
+/* Build UI-friendly fare array for modal/table from FARES_2025 map */
+function buildFareArrayFromMap(lineKey) {
+  const map = FARES_2025[lineKey];
+  if (!map || typeof map !== 'object') return [];
+  const rows = [];
+  for (let i = 1; i <= 7; i++) {
+    const k = String(i);
+    if (Object.prototype.hasOwnProperty.call(map, k)) {
+      rows.push({ stations: `${i} ${i === 1 ? 'station' : 'stations'}`, fare: map[k] });
+    }
+  }
+  if (Object.prototype.hasOwnProperty.call(map, '8+')) {
+    rows.push({ stations: '8+ stations', fare: map['8+'] });
+  }
+  return rows;
+}
+
+/* Compute single-journey fare by stations for a given line */
+function fareByStations(lineKey, stations) {
+  const map = FARES_2025[lineKey];
+  if (!map || map.note) return NaN; // unsupported (e.g., Line 3 pending)
+  const s = Math.max(1, Math.floor(Number(stations) || 1));
+  if (s >= 8) return map['8+'];
+  const val = map[String(s)];
+  return typeof val === 'number' ? val : NaN;
+}
 // Global app state
 window.appState = {
     currentTab: 'plan',
@@ -76,55 +226,19 @@ window.appState = {
         fares: {
             'line1': {
                 name: 'Line 1 (Versova-Andheri-Ghatkopar)',
-                fares: [
-                    { stations: '1 station', fare: 10 },
-                    { stations: '2 stations', fare: 20 },
-                    { stations: '3 stations', fare: 30 },
-                    { stations: '4 stations', fare: 40 },
-                    { stations: '5 stations', fare: 50 },
-                    { stations: '6 stations', fare: 60 },
-                    { stations: '7 stations', fare: 70 },
-                    { stations: '8+ stations', fare: 80 }
-                ]
+                fares: buildFareArrayFromMap('line1')
             },
             'line2a': {
                 name: 'Line 2A (Dahisar East-DN Nagar)',
-                fares: [
-                    { stations: '1 station', fare: 10 },
-                    { stations: '2 stations', fare: 20 },
-                    { stations: '3 stations', fare: 30 },
-                    { stations: '4 stations', fare: 40 },
-                    { stations: '5 stations', fare: 50 },
-                    { stations: '6 stations', fare: 60 },
-                    { stations: '7 stations', fare: 70 },
-                    { stations: '8+ stations', fare: 80 }
-                ]
+                fares: buildFareArrayFromMap('line2a')
             },
             'line3': {
                 name: 'Line 3 (Cuffe Parade-Bandra)',
-                fares: [
-                    { stations: '1 station', fare: 10 },
-                    { stations: '2 stations', fare: 20 },
-                    { stations: '3 stations', fare: 30 },
-                    { stations: '4 stations', fare: 40 },
-                    { stations: '5 stations', fare: 50 },
-                    { stations: '6 stations', fare: 60 },
-                    { stations: '7 stations', fare: 70 },
-                    { stations: '8+ stations', fare: 80 }
-                ]
+                fares: buildFareArrayFromMap('line3')
             },
             'line7': {
                 name: 'Line 7 (Dahisar-Andheri)',
-                fares: [
-                    { stations: '1 station', fare: 10 },
-                    { stations: '2 stations', fare: 20 },
-                    { stations: '3 stations', fare: 30 },
-                    { stations: '4 stations', fare: 40 },
-                    { stations: '5 stations', fare: 50 },
-                    { stations: '6 stations', fare: 60 },
-                    { stations: '7 stations', fare: 70 },
-                    { stations: '8+ stations', fare: 80 }
-                ]
+                fares: buildFareArrayFromMap('line7')
             }
         },
         routes: []
@@ -228,6 +342,14 @@ function switchTab(tabName) {
             item.classList.remove('active');
         }
     });
+
+    // Toggle any sections that should only show on the Tickets tab
+    try {
+        const ticketsOnly = document.querySelectorAll('.tickets-only');
+        ticketsOnly.forEach(el => {
+            el.style.display = (tabName === 'tickets') ? '' : 'none';
+        });
+    } catch {}
 
     console.log(`📱 Switched to tab: ${tabName}`);
 }
@@ -452,6 +574,39 @@ function initApp() {
             routeResults.innerHTML = '';
         }
 
+        // Initialize Station-based Metro Fare Calculator if present (no framework)
+        try {
+            const lineSel = document.getElementById('calc-line');
+            const stationsInput = document.getElementById('calc-stations');
+            const qtyInput = document.getElementById('calc-qty');
+            const singleEl = document.getElementById('calc-single');
+            const perEl = document.getElementById('calc-per');
+            const totalEl = document.getElementById('calc-total');
+
+            function calcFare(n) {
+                n = Math.max(1, Math.min(100, parseInt(n || '1', 10)));
+                return Math.min(n, 8) * 10; // 1..8+ stations => ₹10..₹80
+            }
+            function updateCalc() {
+                if (!stationsInput || !qtyInput || !singleEl || !perEl || !totalEl) return;
+                const s = Math.max(1, Math.min(100, parseInt(stationsInput.value || '1', 10)));
+                const q = Math.max(1, Math.min(10, parseInt(qtyInput.value || '1', 10)));
+                const lineKey = (lineSel && lineSel.value) || 'line2a';
+                let single = fareByStations(lineKey, s);
+                if (!isFinite(single)) {
+                  // Fallback for unsupported lines (e.g., Line 3 until slabs confirmed)
+                  single = Math.min(s, 8) * 10;
+                }
+                singleEl.textContent = `₹${single}`;
+                perEl.textContent = `${s} ${s === 1 ? 'station' : 'stations'} • per ticket`;
+                totalEl.textContent = `Total: ₹${single * q}`;
+            }
+            [lineSel, stationsInput, qtyInput].forEach(el => el && el.addEventListener('input', updateCalc));
+            updateCalc();
+            // Expose for other handlers
+            window.updateStationFareCalc = updateCalc;
+        } catch (e) { console.log('fare calc init error', e); }
+
         // Show welcome message
         showToast('Mumbai Transport App loaded successfully!', 'success');
 
@@ -599,16 +754,28 @@ function filterTransportMode(mode) {
  */
 async function buyTicket(line) {
     console.log(`🎫 Buying ticket for ${line}`);
-    showToast('Loading ticket options...', 'info');
+    // Direct official booking links (no framework, no tokens)
+    const LINKS = {
+        line1: 'https://wa.me/919670008889',      // MMOPL Line 1 WhatsApp
+        line2a: 'https://wa.me/918652635500',     // MMMOCL Lines 2A & 7 WhatsApp
+        line7: 'https://wa.me/918652635500',      // MMMOCL Lines 2A & 7 WhatsApp
+        line3: 'https://mmrcl.com/en/map'         // MMRCL info/booking/map
+    };
+    const target = LINKS[line];
+    if (target) {
+        try { window.open(target, '_blank', 'noopener'); } catch {}
+        showToast('Opening official ticketing...', 'info');
+        return;
+    }
 
-    // Use static data instead of API call
+    // Fallback to static modal
+    showToast('Loading ticket options...', 'info');
     const ticketData = window.appState.staticData.fares[line];
     if (ticketData) {
         const ticketModal = createTicketModal(line, { data: ticketData });
         document.body.appendChild(ticketModal);
         showToast(`Ticket options loaded for ${line}`, 'success');
     } else {
-        // Fallback to basic modal
         const ticketModal = createTicketModal(line);
         document.body.appendChild(ticketModal);
         showToast(`Opening ticket purchase for ${line}...`, 'success');
@@ -630,11 +797,34 @@ async function checkFare(line) {
         showToast(`Fare information loaded for ${line}`, 'success');
     } else {
         // Fallback to mock data
-        const fareData = getFareData(line);
-        const fareModal = createFareModal(line, fareData);
+        const f = getFareData(line);
+        const fareModal = createFareModal(line, f);
         document.body.appendChild(fareModal);
         showToast(`Showing fare information for ${line}`, 'info');
     }
+
+    // Also guide users to the station-based calculator (no framework)
+    try {
+        // Switch to Tickets tab
+        const ticketsRadio = document.getElementById('tickets-radio');
+        if (ticketsRadio) {
+            ticketsRadio.checked = true;
+            switchTab('tickets');
+        }
+        // Select line in calculator if present
+        const lineSel = document.getElementById('calc-line');
+        if (lineSel) {
+            lineSel.value = line;
+            lineSel.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        // Scroll into view
+        const calc = document.getElementById('station-fare-calculator');
+        if (calc) {
+            calc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Ensure the totals reflect current inputs
+            if (typeof window.updateStationFareCalc === 'function') window.updateStationFareCalc();
+        }
+    } catch (e) {}
 }
 
 /**
@@ -770,62 +960,17 @@ function showBookmarkInstructions() {
  * Get fare data for a specific line
  */
 function getFareData(line) {
-    const fareMap = {
-        'line1': {
-            name: 'Line 1 (Versova-Andheri-Ghatkopar)',
-            fares: [
-                { stations: '1 station', fare: 10 },
-                { stations: '2 stations', fare: 20 },
-                { stations: '3 stations', fare: 30 },
-                { stations: '4 stations', fare: 40 },
-                { stations: '5 stations', fare: 50 },
-                { stations: '6 stations', fare: 60 },
-                { stations: '7 stations', fare: 70 },
-                { stations: '8+ stations', fare: 80 }
-            ]
-        },
-        'line2a': {
-            name: 'Line 2A (Dahisar East-DN Nagar)',
-            fares: [
-                { stations: '1 station', fare: 10 },
-                { stations: '2 stations', fare: 20 },
-                { stations: '3 stations', fare: 30 },
-                { stations: '4 stations', fare: 40 },
-                { stations: '5 stations', fare: 50 },
-                { stations: '6 stations', fare: 60 },
-                { stations: '7 stations', fare: 70 },
-                { stations: '8+ stations', fare: 80 }
-            ]
-        },
-        'line3': {
-            name: 'Line 3 (Cuffe Parade-Bandra)',
-            fares: [
-                { stations: '1 station', fare: 10 },
-                { stations: '2 stations', fare: 20 },
-                { stations: '3 stations', fare: 30 },
-                { stations: '4 stations', fare: 40 },
-                { stations: '5 stations', fare: 50 },
-                { stations: '6 stations', fare: 60 },
-                { stations: '7 stations', fare: 70 },
-                { stations: '8+ stations', fare: 80 }
-            ]
-        },
-        'line7': {
-            name: 'Line 7 (Dahisar-Andheri)',
-            fares: [
-                { stations: '1 station', fare: 10 },
-                { stations: '2 stations', fare: 20 },
-                { stations: '3 stations', fare: 30 },
-                { stations: '4 stations', fare: 40 },
-                { stations: '5 stations', fare: 50 },
-                { stations: '6 stations', fare: 60 },
-                { stations: '7 stations', fare: 70 },
-                { stations: '8+ stations', fare: 80 }
-            ]
-        }
+    const names = {
+        line1: 'Line 1 (Versova-Andheri-Ghatkopar)',
+        line2a: 'Line 2A (Dahisar East-DN Nagar)',
+        line3: 'Line 3 (Cuffe Parade-Bandra)',
+        line7: 'Line 7 (Dahisar-Andheri)'
     };
-
-    return fareMap[line] || fareMap['line1'];
+    const key = names[line] ? line : 'line1';
+    return {
+        name: names[key],
+        fares: buildFareArrayFromMap(key)
+    };
 }
 
 /**
@@ -943,6 +1088,7 @@ function createFareModal(line, fareData) {
                     <div class="fare-notes">
                         <p><strong>Notes:</strong></p>
                         <ul>
+                            <li>Fares last verified: 2025-09</li>
                             <li>Metro fares are calculated by number of stations traveled</li>
                             <li>Children under 5 travel free</li>
                             <li>Senior citizens (60+) get 50% discount</li>
@@ -1639,3 +1785,114 @@ function getDirectionsPanel() {
   }
   return p;
 }
+/* === Aqua Line (Line 3) info modal + safe interceptor (no framework) === */
+function createAquaInfoModal() {
+  try {
+    const info = (typeof AQUA_INFO === 'object' && AQUA_INFO.lines && AQUA_INFO.lines.line3_aqua) ? AQUA_INFO.lines.line3_aqua : null;
+    const timings = info?.timings || {};
+    const phases = info?.operational_sections || {};
+    const interchanges = info?.key_interchanges || [];
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+
+    const body = `
+      <div class="fare-info">
+        <h4>${info?.name || 'Aqua Line (Line 3)'}</h4>
+        <p style="margin:6px 0; opacity:0.85;">
+          ${info?.status || 'Partially operational'} • ${info?.type || ''} • ${info?.stations_count || ''} stations • ${info?.length_km || ''} km
+        </p>
+
+        <div class="fare-notes" style="margin:8px 0;">
+          <p><strong>Timings:</strong> ${timings.first_train || ''} – ${timings.last_train || ''} • Peak ${timings.frequency_peak || ''} • Off-peak ${timings.frequency_offpeak || ''}</p>
+        </div>
+
+        <div class="fare-notes" style="margin:8px 0;">
+          <p><strong>Operational Sections:</strong></p>
+          <ul style="margin-left:18px; line-height:1.4;">
+            ${phases.phase1 ? `<li><strong>${phases.phase1.route}</strong> (${phases.phase1.opened}) — ${phases.phase1.stations.join(', ')}</li>` : ''}
+            ${phases.phase2 ? `<li><strong>${phases.phase2.route}</strong> (${phases.phase2.opened}) — ${phases.phase2.stations.join(', ')}</li>` : ''}
+            ${phases.phase3 ? `<li><strong>${phases.phase3.route}</strong> (${phases.phase3.expected}) — ${phases.phase3.stations.join(', ')}</li>` : ''}
+          </ul>
+        </div>
+
+        <div class="fare-notes" style="margin:8px 0;">
+          <p><strong>Key Interchanges:</strong> ${interchanges.map(i => `${i.station} (${i.connects})`).join(', ')}</p>
+        </div>
+
+        <div style="margin-top:10px;">
+          <a class="btn btn-outline" href="https://mmrcl.com/en/map" target="_blank" rel="noopener">Open MMRCL Map &amp; Info</a>
+        </div>
+
+        <div class="fare-notes" style="margin-top:10px;">
+          <p><strong>Notes:</strong></p>
+          <ul style="margin-left:18px; line-height:1.4;">
+            <li>Fares for Aqua Line are published by MMRCL. Verify at the official site.</li>
+            <li>Information last updated: ${AQUA_INFO?.updated_date || 'September 2025'}</li>
+            <li>Source: ${AQUA_INFO?.source || 'Official operator data'}</li>
+          </ul>
+        </div>
+      </div>
+    `;
+
+    modal.innerHTML = `
+      <div class="modal-content fare-modal">
+        <div class="modal-header">
+          <h3>Line Information</h3>
+          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+        </div>
+        <div class="modal-body">
+          ${body}
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+        </div>
+      </div>
+    `;
+
+    return modal;
+  } catch (e) {
+    console.log('createAquaInfoModal error', e);
+    const m = document.createElement('div');
+    m.className = 'modal-overlay';
+    m.innerHTML = `
+      <div class="modal-content fare-modal">
+        <div class="modal-header">
+          <h3>Line Information</h3>
+          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Could not load Aqua Line information. Please check the official site.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+        </div>
+      </div>
+    `;
+    return m;
+  }
+}
+
+/* Intercept checkFare only for Aqua (Line 3), keep original behavior for others */
+(function patchCheckFareForAqua(){
+  try {
+    const original = window.checkFare;
+    if (typeof original !== 'function') return;
+
+    window.checkFare = async function(line) {
+      try {
+        if (line === 'line3') {
+          const modal = createAquaInfoModal();
+          document.body.appendChild(modal);
+          showToast && showToast('Aqua Line information loaded', 'success');
+          return;
+        }
+      } catch (e) {
+        console.log('Aqua interceptor error', e);
+      }
+      return original.apply(this, arguments);
+    };
+  } catch (e) {
+    console.log('patchCheckFareForAqua error', e);
+  }
+})();

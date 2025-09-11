@@ -38,13 +38,13 @@ export default {
       return new Response("Not Found", { status: 404 });
     }
 
-    // Map /portal/* -> upstream /portal/* so Svelte build can live under /portal
-    let upstreamPath = pathname; // keep /portal prefix
-    if (upstreamPath === "/portal") upstreamPath = "/portal/";
-    if (upstreamPath === "/portal/") upstreamPath = "/portal/index.html";
+    // Map /portal/* -> upstream root /* (serve static site under /portal scope)
+    // This serves repo-root index.html and assets when client navigates under /portal
+    let upstreamPath = pathname.replace(/^\/portal/, "") || "/";
+    if (upstreamPath === "/") upstreamPath = "/index.html";
 
     // Build upstream URL to GitHub Pages with cache-busting (rotate via env.PORTAL_VERSION)
-    const VERSION = (env && (env.PORTAL_VERSION || env.BUILD_VERSION)) || '20250911-01';
+    const VERSION = (env && (env.PORTAL_VERSION || env.BUILD_VERSION)) || '20250911-02';
     const upstreamUrl = new URL(`https://jobchta.github.io/mumbaitransport`);
     upstreamUrl.pathname = upstreamPath;
     // Preserve incoming search params and add cache-buster for html/js/css
