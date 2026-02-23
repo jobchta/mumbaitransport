@@ -112,3 +112,4 @@ dist
 *.vsix
 .claude
 CLAUDE.md
+frontend/.svelte-kit/
