@@ -18,8 +18,11 @@ export default {
     if (pathname.startsWith("/api/gtfs/json/")) return handleGtfsJson(request, env);
     // Protobuf GTFS passthrough (returns application/x-protobuf)
     if (pathname.startsWith("/api/gtfs/")) return handleGtfsApi(request, env);
-    // Google proxy with key injection via env
-    if (pathname.startsWith("/api/google/")) return handleGoogleApi(request, env);
+
+    // Google proxy removed to eliminate costs.
+    if (pathname.startsWith("/api/google/")) {
+        return new Response("Google API proxy removed", { status: 410 });
+    }
 
     // Root -> /portal/
     if (pathname === "/") {
@@ -103,29 +106,7 @@ export default {
     const upstreamRes = await fetch(upstreamReq, { redirect: "follow", cf });
     const headers = new Headers(upstreamRes.headers);
 
-    // If HTML, inject Google Maps JS with key stored in Worker env (never in repo)
-    const contentType = headers.get("content-type") || "";
-    const shouldInject = contentType.includes("text/html") || upstreamPath.endsWith(".html");
-    if (shouldInject) {
-      const apiKey = env.GOOGLE_MAPS_API_KEY || env.GMAPS_JS_KEY || "";
-      // Never expose if not configured
-      const mapsScript = apiKey
-        ? `<script async defer src="https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMaps"></script>`
-        : "";
-
-      const html = await upstreamRes.text();
-      let out = html;
-      if (mapsScript) {
-        if (html.includes("<!-- MAPS_JS_INJECTED_BY_WORKER -->")) {
-          out = html.replace("<!-- MAPS_JS_INJECTED_BY_WORKER -->", mapsScript);
-        } else if (html.includes("</head>")) {
-          out = html.replace("</head>", `${mapsScript}\n</head>`);
-        }
-      }
-      const injHeaders = new Headers(headers);
-      injHeaders.set("content-type", "text/html; charset=utf-8");
-      return new Response(out, { status: upstreamRes.status, statusText: upstreamRes.statusText, headers: injHeaders });
-    }
+    // No Google Maps injection here anymore.
 
     // Guess content-type if missing
     if (!headers.get("content-type")) {
@@ -182,50 +163,7 @@ async function handleGtfsApi(request, env) {
   return new Response(resp.body, { status: 200, headers });
 }
 
-async function handleGoogleApi(request, env) {
-  const url = new URL(request.url);
-  const service = url.pathname.split("/").filter(Boolean)[2] || "";
-  const API_KEY = env.GOOGLE_MAPS_API_KEY;
-  if (!API_KEY) return json({ error: "Missing GOOGLE_MAPS_API_KEY secret in Worker env" }, 500, request);
-
-  const params = new URLSearchParams(url.search);
-  params.set("key", API_KEY);
-  let upstream;
-  switch (service) {
-    case "directions": {
-      const base = env.GOOGLE_TRANSIT_BASE_URL || "https://maps.googleapis.com/maps/api/directions/json";
-      if (!params.has("mode")) params.set("mode", "transit");
-      if (!params.has("region")) params.set("region", "in");
-      if (!params.has("departure_time")) params.set("departure_time", "now");
-      upstream = `${base}?${params.toString()}`;
-      break;
-    }
-    case "places": {
-      const endpoint = params.get("endpoint") || "nearbysearch/json";
-      params.delete("endpoint");
-      const base = env.GOOGLE_PLACES_BASE_URL || "https://maps.googleapis.com/maps/api/place";
-      upstream = `${base}/${endpoint}?${params.toString()}`;
-      break;
-    }
-    case "distance-matrix": {
-      const base = env.GOOGLE_DISTANCE_MATRIX_BASE_URL || "https://maps.googleapis.com/maps/api/distancematrix/json";
-      if (!params.has("mode")) params.set("mode", "transit");
-      if (!params.has("region")) params.set("region", "in");
-      upstream = `${base}?${params.toString()}`;
-      break;
-    }
-    default:
-      return json({ error: "Unknown Google API service. Use directions | places | distance-matrix" }, 400, request);
-  }
-  const resp = await fetch(upstream, { method: "GET", cf: { cacheEverything: true, cacheTtl: 30 } });
-  const cors = new Headers({ "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=30" });
-  const origin = request.headers.get("Origin");
-  if (origin) {
-    cors.set("Access-Control-Allow-Origin", origin);
-    cors.set("Vary", "Origin");
-  }
-  return new Response(resp.body, { status: resp.status, headers: cors });
-}
+// handleGoogleApi removed
 
 /**
  * JSON GTFS passthrough. Expects env secrets like:

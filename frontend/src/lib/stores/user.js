@@ -1,28 +1,23 @@
 import { writable } from 'svelte/store';
-import { auth } from './firebase';
+
+// Firebase auth removed to eliminate costs.
+// This is now a simple store without backend integration.
 
 export const user = writable(null);
 
-auth.onAuthStateChanged((userRecord) => {
-  if (userRecord) {
-    user.set({
-      uid: userRecord.uid,
-      email: userRecord.email,
-      displayName: userRecord.displayName
-    });
-  } else {
-    user.set(null);
-  }
-});
-
 export function login(email, password) {
-  return auth.signInWithEmailAndPassword(email, password);
+  // Stub
+  console.log('Login stub called');
+  return Promise.resolve();
 }
 
 export function logout() {
-  return auth.signOut();
+  user.set(null);
+  return Promise.resolve();
 }
 
 export function register(email, password) {
-  return auth.createUserWithEmailAndPassword(email, password);
+  // Stub
+  console.log('Register stub called');
+  return Promise.resolve();
 }

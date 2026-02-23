@@ -1,135 +1,11 @@
 <script>
-  import { onMount } from 'svelte';
   let from = '';
   let to = '';
-  let routes = [];
-  let loading = false;
-  let map;
-  let directionsService;
-  let directionsRenderer;
 
-  // Wait for Worker-injected Maps JS to call window.initGoogleMaps or for google to be present
-  onMount(() => {
-    if (typeof window !== 'undefined') {
-      if (window.google && window.google.maps) {
-        initGoogleMaps();
-      } else {
-        // Define global callback used by injected script (and app.html stub)
-        window.initGoogleMaps = () => {
-          try { initGoogleMaps(); } catch (e) { console.error('initGoogleMaps error', e); }
-        };
-        // Also listen for our custom event if app.html fired it
-        document.addEventListener('maps-ready', () => {
-          if (!map && window.google && window.google.maps) initGoogleMaps();
-        });
-      }
-    }
-  });
+  // Google Maps logic removed to eliminate costs.
 
-  function initGoogleMaps() {
-    const mapElement = document.getElementById('map');
-    if (!mapElement) return;
-
-    map = new google.maps.Map(mapElement, {
-      center: { lat: 19.0760, lng: 72.8777 },
-      zoom: 12,
-      disableDefaultUI: false,
-      zoomControl: true,
-      fullscreenControl: true
-    });
-
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({
-      map,
-      suppressMarkers: false,
-      polylineOptions: { strokeColor: '#6366f1', strokeOpacity: 0.9, strokeWeight: 6 }
-    });
-
-    initPlacesAutocomplete();
-  }
-
-  function initPlacesAutocomplete() {
-    const fromInput = document.getElementById('from');
-    const toInput = document.getElementById('to');
-
-    if (fromInput) {
-      const fromAutocomplete = new google.maps.places.Autocomplete(fromInput, {
-        componentRestrictions: { country: 'in' },
-        fields: ['place_id', 'name', 'formatted_address', 'geometry'],
-        types: ['geocode', 'establishment']
-      });
-      fromAutocomplete.addListener('place_changed', () => {
-        const place = fromAutocomplete.getPlace();
-        if (place.place_id) {
-          from = place.name || fromInput.value || '';
-        }
-      });
-    }
-
-    if (toInput) {
-      const toAutocomplete = new google.maps.places.Autocomplete(toInput, {
-        componentRestrictions: { country: 'in' },
-        fields: ['place_id', 'name', 'formatted_address', 'geometry'],
-        types: ['geocode', 'establishment']
-      });
-      toAutocomplete.addListener('place_changed', () => {
-        const place = toAutocomplete.getPlace();
-        if (place.place_id) {
-          to = place.name || toInput.value || '';
-        }
-      });
-    }
-  }
-
-  async function findRoutes() {
-    if (!from || !to) {
-      alert('Please enter both from and to locations');
-      return;
-    }
-    if (!directionsService || !directionsRenderer) {
-      if (window.google && window.google.maps) {
-        initGoogleMaps();
-      } else {
-        alert('Map not ready. Please wait a moment and try again.');
-        return;
-      }
-    }
-
-    loading = true;
-    routes = [];
-
-    const request = {
-      origin: from,
-      destination: to,
-      travelMode: google.maps.TravelMode.TRANSIT,
-      transitOptions: {
-        modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.TRAIN, google.maps.TransitMode.SUBWAY],
-        routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
-      },
-      provideRouteAlternatives: true
-    };
-
-    directionsService.route(request, (response, status) => {
-      loading = false;
-      if (status === google.maps.DirectionsStatus.OK) {
-        directionsRenderer.setDirections(response);
-        routes = response.routes || [];
-      } else {
-        // Fallback: DRIVING
-        directionsService.route(
-          { origin: from, destination: to, travelMode: google.maps.TravelMode.DRIVING, provideRouteAlternatives: true },
-          (drResp, drStatus) => {
-            if (drStatus === google.maps.DirectionsStatus.OK) {
-              directionsRenderer.setDirections(drResp);
-              routes = drResp.routes || [];
-              alert('Public transit unavailable; showing driving route.');
-            } else {
-              alert('Could not calculate route. Try different locations.');
-            }
-          }
-        );
-      }
-    });
+  function findRoutes() {
+    alert('Routing is currently unavailable (Map disabled).');
   }
 
   function swapLocations() {
@@ -177,32 +53,15 @@
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary btn-full btn-large" disabled={loading}>
+    <button type="submit" class="btn btn-primary btn-full btn-large">
       <i class="fas fa-route"></i>
-      {#if loading}
-        <span>Finding routes...</span>
-      {:else}
-        <span>Find Routes</span>
-      {/if}
+      <span>Find Routes</span>
     </button>
   </form>
 
-  {#if routes.length > 0}
-    <div class="routes-section">
-      <h3>Available Routes</h3>
-      {#each routes as route}
-        <div class="route-card">
-          <div class="route-info">
-            <h4>{route.summary}</h4>
-            <p>Duration: {route.legs[0].duration.text}</p>
-            <p>Distance: {route.legs[0].distance.text}</p>
-          </div>
-        </div>
-      {/each}
-    </div>
-  {/if}
-
-  <div id="map" class="map-container"></div>
+  <div class="map-container" style="display: flex; align-items: center; justify-content: center; height: 300px;">
+    <p style="color: rgba(255,255,255,0.7);">Map unavailable</p>
+  </div>
 </div>
 
 <style>
@@ -325,57 +184,9 @@
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
   }
 
-  .btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
   .btn-large {
     padding: 1rem 2rem;
     font-size: 1.1rem;
-  }
-
-  .routes-section {
-    margin-top: 2rem;
-  }
-
-  .routes-section h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: white;
-  }
-
-  .route-card {
-    background: var(--glass-light);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-  }
-
-  .route-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-color: var(--primary);
-  }
-
-  .route-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .route-info h4 {
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-
-  .route-info p {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
   }
 
   .map-container {
@@ -385,14 +196,6 @@
     overflow: hidden;
     backdrop-filter: blur(10px);
     position: relative;
-    min-height: 300px;
     margin-top: 1.5rem;
-  }
-
-  #map {
-    width: 100%;
-    height: 100%;
-    min-height: 300px;
-    border-radius: 16px;
   }
 </style>

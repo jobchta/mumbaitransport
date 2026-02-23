@@ -1,68 +1,9 @@
-/* Places Autocomplete for From/To with India restriction and Mumbai bias */
-function initPlacesAutocomplete() {
-  try {
-    if (!(window.google && google.maps && google.maps.places)) {
-      console.log('⚠️ Places API not available on google.maps');
-      return;
-    }
-
-    const fromInput = document.getElementById('from');
-    const toInput   = document.getElementById('to');
-    const options = {
-      componentRestrictions: { country: 'in' },
-      fields: ['place_id', 'name', 'formatted_address', 'geometry'],
-      types: ['geocode', 'establishment']
-    };
-
-    // Bias to Mumbai area if map exists
-    let bounds = null;
-    try {
-      const mumbai = new google.maps.LatLng(19.0760, 72.8777);
-      const circle = new google.maps.Circle({ center: mumbai, radius: 35000 });
-      bounds = circle.getBounds();
-    } catch {}
-
-    if (fromInput) {
-      const acFrom = new google.maps.places.Autocomplete(fromInput, options);
-      if (bounds) acFrom.setBounds(bounds);
-      acFrom.addListener('place_changed', () => {
-        const p = acFrom.getPlace();
-        window._fromPlace = p && p.place_id ? { place_id: p.place_id, name: p.name, address: p.formatted_address, loc: p.geometry?.location || null } : null;
-        if (window._fromPlace?.loc && window.mapInstance) {
-          // Optional: softly pan to hint user
-          try { window.mapInstance.panTo(window._fromPlace.loc); } catch {}
-        }
-      });
-      // If user clears the field, clear stored place_id
-      fromInput.addEventListener('input', () => {
-        if (!fromInput.value) window._fromPlace = null;
-      });
-    }
-
-    if (toInput) {
-      const acTo = new google.maps.places.Autocomplete(toInput, options);
-      if (bounds) acTo.setBounds(bounds);
-      acTo.addListener('place_changed', () => {
-        const p = acTo.getPlace();
-        window._toPlace = p && p.place_id ? { place_id: p.place_id, name: p.name, address: p.formatted_address, loc: p.geometry?.location || null } : null;
-        if (window._toPlace?.loc && window.mapInstance) {
-          try { window.mapInstance.panTo(window._toPlace.loc); } catch {}
-        }
-      });
-      toInput.addEventListener('input', () => {
-        if (!toInput.value) window._toPlace = null;
-      });
-    }
-
-    console.log('✅ Places Autocomplete initialized');
-  } catch (e) {
-    console.log('❌ initPlacesAutocomplete error', e);
-  }
-}
 /**
  * Mumbai Transport App - Static Version (No Backend Required)
  * This version works on GitHub Pages, Netlify, and Cloudflare
  */
+
+// NOTE: Google Maps and Realtime map features removed to eliminate costs.
 
 /* Accurate station-based metro fares (Sept 2025) provided by operator/user */
 const FARES_2025 = {
@@ -440,14 +381,9 @@ function handleJourneyForm(event) {
     }
 
     console.log(`🗺️ Planning route from "${from}" to "${to}"`);
-    showToast('Finding routes...', 'info');
+    showToast('Routing is currently unavailable (Map disabled).', 'info');
 
-    try {
-        if (!window.mapInstance && window.google && window.google.maps) {
-            window.initGoogleMaps();
-        }
-    } catch (e) {}
-    routeWithGoogle(from, to);
+    // Routing removed to avoid Google Maps costs
 }
 
 /**
@@ -639,7 +575,7 @@ async function handlePlanJourney() {
     console.log('✅ Journey planning interface ready');
 }
 
-// showAvailableRoutes function removed - using Google Directions only
+// showAvailableRoutes function removed
 
 /**
  * Handle View Map button (Static Version)
@@ -649,31 +585,7 @@ function handleViewMap() {
 
     // Switch to plan tab to show the map
     switchTab('plan');
-    showToast('Loading Mumbai metro network map...', 'info');
-
-    // Center map on Mumbai metro network
-    if (window.mapInstance) {
-        const mumbaiCenter = { lat: 19.0760, lng: 72.8777 };
-        window.mapInstance.setCenter(mumbaiCenter);
-        window.mapInstance.setZoom(11);
-
-        // Add metro line overlays after a short delay
-        setTimeout(() => {
-            addMetroLinesToMap();
-            showToast('Mumbai metro network displayed', 'success');
-        }, 1000);
-    } else {
-        // If map is not loaded yet, show message
-        showToast('Map loading... Please wait', 'info');
-
-        // Try again after map loads
-        const checkMapLoaded = setInterval(() => {
-            if (window.mapInstance) {
-                clearInterval(checkMapLoaded);
-                handleViewMap(); // Retry
-            }
-        }, 500);
-    }
+    showToast('Map feature is currently disabled.', 'warning');
 }
 
 /**
@@ -732,21 +644,7 @@ function filterTransportMode(mode) {
     // Store current filter
     window.appState.transportMode = mode;
 
-    // Filter routes if they exist
-    const routeCards = document.querySelectorAll('.route-card');
-    if (routeCards.length > 0) {
-        routeCards.forEach(card => {
-            if (mode === 'all') {
-                card.style.display = 'block';
-            } else {
-                // In a real implementation, you'd check the route type
-                // For now, just show a message
-                card.style.display = 'block';
-            }
-        });
-    }
-
-    showToast(`Showing ${mode} routes`, 'info');
+    showToast(`Showing ${mode} routes (Static)`, 'info');
 }
 
 /**
@@ -1200,14 +1098,6 @@ function showBookingConfirmation(bookingId, rideType, pickup, drop, passengers) 
     document.body.appendChild(modal);
 }
 
-/**
- * Add metro lines to map (placeholder)
- */
-function addMetroLinesToMap() {
-    console.log('🚇 Adding Mumbai metro lines to map (placeholder)');
-    showToast('Metro network overlay added to map', 'success');
-}
-
 // Export functions to global scope
 window.initApp = initApp;
 window.showToast = showToast;
@@ -1311,22 +1201,22 @@ function openFareCalculator() {
   `;
   document.body.appendChild(modal);
 
-  const $mode = modal.querySelector('#fc-mode');
-  const $km   = modal.querySelector('#fc-km');
-  const $night= modal.querySelector('#fc-night');
-  const $out  = modal.querySelector('#fc-result');
-  const $bd   = modal.querySelector('#fc-breakdown');
+  const  = modal.querySelector('#fc-mode');
+  const    = modal.querySelector('#fc-km');
+  const = modal.querySelector('#fc-night');
+  const   = modal.querySelector('#fc-result');
+  const    = modal.querySelector('#fc-breakdown');
 
   function recompute() {
-    const m = $mode.value;
-    const k = parseFloat($km.value || '0');
-    const n = !!$night.checked;
+    const m = .value;
+    const k = parseFloat(.value || '0');
+    const n = !!.checked;
     const r = REGULATED_RATES[m];
     const fare = calculateRegulatedFare(m, k, n);
-    $out.textContent = toINR(fare);
-    $bd.textContent = `Base ${toINR(r.base)} + ${toINR(r.perKm)}/km beyond ${r.initialKm} km${n ? ' (+25% night)' : ''}`;
+    .textContent = toINR(fare);
+    .textContent = `Base ${toINR(r.base)} + ${toINR(r.perKm)}/km beyond ${r.initialKm} km${n ? ' (+25% night)' : ''}`;
   }
-  [$mode,$km,$night].forEach(el => el.addEventListener('input', recompute));
+  [,,].forEach(el => el.addEventListener('input', recompute));
   recompute();
 }
 
@@ -1452,339 +1342,7 @@ function injectCabAutoCalculatorButton() {
 document.addEventListener('DOMContentLoaded', () => {
   try { injectCabAutoCalculatorButton(); } catch(e) { console.log('inject calc btn error', e); }
 });
-/* === Real Google Maps Directions (no API key in repo; Worker injects JS with key) === */
 
-/* Ensure global map + services */
-window.initGoogleMaps = function initGoogleMaps() {
-  try {
-    const el = document.getElementById('map');
-    if (!el) return;
-
-    const mumbai = { lat: 19.0760, lng: 72.8777 };
-    window.mapInstance = new google.maps.Map(el, {
-      center: mumbai,
-      zoom: 12,
-      disableDefaultUI: false,
-      zoomControl: true,
-      fullscreenControl: true
-    });
-
-    window.directionsService = new google.maps.DirectionsService();
-    window.directionsRenderer = new google.maps.DirectionsRenderer({
-      map: window.mapInstance,
-      suppressMarkers: false,
-      polylineOptions: { strokeColor: '#6366f1', strokeOpacity: 0.9, strokeWeight: 6 }
-    });
-
-    // Optional layers
-    try {
-      const transit = new google.maps.TransitLayer();
-      transit.setMap(window.mapInstance);
-    } catch (e) {}
-    initPlacesAutocomplete();
-    console.log('✅ Google Maps initialized');
-  } catch (err) {
-    console.error('❌ initGoogleMaps error:', err);
-  }
-};
-
-/* Route via Google Directions (Transit first, Driving fallback) */
-async function routeWithGoogle(from, to) {
-  if (!from || !to) {
-    showToast && showToast('Please enter both locations', 'error');
-    return;
-  }
-  if (!window.mapInstance || !window.directionsService || !window.directionsRenderer) {
-    if (window.google && window.google.maps) {
-      window.initGoogleMaps();
-    } else {
-      showToast && showToast('Map not ready. Please wait...', 'warning');
-      return;
-    }
-  }
-
-  console.log('🗺️ Routing:', from, '→', to);
-  showToast && showToast('Finding best routes...', 'info');
-
-  // Helper to fit route bounds
-  function fitBoundsFromResponse(resp) {
-    const bounds = new google.maps.LatLngBounds();
-    resp.routes.forEach(route => {
-      route.legs.forEach(leg => {
-        bounds.extend(leg.start_location);
-        bounds.extend(leg.end_location);
-      });
-    });
-    window.mapInstance.fitBounds(bounds);
-  }
-
-  // Primary: TRANSIT
-  await new Promise((resolve) => {
-    window.directionsService.route({
-      origin: (window._fromPlace && window._fromPlace.place_id) ? { placeId: window._fromPlace.place_id } : from,
-      destination: (window._toPlace && window._toPlace.place_id) ? { placeId: window._toPlace.place_id } : to,
-      travelMode: google.maps.TravelMode.TRANSIT,
-      transitOptions: {
-        modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.TRAIN, google.maps.TransitMode.SUBWAY],
-        routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
-      },
-      provideRouteAlternatives: true
-    }, (response, status) => {
-      if (status === google.maps.DirectionsStatus.OK) {
-        window.directionsRenderer.setPanel(getDirectionsPanel());
-        window.directionsRenderer.setDirections(response);
-        fitBoundsFromResponse(response);
-        showToast && showToast(`Found ${response.routes.length} public transit route(s)`, 'success');
-        resolve(true);
-      } else {
-        // Fallback: DRIVING
-        window.directionsService.route({
-          origin: (window._fromPlace && window._fromPlace.place_id) ? { placeId: window._fromPlace.place_id } : from,
-          destination: (window._toPlace && window._toPlace.place_id) ? { placeId: window._toPlace.place_id } : to,
-          travelMode: google.maps.TravelMode.DRIVING,
-          provideRouteAlternatives: true
-        }, (drResp, drStatus) => {
-          if (drStatus === google.maps.DirectionsStatus.OK) {
-            window.directionsRenderer.setPanel(getDirectionsPanel());
-            window.directionsRenderer.setDirections(drResp);
-            fitBoundsFromResponse(drResp);
-            showToast && showToast('Public transit unavailable; showing driving route', 'info');
-          } else {
-            showToast && showToast('Could not calculate route. Try different locations.', 'error');
-          }
-          resolve(true);
-        });
-      }
-    });
-  });
-}
-
-/* Override journey form to use REAL directions (and not mock) */
-function setupRealRouting() {
-  const form = document.getElementById('journey-form');
-  if (!form) return;
-
-  // Override any previously attached handlers
-  try { form.removeEventListener('submit', handleJourneyForm); } catch {}
-  form.onsubmit = (e) => {
-    e.preventDefault();
-    const from = document.getElementById('from')?.value?.trim();
-    const to   = document.getElementById('to')?.value?.trim();
-
-    // Ensure map exists
-    if (!window.mapInstance && window.google && window.google.maps) {
-      window.initGoogleMaps();
-    }
-    routeWithGoogle(from, to);
-  };
-}
-
-/* Attach on DOM ready */
-document.addEventListener('DOMContentLoaded', () => {
-  try { setupRealRouting(); } catch (e) { console.log('setupRealRouting error', e); }
-});
-/* === GTFS Realtime (JSON) integration via Cloudflare Worker proxy ===================
-   Frontend polls same-origin endpoints that the Worker exposes:
-
-   - /api/gtfs/json/MMRDA/METRO    -> env.MMRDA_METRO_JSON_URL
-   - /api/gtfs/json/BEST/BUS       -> env.BEST_BUS_JSON_URL
-   - /api/gtfs/json/MRVC/TRAIN     -> env.MRVC_TRAIN_JSON_URL
-
-   Each URL should return a GTFS-RT feed converted to JSON (entity array with .vehicle/.alert/.trip_update).
-   Configure those env secrets in Cloudflare Worker > Settings > Variables (Secrets).
-   This keeps private feeds and keys out of the repo and avoids protobuf parsing in the browser.
-==================================================================================== */
-
-window.realtime = {
-  markers: {
-    METRO: new Map(),
-    BUS: new Map(),
-    TRAIN: new Map()
-  },
-  lastAlerts: [],
-  timer: null
-};
-
-const REALTIME_CONFIG = {
-  METRO: { endpoint: '/api/gtfs/json/MMRDA/METRO', color: '#1e40af', type: 'METRO' },
-  BUS:   { endpoint: '/api/gtfs/json/BEST/BUS',    color: '#10b981', type: 'BUS' },
-  TRAIN: { endpoint: '/api/gtfs/json/MRVC/TRAIN',  color: '#ef4444', type: 'TRAIN' }
-};
-
-/* Build a simple circular symbol for vehicles */
-function buildVehicleSymbol(color) {
-  return {
-    path: google.maps.SymbolPath.CIRCLE,
-    fillColor: color,
-    fillOpacity: 0.95,
-    scale: 5.5,
-    strokeColor: '#ffffff',
-    strokeWeight: 1.5
-  };
-}
-
-function upsertVehicleMarker(vType, vehId, lat, lng, color, label = '') {
-  if (!window.mapInstance) return;
-
-  const id = String(vehId || `${vType}-${lat}-${lng}-${Date.now()}`);
-  const mm = window.realtime.markers[vType];
-  if (!mm) return;
-
-  const position = new google.maps.LatLng(lat, lng);
-  let marker = mm.get(id);
-  if (marker) {
-    marker.setPosition(position);
-  } else {
-    marker = new google.maps.Marker({
-      position,
-      map: window.mapInstance,
-      icon: buildVehicleSymbol(color),
-      title: label || `${vType} ${id}`
-    });
-    mm.set(id, marker);
-  }
-  return id;
-}
-
-function sweepStaleMarkers(vType, aliveIds) {
-  const mm = window.realtime.markers[vType];
-  if (!mm) return;
-  for (const [id, marker] of mm.entries()) {
-    if (!aliveIds.has(id)) {
-      marker.setMap(null);
-      mm.delete(id);
-    }
-  }
-}
-
-/* Parse a GTFS-RT JSON entity block defensively */
-function extractVehicleFromEntity(entity) {
-  // Expected structure: entity.vehicle.position.{latitude, longitude}
-  if (!entity || !entity.vehicle || !entity.vehicle.position) return null;
-  const pos = entity.vehicle.position;
-  const meta = entity.vehicle.vehicle || {};
-  const id = meta.id || meta.label || entity.id || Math.random().toString(36).slice(2);
-  if (typeof pos.latitude !== 'number' || typeof pos.longitude !== 'number') return null;
-  return { id, lat: pos.latitude, lng: pos.longitude, label: meta.label || '' };
-}
-
-function extractAlertText(alertEntity) {
-  try {
-    const a = alertEntity.alert;
-    if (!a) return null;
-    // Try multiple proto-JSON shapes
-    const headerTx = a.headerText?.translation?.[0]?.text ||
-                     a.headerText?.translatedText?.text ||
-                     a.headerText?.text ||
-                     a.headerText ||
-                     null;
-    const descTx = a.descriptionText?.translation?.[0]?.text ||
-                   a.descriptionText?.translatedText?.text ||
-                   a.descriptionText?.text ||
-                   a.descriptionText ||
-                   '';
-    return (headerTx || 'Service Alert') + (descTx ? ` — ${descTx}` : '');
-  } catch {
-    return null;
-  }
-}
-
-async function fetchGtfsJson(endpoint) {
-  try {
-    const res = await fetch(endpoint, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch (e) {
-    console.log(`GTFS fetch failed for ${endpoint}:`, e.message || e);
-    return null;
-  }
-}
-
-async function updateVehiclesFor(config) {
-  const feed = await fetchGtfsJson(config.endpoint);
-  if (!feed || !Array.isArray(feed.entity)) return;
-
-  const alive = new Set();
-  for (const ent of feed.entity) {
-    const v = extractVehicleFromEntity(ent);
-    if (!v) continue;
-    const markerId = upsertVehicleMarker(config.type, v.id, v.lat, v.lng, config.color, v.label);
-    if (markerId) alive.add(markerId);
-  }
-  sweepStaleMarkers(config.type, alive);
-
-  // Alerts (if any) from this feed
-  const panel = document.getElementById('alerts');
-  if (panel) {
-    const alerts = feed.entity.filter(e => e.alert).map(extractAlertText).filter(Boolean);
-    if (alerts.length) {
-      window.realtime.lastAlerts = alerts;
-    }
-    // Render deduped, last 5 alerts
-    const unique = [...new Set(window.realtime.lastAlerts)].slice(0, 5);
-    panel.innerHTML = unique.map(a => `<div class="alert-item">${a}</div>`).join('');
-  }
-}
-
-async function updateAllRealtime() {
-  // Parallel fetch across configured modes
-  await Promise.all([
-    updateVehiclesFor(REALTIME_CONFIG.METRO),
-    updateVehiclesFor(REALTIME_CONFIG.BUS),
-    updateVehiclesFor(REALTIME_CONFIG.TRAIN)
-  ]);
-}
-
-function startRealtimePolling() {
-  // Avoid double timers
-  if (window.realtime.timer) return;
-  // First tick
-  updateAllRealtime().catch(() => {});
-  // Poll every 30s (tunable)
-  window.realtime.timer = setInterval(() => {
-    updateAllRealtime().catch(() => {});
-  }, 30000);
-}
-
-/* Hook into existing Google Maps init to start RT loop when map is ready */
-(function hookRealtimeToMapInit(){
-  const originalInit = window.initGoogleMaps;
-  window.initGoogleMaps = function() {
-    try {
-      if (typeof originalInit === 'function') originalInit();
-    } finally {
-      try { startRealtimePolling(); } catch (e) { console.log('realtime start err', e); }
-    }
-  };
-})();
-/* === Directions step-by-step panel helper (creates or returns panel under the map) === */
-function getDirectionsPanel() {
-  let p = document.getElementById('directions-panel');
-  if (!p) {
-    p = document.createElement('div');
-    p.id = 'directions-panel';
-    p.className = 'directions-panel';
-    // Lightweight inline styling so steps are readable without touching CSS
-    p.style.maxHeight = '240px';
-    p.style.overflow = 'auto';
-    p.style.marginTop = '12px';
-    p.style.padding = '10px';
-    p.style.borderRadius = '10px';
-    p.style.background = 'rgba(255,255,255,0.06)';
-    p.style.border = '1px solid rgba(255,255,255,0.15)';
-    p.style.lineHeight = '1.4';
-    p.style.fontSize = '14px';
-
-    const mapEl = document.getElementById('map');
-    const planTab = document.getElementById('plan-tab');
-    if (mapEl && mapEl.parentNode) {
-      mapEl.parentNode.insertBefore(p, mapEl.nextSibling);
-    } else if (planTab) {
-      planTab.appendChild(p);
-    }
-  }
-  return p;
-}
 /* === Aqua Line (Line 3) info modal + safe interceptor (no framework) === */
 function createAquaInfoModal() {
   try {
