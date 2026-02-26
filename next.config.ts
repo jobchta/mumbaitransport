@@ -1,12 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-  /* config options here */
-  typescript: {
-    ignoreBuildErrors: true,
+  // Vercel deployment (supports API routes)
+  images: {
+    unoptimized: true,
   },
-  reactStrictMode: false,
+
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+
+  reactStrictMode: true,
+
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'recharts', '@radix-ui/react-icons'],
+  },
 };
 
 export default nextConfig;
