@@ -3,7 +3,10 @@
  * All shared types should be exported from this file
  */
 
-// Alert types for transport disruptions
+// ============================================================================
+// Alert Types
+// ============================================================================
+
 export interface Alert {
   id: string;
   title: string;
@@ -18,7 +21,10 @@ export interface Alert {
 export type AlertSeverity = 'critical' | 'high' | 'medium' | 'low';
 export type AlertStatus = 'active' | 'resolved';
 
-// Transport line identifiers
+// ============================================================================
+// Transport Line Types
+// ============================================================================
+
 export type LineId =
   | 'western'
   | 'central'
@@ -41,23 +47,34 @@ export type TransportLine =
   | 'Monorail'
   | 'General';
 
-// Station types
+// ============================================================================
+// Station Types
+// ============================================================================
+
 export interface Station {
   id: string;
   name: string;
   nameHi: string;
+  nameMr?: string; // Marathi
   line: LineId;
   zone: string;
   platforms: number;
-  distance: number; // km from origin
+  distance: number;
   facilities: string[];
   parking: boolean;
   wheelchair: boolean;
   fastStop: boolean;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
 }
 
-// Train schedule types
-export type TrainType = 'slow' | 'fast' | 'semi-fast' | 'ladies';
+// ============================================================================
+// Train Schedule Types
+// ============================================================================
+
+export type TrainType = 'slow' | 'fast' | 'semi-fast' | 'ladies' | 'special';
 
 export interface TrainSchedule {
   id: string;
@@ -68,9 +85,24 @@ export interface TrainSchedule {
   type: TrainType;
   days: string[];
   platform?: number;
+  carCount?: number;
 }
 
-// Fare types
+export interface TrainPosition {
+  trainId: string;
+  currentStation: string;
+  nextStation: string;
+  departureTime: string;
+  arrivalTime: string;
+  delay: number; // in minutes
+  status: 'on-time' | 'delayed' | 'cancelled' | 'arriving';
+  lastUpdated: string;
+}
+
+// ============================================================================
+// Fare Types
+// ============================================================================
+
 export interface Fare {
   from: string;
   to: string;
@@ -81,7 +113,17 @@ export interface Fare {
   season: number;
 }
 
-// Line information
+export interface FareBreakdown {
+  baseFare: number;
+  distance: number;
+  peakSurcharge?: number;
+  total: number;
+}
+
+// ============================================================================
+// Line Information
+// ============================================================================
+
 export interface LineInfo {
   id: LineId;
   name: string;
@@ -94,23 +136,159 @@ export interface LineInfo {
   firstTrain: string;
   lastTrain: string;
   frequency: string;
+  avgDailyRidership?: number;
 }
 
-// Line status for UI display
 export interface LineStatus {
   lineId: LineId;
   status: 'normal' | 'delayed' | 'suspended';
   alertCount: number;
+  lastUpdated?: string;
 }
 
-// Crowd level information
+// ============================================================================
+// Journey Planner Types
+// ============================================================================
+
+export interface JourneyRoute {
+  id: string;
+  from: Station;
+  to: Station;
+  legs: JourneyLeg[];
+  totalTime: number;
+  totalDistance: number;
+  fare: Fare;
+  transfers: number;
+  departureTime: string;
+  arrivalTime: string;
+}
+
+export interface JourneyLeg {
+  from: Station;
+  to: Station;
+  line: LineId;
+  trainType: TrainType;
+  departureTime: string;
+  arrivalTime: string;
+  duration: number;
+  platforms: {
+    from: number;
+    to: number;
+  };
+}
+
+export interface JourneyPlanRequest {
+  from: string;
+  to: string;
+  departureTime?: Date;
+  arrivalTime?: Date;
+  preferences?: JourneyPreferences;
+}
+
+export interface JourneyPreferences {
+  avoidTransfers?: boolean;
+  preferFast?: boolean;
+  wheelchairAccessible?: boolean;
+  ladiesOnly?: boolean;
+}
+
+// ============================================================================
+// User Data Types
+// ============================================================================
+
+export interface FavoriteStation {
+  stationId: string;
+  addedAt: string;
+  nickname?: string;
+}
+
+export interface FavoriteRoute {
+  id: string;
+  from: Station;
+  to: Station;
+  nickname?: string;
+  addedAt: string;
+  lastUsed?: string;
+}
+
+export interface TripHistory {
+  id: string;
+  from: Station;
+  to: Station;
+  timestamp: string;
+  line: LineId;
+  fare?: number;
+}
+
+export interface UserPreferences {
+  defaultLine?: LineId;
+  homeStation?: string;
+  workStation?: string;
+  language: 'en' | 'hi' | 'mr';
+  theme: 'dark' | 'light' | 'system';
+  notifications: NotificationPreferences;
+}
+
+export interface NotificationPreferences {
+  lineAlerts: LineId[];
+  pushEnabled: boolean;
+  quietHoursStart?: string;
+  quietHoursEnd?: string;
+}
+
+// ============================================================================
+// Crowd Data Types
+// ============================================================================
+
 export interface CrowdInfo {
   stationId: string;
   percentage: number;
+  level: 'low' | 'medium' | 'high';
+  colorClass: string;
+}
+
+export interface CrowdReport {
+  id: string;
+  stationId: string;
+  userId: string;
+  level: 'low' | 'medium' | 'high';
+  timestamp: string;
+  platform?: number;
+  expiresAt: string;
+}
+
+// ============================================================================
+// Weather Types
+// ============================================================================
+
+export interface WeatherInfo {
+  temp: number;
+  feelsLike: number;
+  condition: 'sunny' | 'cloudy' | 'rainy' | 'stormy' | 'foggy';
+  humidity: number;
+  windSpeed: number;
+  icon: string;
   lastUpdated: string;
 }
 
-// API response types
+// ============================================================================
+// Share Types
+// ============================================================================
+
+export interface ShareableTrip {
+  from: string;
+  to: string;
+  line: string;
+  departureTime: string;
+  expectedArrival: string;
+  shareCode: string;
+  createdAt: string;
+}
+
+// ============================================================================
+// API Response Types
+// ============================================================================
+
 export interface AlertsApiResponse {
   success: boolean;
   cached?: boolean;
@@ -125,7 +303,6 @@ export interface AlertsApiResponse {
   error?: string;
 }
 
-// Web search result from z-ai SDK
 export interface WebSearchResult {
   url: string;
   name: string;
@@ -136,10 +313,43 @@ export interface WebSearchResult {
   favicon: string;
 }
 
-// LLM-extracted alert (raw from AI)
-export interface LlmExtractedAlert {
-  title?: string;
-  description?: string;
-  line?: string;
-  severity?: string;
+// ============================================================================
+// PWA Types
+// ============================================================================
+
+export interface PWAInstallPrompt {
+  isInstallable: boolean;
+  prompt: () => Promise<boolean>;
+  isInstalled: boolean;
+}
+
+export interface OfflineData {
+  stations: Station[];
+  lines: Record<string, LineInfo>;
+  lastSync: string;
+}
+
+// ============================================================================
+// Quick Actions
+// ============================================================================
+
+export interface QuickAction {
+  id: string;
+  type: 'station' | 'route' | 'alert' | 'fare';
+  title: string;
+  subtitle?: string;
+  icon: string;
+  action: () => void;
+}
+
+// ============================================================================
+// Statistics
+// ============================================================================
+
+export interface TransportStats {
+  totalStations: number;
+  totalLines: number;
+  totalDistance: number;
+  dailyRidership: number;
+  avgFrequency: number;
 }
